@@ -6,7 +6,7 @@
   </parent> 
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>component.security</artifactId>
+  <artifactId>exo.core.component.security</artifactId>
   <packaging>jar</packaging>
   <version>${org.exoplatform.core.version}</version>
   <name>eXo Security Service</name>
@@ -15,13 +15,13 @@
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
-      <artifactId>component.common</artifactId>
+      <artifactId>exo.kernel.component.common</artifactId>
       <version>${org.exoplatform.kernel.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.exoplatform.core</groupId>
-      <artifactId>component.organization</artifactId>
+      <artifactId>exo.core.component.organization</artifactId>
       <version>${org.exoplatform.core.version}</version>
     </dependency>
     

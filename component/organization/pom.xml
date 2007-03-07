@@ -6,7 +6,7 @@
   </parent> 
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>component.organization</artifactId>
+  <artifactId>exo.core.component.organization</artifactId>
   <packaging>jar</packaging>
   <version>${org.exoplatform.core.version}</version>
   <name>eXo Organization Service</name>
@@ -15,32 +15,32 @@
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
-      <artifactId>container</artifactId>
+      <artifactId>exo.kernel.container</artifactId>
       <version>${org.exoplatform.kernel.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
-      <artifactId>component.common</artifactId>
+      <artifactId>exo.kernel.component.common</artifactId>
       <version>${org.exoplatform.kernel.version}</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
-      <artifactId>component.cache</artifactId>
+      <artifactId>exo.kernel.component.cache</artifactId>
       <version>${org.exoplatform.kernel.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.exoplatform.core</groupId>
-      <artifactId>component.ldap</artifactId>
+      <artifactId>exo.core.component.ldap</artifactId>
       <version>${org.exoplatform.core.version}</version>
     </dependency>    
 
     <dependency>
       <groupId>org.exoplatform.core</groupId>
-      <artifactId>component.database</artifactId>
+      <artifactId>exo.core.component.database</artifactId>
       <version>${org.exoplatform.core.version}</version>
     </dependency>
   </dependencies>

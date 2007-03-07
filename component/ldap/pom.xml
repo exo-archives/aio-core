@@ -6,7 +6,7 @@
   </parent> 
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>component.ldap</artifactId>
+  <artifactId>exo.core.component.ldap</artifactId>
   <packaging>jar</packaging>
   <version>${exo.platform.version}</version>
   <name>eXo LDAP Service impl</name>
@@ -15,7 +15,7 @@
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
-      <artifactId>component.common</artifactId>
+      <artifactId>exo.kernel.component.common</artifactId>
       <version>${org.exoplatform.kernel.version}</version>
       <scope>compile</scope>
     </dependency>
