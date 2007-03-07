@@ -1,0 +1,16 @@
+<!-- ?xml version="1.0" encoding="UTF-8"? -->
+<beans>
+<!-- Commentary -->
+  <bean property="Test String#1">
+       <e1>1</e1>
+  </bean>
+  <bean property="Test String#2">
+       <e1>2</e1>
+       <f2>2.22</f2>
+  </bean>
+  <bean property="Test String#3">
+       <f2>3.333</f2>
+  </bean>
+  <bean property="Test String#4"/>
+  <bean/>
+</beans>

@@ -1,0 +1,41 @@
+<project>
+  <parent>
+    <groupId>org.exoplatform.core</groupId>
+    <artifactId>config</artifactId>
+    <version>2.0.3</version>
+  </parent> 
+
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>component.security</artifactId>
+  <packaging>jar</packaging>
+  <version>${org.exoplatform.core.version}</version>
+  <name>eXo Security Service</name>
+  <description>eXo Security</description>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.exoplatform.kernel</groupId>
+      <artifactId>component.common</artifactId>
+      <version>${org.exoplatform.kernel.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.exoplatform.core</groupId>
+      <artifactId>component.organization</artifactId>
+      <version>${org.exoplatform.core.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>cas</groupId>
+      <artifactId>casclient</artifactId>
+      <version>2.1.1</version>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>  
+</project>

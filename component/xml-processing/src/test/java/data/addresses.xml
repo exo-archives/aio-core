@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addresses country="Ukraine">
+<address>
+<street1>Street1</street1>
+<street2>Street2</street2>
+<city>Kiev</city>
+<zip>88888</zip>
+</address>
+<address>
+<street1>Street1</street1>
+<street2>Street2</street2>
+<city>Cherkassy</city>
+<zip>18000</zip>
+</address>
+</addresses>

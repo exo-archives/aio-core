@@ -1,0 +1,100 @@
+package id2k2v3drofikskdrp5388b;
+
+/**
+@version 2.0
+@physicalPackage
+@__modelType diagram 
+*/
+class diagram {
+/**
+@__ref <oiref:design#Class#id2y54idrofikskdrp9ob8i.diagram:oiref><oihard>
+@__modelType reference
+@__fqn <oiref:#Package#xtas.exo.services.xml.querying.object:oiref> 
+*/
+class reference34 {
+}/**
+@__ref <oiref:design#Class#id1oxdidrofikskdrp9upkz.diagram:oiref><oihard>
+@__modelType reference
+@__fqn <oiref:#Package#xtas.exo.services.xml.querying.impl:oiref> 
+*/
+class reference39 {
+}/**
+@__ref <oiref:java#Class#exo.services.xml.querying.QueryRunTimeException:oiref><oihard>
+@__modelType reference 
+*/
+class reference1 {
+}/**
+@__ref <oiref:java#Class#exo.services.xml.querying.InvalidSourceException:oiref><oihard>
+@__modelType reference 
+*/
+class reference2 {
+}/**
+@__ref <oiref:java#Class#exo.services.xml.querying.XMLFragmentData:oiref><oihard>
+@__modelType reference 
+*/
+class reference3 {
+}/**
+@__ref <oiref:java#Class#exo.services.xml.querying.XMLResource:oiref><oihard>
+@__modelType reference 
+*/
+class reference5 {
+}/**
+@__ref <oiref:java#Class#exo.services.xml.querying.InvalidStatementException:oiref><oihard>
+@__modelType reference 
+*/
+class reference9 {
+}/**
+@__ref <oiref:java#Class#exo.services.xml.querying.XMLQuery:oiref><oihard>
+@__modelType reference 
+*/
+class reference10 {
+}/**
+@__ref <oiref:java#Class#exo.services.xml.querying.InvalidDestinationException:oiref><oihard>
+@__modelType reference 
+*/
+class reference11 {
+}/**
+@__ref <oiref:java#Class#exo.services.xml.querying.UniFormTransformationException:oiref><oihard>
+@__modelType reference 
+*/
+class reference12 {
+}/**
+@__ref <oiref:java#Class#exo.services.xml.querying.ConfigException:oiref><oihard>
+@__modelType reference 
+*/
+class reference20 {
+}/**
+@__ref <oiref:java#Class#exo.services.xml.querying.XMLData:oiref><oihard>
+@__modelType reference 
+*/
+class reference21 {
+}/**
+@__ref <oiref:java#Class#exo.services.xml.querying.XMLWellFormedData:oiref><oihard>
+@__modelType reference 
+*/
+class reference22 {
+}/**
+@__ref <oiref:java#Class#exo.services.xml.querying.Statement:oiref><oihard>
+@__modelType reference 
+*/
+class reference23 {
+}/**
+@__ref <oiref:design#Class#id3o7n9drpurkwvdrpw5mxv.diagram:oiref><oihard>
+@__modelType reference
+@__fqn <oiref:#Package#exo.services.xml.querying.helper:oiref> 
+*/
+class reference24 {
+}}/**
+@__tags
+@shapeType ClassDiagram 
+*/
+class __tags {
+}/**
+@__options 
+*/
+class __options {
+}/**
+@__positions 
+*/
+class __positions {
+}

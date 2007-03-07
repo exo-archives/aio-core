@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xtas-config>
+  <resources>
+     <resource>
+       <name>Local File</name>
+       <description>Flat XML file</description>
+       <classname>org.exoplatform.services.xml.querying.impl.xtas.resource.plugins.LocalFile</classname>
+       <prefix/>
+     </resource>
+     <resource>
+       <name>Servlet Resource</name>
+       <description>XML under servlet context</description>
+       <classname>xtas.resource.plugins.ServletResource</classname>
+       <prefix>servlet:/</prefix>
+     </resource>
+     <resource>
+       <name>Http Resource</name>
+       <description>XML reached through HTTP (read only)</description>
+       <classname>xtas.resource.plugins.HttpResource</classname>
+       <prefix>http:/</prefix>
+     </resource>
+     <resource>
+       <name>XML:DB Resource</name>
+       <description>XML:DB resource</description>
+       <classname>xtas.resource.plugins.XmldbResource</classname>
+       <prefix>xmldb:</prefix>
+     </resource>
+     <resource>
+       <name>Simple JDBC Storage</name>
+       <description>Simple JDBC Storage resource</description>
+       <classname>xtas.resource.plugins.SimpleJdbcStorage</classname>
+       <prefix>jdbc:</prefix>
+     </resource>
+     <resource>
+       <name>Simple JNDI DataSource Storage</name>
+       <description>Simple JNDI DataSource Storage</description>
+       <classname>xtas.resource.plugins.SimpleJndiDsStorage</classname>
+       <prefix>jndi-ds:</prefix>
+     </resource>
+  </resources>
+</xtas-config>
+ 
