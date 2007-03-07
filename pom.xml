@@ -10,7 +10,9 @@
     <module>component/xml-processing</module>
     <module>component/database</module>
     <module>component/ldap</module>
-    <module>component/organization</module>
+    <module>component/organization/api</module>
+    <module>component/organization/jdbc</module>
+    <module>component/organization/ldap</module>
     <module>component/security</module>
   </modules>
 
@@ -43,7 +45,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <skip>true</skip>
+          <skip>false</skip>
           <useFile>false</useFile>
           <forkMode>pertest</forkMode><!--once , pertest -->
           <testFailureIgnore>false</testFailureIgnore>

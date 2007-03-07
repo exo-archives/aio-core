@@ -6,7 +6,7 @@
   </parent> 
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>exo.core.component.organization</artifactId>
+  <artifactId>exo.core.component.organization.api</artifactId>
   <packaging>jar</packaging>
   <version>${org.exoplatform.core.version}</version>
   <name>eXo Organization Service</name>

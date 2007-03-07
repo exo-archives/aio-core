@@ -21,7 +21,7 @@
 
     <dependency>
       <groupId>org.exoplatform.core</groupId>
-      <artifactId>exo.core.component.organization</artifactId>
+      <artifactId>exo.core.component.organization.jdbc</artifactId>
       <version>${org.exoplatform.core.version}</version>
     </dependency>
     
