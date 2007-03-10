@@ -2,7 +2,7 @@
  * Copyright 2001-2003 The eXo Platform SARL         All rights reserved.  *
  * Please look at license.txt in info directory for more license detail.   *
  **************************************************************************/
-package org.exoplatform.services.database.test;
+package org.exoplatform.services.database;
 
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.database.HibernateService;
@@ -15,9 +15,9 @@ import org.exoplatform.test.BasicTestCase;
  * @since: 0.0
  * @email: tuan08@yahoo.com
  */
-public class TestDatabaseService extends BasicTestCase {
+public class TestHibernateService extends BasicTestCase {
   HibernateService hservice_ ;
-  public TestDatabaseService(String name) {
+  public TestHibernateService(String name) {
     super(name);
   }
 
