@@ -37,9 +37,6 @@
   <component> 
     <key>org.exoplatform.services.database.DatabaseService</key>
     <type>org.exoplatform.services.database.impl.XAPoolStandardDatabaseService</type>
-<!--
-    <type>org.exoplatform.services.database.impl.XAPoolTxSupportDatabaseService</type>
--->
     <init-params>
       <properties-param>
         <name>connection.config</name>
