@@ -19,7 +19,7 @@ import org.exoplatform.test.BasicTestCase;
  * Jan 10, 2006
  */
 public class TestTransactionService extends BasicTestCase {
-  private TransactionService service_ ;
+  private ExoTransactionService service_ ;
   
   public TestTransactionService(String name) {
     super(name) ;
@@ -28,7 +28,7 @@ public class TestTransactionService extends BasicTestCase {
   public void setUp() throws Exception  {
     if(service_== null) {
       PortalContainer manager = PortalContainer.getInstance() ;
-      service_ = (TransactionService)manager.getComponentInstanceOfType(TransactionService.class) ;
+      service_ = (ExoTransactionService)manager.getComponentInstanceOfType(ExoTransactionService.class) ;
     }        
   }
   

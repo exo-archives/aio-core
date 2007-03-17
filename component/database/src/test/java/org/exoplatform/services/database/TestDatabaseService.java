@@ -21,41 +21,20 @@ import org.exoplatform.test.BasicTestCase;
  * @email: tuan08@yahoo.com
  */
 public class TestDatabaseService extends BasicTestCase {
-
-  public void setUp() throws Exception {
-  }
-
-  public void testXAPoolStandardDBConnectionService() throws Exception {
-    PortalContainer pcontainer = PortalContainer.getInstance() ;
-    DatabaseService service_ = (DatabaseService) pcontainer.getComponentInstance("XAPoolStandardDBConnectionService") ;
-    
-    assertTrue(service_ != null) ;
-    Connection conn = service_.getConnection() ;
-    System.err.println("\n\nConnection type: " + conn + "\n\n");
-    Statement s = conn.createStatement() ;
-    s.addBatch("create table test (name varchar, data varchar)" ) ;
-    s.addBatch("insert into test values('name1', 'value1')" ) ;
-    s.executeBatch() ;
-    s.close() ;
-    conn.commit() ;
-    service_.closeConnection(conn) ;
-    
-    conn =  service_.getConnection() ;
-    s = conn.createStatement() ;
-    
-    ResultSet r = s.executeQuery("select name from test") ;
-    if(r.next()) assertEquals("name1", r.getString("name")) ;
-  }
   
   public void testXAPoolTxSupportDBConnectionService() throws Exception {
     PortalContainer pcontainer = PortalContainer.getInstance() ;
-    DatabaseService service_ = (DatabaseService) pcontainer.getComponentInstance("XAPoolTxSupportDBConnectionService") ;
+    DatabaseService service = 
+      (DatabaseService) pcontainer.getComponentInstance("XAPoolTxSupportDBConnectionService") ;
+    assertConfiguration(service) ;
+  }
   
-    TransactionService txservice = service_.getTransactionService() ;
-    assertTrue(service_ != null) ;
+  private void assertConfiguration(DatabaseService service)  throws Exception {
+    TransactionService txservice = service.getTransactionService() ;
+    assertTrue(service != null) ;
     //TransactionManager tm = txservice.getTransactionManager() ;
     UserTransaction utx = txservice.getUserTransaction() ;
-    Connection conn = service_.getConnection() ;
+    Connection conn = service.getConnection() ;
     Statement s = null ;
     utx.begin() ;
     try {
@@ -74,8 +53,8 @@ public class TestDatabaseService extends BasicTestCase {
       utx.rollback() ;
     }
     //tm.rollback() ;
-    service_.closeConnection(conn) ;
-    conn =  service_.getConnection() ;
+    service.closeConnection(conn) ;
+    conn =  service.getConnection() ;
     s = conn.createStatement() ;
     ResultSet r = s.executeQuery("select name from test") ;
     if(r.next()) {
@@ -84,4 +63,13 @@ public class TestDatabaseService extends BasicTestCase {
       System.err.println("Transaction work ok") ;
     }
   }
+  
+  private void assertDBTableManager(DatabaseService service)  throws Exception {
+    
+  }
+ 
+  private void assertIDGenerator(DatabaseService service)  throws Exception {
+    
+  }
+  
 }

@@ -6,8 +6,6 @@ package org.exoplatform.services.database;
 
 import java.sql.Connection;
 
-import javax.sql.DataSource;
-
 import org.exoplatform.services.transaction.TransactionService;
 /**
  * Created by The eXo Platform SARL
@@ -17,10 +15,11 @@ import org.exoplatform.services.transaction.TransactionService;
  */
 public interface DatabaseService {
   
-  public DataSource getDatasource() throws Exception ;
+  public ExoDatasource getDatasource() throws Exception ;
+  public ExoDatasource getDatasource(String dsname) throws Exception ;
   public Connection getConnection() throws Exception ;
+  public Connection getConnection(String  dsName) throws Exception ;
   public void closeConnection(Connection conn) throws Exception ;
-  public boolean isTransactionSupport() ;
   public TransactionService getTransactionService() throws Exception ;
 
 }

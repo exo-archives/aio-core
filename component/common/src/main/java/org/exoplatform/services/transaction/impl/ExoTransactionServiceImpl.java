@@ -15,7 +15,7 @@ import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
 import org.exoplatform.services.transaction.TransactionPlugin;
-import org.exoplatform.services.transaction.TransactionService;
+import org.exoplatform.services.transaction.ExoTransactionService;
 import org.picocontainer.Startable;
 /**
  * Created by The eXo Platform SARL
@@ -23,11 +23,11 @@ import org.picocontainer.Startable;
  *          tuan08@users.sourceforge.net
  * Apr 4, 2006
  */
-public class TransactionServiceImpl  implements TransactionService,  Startable {
+public class ExoTransactionServiceImpl  implements ExoTransactionService,  Startable {
   
   private TransactionPlugin transactionPlugin_ ;
   
-  public TransactionServiceImpl() {
+  public ExoTransactionServiceImpl() {
   }
   
   public void setTransactionPlugin(JOTMTransactionPlugin plugin) {

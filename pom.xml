@@ -7,13 +7,15 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>component/xml-processing</module>
+    <module>component/common</module>
     <module>component/database</module>
+    <module>component/document</module>
     <module>component/ldap</module>
     <module>component/organization/api</module>
     <module>component/organization/jdbc</module>
     <module>component/organization/ldap</module>
     <module>component/security</module>
+    <module>component/xml-processing</module>
   </modules>
 
   <build>
@@ -45,12 +47,12 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <skip>false</skip>
+          <skip>${test.skip}</skip>
           <useFile>false</useFile>
           <forkMode>pertest</forkMode><!--once , pertest -->
           <testFailureIgnore>false</testFailureIgnore>
           <includes>
-            <include implementation="java.lang.String">**/Test*.java</include>
+            <include implementation="java.lang.String">**/${test.classes}*.java</include>
           </includes>
         </configuration>
       </plugin>
@@ -69,6 +71,8 @@
 
         <org.exoplatform.kernel.version>2.0.3</org.exoplatform.kernel.version>
         <org.exoplatform.core.version>2.0.3</org.exoplatform.core.version>
+        <test.classes>Test</test.classes>
+        <test.skip>true</test.skip>
       </properties>
     </profile>
   </profiles>

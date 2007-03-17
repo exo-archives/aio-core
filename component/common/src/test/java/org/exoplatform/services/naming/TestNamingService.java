@@ -36,7 +36,7 @@ public class TestNamingService extends BasicTestCase {
   
   public void testNamingService() throws Exception { 
     Context context =  service_.getContext() ;
-    context.createSubcontext("java:comp/test") ;
-    context.bind("java:comp/test/hello", "hello") ;
+    context.createSubcontext("test") ;
+    context.bind("test/hello", "hello") ;
   }
 }

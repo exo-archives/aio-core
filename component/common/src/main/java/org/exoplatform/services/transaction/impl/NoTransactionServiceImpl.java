@@ -17,14 +17,14 @@ import javax.transaction.UserTransaction;
 import org.apache.commons.logging.Log;
 import org.exoplatform.services.log.LogService;
 import org.exoplatform.services.transaction.TransactionPlugin;
-import org.exoplatform.services.transaction.TransactionService;
+import org.exoplatform.services.transaction.ExoTransactionService;
 /**
  * Created by The eXo Platform SARL
  * Author : Tuan Nguyen
  *          tuan08@users.sourceforge.net
  * Apr 4, 2006
  */
-public class NoTransactionServiceImpl implements TransactionService { 
+public class NoTransactionServiceImpl implements ExoTransactionService { 
   
   Log log_ ;
   

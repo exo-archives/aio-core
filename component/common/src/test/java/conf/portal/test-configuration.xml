@@ -20,16 +20,4 @@
   </component>
 -->
 
-  <component>
-    <key>org.exoplatform.services.transaction.TransactionService</key>
-    <type>org.exoplatform.services.transaction.impl.TransactionServiceImpl</type>
-    <component-plugins>
-      <component-plugin>
-        <name>transaction.plugin.jotm</name>
-        <set-method>setTransactionPlugin</set-method>
-        <type>org.exoplatform.services.transaction.impl.JOTMTransactionPlugin</type>
-        <description>JOTM Transaction Plugin</description>
-      </component-plugin>
-    </component-plugins>
-  </component>
 </configuration>

@@ -20,6 +20,7 @@ import org.exoplatform.container.xml.InitParams;
  * Apr 12, 2006
  */
 public class NamingService  {
+  private static String ROOT_DOMAIN = "java:comp/exo" ;
   private Hashtable<String, String> env_ ;
   
   public NamingService(InitParams params) throws Exception {  
@@ -27,6 +28,7 @@ public class NamingService  {
     env_ = new Hashtable<String, String>() ;
     env_.putAll(env) ;
     createSubcontext("java:comp", true) ;
+    createSubcontext(ROOT_DOMAIN, true) ;
   }
   
   public Context getContext()  throws Exception {   return new InitialContext(env_); }
@@ -36,17 +38,21 @@ public class NamingService  {
   public void createSubcontext(String name, boolean createAncestor) throws  Exception {
     Context context =  getContext() ;
     try {
-      context.lookup(name) ;
+      context.lookup(ROOT_DOMAIN + "/" + name) ;
     } catch (NameNotFoundException ex) {
       context.createSubcontext(name);
     }
   }
   
   public void bind(String name, Object value) throws  Exception { 
-    getContext().bind(name, value);
+    getContext().bind(ROOT_DOMAIN + "/" + name, value);
   }
     
   public void rebind(String name, Object value) throws  Exception {
-    getContext().rebind(name, value);
+    getContext().rebind(ROOT_DOMAIN + "/" + name, value);
+  }
+  
+  public Object lookup(String name) throws  Exception {
+    return getContext().lookup(ROOT_DOMAIN + "/" + name);
   }
 }

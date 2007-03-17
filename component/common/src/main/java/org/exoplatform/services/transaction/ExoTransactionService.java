@@ -11,7 +11,7 @@ import javax.transaction.*;
  * Created by The eXo Platform SARL Author : Tuan Nguyen
  * tuan08@users.sourceforge.net Apr 4, 2006
  */
-public interface TransactionService {
+public interface ExoTransactionService {
   public UserTransaction getUserTransaction() throws Exception;
 
   public TransactionManager getTransactionManager() throws Exception;

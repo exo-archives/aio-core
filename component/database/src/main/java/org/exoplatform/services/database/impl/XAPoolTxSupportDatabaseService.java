@@ -5,14 +5,15 @@
 package org.exoplatform.services.database.impl;
 
 import java.sql.Connection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
-
-import javax.sql.DataSource;
-import javax.sql.XAConnection;
 
 import org.enhydra.jdbc.standard.StandardXADataSource;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.PropertiesParam;
 import org.exoplatform.services.database.DatabaseService;
+import org.exoplatform.services.database.ExoDatasource;
 import org.exoplatform.services.transaction.TransactionService;
 /**
  * Created by The eXo Platform SARL
@@ -21,36 +22,57 @@ import org.exoplatform.services.transaction.TransactionService;
  * Apr 4, 2006
  */
 public class XAPoolTxSupportDatabaseService implements DatabaseService {
-  private StandardXADataSource datasource_ ;
+  private HashMap<String, ExoDatasource> datasources_ ;
+  private ExoDatasource defaultDS_ ;
   private TransactionService txService_ ;
   
-  public XAPoolTxSupportDatabaseService(InitParams params, TransactionService txService) throws Exception {
-    Map<String,String> props = params.getPropertiesParam("connection.config").getProperties();
-    datasource_ = new StandardXADataSource();
-    datasource_.setDriverName(props.get("connection.driver")) ;
-    datasource_.setUrl(props.get("connection.url")) ;
-    datasource_.setUser(props.get("connection.login")) ;
-    datasource_.setPassword(props.get("connection.password")) ;
-    datasource_.setMinCon(Integer.parseInt(props.get("connection.min-size"))) ;
-    datasource_.setMaxCon(Integer.parseInt(props.get("connection.max-size"))) ;
+  public XAPoolTxSupportDatabaseService(InitParams params, 
+                                        TransactionService txService) throws Exception {
+    datasources_ = new HashMap<String, ExoDatasource>(5) ;
     txService_ =  txService ;
-    datasource_.setTransactionManager(txService_.getTransactionManager()) ;
+    Iterator i = params.getPropertiesParamIterator() ;
+    while(i.hasNext()) {
+      PropertiesParam param = (PropertiesParam)i.next() ;
+      String name = param.getName() ;
+      ExoDatasource ds = new ExoDatasource(createDatasource(param.getProperties())) ;
+      datasources_.put(name, ds) ;
+      if(defaultDS_ == null)  defaultDS_ = ds ;
+    }
   }
   
   
-  public DataSource getDatasource() throws Exception { return datasource_ ; }
+  public ExoDatasource getDatasource() throws Exception {  return defaultDS_ ; }
+  
+  public ExoDatasource getDatasource(String dsName) throws Exception {  
+    return datasources_.get(dsName) ; 
+  }
+  
   
   public Connection getConnection() throws Exception {
-    XAConnection xaconn = datasource_.getXAConnection() ;
-    Connection conn = xaconn.getConnection();
-    return conn ;
+    return   defaultDS_.getXAConnection() .getConnection() ;
+  }
+  
+  public Connection getConnection(String dsName) throws Exception {
+    ExoDatasource ds = datasources_.get(dsName) ;
+    return  ds.getXAConnection().getConnection();
   }
   
   public void closeConnection(Connection conn) throws Exception {
     conn.close() ;
   }
   
-  public boolean isTransactionSupport() {  return true; }
-  
   public TransactionService getTransactionService() throws Exception { return txService_ ; }
+  
+  
+  private  StandardXADataSource createDatasource(Map<String,String> props) throws Exception {
+    StandardXADataSource ds = new StandardXADataSource();
+    ds.setDriverName(props.get("connection.driver")) ;
+    ds.setUrl(props.get("connection.url")) ;
+    ds.setUser(props.get("connection.login")) ;
+    ds.setPassword(props.get("connection.password")) ;
+    ds.setMinCon(Integer.parseInt(props.get("connection.min-size"))) ;
+    ds.setMaxCon(Integer.parseInt(props.get("connection.max-size"))) ;
+    ds.setTransactionManager(txService_.getTransactionManager()) ;
+    return ds ;
+  }
 }

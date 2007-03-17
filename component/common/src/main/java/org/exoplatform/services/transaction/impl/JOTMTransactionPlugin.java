@@ -35,9 +35,9 @@ public class JOTMTransactionPlugin  extends BaseComponentPlugin implements Trans
     jotm_ = new  Jotm(true, false) ;
     service_ = service;
     Context context = service.getContext() ;
-    service.createSubcontext("java:comp/jotm", true) ;
-    context.rebind("java:comp/jotm/UserTransaction", getUserTransaction()) ;
-    context.rebind("java:comp/jotm/TransactionManager", getTransactionManager()) ;    
+    service.createSubcontext("jotm", true) ;
+    context.rebind("jotm/UserTransaction", getUserTransaction()) ;
+    context.rebind("jotm/TransactionManager", getTransactionManager()) ;    
   }
   
   public UserTransaction getUserTransaction() throws Exception {

@@ -13,15 +13,14 @@
     </init-params>
   </component>
 
-<!--
   <component>
     <key>org.exoplatform.services.transaction.TransactionService</key>
     <type>org.exoplatform.services.transaction.impl.NoTransactionServiceImpl</type>
   </component>
 
   <component>
-    <key>org.exoplatform.services.transaction.TransactionService</key>
-    <type>org.exoplatform.services.transaction.impl.TransactionServiceImpl</type>
+    <key>org.exoplatform.services.transaction.ExoTransactionService</key>
+    <type>org.exoplatform.services.transaction.impl.ExoTransactionServiceImpl</type>
     <component-plugins>
       <component-plugin>
         <name>transaction.plugin.jotm</name>
@@ -31,5 +30,4 @@
       </component-plugin>
     </component-plugins>
   </component>
--->
 </configuration>
