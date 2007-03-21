@@ -19,6 +19,7 @@ import org.exoplatform.services.database.annotation.TableField;
  * Apr 4, 2006
  */
 abstract public  class StandardSQLDAO<T extends DBObject>  extends DAO<T> {
+  
   private String updateQuery_ ;
   protected ExoDatasource datasource_ ;
   
@@ -39,6 +40,7 @@ abstract public  class StandardSQLDAO<T extends DBObject>  extends DAO<T> {
     return bean ;
   }
   
+  @SuppressWarnings("unchecked")
   public  T update(T bean, long id) throws Exception {
     Connection conn = datasource_.getConnection() ;
     Class<T>  type = (Class<T>)bean.getClass() ;
@@ -51,6 +53,7 @@ abstract public  class StandardSQLDAO<T extends DBObject>  extends DAO<T> {
     return bean ;
   }
   
+  @SuppressWarnings("unchecked")
   public  T save(T bean,  long id) throws Exception {
     Connection conn = datasource_.getConnection() ;
     Class<T>  type = (Class<T>)bean.getClass() ;

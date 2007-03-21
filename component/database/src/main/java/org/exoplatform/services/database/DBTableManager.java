@@ -19,8 +19,7 @@ abstract public class DBTableManager {
   final static  public DBTableManager createDBTableManager(ExoDatasource datasource) {
     if(datasource.getDatabaseType() == ExoDatasource.HSQL_DB_TYPE) {
       return new StandardSQLTableManager(datasource)  ;
-    } else {
-      return new StandardSQLTableManager(datasource) ;
-    }
+    } 
+    return new StandardSQLTableManager(datasource) ;
   }
 }

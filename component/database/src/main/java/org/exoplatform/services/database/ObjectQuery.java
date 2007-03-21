@@ -18,13 +18,13 @@ public class ObjectQuery {
   private Class type_ ;
   private String orderBy_ ;
   private String groupBy_ ;
-  private List  parameters_ ;  
-  private List selectParameter_ ;
+  private List<Parameter>  parameters_ ;  
+  private List<Parameter> selectParameter_ ;
   
   public ObjectQuery(Class type) {
     type_ = type ;
-    parameters_ = new ArrayList(3) ;
-    selectParameter_ = new ArrayList(10) ;
+    parameters_ = new ArrayList<Parameter>(3) ;
+    selectParameter_ = new ArrayList<Parameter>(10) ;
   }
   
   public ObjectQuery addEQ(String field, Object value) {
@@ -100,7 +100,7 @@ public class ObjectQuery {
       b.append(" where ") ;
       for(int i = 0; i < parameters_.size(); i ++) {
         if(i > 0) b.append(" and ") ;
-        Parameter p = (Parameter) parameters_.get(i) ;
+        Parameter p = parameters_.get(i) ;
         if(p.value_ instanceof String) {
           b.append(" o.").append(p.field_).append(p.op_).append("'").append(p.value_).append("'") ;
         } else if(p.value_ instanceof Date) {
@@ -120,7 +120,7 @@ public class ObjectQuery {
     b.append("select ") ;
     if(selectParameter_.size() > 0){
       for(int i = 0; i < selectParameter_.size(); i++){
-        Parameter p = (Parameter)selectParameter_.get(i) ;
+        Parameter p = selectParameter_.get(i) ;
         if(p.op_.equals("fieldselect")){
           b.append("o.").append(p.field_) ;
         }else if(p.op_.equals("countselect")){
@@ -141,7 +141,7 @@ public class ObjectQuery {
       b.append(" where ") ;
       for(int i = 0; i < parameters_.size(); i ++) {
         if(i > 0) b.append(" and ") ;
-        Parameter p = (Parameter) parameters_.get(i) ;
+        Parameter p = parameters_.get(i) ;
         if(p.value_ instanceof String) {
           b.append(" o.").append(p.field_).append(p.op_).append("'").append(p.value_).append("'") ;
         } else if(p.value_ instanceof Date) {
@@ -165,7 +165,7 @@ public class ObjectQuery {
       b.append(" where ") ;
       for(int i = 0; i < parameters_.size(); i ++) {
         if(i > 0) b.append(" and ") ;
-        Parameter p = (Parameter) parameters_.get(i) ;
+        Parameter p = parameters_.get(i) ;
         if(p.value_ instanceof String) {
           b.append(" o.").append(p.field_).append(p.op_).append("'").append(p.value_).append("'") ;
         } else if(p.value_ instanceof Date) {
