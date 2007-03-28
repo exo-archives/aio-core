@@ -31,8 +31,8 @@ public  class ExoLongIDDAO extends StandardSQLDAO<ExoLongID>  {
   }
   
   protected  void mapResultSet(ResultSet res, ExoLongID bean) throws Exception {
-    bean.setId(res.getLong(1)) ;
-    bean.setName(res.getString(2)) ;
-    bean.setStart(res.getLong(3)) ;
-  }
+    bean.setId(res.getLong(1));
+    bean.setName(res.getString(2));
+    bean.setStart(res.getLong(3));
+  }  
 }

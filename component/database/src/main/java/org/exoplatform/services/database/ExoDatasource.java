@@ -25,6 +25,7 @@ public class ExoDatasource {
   
   private XADataSource xaDatasource_  ;
   private DBTableManager tableManager_ ;
+  private IDGenerator  idGenerator_ ;
   private String databaseName_ ;
   private String databaseVersion_ ;
   private int dbType_ = STANDARD_DB_TYPE;
@@ -34,7 +35,7 @@ public class ExoDatasource {
     DatabaseMetaData metaData = ds.getXAConnection().getConnection().getMetaData() ;
     databaseName_ = metaData.getDatabaseProductName() ;
     databaseVersion_ = metaData.getDatabaseProductVersion() ;
-    tableManager_ = DBTableManager.createDBTableManager(this) ;
+    
     String dbname = databaseName_.toLowerCase() ;
     if(dbname.indexOf("oracle") >= 0) {
       dbType_ = ORACLE_DB_TYPE ;
@@ -43,14 +44,16 @@ public class ExoDatasource {
     } else if(dbname.indexOf("mysql") >= 0) {
       dbType_ = MYSQL_DB_TYPE ;
     } else if(dbname.indexOf("derby") >= 0) {
-      dbType_ = DB2_DB_TYPE ;
+      dbType_ = DERBY_DB_TYPE ;
     } else if(dbname.indexOf("db2") >= 0) {
       dbType_ = DB2_DB_TYPE ;
     } else {
       dbType_ = STANDARD_DB_TYPE ;
     }
     
-    verifyIDGenerator() ;
+    tableManager_ = DBTableManager.createDBTableManager(this) ;
+    //TODO: Create IDGenrator and test
+    idGenerator_ = new IDGenerator(this) ;
   }
   
   public XADataSource getDatasource() { return xaDatasource_ ;}
@@ -80,8 +83,4 @@ public class ExoDatasource {
   public String getDatabaseName() { return databaseName_ ;}
 
   public String getDatabaseVersion() { return databaseVersion_ ; }
-  
-  private void verifyIDGenerator() throws Exception {
-    
-  }
 }

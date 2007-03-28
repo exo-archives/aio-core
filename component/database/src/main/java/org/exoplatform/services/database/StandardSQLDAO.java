@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.exoplatform.services.database.annotation.Table;
 import org.exoplatform.services.database.annotation.TableField;
@@ -20,13 +22,10 @@ import org.exoplatform.services.database.annotation.TableField;
  */
 abstract public  class StandardSQLDAO<T extends DBObject>  extends DAO<T> {
   
-  private String updateQuery_ ;
-  protected ExoDatasource datasource_ ;
-  
   public StandardSQLDAO(ExoDatasource ds) {
     super(ds) ;
   }
- 
+
   public  T load(Class<T> type, long id) throws Exception {
     Table table = type.getAnnotation(Table.class) ;
     String loadQuery =  "SELECT * FROM " + table.name() + " WHERE id = '" +  id  + "'" ;
@@ -39,10 +38,25 @@ abstract public  class StandardSQLDAO<T extends DBObject>  extends DAO<T> {
     res.close() ;
     return bean ;
   }
+    
+  public List<T> load(Class<T> type, String loadQuery) throws Exception {
+    Connection conn = datasource_.getConnection() ;
+    Statement statement = conn.createStatement() ;
+    ResultSet res =  statement.executeQuery(loadQuery) ;
+    List<T> list = new ArrayList<T>();
+    while (res.next()) {
+      T bean =  createInstance(type) ;
+      mapResultSet(res, bean) ;
+      list.add(bean) ;
+    }
+    statement.close() ;
+    res.close() ;
+    return list ;
+  }
   
   @SuppressWarnings("unchecked")
   public  T update(T bean, long id) throws Exception {
-    Connection conn = datasource_.getConnection() ;
+    Connection conn = getExoDatasource().getConnection() ;
     Class<T>  type = (Class<T>)bean.getClass() ;
     PreparedStatement statement = conn.prepareStatement(getUpdateQuery(type, id)) ;
     mapUpdate(bean, statement) ;
@@ -79,7 +93,7 @@ abstract public  class StandardSQLDAO<T extends DBObject>  extends DAO<T> {
     for(int i = 0; i <  fields.length; i++) {
       TableField  field =  fields[i] ;
       updateQuery += field.name() + " = ?" ;
-      if(i ==  field.length() - 1)  updateQuery += ", " ;
+      if (i !=  fields.length - 1)  updateQuery += ", " ;      
     }
     updateQuery += 
       " WHERE id = " +  id ;
@@ -95,15 +109,17 @@ abstract public  class StandardSQLDAO<T extends DBObject>  extends DAO<T> {
     for(int i = 0; i <  fields.length; i++) {
       TableField  field =  fields[i] ;
       query.append(field.name()) ;
-      if(i ==  field.length() - 1)  query.append(", ") ;
+      if (i !=  fields.length - 1)  query.append(", ") ;
     }
     query.append(")") ;
-    query.append(" VALUES(").append(id) ;
+    query.append(" VALUES(").append(id).append(", ");
     for(int i = 0; i <  fields.length; i++) {
-      TableField  field =  fields[i] ;
+//      TableField  field =  fields[i] ;
       query.append("?") ;
-      if(i ==  field.length() - 1)  query.append(", ") ;
+//      if(i ==  field.length() - 1)  query.append(", ") ;
+      if (i !=  fields.length - 1)  query.append(", ") ;
     }
+    query.append(")") ;
     return query.toString() ;
   }
   

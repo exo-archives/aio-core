@@ -6,11 +6,14 @@ package org.exoplatform.services.database;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 
 import javax.transaction.UserTransaction;
 
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.database.annotation.Table;
+import org.exoplatform.services.database.table.ExoLongID;
 import org.exoplatform.services.transaction.TransactionService;
 import org.exoplatform.test.BasicTestCase;
 /*
@@ -22,11 +25,13 @@ import org.exoplatform.test.BasicTestCase;
  */
 public class TestDatabaseService extends BasicTestCase {
   
-  public void testXAPoolTxSupportDBConnectionService() throws Exception {
+  public void testDatabaseService() throws Exception {
     PortalContainer pcontainer = PortalContainer.getInstance() ;
     DatabaseService service = 
       (DatabaseService) pcontainer.getComponentInstance("XAPoolTxSupportDBConnectionService") ;
-    assertConfiguration(service) ;
+    //assertConfiguration(service) ;
+//    assertDBTableManager(service);
+    assertIDGenerator(service);
   }
   
   private void assertConfiguration(DatabaseService service)  throws Exception {
@@ -56,8 +61,8 @@ public class TestDatabaseService extends BasicTestCase {
     service.closeConnection(conn) ;
     conn =  service.getConnection() ;
     s = conn.createStatement() ;
-    ResultSet r = s.executeQuery("select name from test") ;
-    if(r.next()) {
+    ResultSet rs = s.executeQuery("select name from test") ;   
+    if(rs.next()) {     
       fail("Should not have any data in the test table") ;
     } else {
       System.err.println("Transaction work ok") ;
@@ -65,11 +70,39 @@ public class TestDatabaseService extends BasicTestCase {
   }
   
   private void assertDBTableManager(DatabaseService service)  throws Exception {
+    System.err.println("\n\n===>ASERT DBTableManager\n") ;
+    ExoDatasource  datasource = service.getDatasource() ;
+    DBTableManager dbManager = datasource.getDBTableManager() ;
+    assertEquals(dbManager.hasTable(TestTable.class), false);
+    dbManager.createTable(TestTable.class, true) ;
     
+    //Test meta data here
+//    ResultSetMetaData metaData = datasource.g
+    
+    assertEquals(dbManager.hasTable(TestTable.class), true);
+    dbManager.dropTable(TestTable.class);
+    
+    assertEquals(dbManager.hasTable(TestTable.class), false);
+    
+    //Test metadata here
+  /*  Connection conn = service.getConnection() ;
+    Statement s = conn.createStatement() ;
+    Table table =  TestTable.class.getAnnotation(Table.class) ;
+    ResultSet rs = s.executeQuery("SELECT * FROM " + table.name());
+    ResultSetMetaData metaData = rs.getMetaData();
+    for (int i = 1; i <= metaData.getColumnCount(); i++) {
+      System.out.println("Information about column " + metaData.getColumnName(i) + ":\n" +
+         "type: " + metaData.getColumnTypeName(i) + ", is nullable: " + metaData.isNullable(i) +
+         "\n");      
+    }*/
+    System.err.println("\n\n<===ASSERT DBTableManager\n") ;
   }
  
   private void assertIDGenerator(DatabaseService service)  throws Exception {
-    
+    ExoDatasource  datasource = service.getDatasource() ;
+//    DBTableManager dbManager = datasource.getDBTableManager() ;    
+    IDGenerator idGenerator = new IDGenerator(datasource);
+    System.out.println("\n=================> IDGenerator: " + idGenerator.generateLongId(ExoLongID.class));
   }
   
 }

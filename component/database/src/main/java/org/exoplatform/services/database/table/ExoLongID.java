@@ -17,13 +17,16 @@ import org.exoplatform.services.database.annotation.*;
   name = "ExoLongId" ,
   field = {
     @TableField(name = "name", type = "string", length = 500, unique = true, nullable = false),
-    @TableField(name = "start", type = "string")
+    @TableField(name = "start", type = "long")
   }
 )
 public class ExoLongID extends DBObject {
-  private String name ;
-  private long   start ;
+  final static public long BLOCK_SIZE = 100 ;
 
+  private String name ;
+  //rename to currentBlockId
+  private long   start ;
+  
   public ExoLongID() { }
 
   public ExoLongID(String name,  long start) {
@@ -36,4 +39,5 @@ public class ExoLongID extends DBObject {
   
   public long getStart()  { return start ; }
   public void setStart(long start) { this.start = start ; }
+  public void setNextBlock() { this.start = this.start + BLOCK_SIZE ; }
 }

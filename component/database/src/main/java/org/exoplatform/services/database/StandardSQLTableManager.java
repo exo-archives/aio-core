@@ -5,6 +5,7 @@
 package org.exoplatform.services.database;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.sql.XADataSource;
@@ -54,33 +55,62 @@ public class StandardSQLTableManager extends DBTableManager {
       } else if("binary".equals(fieldType)) {
         appendBinaryField(field, b);
       }
-      if(i !=  field.length() - 1) b.append(", ");
+      if(i !=  fields.length - 1) b.append(", ");
     }
     b.append(")") ;
-    
+    // print  out  the  sql string 
     Connection conn = xaDatasource_.getXAConnection().getConnection() ;
     Statement s = conn.createStatement() ;
+    System.out.println("QUERY: \n  " + b + "\n");
     s.execute(b.toString()) ;
+    
     s.close() ;
     conn.commit() ;
+    conn.close() ;
   }
   
   public <T extends DBObject> void dropTable(Class<T>  type) throws Exception {
-    
+    Table table = type.getAnnotation(Table.class);
+    if (table == null) {
+      throw new Exception("Can not find the annotation for class " + type.getClass().getName());
+    }
+    Connection conn = xaDatasource_.getXAConnection().getConnection();
+    Statement s = conn.createStatement();
+    s.execute("DROP TABLE " + table.name());
+    s.close();
+    conn.commit();
+    conn.close();    
   }
   
   public <T extends DBObject> boolean hasTable(Class<T> type)  throws Exception {
-    return false ;
+    Table table = type.getAnnotation(Table.class);
+    if (table == null) {
+      throw new Exception("Can not find the annotation for class " + type.getClass().getName());
+    }
+    Connection conn = xaDatasource_.getXAConnection().getConnection();
+    Statement s = conn.createStatement();
+    try {
+      if (s.execute("SELECT 1 FROM " + table.name()) == true) return true;      
+    } catch (SQLException ex) {
+      return false;      
+    } finally {
+      s.close();
+      conn.close();
+    }
+    return false;
   }
   
-  protected void appendStringField(TableField field, StringBuilder b) {
+  protected void appendStringField(TableField field, StringBuilder b) throws Exception {   
+    if(field.length() < 1) {
+      throw new Exception("You forget to specify  the length for field " + field.name() + " , type " + field.type()) ;
+    } 
     String  nullable = "" ;
     if(!field.nullable())  nullable = " NOT NULL " ;
-    b. append(field.name()).append(" ").append("VARCHAR(" + field.length() + ")").append(nullable);
+    b.append(field.name()).append(" ").append("VARCHAR(" + field.length() + ")").append(nullable);
   }
   
   protected void appendIntegerField(TableField field, StringBuilder b) {
-    b. append(field.name()).append(" INTEGER");
+    b.append(field.name()).append(" INTEGER");
   }
   
   protected void appendLongField(TableField field, StringBuilder b) {

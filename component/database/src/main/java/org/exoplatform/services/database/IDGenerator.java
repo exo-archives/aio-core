@@ -4,6 +4,13 @@
  **************************************************************************/
 package org.exoplatform.services.database;
 
+import java.util.HashMap;
+import java.util.List;
+
+import org.exoplatform.services.database.annotation.Table;
+import org.exoplatform.services.database.table.ExoLongID;
+import org.exoplatform.services.database.table.ExoLongIDDAO;
+
 /**
  * Created by The eXo Platform SARL
  * Author : Tuan Nguyen
@@ -11,20 +18,63 @@ package org.exoplatform.services.database;
  * Apr 4, 2006
  */
 public class IDGenerator {
-  public <T extends DBObject> long generateLongId(T bean) throws Exception {
-    return 0;
-  }
-
-  public <T extends DBObject> long generatetLongId(Class<T> type) throws Exception {
-    return 0;
-  }
-
+  private HashMap<Class, IDTracker> idTrackers_  ;
+  private ExoLongIDDAO dao_ ;
   
-  public <T extends DBObject> String generateUUID(T bean) throws Exception {
-    return null;
+  public IDGenerator(ExoDatasource datasource) throws Exception {
+    idTrackers_  = new HashMap<Class, IDTracker>();
+    dao_  = new ExoLongIDDAO(datasource) ;
+   
+    //TODO: check  and create ExoLongID  table if it is not existed   
+    DBTableManager tableManager = datasource.getDBTableManager();
+    if (!tableManager.hasTable(ExoLongID.class)) {
+      tableManager.createTable(ExoLongID.class, true);
+    }
+    
+  }
+  
+  public <T extends DBObject> long generateLongId(T bean) throws Exception {
+    return generateLongId(bean.getClass()) ;
   }
 
-  public <T extends DBObject> String generateUUID(Class<T> type) throws Exception {
-    return null;
+  //Lazy loading
+  synchronized  public <T extends DBObject> long generateLongId(Class<T> type) throws Exception {
+    IDTracker idTracker =  idTrackers_.get(type) ;
+    if(idTracker == null) {
+      Table table = ExoLongID.class.getAnnotation(Table.class) ;    
+      String loadQuery =  
+        "SELECT * FROM " + table.name() + " WHERE name = '" +  type.getName()  + "'" ;
+      System.out.println("\n=======> loadQuery: " + loadQuery + "\n");
+      List<ExoLongID> list = dao_.load(ExoLongID.class, loadQuery) ;
+      ExoLongID idObject ;
+      if(list.size() == 0) {
+        idObject = new ExoLongID(type.getClass().getName(), 100) ;
+        //save
+        
+      } else if(list.size() == 1) {
+        idObject = list.get(0);
+      } else {
+        throw new Exception("") ;
+      }
+      idTracker = new IDTracker(idObject) ;
+      idTrackers_.put(type, idTracker) ;
+    }
+    
+    long id = idTracker.currentId_++ ;
+    if(id > idTracker.dbobject.getStart() + ExoLongID.BLOCK_SIZE) {
+      idTracker.dbobject.setNextBlock() ;
+      //save idTracker.dbobject
+    }
+    return id ;    
+  }
+  
+  static private class IDTracker {
+    ExoLongID dbobject ;
+    long currentId_ ;
+    
+    IDTracker(ExoLongID dbobject) {
+      this.dbobject = dbobject ;
+      currentId_ = dbobject.getStart() ;
+    }
   }
 }
