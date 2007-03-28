@@ -25,19 +25,19 @@ public class ExoLongID extends DBObject {
 
   private String name ;
   //rename to currentBlockId
-  private long   start ;
+  private long   currentBlockId ;
   
   public ExoLongID() { }
 
   public ExoLongID(String name,  long start) {
     this.name = name ;
-    this.start =  start ;
+    this.currentBlockId =  start ;
   }
   
   public String getName()  { return name ; }
   public void setName(String name) { this.name = name ; }
   
-  public long getStart()  { return start ; }
-  public void setStart(long start) { this.start = start ; }
-  public void setNextBlock() { this.start = this.start + BLOCK_SIZE ; }
+  public long getCurrentBlockId()  { return currentBlockId ; }
+  public void setCurrentBlockId(long start) { this.currentBlockId = start ; }
+  public void setNextBlock() { this.currentBlockId = this.currentBlockId + BLOCK_SIZE ; }
 }
