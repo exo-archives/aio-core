@@ -100,8 +100,10 @@ public class TestDatabaseService extends BasicTestCase {
   }
  
   private void assertExoLongIDDAO(DatabaseService service)  throws Exception {
-    Connection connection = service.getConnection();
+   /* Connection connection = service.getConnection();
     ExoLongIDDAO exoLongIDDAO = new ExoLongIDDAO(service.getDatasource());
+    ExoLongID 
+    exoLongIDDAO.save();*/
   }
   
   private void assertIDGenerator(DatabaseService service)  throws Exception {
