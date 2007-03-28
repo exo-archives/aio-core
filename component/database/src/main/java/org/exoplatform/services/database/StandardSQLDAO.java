@@ -28,11 +28,13 @@ abstract public  class StandardSQLDAO<T extends DBObject>  extends DAO<T> {
 
   public  T load(Class<T> type, long id) throws Exception {
     Table table = type.getAnnotation(Table.class) ;
-    String loadQuery =  "SELECT * FROM " + table.name() + " WHERE id = '" +  id  + "'" ;
+    String loadQuery =  "SELECT * FROM " + table.name() + " WHERE id = " +  id ;
+    System.out.println("LOAD QUERY: " + loadQuery) ;
     T bean =  createInstance(type) ;
     Connection conn = datasource_.getConnection() ;
     Statement statement = conn.createStatement() ;
     ResultSet res =  statement.executeQuery(loadQuery) ;
+    if(!res.next())  return null ;
     mapResultSet(res, bean) ;
     statement.close() ;
     res.close() ;
@@ -55,10 +57,13 @@ abstract public  class StandardSQLDAO<T extends DBObject>  extends DAO<T> {
   }
   
   @SuppressWarnings("unchecked")
-  public  T update(T bean, long id) throws Exception {
+  public  T update(T bean) throws Exception {
+    if(bean.getId() < 0) {
+      throw new Exception("The given bean " + bean.getClass() + " doesn't have an id") ;
+    }
     Connection conn = getExoDatasource().getConnection() ;
     Class<T>  type = (Class<T>)bean.getClass() ;
-    PreparedStatement statement = conn.prepareStatement(getUpdateQuery(type, id)) ;
+    PreparedStatement statement = conn.prepareStatement(getUpdateQuery(type, bean.getId())) ;
     mapUpdate(bean, statement) ;
     statement.executeUpdate() ;
     statement.close() ;
@@ -71,9 +76,10 @@ abstract public  class StandardSQLDAO<T extends DBObject>  extends DAO<T> {
   public  T save(T bean,  long id) throws Exception {
     Connection conn = datasource_.getConnection() ;
     Class<T>  type = (Class<T>)bean.getClass() ;
-    PreparedStatement statement = conn.prepareStatement(getUpdateQuery(type, id)) ;
+    PreparedStatement statement = conn.prepareStatement(getInsertQuery(type, id)) ;
+    bean.setId(id) ;
     mapUpdate(bean, statement) ;
-    statement.executeUpdate() ;
+    System.out.println("INSERT STATUS: " + statement.executeUpdate() + ", id = " + id) ;
     statement.close() ;
     datasource_.commit(conn) ;
     datasource_.closeConnection(conn) ;
@@ -120,6 +126,7 @@ abstract public  class StandardSQLDAO<T extends DBObject>  extends DAO<T> {
       if (i !=  fields.length - 1)  query.append(", ") ;
     }
     query.append(")") ;
+    System.out.println("INSERT QUERY: " + query.toString());
     return query.toString() ;
   }
   

@@ -4,13 +4,9 @@
  **************************************************************************/
 package org.exoplatform.services.database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 
-import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.database.annotation.Table;
 import org.exoplatform.services.database.table.ExoLongID;
 import org.exoplatform.services.database.table.ExoLongIDDAO;
@@ -43,54 +39,54 @@ public class IDGenerator {
 
   //Lazy loading
   synchronized  public <T extends DBObject> long generateLongId(Class<T> type) throws Exception {
-    IDTracker idTracker =  idTrackers_.get(type) ;
+    IDTracker idTracker =  idTrackers_.get(type) ;  
+    
     if(idTracker == null) {
       Table table = ExoLongID.class.getAnnotation(Table.class) ;    
       String loadQuery =  
         "SELECT * FROM " + table.name() + " WHERE name = '" +  type.getName()  + "'" ;
       System.out.println("\n=======> loadQuery: " + loadQuery + "\n");
       List<ExoLongID> list = dao_.load(ExoLongID.class, loadQuery) ;
-      ExoLongID idObject ;
-      if (list.size() == 0) {
-        idObject = new ExoLongID(type.getClass().getName(), 100) ;
-        //save
-        PortalContainer pcontainer = PortalContainer.getInstance() ;
-        DatabaseService service = 
-          (DatabaseService) pcontainer.getComponentInstance("XAPoolTxSupportDBConnectionService") ;
-        Connection conn = service.getConnection() ;        
-        ExoLongIDDAO exoLongIDDAO = new ExoLongIDDAO(service.getDatasource());  
-        String sql = exoLongIDDAO.getInsertQuery(ExoLongID.class, 1L);
-        PreparedStatement ps = conn.prepareStatement(sql) ;       
-        ps.setString(1, ExoLongID.class.getName());
-        ps.setLong(2, 0L);
-        ps.execute();        
-//        System.out.println(printQueryResult(service));
-//      } else if(list.size() == 1) {
-        } else if(list.size() > 0) {
+      System.out.println("\n=======> list.size() " + list.size());
+      ExoLongID idObject ;  
+      long currentId = 0 ;
+      if (list.size() == 0) {       
+        idObject = new ExoLongID(type.getName(), ExoLongID.BLOCK_SIZE) ;
+        dao_.save(idObject, 1);       
+      } else if(list.size() == 1) {
         idObject = list.get(0);
+        currentId = idObject.getCurrentBlockId() ;
+        idTracker.blockTracker.setNextBlock() ;   
+        dao_.update(idTracker.blockTracker);
       } else {
         throw new Exception("") ;
       }
-      idTracker = new IDTracker(idObject) ;
+      idTracker = new IDTracker(idObject, currentId) ;
       idTrackers_.put(type, idTracker) ;
+      
+      System.out.println("+++>>" + dao_.load(ExoLongID.class, 1))  ;
     }
     
-    long id = idTracker.currentId_++ ;
-    if(id > idTracker.dbobject.getCurrentBlockId() + ExoLongID.BLOCK_SIZE) {
-      idTracker.dbobject.setNextBlock() ;
-      //save idTracker.dbobject
-      
+    long generatedId = ++idTracker.currentId_ ;
+    if(generatedId > idTracker.blockTracker.getCurrentBlockId() + ExoLongID.BLOCK_SIZE) {
+      idTracker.blockTracker.setNextBlock() ;   
+      dao_.update(idTracker.blockTracker);
     }
-    return id ;    
+    return generatedId ;
+  }
+  
+  //for testing
+  public void restartTracker() {
+    idTrackers_.clear() ;
   }
   
   static private class IDTracker {
-    ExoLongID dbobject ;
+    ExoLongID blockTracker ;
     long currentId_ ;
     
-    IDTracker(ExoLongID dbobject) {
-      this.dbobject = dbobject ;
-      currentId_ = dbobject.getCurrentBlockId() ;
+    IDTracker(ExoLongID dbobject, long currentId) {
+      this.blockTracker = dbobject ;
+      currentId_ = currentId ;     
     }
   }
 }

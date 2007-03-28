@@ -14,6 +14,7 @@ import javax.transaction.UserTransaction;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.database.annotation.Table;
 import org.exoplatform.services.database.table.ExoLongID;
+import org.exoplatform.services.database.table.ExoLongIDDAO;
 import org.exoplatform.services.transaction.TransactionService;
 import org.exoplatform.test.BasicTestCase;
 /*
@@ -98,11 +99,24 @@ public class TestDatabaseService extends BasicTestCase {
     System.err.println("\n\n<===ASSERT DBTableManager\n") ;
   }
  
+  private void assertExoLongIDDAO(DatabaseService service)  throws Exception {
+    Connection connection = service.getConnection();
+    ExoLongIDDAO exoLongIDDAO = new ExoLongIDDAO(service.getDatasource());
+  }
+  
   private void assertIDGenerator(DatabaseService service)  throws Exception {
     ExoDatasource  datasource = service.getDatasource() ;
 //    DBTableManager dbManager = datasource.getDBTableManager() ;    
     IDGenerator idGenerator = new IDGenerator(datasource);
-    System.out.println("\n=================> IDGenerator: " + idGenerator.generateLongId(ExoLongID.class));
+    
+//    idGenerator.restartTracker();
+    for(int i = 0; i < 10; i++) {
+      System.out.println("\n=================> IDGenerator " + i + " : " + idGenerator.generateLongId(ExoLongID.class));
+//      if (i == 5) idGenerator.restartTracker();        
+    }
+    
+    idGenerator.restartTracker();
+    System.out.println("\n=================> IDGenerator " + 10 + " : " + idGenerator.generateLongId(ExoLongID.class));
   }
   
 }

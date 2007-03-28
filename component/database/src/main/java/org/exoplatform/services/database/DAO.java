@@ -24,7 +24,7 @@ public abstract  class DAO<T extends DBObject> {
   public ExoDatasource getExoDatasource() { return datasource_ ; }
   
   abstract public T load(Class<T> type, long id) throws Exception ;
-  abstract public T  update(T bean, long id) throws Exception ;
+  abstract public T  update(T bean) throws Exception ;
   abstract public T save(T bean,  long id) throws Exception ;
   abstract public T remove(T bean, long id) throws Exception ;
   
