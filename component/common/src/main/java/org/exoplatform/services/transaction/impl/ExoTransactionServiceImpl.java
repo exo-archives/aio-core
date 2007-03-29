@@ -28,6 +28,7 @@ public class ExoTransactionServiceImpl  implements ExoTransactionService,  Start
   private TransactionPlugin transactionPlugin_ ;
   
   public ExoTransactionServiceImpl() {
+  
   }
   
   public void setTransactionPlugin(JOTMTransactionPlugin plugin) {
