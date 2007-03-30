@@ -32,7 +32,7 @@ public class TestQueryManager extends BasicTestCase {
     String[][] parameters = {{"table", "student"}, {"id", "12345"}};
     String pamameterSql = manager_.mapDataToSql(template, parameters);
     
-    String [] array = {"table", "student"};
+   /* String [] array = {"table", "student"};
     String arraySql = manager_.mapDataToSql(template, array);
     array = new String[]{"id", "12345"};
     arraySql = manager_.mapDataToSql(arraySql, array);
@@ -46,9 +46,9 @@ public class TestQueryManager extends BasicTestCase {
     assertEquals(mapSql, arraySql);
     
     String beanSql = manager_.mapDataToSql(template, new Table());
-    assertEquals(beanSql, arraySql);
+    assertEquals(beanSql, arraySql);*/
    
-    System.out.println("\n\n\n "+beanSql+"\n\n");
+    System.out.println("\n\n\n "+pamameterSql+"\n\n");
   }
   
   private class Table {

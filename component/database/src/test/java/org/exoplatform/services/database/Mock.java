@@ -9,7 +9,8 @@ import java.sql.ResultSet;
 import java.util.Calendar;
 import java.util.HashMap;
 
-import org.exoplatform.services.database.annotation.*;
+import org.exoplatform.services.database.annotation.Table;
+import org.exoplatform.services.database.annotation.TableField;
 
 /**
  * Created by The eXo Platform SARL
@@ -55,8 +56,15 @@ public class Mock extends DBObject {
 
   static public class MockMapper implements Mapper<Mock> {
 
-    public String mapSQL(Mock bean, String template) throws Exception {
-      return null;
+    public String[][] toParameters(Mock bean) throws Exception {
+      java.sql.Date date = new java.sql.Date(bean.getStart().getTimeInMillis());
+      return new String[][] {
+          {"id", String.valueOf(bean.getId())}          ,
+          {"name", bean.getName()}                      ,
+          {"status", String.valueOf(bean.getStatus())}  ,
+          {"start", date.toString()}                    ,
+          {"pass", String.valueOf(bean.isPass())}
+      };
     }
 
     public void mapResultSet(ResultSet res, Mock bean) throws Exception {

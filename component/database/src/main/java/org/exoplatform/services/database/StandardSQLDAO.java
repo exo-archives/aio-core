@@ -25,10 +25,10 @@ public  class StandardSQLDAO<T extends DBObject>  extends DAO<T> {
   }
 
   public  T load(Class<T> type, long id) throws Exception {
-    return super.loadInstance(datasource_.getQueryManager().getSelectQuery(type, id), type);
+    return super.loadInstance(datasource_.getQueryBuilder().createSelectQuery(type, id), type);
   }
   
-//  @SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")
   public void update(List<T> list) throws Exception {
     if(list == null) throw new Exception("The given beans null ") ;
     if(list.size() < 1) return;
@@ -38,31 +38,35 @@ public  class StandardSQLDAO<T extends DBObject>  extends DAO<T> {
       }
     }
     Class clazz = list.get(0).getClass();
-    execute(datasource_.getQueryManager().getUpdateQuery(clazz, -1), list);
+    execute(datasource_.getQueryBuilder().createUpdateQuery(clazz), list);
   }    
   
   public void update(T bean) throws Exception {
-    String query = datasource_.getQueryManager().getUpdateQuery(bean.getClass(), bean.getId());
+    String query = datasource_.getQueryBuilder().createUpdateQuery(bean.getClass(), bean.getId());
     execute(query, bean);
   }
   
-  public void save(List<T> beans) throws Exception {
+  @SuppressWarnings("unchecked")
+  public void save(List<T> list) throws Exception {
+    if(list == null) throw new Exception("The given beans null ") ;
+    if(list.size() < 1) return;
+    Class<T> clazz = (Class<T>)list.get(0).getClass();
+    execute(datasource_.getQueryBuilder().createUpdateQuery(clazz), list);
   }
-  
   
   public void save(T bean) throws Exception {
     if(bean.getId() == -1) bean.setId(datasource_.getIDGenerator().generateLongId(bean));
-    execute(datasource_.getQueryManager().getInsertQuery(bean.getClass(), bean.getId()), bean);
+    execute(datasource_.getQueryBuilder().createInsertQuery(bean.getClass(), bean.getId()), bean);
   }
   
   public T remove(Class<T> type, long id) throws Exception {
     T value = load(type, id);
     if(value == null) return null;
-    execute(datasource_.getQueryManager().getRemoveQuery(type, id), (T)null);
+    execute(datasource_.getQueryBuilder().createRemoveQuery(type, id), (T)null);
     return value;
   }
 
   public void remove(T bean) throws Exception {
-    execute(datasource_.getQueryManager().getRemoveQuery(bean.getClass(), bean.getId()), (T)null); 
+    execute(datasource_.getQueryBuilder().createRemoveQuery(bean.getClass(), bean.getId()), (T)null); 
   }
 }

@@ -6,8 +6,6 @@ package org.exoplatform.services.database;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.sql.XAConnection;
 import javax.sql.XADataSource;
@@ -88,5 +86,5 @@ public class ExoDatasource {
 
   public String getDatabaseVersion() { return databaseVersion_ ; }
 
-  public QueryBuilder getQueryManager() { return queryManager_; }
+  public QueryBuilder getQueryBuilder() { return queryManager_; }
 }

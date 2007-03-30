@@ -69,18 +69,20 @@ public abstract  class DAO<T extends DBObject> {
     }
   }
   
-  protected void execute(String query, List<T> beans) throws Exception {
+  protected void execute(String template, List<T> beans) throws Exception {
     Connection connection = null;
     Statement statement = null;
     try{
       connection = datasource_.getConnection() ;
       statement = connection.createStatement() ;
+      QueryBuilder builder = datasource_.getQueryBuilder();      
       for(T bean : beans) {
-        mapper_.mapSQL(bean, query) ;
+        String query = builder.mapDataToSql(template, mapper_.toParameters(bean));
+        statement.addBatch(query);
       }
       statement.executeBatch();
       datasource_.commit(connection) ;
-      System.out.println(" Executed queries "+query) ;
+      System.out.println(" Executed queries "+template) ;
     } catch (Exception e) {
       throw e;
     } finally {

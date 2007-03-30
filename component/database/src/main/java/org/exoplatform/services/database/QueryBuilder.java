@@ -4,10 +4,8 @@
  **************************************************************************/
 package org.exoplatform.services.database;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
 
 import org.exoplatform.services.database.annotation.Query;
 import org.exoplatform.services.database.annotation.Table;
@@ -29,7 +27,7 @@ public class QueryBuilder {
   
   public QueryBuilder(int dbType) { databaseType = dbType; }
   
-  public <T extends DBObject> String getSelectQuery(Class<T> type, long id) throws Exception {
+  public <T extends DBObject> String createSelectQuery(Class<T> type, long id) throws Exception {
     Table table = type.getAnnotation(Table.class) ;
     TableField[]  fields =  table.field() ;
     
@@ -43,7 +41,38 @@ public class QueryBuilder {
     return query.toString() ;
   }
   
-  public <T extends DBObject> String getUpdateQuery(Class<T> type, long id) throws Exception {
+  public <T extends DBObject> String createUpdateQuery(Class<T> type) throws Exception {
+    Table table = type.getAnnotation(Table.class) ;
+    TableField[]  fields =  table.field() ;
+    
+    StringBuilder query = new StringBuilder("UPDATE ").append(table.name()).append(" SET ");
+    for(int i = 0; i <  fields.length; i++) {
+      TableField  field =  fields[i] ;
+      query.append(field.name()).append(" = '$").append(field.name()).append('\'') ;
+      if (i !=  fields.length - 1) query.append(", ") ; else query.append(" WHERE id = $id");   
+    }
+    return query.toString() ;
+  }
+  
+  public <T extends DBObject> String createInsertQuery(Class<T> type) throws Exception {
+    Table table = type.getAnnotation(Table.class) ;
+    TableField[]  fields =  table.field() ;
+    
+    StringBuilder query = new StringBuilder("INSERT INTO ").append(table.name()).append("(id, ");
+    for(int i = 0; i <  fields.length; i++) {
+      TableField  field =  fields[i] ;
+      query.append(field.name()) ;
+      if (i !=  fields.length - 1)  query.append(", ") ; else query.append(") VALUES($id, ");
+    }
+    
+    for(int i = 0; i <  fields.length; i++) {
+      query.append("'$").append(fields[i].name()).append('\'') ;
+      if (i !=  fields.length - 1)  query.append(", "); else query.append(")");
+    }
+    return query.toString();
+  }
+  
+  public <T extends DBObject> String createUpdateQuery(Class<T> type, long id) throws Exception {
     Table table = type.getAnnotation(Table.class) ;
     TableField[]  fields =  table.field() ;
     
@@ -51,13 +80,13 @@ public class QueryBuilder {
     for(int i = 0; i <  fields.length; i++) {
       TableField  field =  fields[i] ;
       query.append(field.name()).append(" = ?") ;
-      if (i !=  fields.length - 1) query.append(", ") ;      
+      if (i !=  fields.length - 1) query.append(", "); else query.append(" WHERE id = ").append(id); 
     }
-    query.append(" WHERE id = ").append(id == -1 ? '?' : id);
+    
     return query.toString() ;
   }
   
-  public <T extends DBObject> String getInsertQuery(Class<T> clazz, long id) throws Exception {
+  public <T extends DBObject> String createInsertQuery(Class<T> clazz, long id) throws Exception {
     Table table = clazz.getAnnotation(Table.class);
     TableField[]  fields =  table.field() ;
     
@@ -65,20 +94,20 @@ public class QueryBuilder {
     for(int i = 0; i <  fields.length; i++) {
       TableField  field =  fields[i] ;
       query.append(field.name()) ;
-      if (i !=  fields.length - 1)  query.append(", ") ;
+      if(i != fields.length - 1) query.append(", "); 
     }
-    query.append(")").append(" VALUES(").append(id == -1 ? '?' : id).append(", ");
+    query.append(") VALUES(").append(id).append(", ");
+    
     for(int i = 0; i <  fields.length; i++) {
 //      TableField  field =  fields[i] ;
       query.append("?") ;
 //      if(i ==  field.length() - 1)  query.append(", ") ;
-      if (i !=  fields.length - 1)  query.append(", ") ;
+      if (i !=  fields.length - 1)  query.append(", ") ; else query.append(")");
     }
-    query.append(")") ;
     return query.toString();
   }
   
-  public <T extends DBObject> String getRemoveQuery(Class<T> type, long id) throws Exception {
+  public <T extends DBObject> String createRemoveQuery(Class<T> type, long id) throws Exception {
     Table table = type.getAnnotation(Table.class) ;
     StringBuilder builder = new StringBuilder("DELETE FROM ");
     builder.append(table.name()).append(" WHERE id = ").append(id).toString();
@@ -107,28 +136,7 @@ public class QueryBuilder {
     return null;
   }
   
-  public String prepareQuery(String seq, Object[] objects) throws Exception {
-    if(seq.length() < 1 || objects.length < 1) return seq.toString();
-    StringBuilder builder = new StringBuilder();
-    int i = 0;
-    int start  = 0;
-    int idx = 0;
-    while(i < seq.length()) {
-      if(seq.charAt(i) == '?') {
-        builder.append(seq.subSequence(start, i)).append(objects[idx]);
-        start = i+1;
-        idx++;
-      }
-      i++;
-    }
-    if(start > 0 && start < seq.length()) {
-      builder.append(seq.subSequence(start, seq.length())); 
-    }
-    if(builder.length() < 1) return seq.toString(); 
-    return builder.toString();
-  }
-  
-  public String mapDataToSql(String template, Object object) throws Exception {
+  public String mapDataToSql(String template, String[][] parameters) throws Exception {
     StringBuilder builder = new StringBuilder();
     int i = 0;
     int start  = 0;
@@ -154,15 +162,7 @@ public class QueryBuilder {
         j++;
       }
       String name = template.substring(i+1, j);
-      if(object instanceof String[]) {
-        start = replace(template, builder, (String[])object, name, start, i);
-      } else if(object instanceof String [][]) {
-        start = replace(template, builder, (String [][])object, name, start, i);
-      } else if(object instanceof Map) {
-        start = replace(template, builder, Map.class.cast(object), name, start, i);
-      } else {
-        start = replace(template, builder, object, name, start, i); 
-      }
+      start = replace(template, builder, parameters, name, start, i); 
       i++;
     }
     if(start > 0 && start < template.length()) {
@@ -182,7 +182,16 @@ public class QueryBuilder {
     return start;
   }
   
-  private int replace(String template, StringBuilder builder,
+  /*  will support 
+     if(object instanceof String[]) {
+        start = replace(template, builder, (String[])object, name, start, i);
+      } else if(object instanceof String [][]) {
+        start = replace(template, builder, (String [][])object, name, start, i);
+      } else if(object instanceof Map) {
+        start = replace(template, builder, Map.class.cast(object), name, start, i);
+      } else {
+      }
+    private int replace(String template, StringBuilder builder,
                       String [] params, String name, int start, int current) throws Exception {
     if(params.length != 2) throw new Exception("Parameter is incorrect!");
     if(!params[0].equals(name)) return start;
@@ -211,7 +220,7 @@ public class QueryBuilder {
     if(value == null) value = new String();
     builder.append(template.subSequence(start, current)).append(value);
     return current + 1 + name.length();
-  }
+  }*/
 
   public String encode(CharSequence seq) {
     if(seq.length() < 1) return seq.toString();

@@ -34,7 +34,7 @@ public  class ExoLongIDDAO extends DAO<ExoLongID>  {
 
   static public class ExoLongIDMapper implements Mapper<ExoLongID> {
 
-    public String mapSQL(ExoLongID bean, String template) throws Exception {
+    public String[][] toParameters(ExoLongID bean) throws Exception {
       return null;
     }
 

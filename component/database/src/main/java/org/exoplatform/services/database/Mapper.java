@@ -17,7 +17,7 @@ public interface Mapper<T extends DBObject> {
   
   public  void mapUpdate(T bean, PreparedStatement statement) throws Exception ;
   
-  public String mapSQL(T bean, String template) throws Exception ;
+  public String [][] toParameters(T bean) throws Exception ;
   
   public void mapResultSet(ResultSet res, T bean) throws Exception ;
   
