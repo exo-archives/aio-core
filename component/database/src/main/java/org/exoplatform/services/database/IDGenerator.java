@@ -59,7 +59,7 @@ public class IDGenerator {
       idTracker = new IDTracker(idObject, currentId) ;
       idTrackers_.put(type, idTracker) ;
       
-      System.out.println("+++>>" + dao_.load(ExoLongID.class, 1))  ;
+      System.out.println("+++>>" + dao_.load(1))  ;
     }
     
     long generatedId = ++idTracker.currentId_ ;

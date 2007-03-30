@@ -29,7 +29,7 @@ public  class ExoLongIDDAO extends DAO<ExoLongID>  {
     Table table = ExoLongID.class.getAnnotation(Table.class) ;   
     StringBuilder builder = new StringBuilder("SELECT NAME, START FROM ");
     builder.append(table.name()).append(" WHERE name = '").append(name).append('\'');
-    return loadByQuery(ExoLongID.class, builder.toString()) ;
+    return loadByQuery(builder.toString()) ;
   }
 
   static public class ExoLongIDMapper implements Mapper<ExoLongID> {
@@ -49,35 +49,22 @@ public  class ExoLongIDDAO extends DAO<ExoLongID>  {
     } 
   }
   
-  public ExoLongID createInstance(Class<ExoLongID> type) throws Exception {
-    return null;
-  }
+  public ExoLongID createInstance() throws Exception { return new ExoLongID(); }
 
-  public ExoLongID load(Class<ExoLongID> type, long id) throws Exception {
-    return null;
-  }
+  public ExoLongID load(long id) throws Exception { return null; }
+  
+  public List<ExoLongID> loadAll() throws Exception { return null; }
 
-  public ExoLongID loadUnique(Class<ExoLongID> type, String query) throws Exception {
-    return null;
-  }
+  public ExoLongID remove(long id) throws Exception { return null; }
 
-  public ExoLongID remove(Class<ExoLongID> type, long id) throws Exception {
-    return null;
-  }
+  public void remove(ExoLongID bean) throws Exception {}
 
-  public void remove(ExoLongID bean) throws Exception {
-  }
+  public void save(ExoLongID bean) throws Exception {}
 
-  public void save(ExoLongID bean) throws Exception {
-  }
+  public void save(List<ExoLongID> beans) throws Exception {}
 
-  public void save(List<ExoLongID> beans) throws Exception {
-  }
+  public void update(ExoLongID bean) throws Exception {}
 
-  public void update(ExoLongID bean) throws Exception {
-  }
-
-  public void update(List<ExoLongID> beans) throws Exception {
-  }
+  public void update(List<ExoLongID> beans) throws Exception { }
   
 }

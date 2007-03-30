@@ -14,18 +14,21 @@ import java.util.List;
  */
 public  class StandardSQLDAO<T extends DBObject> extends DAO<T> {
   
-  public StandardSQLDAO(ExoDatasource datasource, Mapper<T> mapper) {
+  private Class<T> type_;
+  
+  public StandardSQLDAO(ExoDatasource datasource, Mapper<T> mapper, Class<T> type) {
     super(datasource, mapper) ;
+    this.type_ = type;
   }
   
-  public T createInstance(Class<T> type) throws Exception { return type.newInstance(); }
+  public T createInstance() throws Exception { return type_.newInstance(); }
 
-  public T loadUnique(Class<T> type, String query) throws Exception {
-    return super.loadInstance(query, type);
+  public T load(long id) throws Exception {
+    return super.loadInstance(datasource_.getQueryBuilder().createSelectQuery(type_, id));
   }
-
-  public  T load(Class<T> type, long id) throws Exception {
-    return super.loadInstance(datasource_.getQueryBuilder().createSelectQuery(type, id), type);
+  
+  public List<T> loadAll() throws Exception {
+    return super.loadByQuery(datasource_.getQueryBuilder().createSelectQuery(type_, -1));
   }
   
   @SuppressWarnings("unchecked")
@@ -37,12 +40,11 @@ public  class StandardSQLDAO<T extends DBObject> extends DAO<T> {
         throw new Exception("The given bean " + bean.getClass() + " doesn't have an id") ;
       }
     }
-    Class clazz = list.get(0).getClass();
-    execute(datasource_.getQueryBuilder().createUpdateQuery(clazz), list);
+    execute(datasource_.getQueryBuilder().createUpdateQuery(type_), list);
   }    
   
   public void update(T bean) throws Exception {
-    String query = datasource_.getQueryBuilder().createUpdateQuery(bean.getClass(), bean.getId());
+    String query = datasource_.getQueryBuilder().createUpdateQuery(type_, bean.getId());
     execute(query, bean);
   }
   
@@ -50,8 +52,7 @@ public  class StandardSQLDAO<T extends DBObject> extends DAO<T> {
   public void save(List<T> list) throws Exception {
     if(list == null) throw new Exception("The given beans null ") ;
     if(list.size() < 1) return;
-    Class<T> clazz = (Class<T>)list.get(0).getClass();
-    execute(datasource_.getQueryBuilder().createUpdateQuery(clazz), list);
+    execute(datasource_.getQueryBuilder().createUpdateQuery(type_), list);
   }
   
   public void save(T bean) throws Exception {
@@ -59,14 +60,16 @@ public  class StandardSQLDAO<T extends DBObject> extends DAO<T> {
     execute(datasource_.getQueryBuilder().createInsertQuery(bean.getClass(), bean.getId()), bean);
   }
   
-  public T remove(Class<T> type, long id) throws Exception {
-    T value = load(type, id);
+  public T remove(long id) throws Exception {
+    T value = load(id);
     if(value == null) return null;
-    execute(datasource_.getQueryBuilder().createRemoveQuery(type, id), (T)null);
+    execute(datasource_.getQueryBuilder().createRemoveQuery(type_, id), (T)null);
     return value;
   }
 
   public void remove(T bean) throws Exception {
-    execute(datasource_.getQueryBuilder().createRemoveQuery(bean.getClass(), bean.getId()), (T)null); 
+    execute(datasource_.getQueryBuilder().createRemoveQuery(type_, bean.getId()), (T)null); 
   }
+
+  public Class<T> getType() { return type_; }
 }

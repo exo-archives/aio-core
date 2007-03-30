@@ -22,8 +22,7 @@ public class QueryBuilder {
   
   private int databaseType = ExoDatasource.STANDARD_DB_TYPE;
   
-  public QueryBuilder() {
-  }
+  public QueryBuilder() {}
   
   public QueryBuilder(int dbType) { databaseType = dbType; }
   
@@ -37,7 +36,8 @@ public class QueryBuilder {
       query.append(field.name()) ;
       if (i !=  fields.length - 1) query.append(", ") ;      
     }
-    query.append(" FROM ").append(table.name()).append(" WHERE id = ").append(id);
+    query.append(" FROM ").append(table.name());
+    if(id > -1) query.append(" WHERE id = ").append(id);
     return query.toString() ;
   }
   

@@ -11,6 +11,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sql.rowset.CachedRowSet;
+
+import com.sun.rowset.CachedRowSetImpl;
+
 /**
  * Created by The eXo Platform SARL
  * Author : Tuan Nguyen
@@ -29,8 +33,8 @@ public abstract  class DAO<T extends DBObject> {
   
   public ExoDatasource getExoDatasource() { return datasource_ ; }
     
-  abstract public T load(Class<T> type, long id) throws Exception ;
-  abstract public T loadUnique(Class<T> type, String query) throws Exception ;
+  abstract public T load(long id) throws Exception ;
+  abstract public List<T> loadAll() throws Exception ;
   
   abstract public void update(T bean) throws Exception ;
   abstract public void update(List<T> beans) throws Exception; 
@@ -39,14 +43,105 @@ public abstract  class DAO<T extends DBObject> {
   abstract public void save(List<T> beans) throws Exception; 
   
   abstract public void remove(T bean) throws Exception ;
-  abstract public T remove(Class<T> type, long id) throws Exception ;
+  abstract public T remove(long id) throws Exception ;
   
-  abstract public T createInstance(Class<T> type) throws Exception ;
+  abstract public T createInstance() throws Exception ;
   
-  public List<T> loadByQuery(Class<T> type, String query) throws Exception {
+  public List<T> loadByQuery(String query) throws Exception {
     List<T> list = new ArrayList<T>();
-    loadInstances(query, type, list);
+    loadInstances(query, list);
     return list;
+  }
+  
+  @SuppressWarnings("unchecked")
+  public void loadPageList(DBPageList<T> pageList, String query) throws Exception {
+    Connection connection = null;
+    Statement statement = null;
+    try {
+      connection = datasource_.getConnection() ;
+      statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+      ResultSet resultSet = statement.executeQuery(query);
+      
+      CachedRowSet crs = new CachedRowSetImpl();
+      crs.setPageSize(pageList.getPageSize());
+      crs.populate(resultSet, (pageList.getCurrentPage() - 1) * pageList.getPageSize() + 1);
+      
+      List<T>  list = pageList.currentPage();
+      while (resultSet.next()) {
+        T bean = createInstance() ;
+        mapper_.mapResultSet(resultSet, bean) ;
+        list.add(bean) ;
+      }
+      resultSet.close() ;
+    } catch (Exception e) {
+      throw e;
+    } finally {
+      if (statement != null) statement.close();
+      if (connection != null) datasource_.closeConnection(connection) ; 
+    }
+  }
+  
+  @SuppressWarnings("unchecked")
+  public <E> E loadValue(String query) throws Exception {
+    Connection connection = null;
+    Statement statement = null;
+    try{
+      connection = datasource_.getConnection() ;
+      statement = connection.createStatement() ;
+      ResultSet resultSet =  statement.executeQuery(query) ;
+      if(!resultSet.next()) return null ;
+      E value =  (E)resultSet.getObject(1);
+      statement.close() ;
+      resultSet.close() ;
+      return value ;
+    } catch (Exception e) {
+      throw e;
+    } finally {
+      if (statement != null) statement.close();
+      if (connection != null) datasource_.closeConnection(connection) ; 
+    }
+  }
+  
+  protected T loadInstance(String query) throws Exception {
+    Connection connection = null;
+    Statement statement = null;
+    try{
+      connection = datasource_.getConnection() ;
+      statement = connection.createStatement() ;
+      ResultSet resultSet =  statement.executeQuery(query) ;
+      if(!resultSet.next()) return null ;
+      T bean =  createInstance() ;
+      mapper_.mapResultSet(resultSet, bean) ;
+      statement.close() ;
+      resultSet.close() ;
+      return bean ;
+    } catch (Exception e) {
+      throw e;
+    } finally {
+      if (statement != null) statement.close();
+      if (connection != null) datasource_.closeConnection(connection) ; 
+    }
+  }
+  
+  protected void loadInstances(String loadQuery, List<T> list) throws Exception {
+    Connection connection = null;
+    Statement statement = null;
+    try{
+      connection = datasource_.getConnection() ;
+      statement = connection.createStatement() ;
+      ResultSet resultSet =  statement.executeQuery(loadQuery) ;
+      while (resultSet.next()) {
+        T bean = createInstance() ;
+        mapper_.mapResultSet(resultSet, bean) ;
+        list.add(bean) ;
+      }
+      resultSet.close() ;
+    } catch (Exception e) {
+      throw e;
+    } finally {
+      if (statement != null) statement.close();
+      if (connection != null) datasource_.closeConnection(connection) ; 
+    }
   }
   
   protected void execute(String query, T bean) throws Exception {
@@ -83,48 +178,6 @@ public abstract  class DAO<T extends DBObject> {
       statement.executeBatch();
       datasource_.commit(connection) ;
       System.out.println(" Executed queries "+template) ;
-    } catch (Exception e) {
-      throw e;
-    } finally {
-      if (statement != null) statement.close();
-      if (connection != null) datasource_.closeConnection(connection) ; 
-    }
-  }
-  
-  protected T loadInstance(String query, Class<T> type) throws Exception {
-    Connection connection = null;
-    Statement statement = null;
-    try{
-      connection = datasource_.getConnection() ;
-      statement = connection.createStatement() ;
-      ResultSet resultSet =  statement.executeQuery(query) ;
-      if(!resultSet.next()) return null ;
-      T bean =  createInstance(type) ;
-      mapper_.mapResultSet(resultSet, bean) ;
-      statement.close() ;
-      resultSet.close() ;
-      return bean ;
-    } catch (Exception e) {
-      throw e;
-    } finally {
-      if (statement != null) statement.close();
-      if (connection != null) datasource_.closeConnection(connection) ; 
-    }
-  }
-  
-  protected void loadInstances(String loadQuery, Class<T> type, List<T> list) throws Exception {
-    Connection connection = null;
-    Statement statement = null;
-    try{
-      connection = datasource_.getConnection() ;
-      statement = connection.createStatement() ;
-      ResultSet resultSet =  statement.executeQuery(loadQuery) ;
-      while (resultSet.next()) {
-        T bean = createInstance(type) ;
-        mapper_.mapResultSet(resultSet, bean) ;
-        list.add(bean) ;
-      }
-      resultSet.close() ;
     } catch (Exception e) {
       throw e;
     } finally {

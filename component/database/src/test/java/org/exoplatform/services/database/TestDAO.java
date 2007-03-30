@@ -35,11 +35,11 @@ public class TestDAO extends TestCase {
     dbManager.createTable(Mock.class, true) ;
     assertEquals(dbManager.hasTable(Mock.class), true);
     
-    StandardSQLDAO<Mock>  dao = new StandardSQLDAO<Mock>(dataSource, new Mock.MockMapper());
+    StandardSQLDAO<Mock>  dao = new StandardSQLDAO<Mock>(dataSource, new Mock.MockMapper(), Mock.class);
     Mock mock = new Mock("benj", 2);
     dao.save(mock);
     
-    Mock savedMock = dao.load(Mock.class, mock.getId());
+    Mock savedMock = dao.load(mock.getId());
     assertEquals(mock.getName(), savedMock.getName());
   }
   
