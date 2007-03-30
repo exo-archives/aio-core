@@ -6,6 +6,8 @@ package org.exoplatform.services.database;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sql.XAConnection;
 import javax.sql.XADataSource;
@@ -16,6 +18,7 @@ import javax.sql.XADataSource;
  * Apr 4, 2006
  */
 public class ExoDatasource {
+  
   final public static int STANDARD_DB_TYPE  = 0;
   final public static int HSQL_DB_TYPE  = 1;
   final public static int MYSQL_DB_TYPE  = 2;
@@ -26,6 +29,7 @@ public class ExoDatasource {
   private XADataSource xaDatasource_  ;
   private DBTableManager tableManager_ ;
   private IDGenerator  idGenerator_ ;
+  private QueryBuilder queryManager_;
   private String databaseName_ ;
   private String databaseVersion_ ;
   private int dbType_ = STANDARD_DB_TYPE;
@@ -52,8 +56,8 @@ public class ExoDatasource {
     }
     
     tableManager_ = DBTableManager.createDBTableManager(this) ;
-    //TODO: Create IDGenrator and test
     idGenerator_ = new IDGenerator(this) ;
+    queryManager_ = new QueryBuilder(dbType_);
   }
   
   public XADataSource getDatasource() { return xaDatasource_ ;}
@@ -76,11 +80,13 @@ public class ExoDatasource {
 
   public  DBTableManager getDBTableManager()  { return tableManager_ ; }
   
-  public  IDGenerator  getIDGenerator() { return null ; }
+  public  IDGenerator  getIDGenerator() { return idGenerator_ ; }
   
   public int getDatabaseType()  { return dbType_ ; }
   
   public String getDatabaseName() { return databaseName_ ;}
 
   public String getDatabaseVersion() { return databaseVersion_ ; }
+
+  public QueryBuilder getQueryManager() { return queryManager_; }
 }

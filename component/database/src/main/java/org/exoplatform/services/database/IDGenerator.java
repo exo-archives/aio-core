@@ -7,7 +7,6 @@ package org.exoplatform.services.database;
 import java.util.HashMap;
 import java.util.List;
 
-import org.exoplatform.services.database.annotation.Table;
 import org.exoplatform.services.database.table.ExoLongID;
 import org.exoplatform.services.database.table.ExoLongIDDAO;
 
@@ -18,19 +17,19 @@ import org.exoplatform.services.database.table.ExoLongIDDAO;
  * Apr 4, 2006
  */
 public class IDGenerator {
+  
   private HashMap<Class, IDTracker> idTrackers_  ;
-  private ExoLongIDDAO dao_ ;
+  private ExoLongIDDAO dao_;
   
   public IDGenerator(ExoDatasource datasource) throws Exception {
     idTrackers_  = new HashMap<Class, IDTracker>();
-    dao_  = new ExoLongIDDAO(datasource) ;
    
     //TODO: check  and create ExoLongID  table if it is not existed   
     DBTableManager tableManager = datasource.getDBTableManager();
     if (!tableManager.hasTable(ExoLongID.class)) {
       tableManager.createTable(ExoLongID.class, true);
     }
-    
+    dao_ = new ExoLongIDDAO(datasource); 
   }
   
   public <T extends DBObject> long generateLongId(T bean) throws Exception {
@@ -42,17 +41,13 @@ public class IDGenerator {
     IDTracker idTracker =  idTrackers_.get(type) ;  
     
     if(idTracker == null) {
-      Table table = ExoLongID.class.getAnnotation(Table.class) ;    
-      String loadQuery =  
-        "SELECT * FROM " + table.name() + " WHERE name = '" +  type.getName()  + "'" ;
-      System.out.println("\n=======> loadQuery: " + loadQuery + "\n");
-      List<ExoLongID> list = dao_.load(ExoLongID.class, loadQuery) ;
+      List<ExoLongID> list = dao_.loadObjectByName(type.getName()) ;
       System.out.println("\n=======> list.size() " + list.size());
       ExoLongID idObject ;  
       long currentId = 0 ;
       if (list.size() == 0) {       
         idObject = new ExoLongID(type.getName(), ExoLongID.BLOCK_SIZE) ;
-        dao_.save(idObject, 1);       
+        dao_.save(idObject);       
       } else if(list.size() == 1) {
         idObject = list.get(0);
         currentId = idObject.getCurrentBlockId() ;
@@ -76,9 +71,7 @@ public class IDGenerator {
   }
   
   //for testing
-  public void restartTracker() {
-    idTrackers_.clear() ;
-  }
+  public void restartTracker() { idTrackers_.clear() ; }
   
   static private class IDTracker {
     ExoLongID blockTracker ;

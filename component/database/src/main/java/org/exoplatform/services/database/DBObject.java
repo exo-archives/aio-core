@@ -11,7 +11,8 @@ package org.exoplatform.services.database;
  * Mar 15, 2007  
  */
 abstract public class DBObject {
-  private long id_ ;
+  
+  private long id_ = -1 ;
 
   public long getId() {  return id_ ; }
   public void setId(long id) { id_ = id ; }

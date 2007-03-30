@@ -9,8 +9,6 @@ import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.services.database.jdbc.CreateDBSchemaPlugin;
 import org.exoplatform.services.database.jdbc.DBSchemaCreator;
 
-
-
 /**
  * Created by The eXo Platform SARL .
  * 

@@ -4,15 +4,7 @@
  **************************************************************************/
 package org.exoplatform.services.database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
-
-import org.exoplatform.services.database.annotation.Table;
-import org.exoplatform.services.database.annotation.TableField;
 
 /**
  * Created by The eXo Platform SARL
@@ -20,118 +12,57 @@ import org.exoplatform.services.database.annotation.TableField;
  *          tuan08@users.sourceforge.net
  * Apr 4, 2006
  */
-abstract public  class StandardSQLDAO<T extends DBObject>  extends DAO<T> {
+public  class StandardSQLDAO<T extends DBObject>  extends DAO<T> {
   
-  public StandardSQLDAO(ExoDatasource ds) {
-    super(ds) ;
+  public StandardSQLDAO(ExoDatasource datasource, Mapper<T> mapper) {
+    super(datasource, mapper) ;
+  }
+  
+  public T createInstance(Class<T> type) throws Exception { return type.newInstance(); }
+
+  public T loadUnique(Class<T> type, String query) throws Exception {
+    return super.loadInstance(query, type);
   }
 
   public  T load(Class<T> type, long id) throws Exception {
-    Table table = type.getAnnotation(Table.class) ;
-    String loadQuery =  "SELECT * FROM " + table.name() + " WHERE id = " +  id ;
-    System.out.println("LOAD QUERY: " + loadQuery) ;
-    T bean =  createInstance(type) ;
-    Connection conn = datasource_.getConnection() ;
-    Statement statement = conn.createStatement() ;
-    ResultSet res =  statement.executeQuery(loadQuery) ;
-    if(!res.next())  return null ;
-    mapResultSet(res, bean) ;
-    statement.close() ;
-    res.close() ;
-    return bean ;
+    return super.loadInstance(datasource_.getQueryManager().getSelectQuery(type, id), type);
   }
-    
-  public List<T> load(Class<T> type, String loadQuery) throws Exception {
-    Connection conn = datasource_.getConnection() ;
-    Statement statement = conn.createStatement() ;
-    ResultSet res =  statement.executeQuery(loadQuery) ;
-    List<T> list = new ArrayList<T>();
-    while (res.next()) {
-      T bean =  createInstance(type) ;
-      mapResultSet(res, bean) ;
-      list.add(bean) ;
+  
+//  @SuppressWarnings("unchecked")
+  public void update(List<T> list) throws Exception {
+    if(list == null) throw new Exception("The given beans null ") ;
+    if(list.size() < 1) return;
+    for(T bean : list){
+      if(bean.getId() < 0) {
+        throw new Exception("The given bean " + bean.getClass() + " doesn't have an id") ;
+      }
     }
-    statement.close() ;
-    res.close() ;
-    return list ;
+    Class clazz = list.get(0).getClass();
+    execute(datasource_.getQueryManager().getUpdateQuery(clazz, -1), list);
+  }    
+  
+  public void update(T bean) throws Exception {
+    String query = datasource_.getQueryManager().getUpdateQuery(bean.getClass(), bean.getId());
+    execute(query, bean);
   }
   
-  @SuppressWarnings("unchecked")
-  public  T update(T bean) throws Exception {
-    if(bean.getId() < 0) {
-      throw new Exception("The given bean " + bean.getClass() + " doesn't have an id") ;
-    }
-    Connection conn = getExoDatasource().getConnection() ;
-    Class<T>  type = (Class<T>)bean.getClass() ;
-    PreparedStatement statement = conn.prepareStatement(getUpdateQuery(type, bean.getId())) ;
-    mapUpdate(bean, statement) ;
-    statement.executeUpdate() ;
-    statement.close() ;
-    datasource_.commit(conn) ;
-    datasource_.closeConnection(conn) ;
-    return bean ;
-  }
-  
-  @SuppressWarnings("unchecked")
-  public  T save(T bean,  long id) throws Exception {
-    Connection conn = datasource_.getConnection() ;
-    Class<T>  type = (Class<T>)bean.getClass() ;
-    PreparedStatement statement = conn.prepareStatement(getInsertQuery(type, id)) ;
-    bean.setId(id) ;
-    mapUpdate(bean, statement) ;
-    System.out.println("INSERT STATUS: " + statement.executeUpdate() + ", id = " + id) ;
-    statement.close() ;
-    datasource_.commit(conn) ;
-    datasource_.closeConnection(conn) ;
-    return bean ;
-  }
-  
-  public  T remove(T bean, long id) throws Exception {
-    return bean ;
+  public void save(List<T> beans) throws Exception {
   }
   
   
-  protected String  getUpdateQuery(Class<T> type, long id) throws Exception {
-    Table table = type.getAnnotation(Table.class) ;
-    String updateQuery = 
-      "UPDATE " + table.name() + " SET " ; 
-    TableField[]  fields =  table.field() ;
-    for(int i = 0; i <  fields.length; i++) {
-      TableField  field =  fields[i] ;
-      updateQuery += field.name() + " = ?" ;
-      if (i !=  fields.length - 1)  updateQuery += ", " ;      
-    }
-    updateQuery += 
-      " WHERE id = " +  id ;
-    return updateQuery ;
+  public void save(T bean) throws Exception {
+    if(bean.getId() == -1) bean.setId(datasource_.getIDGenerator().generateLongId(bean));
+    execute(datasource_.getQueryManager().getInsertQuery(bean.getClass(), bean.getId()), bean);
   }
   
-  protected String  getInsertQuery(Class<T> type, long id) throws Exception {
-    Table table = type.getAnnotation(Table.class) ;
-    TableField[]  fields =  table.field() ;
-    StringBuilder query = new StringBuilder(500) ;
-    query. 
-      append("INSERT INTO " + table.name() + "(id, ") ;
-    for(int i = 0; i <  fields.length; i++) {
-      TableField  field =  fields[i] ;
-      query.append(field.name()) ;
-      if (i !=  fields.length - 1)  query.append(", ") ;
-    }
-    query.append(")") ;
-    query.append(" VALUES(").append(id).append(", ");
-    for(int i = 0; i <  fields.length; i++) {
-//      TableField  field =  fields[i] ;
-      query.append("?") ;
-//      if(i ==  field.length() - 1)  query.append(", ") ;
-      if (i !=  fields.length - 1)  query.append(", ") ;
-    }
-    query.append(")") ;
-    System.out.println("INSERT QUERY: " + query.toString());
-    return query.toString() ;
+  public T remove(Class<T> type, long id) throws Exception {
+    T value = load(type, id);
+    if(value == null) return null;
+    execute(datasource_.getQueryManager().getRemoveQuery(type, id), (T)null);
+    return value;
   }
-  
-  protected String  getRemoveQuery(Class<T> type, long id) throws Exception {
-    Table table = type.getAnnotation(Table.class) ;
-    return "DELETE FROM " + table.name() + " WHERE id = '" +  id  + "'" ;
+
+  public void remove(T bean) throws Exception {
+    execute(datasource_.getQueryManager().getRemoveQuery(bean.getClass(), bean.getId()), (T)null); 
   }
 }

@@ -6,15 +6,12 @@ package org.exoplatform.services.database;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 
 import javax.transaction.UserTransaction;
 
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.services.database.annotation.Table;
 import org.exoplatform.services.database.table.ExoLongID;
-import org.exoplatform.services.database.table.ExoLongIDDAO;
 import org.exoplatform.services.transaction.TransactionService;
 import org.exoplatform.test.BasicTestCase;
 /*
@@ -32,7 +29,7 @@ public class TestDatabaseService extends BasicTestCase {
       (DatabaseService) pcontainer.getComponentInstance("XAPoolTxSupportDBConnectionService") ;
     //assertConfiguration(service) ;
 //    assertDBTableManager(service);
-    assertIDGenerator(service);
+//    assertIDGenerator(service);
   }
   
   private void assertConfiguration(DatabaseService service)  throws Exception {
@@ -74,16 +71,16 @@ public class TestDatabaseService extends BasicTestCase {
     System.err.println("\n\n===>ASERT DBTableManager\n") ;
     ExoDatasource  datasource = service.getDatasource() ;
     DBTableManager dbManager = datasource.getDBTableManager() ;
-    assertEquals(dbManager.hasTable(TestTable.class), false);
-    dbManager.createTable(TestTable.class, true) ;
+    assertEquals(dbManager.hasTable(Mock.class), false);
+    dbManager.createTable(Mock.class, true) ;
     
     //Test meta data here
 //    ResultSetMetaData metaData = datasource.g
     
-    assertEquals(dbManager.hasTable(TestTable.class), true);
-    dbManager.dropTable(TestTable.class);
+    assertEquals(dbManager.hasTable(Mock.class), true);
+    dbManager.dropTable(Mock.class);
     
-    assertEquals(dbManager.hasTable(TestTable.class), false);
+    assertEquals(dbManager.hasTable(Mock.class), false);
     
     //Test metadata here
   /*  Connection conn = service.getConnection() ;
