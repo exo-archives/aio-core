@@ -12,7 +12,7 @@ import java.util.List;
  *          tuan08@users.sourceforge.net
  * Apr 4, 2006
  */
-public  class StandardSQLDAO<T extends DBObject>  extends DAO<T> {
+public  class StandardSQLDAO<T extends DBObject> extends DAO<T> {
   
   public StandardSQLDAO(ExoDatasource datasource, Mapper<T> mapper) {
     super(datasource, mapper) ;

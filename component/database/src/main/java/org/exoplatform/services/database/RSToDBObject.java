@@ -5,7 +5,6 @@
 package org.exoplatform.services.database;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 
 /**
  * Created by The eXo Platform SARL
