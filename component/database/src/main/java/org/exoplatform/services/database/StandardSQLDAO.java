@@ -16,7 +16,12 @@ public  class StandardSQLDAO<T extends DBObject> extends DAO<T> {
   
   private Class<T> type_;
   
-  public StandardSQLDAO(ExoDatasource datasource, Mapper<T> mapper, Class<T> type) {
+  public StandardSQLDAO(ExoDatasource datasource, Class<T> type) {
+    super(datasource);
+    this.type_ = type;
+  }
+  
+  public StandardSQLDAO(ExoDatasource datasource, DBObjectMapper<T> mapper, Class<T> type) {
     super(datasource, mapper) ;
     this.type_ = type;
   }
@@ -52,7 +57,10 @@ public  class StandardSQLDAO<T extends DBObject> extends DAO<T> {
   public void save(List<T> list) throws Exception {
     if(list == null) throw new Exception("The given beans null ") ;
     if(list.size() < 1) return;
-    execute(datasource_.getQueryBuilder().createUpdateQuery(type_), list);
+    for(T bean  : list) {
+      if(bean.getId() == -1) bean.setId(datasource_.getIDGenerator().generateLongId(bean));
+    }
+    execute(datasource_.getQueryBuilder().createInsertQuery(type_), list);
   }
   
   public void save(T bean) throws Exception {

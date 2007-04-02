@@ -7,6 +7,8 @@ package org.exoplatform.services.database;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -36,11 +38,23 @@ public class TestDAO extends TestCase {
     assertEquals(dbManager.hasTable(Mock.class), true);
     
     StandardSQLDAO<Mock>  dao = new StandardSQLDAO<Mock>(dataSource, new Mock.MockMapper(), Mock.class);
-    Mock mock = new Mock("benj", 2);
+    Mock mock = new Mock("Benj", 2);
     dao.save(mock);
+    
+    List<Mock> list  = new ArrayList<Mock>();
+    list.add(new Mock("Thuannd", 12));    
+    list.add(new Mock("Hung", 4));
+    dao.save(list);
     
     Mock savedMock = dao.load(mock.getId());
     assertEquals(mock.getName(), savedMock.getName());
+    
+    //reflection mapper
+    dao = new StandardSQLDAO<Mock>(dataSource, Mock.class);
+    list.clear();
+    list.add(new Mock("Ha", 17));
+    list.add(new Mock("Hoa", 6));
+    dao.save(list);
   }
   
   private String printQueryResult(DatabaseService service) throws Exception {

@@ -18,6 +18,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 public @interface TableField {
   String name() ;
+  String field() default "";
   String type() ;
   int    length() default -1;
   boolean unique()  default false;

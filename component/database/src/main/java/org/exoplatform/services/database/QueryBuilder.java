@@ -140,7 +140,6 @@ public class QueryBuilder {
     StringBuilder builder = new StringBuilder();
     int i = 0;
     int start  = 0;
-    
     while(i < template.length()) {
       if(template.charAt(i) != '$') {
         i++;
@@ -159,6 +158,8 @@ public class QueryBuilder {
       int j = i + 1;
       while(j < template.length()) {
         if(Character.isWhitespace(template.charAt(j))) break;
+        if(template.charAt(j) == '\'' && template.charAt(j-1) != '\\') break;
+        if(template.charAt(j) == ',' && template.charAt(j-1) != '\\') break;
         j++;
       }
       String name = template.substring(i+1, j);

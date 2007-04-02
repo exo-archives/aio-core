@@ -21,12 +21,17 @@ import com.sun.rowset.CachedRowSetImpl;
  *          tuan08@users.sourceforge.net
  * Apr 4, 2006
  */
-public abstract  class DAO<T extends DBObject> {
+public abstract class DAO<T extends DBObject> {
   
   protected ExoDatasource datasource_ ;
-  protected Mapper<T> mapper_; 
+  protected DBObjectMapper<T> mapper_; 
   
-  public DAO(ExoDatasource datasource, Mapper<T> mapper) {
+  public DAO(ExoDatasource datasource) {
+    datasource_ = datasource ;
+    mapper_ = new ReflectionMapper<T>();
+  }
+  
+  public DAO(ExoDatasource datasource, DBObjectMapper<T> mapper) {
     datasource_ = datasource ;
     mapper_ = mapper;
   }
@@ -170,14 +175,14 @@ public abstract  class DAO<T extends DBObject> {
     try{
       connection = datasource_.getConnection() ;
       statement = connection.createStatement() ;
-      QueryBuilder builder = datasource_.getQueryBuilder();      
+      QueryBuilder builder = datasource_.getQueryBuilder();
       for(T bean : beans) {
         String query = builder.mapDataToSql(template, mapper_.toParameters(bean));
         statement.addBatch(query);
+        System.out.println(" addBatch "+query) ;
       }
       statement.executeBatch();
       datasource_.commit(connection) ;
-      System.out.println(" Executed queries "+template) ;
     } catch (Exception e) {
       throw e;
     } finally {

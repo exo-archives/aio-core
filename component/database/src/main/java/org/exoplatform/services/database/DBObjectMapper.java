@@ -13,13 +13,12 @@ import java.sql.ResultSet;
  *          nhudinhthuan@exoplatform.com
  * Mar 29, 2007  
  */
-public interface Mapper<T extends DBObject> {
+public interface DBObjectMapper<T extends DBObject> {
   
   public  void mapUpdate(T bean, PreparedStatement statement) throws Exception ;
   
   public String [][] toParameters(T bean) throws Exception ;
   
   public void mapResultSet(ResultSet res, T bean) throws Exception ;
-  
   
 }

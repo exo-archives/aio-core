@@ -18,13 +18,13 @@ import java.util.List;
 public class ReflectionUtil {
   
   public final static void setValue(Object bean, Field field, Object value) throws Exception {
-//    Class clazz = bean.getClass();
-//    Method method = getMethod("set", field, clazz);
-//    if(method != null) return method.invoke(bean, new Object[]{});
-//    method = getMethod("is", field, clazz);
-//    if(method != null) return method.invoke(bean, new Object[]{});
-//    field.setAccessible(true);
-//    return field.get(bean);
+    Class clazz = bean.getClass();
+    Method method = getMethod("set", field, clazz);
+    if(method != null) method.invoke(bean, new Object[]{value});
+    method = getMethod("put", field, clazz);
+    if(method != null) method.invoke(bean, new Object[]{value});
+    field.setAccessible(true);
+    field.set(bean, value);
   }
   
   public final static Object getValue(Object bean, Field field) throws Exception {

@@ -16,10 +16,17 @@ import org.exoplatform.services.transaction.TransactionService;
 public interface DatabaseService {
   
   public ExoDatasource getDatasource() throws Exception ;
+  
   public ExoDatasource getDatasource(String dsname) throws Exception ;
+  
+  
   public Connection getConnection() throws Exception ;
+  
   public Connection getConnection(String  dsName) throws Exception ;
+  
   public void closeConnection(Connection conn) throws Exception ;
+  
+  
   public TransactionService getTransactionService() throws Exception ;
 
 }

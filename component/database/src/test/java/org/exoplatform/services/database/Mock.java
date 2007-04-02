@@ -54,7 +54,7 @@ public class Mock extends DBObject {
   public void setStatus(int status) { this.status = status; }
 
 
-  static public class MockMapper implements Mapper<Mock> {
+  static public class MockMapper implements DBObjectMapper<Mock> {
 
     public String[][] toParameters(Mock bean) throws Exception {
       java.sql.Date date = new java.sql.Date(bean.getStart().getTimeInMillis());

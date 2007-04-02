@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.exoplatform.services.database.DAO;
 import org.exoplatform.services.database.ExoDatasource;
-import org.exoplatform.services.database.Mapper;
+import org.exoplatform.services.database.DBObjectMapper;
 import org.exoplatform.services.database.annotation.Table;
 /**
  * Created by The eXo Platform SARL
@@ -32,7 +32,7 @@ public  class ExoLongIDDAO extends DAO<ExoLongID>  {
     return loadByQuery(builder.toString()) ;
   }
 
-  static public class ExoLongIDMapper implements Mapper<ExoLongID> {
+  static public class ExoLongIDMapper implements DBObjectMapper<ExoLongID> {
 
     public String[][] toParameters(ExoLongID bean) throws Exception {
       return null;

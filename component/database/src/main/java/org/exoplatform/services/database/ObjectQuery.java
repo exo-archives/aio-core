@@ -14,6 +14,7 @@ import java.util.List;
  * @version $Id: ObjectQuery.java 6006 2006-06-06 10:01:27Z thangvn $
  */
 public class ObjectQuery {
+  
   private static SimpleDateFormat ft_ = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS") ;
   private Class type_ ;
   private String orderBy_ ;
