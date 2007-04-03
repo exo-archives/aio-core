@@ -16,6 +16,7 @@
     <module>component/organization/ldap</module>
     <module>component/security</module>
     <module>component/xml-processing</module>
+    <module>component/resources/api</module>
   </modules>
 
   <build>
