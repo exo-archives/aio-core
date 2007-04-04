@@ -12,6 +12,7 @@ import javax.transaction.UserTransaction;
 
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.database.table.ExoLongID;
+import org.exoplatform.services.database.table.IDGenerator;
 import org.exoplatform.services.transaction.TransactionService;
 import org.exoplatform.test.BasicTestCase;
 /*

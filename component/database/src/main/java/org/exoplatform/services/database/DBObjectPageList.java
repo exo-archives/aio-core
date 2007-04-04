@@ -41,7 +41,6 @@ public class DBObjectPageList extends PageList {
     List l  = session.createQuery(countQuery_).list() ;
     Integer count = (Integer) l.get(0) ;
     setAvailablePage(count.intValue()) ;
-    
   }
   
   public DBObjectPageList(HibernateService service, int pageSize,
@@ -56,6 +55,7 @@ public class DBObjectPageList extends PageList {
     setAvailablePage(count.intValue()) ;
   }
   
+  @SuppressWarnings("unused")
   protected void populateCurrentPage(int page) throws Exception  {
     Session session = service_.openSession() ;
     Query query = session.createQuery(findQuery_);

@@ -9,6 +9,8 @@ import java.sql.DatabaseMetaData;
 
 import javax.sql.XAConnection;
 import javax.sql.XADataSource;
+
+import org.exoplatform.services.database.table.IDGenerator;
 /**
  * Created by The eXo Platform SARL
  * Author : Tuan Nguyen

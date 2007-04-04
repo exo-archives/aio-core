@@ -33,14 +33,14 @@ public class DBSchemaCreator  {
   static public String SQL_DELIMITER_COMMENT_PREFIX = "/*$DELIMITER:"; 
   static public String SQL_DELIMITER = ";";
   
-  static private String SQL_ALREADYEXISTS = ".*((already exist)|(duplicate key)|" +
-      "(already used)|(ORA-00955))+.*";
+  static private String SQL_ALREADYEXISTS = ".*((already exist)|(duplicate key)| (already used)|(ORA-00955))+.*";
   private final Pattern pattern;
   
   private static Log log = ExoLogger.getLogger("database.DBSchemaCreator");
   
   private List <CreateDBSchemaPlugin> createDBSchemaPlugins = new ArrayList<CreateDBSchemaPlugin>();
   
+  @SuppressWarnings("unused")
   public DBSchemaCreator(InitialContextInitializer contextInit) {
     pattern =  Pattern.compile(SQL_ALREADYEXISTS, Pattern.CASE_INSENSITIVE);
   }
@@ -78,7 +78,7 @@ public class DBSchemaCreator  {
       }
       for (String scr: scripts) {
         String s = cleanWhitespaces(scr.trim());
-        if (s.length()>0) {
+        if (s.length() > 0) {
           sql = s;
           if (log.isDebugEnabled())
             log.debug("Execute script: \n[" + sql+"]");
@@ -132,13 +132,10 @@ public class DBSchemaCreator  {
     }      
   }
 
-  public ComponentPlugin removePlugin(String name) {
-    return null;
-  }
+  @SuppressWarnings("unused")
+  public ComponentPlugin removePlugin(String name) { return null; }
 
-  public Collection getPlugins() {
-    return createDBSchemaPlugins;
-  }
+  public Collection getPlugins() { return createDBSchemaPlugins; }
   
   // for testing
   public static DBSchemaCreator initialize(String dsName, String script) throws SQLException, NamingException {
@@ -146,16 +143,12 @@ public class DBSchemaCreator  {
   }
   
   static public String cleanWhitespaces(String string) {
-    if (string != null) {
-      char[] cc = string.toCharArray();
-      for (int ci = cc.length - 1; ci > 0; ci--) {
-        if (Character.isWhitespace(cc[ci])) {
-          cc[ci] = ' ';
-        }
-      }
-      return new String(cc);
+    if (string == null || string.length() < 1)  return string;
+    char[] cc = string.toCharArray();
+    for (int ci = cc.length - 1; ci > 0; ci--) {
+      if (Character.isWhitespace(cc[ci])) cc[ci] = ' ';     
     }
-    return string; 
+    return new String(cc);
   }  
 
 }

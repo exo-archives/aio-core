@@ -19,6 +19,7 @@ import org.exoplatform.services.database.annotation.TableField;
  * Apr 4, 2006
  */
 public class StandardSQLTableManager extends DBTableManager {
+  
   private XADataSource xaDatasource_ ;
   
   public StandardSQLTableManager(ExoDatasource  datasource)  {
@@ -31,42 +32,44 @@ public class StandardSQLTableManager extends DBTableManager {
       throw new Exception("Cannot find the annotation for class " + type.getClass().getName()) ;
     }
     
-    StringBuilder b = new StringBuilder(1000) ;
-    b.append("CREATE TABLE ").append(table.name()).append(" (") ;
-    b.  append("id BIGINT PRIMARY KEY, ");
+    StringBuilder builder = new StringBuilder(1000) ;
+    builder.append("CREATE TABLE ").append(table.name()).append(" (") ;
+    builder.  append("id BIGINT PRIMARY KEY, ");
     TableField[]  fields = table.field() ; 
     for(int i = 0; i <  fields.length; i++) {
       TableField field = fields[i] ;
       String  fieldType = field.type() ;
       if("string".equals(fieldType)) {
-        appendStringField(field, b);
+        appendStringField(field, builder);
       } else if("int".equals(fieldType)) {
-        appendIntegerField(field, b);
+        appendIntegerField(field, builder);
       } else if("long".equals(fieldType)) {
-        appendLongField(field, b);
+        appendLongField(field, builder);
       } else if("float".equals(fieldType)) {
-        appendFloatField(field, b);
+        appendFloatField(field, builder);
       } else if("double".equals(fieldType)) {
-        appendDoubleField(field, b);
+        appendDoubleField(field, builder);
       } else if("boolean".equals(fieldType)) {
-        appendBooleanField(field, b);
+        appendBooleanField(field, builder);
       } else if("date".equals(fieldType)) {
-        appendDateField(field, b);
+        appendDateField(field, builder);
       } else if("binary".equals(fieldType)) {
-        appendBinaryField(field, b);
+        appendBinaryField(field, builder);
       }
-      if(i !=  fields.length - 1) b.append(", ");
+      if(i !=  fields.length - 1) builder.append(", ");
     }
-    b.append(")") ;
+    builder.append(")") ;
     // print  out  the  sql string 
-    Connection conn = xaDatasource_.getXAConnection().getConnection() ;
-    Statement s = conn.createStatement() ;
-    System.out.println("QUERY: \n  " + b + "\n");
-    s.execute(b.toString()) ;
+    Connection connection = xaDatasource_.getXAConnection().getConnection() ;
+    Statement statement = connection.createStatement();
     
-    s.close() ;
-    conn.commit() ;
-    conn.close() ;
+    if(dropIfExist) statement.execute("DROP TABLE IF EXISTS " + table.name());
+    System.out.println("QUERY: \n  " + builder + "\n");
+    statement.execute(builder.toString()) ;
+    
+    statement.close() ;
+    connection.commit() ;
+    connection.close() ;
   }
   
   public <T extends DBObject> void dropTable(Class<T>  type) throws Exception {
@@ -87,53 +90,53 @@ public class StandardSQLTableManager extends DBTableManager {
     if (table == null) {
       throw new Exception("Can not find the annotation for class " + type.getClass().getName());
     }
-    Connection conn = xaDatasource_.getXAConnection().getConnection();
-    Statement s = conn.createStatement();
+    Connection connection = xaDatasource_.getXAConnection().getConnection();
+    Statement statement = connection.createStatement();
     try {
-      if (s.execute("SELECT 1 FROM " + table.name()) == true) return true;      
+      if(statement.execute("SELECT 1 FROM " + table.name()) == true) return true;      
     } catch (SQLException ex) {
       return false;      
     } finally {
-      s.close();
-      conn.close();
+      statement.close();
+      connection.close();
     }
     return false;
   }
   
-  protected void appendStringField(TableField field, StringBuilder b) throws Exception {   
+  protected void appendStringField(TableField field, StringBuilder builder) throws Exception {   
     if(field.length() < 1) {
       throw new Exception("You forget to specify  the length for field " + field.name() + " , type " + field.type()) ;
     } 
-    String  nullable = "" ;
-    if(!field.nullable())  nullable = " NOT NULL " ;
-    b.append(field.name()).append(" ").append("VARCHAR(" + field.length() + ")").append(nullable);
+    builder.append(field.name()).append(" ").append("VARCHAR(" + field.length() + ")");
+    if(!field.nullable())  builder.append(" NOT NULL ") ;
   }
   
-  protected void appendIntegerField(TableField field, StringBuilder b) {
-    b.append(field.name()).append(" INTEGER");
+  protected void appendIntegerField(TableField field, StringBuilder builder) {
+    builder.append(field.name()).append(" INTEGER");
   }
   
-  protected void appendLongField(TableField field, StringBuilder b) {
-    b. append(field.name()).append(" BIGINT");
+  protected void appendLongField(TableField field, StringBuilder builder) {
+    builder. append(field.name()).append(" BIGINT");
   }
   
-  protected void appendFloatField(TableField field, StringBuilder b) {
-    b. append(field.name()).append(" REAL");
+  protected void appendFloatField(TableField field, StringBuilder builder) {
+    builder. append(field.name()).append(" REAL");
   }
   
-  protected void appendDoubleField(TableField field, StringBuilder b) {
-    b. append(field.name()).append(" DOUBLE");
+  protected void appendDoubleField(TableField field, StringBuilder builder) {
+    builder. append(field.name()).append(" DOUBLE");
   }
   
-  protected void appendBooleanField(TableField field, StringBuilder b) {
-    b. append(field.name()).append(" BIT");
+  protected void appendBooleanField(TableField field, StringBuilder builder) {
+    builder. append(field.name()).append(" BIT");
   }
   
-  protected void appendDateField(TableField field, StringBuilder b) {
-    b. append(field.name()).append(" DATE");
+  protected void appendDateField(TableField field, StringBuilder builder) {
+    builder. append(field.name()).append(" DATE");
   }
   
-  protected void appendBinaryField(TableField field, StringBuilder b) {
-    b. append(field.name()).append(" VARBINARY");
+  protected void appendBinaryField(TableField field, StringBuilder builder) {
+    builder. append(field.name()).append(" VARBINARY");
   }
+  
 }
