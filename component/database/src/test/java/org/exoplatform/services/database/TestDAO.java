@@ -13,7 +13,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.services.database.table.ExoLongID;
+import org.exoplatform.services.listener.ListenerService;
 /**
  * Created by The eXo Platform SARL
  * Author : Tuan Nguyen
@@ -27,18 +27,21 @@ public class TestDAO extends TestCase {
     DatabaseService service = 
       (DatabaseService) pcontainer.getComponentInstance("XAPoolTxSupportDBConnectionService") ;
     
+    PortalContainer manager  = PortalContainer.getInstance();
+    ListenerService  listenerService = (ListenerService) manager.getComponentInstanceOfType(ListenerService.class) ;    
+    
     queries(service);
-    testMock(service);
+    testMock(listenerService, service);
   }
   
-  private void testMock(DatabaseService service) throws Exception {
+  private void testMock(ListenerService listenerService, DatabaseService service) throws Exception {
     ExoDatasource dataSource = service.getDatasource();
     DBTableManager dbManager = dataSource.getDBTableManager() ;
     assertEquals(dbManager.hasTable(Mock.class), false);
     dbManager.createTable(Mock.class, true) ;
     assertEquals(dbManager.hasTable(Mock.class), true);
     
-    StandardSQLDAO<Mock>  dao = new StandardSQLDAO<Mock>(dataSource, new Mock.MockMapper(), Mock.class);
+    StandardSQLDAO<Mock>  dao = new StandardSQLDAO<Mock>(listenerService, dataSource, new Mock.MockMapper(), Mock.class);
     Mock mock = new Mock("Benj", 2);
     dao.save(mock);
     
@@ -51,7 +54,7 @@ public class TestDAO extends TestCase {
     assertEquals(mock.getName(), savedMock.getName());
     
     //reflection mapper
-    dao = new StandardSQLDAO<Mock>(dataSource, Mock.class);
+    dao = new StandardSQLDAO<Mock>(listenerService,  dataSource, Mock.class);
     list.clear();
     list.add(new Mock("Ha", 17));
     list.add(new Mock("Hoa", 6));

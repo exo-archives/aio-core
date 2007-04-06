@@ -13,6 +13,10 @@ import java.util.List;
 
 import javax.sql.rowset.CachedRowSet;
 
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.database.annotation.Table;
+import org.exoplatform.services.listener.ListenerService;
+
 import com.sun.rowset.CachedRowSetImpl;
 
 /**
@@ -26,14 +30,18 @@ public abstract class DAO<T extends DBObject> {
   protected ExoDatasource datasource_ ;
   protected DBObjectMapper<T> mapper_; 
   
-  public DAO(ExoDatasource datasource) {
+  protected ListenerService listeners_;
+  
+  public DAO(ListenerService listeners, ExoDatasource datasource) {
     datasource_ = datasource ;
     mapper_ = new ReflectionMapper<T>();
+    listeners_ = listeners;
   }
   
-  public DAO(ExoDatasource datasource, DBObjectMapper<T> mapper) {
+  public DAO(ListenerService listenerService, ExoDatasource datasource, DBObjectMapper<T> mapper) {
     datasource_ = datasource ;
     mapper_ = mapper;
+    listeners_ = listenerService;
   }
   
   public ExoDatasource getExoDatasource() { return datasource_ ; }
@@ -116,6 +124,7 @@ public abstract class DAO<T extends DBObject> {
       ResultSet resultSet =  statement.executeQuery(query) ;
       if(!resultSet.next()) return null ;
       T bean =  createInstance() ;
+      invokeEvent("load", bean);
       mapper_.mapResultSet(resultSet, bean) ;
       statement.close() ;
       resultSet.close() ;
@@ -138,6 +147,7 @@ public abstract class DAO<T extends DBObject> {
       while (resultSet.next()) {
         T bean = createInstance() ;
         mapper_.mapResultSet(resultSet, bean) ;
+        invokeEvent("load", bean);
         list.add(bean) ;
       }
       resultSet.close() ;
@@ -169,7 +179,7 @@ public abstract class DAO<T extends DBObject> {
     }
   }
   
-  protected void execute(String template, List<T> beans) throws Exception {
+  protected void execute(String sqlAction, String template, List<T> beans) throws Exception {
     Connection connection = null;
     Statement statement = null;
     try{
@@ -181,7 +191,11 @@ public abstract class DAO<T extends DBObject> {
         statement.addBatch(query);
         System.out.println(" addBatch "+query) ;
       }
-      statement.executeBatch();
+      int [] values = statement.executeBatch();
+      for(int i = 0; i < values.length; i++) {
+        if(values[i] != 1) continue;
+        invokeEvent(sqlAction, beans.get(i));
+      }
       datasource_.commit(connection) ;
     } catch (Exception e) {
       throw e;
@@ -189,6 +203,13 @@ public abstract class DAO<T extends DBObject> {
       if (statement != null) statement.close();
       if (connection != null) datasource_.closeConnection(connection) ; 
     }
+  }
+  
+  protected void invokeEvent(String prefix, T bean)  {    
+    Table table = bean.getClass().getAnnotation(Table.class);
+    DBObjectEvent<T> event  = new DBObjectEvent<T>(bean);
+    StringBuilder builder = new StringBuilder(prefix).append('.').append(table.name());
+    listeners_.invoke(builder.toString(), event);
   }
   
 }
