@@ -72,7 +72,7 @@ public  class StandardSQLDAO<T extends DBObject> extends DAO<T> {
     T value = load(id);
     if(value == null) return null;
     execute(datasource_.getQueryBuilder().createRemoveQuery(type_, id), (T)null);
-    return value;
+    return value ;
   }
 
   public void remove(T bean) throws Exception {
