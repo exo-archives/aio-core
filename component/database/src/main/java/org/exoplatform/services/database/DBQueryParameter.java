@@ -5,8 +5,6 @@
 package org.exoplatform.services.database;
 
 import java.util.Comparator;
-
-
 /**
  * Created by The eXo Platform SARL
  * Author : Nhu Dinh Thuan

@@ -13,6 +13,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.database.table.ExoLongID;
 /**
  * Created by The eXo Platform SARL
  * Author : Tuan Nguyen
@@ -73,12 +74,12 @@ public class TestDAO extends TestCase {
 //    ExoLongIDDAO exoLongIDDAO = new ExoLongIDDAO(service.getDatasource());   
 //    assertEquals(sql, "INSERT INTO ExoLongId(id, name, start) VALUES(34, ?, ?)");
 //    System.out.println("\n=========> sql: " + sql +"\n");
-    
+//    
 //    sql = exoLongIDDAO.getRemoveQuery(ExoLongID.class, 34L);
 //    assertEquals(sql, "DELETE FROM ExoLongId WHERE id = '34'");
 //    sql = exoLongIDDAO.getUpdateQuery(ExoLongID.class, 34L);
 //    assertEquals(sql, "UPDATE ExoLongId SET name = ?, start = ? WHERE id = 34"); 
-  
+//  
 //    Table table =  TestTable.class.getAnnotation(Table.class) ;
 //    String sql = exoLongIDDAO.getInsertQuery(ExoLongID.class, 34L);
 //    

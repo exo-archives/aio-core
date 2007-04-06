@@ -76,28 +76,25 @@ public class DBSchemaCreator  {
       } else {
         scripts = script.split(SQL_DELIMITER);
       }
+      
       for (String scr: scripts) {
         String s = cleanWhitespaces(scr.trim());
-        if (s.length() > 0) {
-          sql = s;
-          if (log.isDebugEnabled())
-            log.debug("Execute script: \n[" + sql+"]");
-          try {
-            conn.setAutoCommit(false);
-            conn.createStatement() .executeUpdate(sql);
-            conn.commit();
-          } catch(SQLException e) {
-            conn.rollback();
-            // already exists check
-            Matcher aeMatcher = pattern.matcher(e.getMessage().trim()); 
-            if (!aeMatcher.matches()) {
-              throw e;
-            }
-            if (log.isDebugEnabled())
-              log.debug(e.getMessage());
-            continue;
-          }
+        if (s.length() < 1)  continue;
+        sql = s;
+        if (log.isDebugEnabled()) log.debug("Execute script: \n[" + sql+"]");
+        
+        try {
+          conn.setAutoCommit(false);
+          conn.createStatement() .executeUpdate(sql);
+          conn.commit();
+        } catch(SQLException e) {
+          conn.rollback();
+          // already exists check
+          Matcher aeMatcher = pattern.matcher(e.getMessage().trim()); 
+          if (!aeMatcher.matches()) throw e;
+          if (log.isDebugEnabled()) log.debug(e.getMessage());
         }
+        
       }
       log.info("DB schema of DataSource: '"+dsName+"' created succesfully. context "+context);
     } catch (SQLException e) {
@@ -109,13 +106,14 @@ public class DBSchemaCreator  {
       }
       Throwable cause = e.getCause(); 
       log.error("Could not create db schema of DataSource: '" + dsName 
-          + "'. Reason: " + e.getMessage() + "; " + errorTrace
-          + (cause != null ? " (Cause: " + cause.getMessage() + ")" : "") 
-          + ". Last command: " + sql);
+                + "'. Reason: " + e.getMessage() + "; " + errorTrace
+                + (cause != null ? " (Cause: " + cause.getMessage() + ")" : "") 
+                + ". Last command: " + sql);
       e.printStackTrace();
     } finally {
       conn.close();
     }
+    
   }
   
   public void addPlugin(ComponentPlugin plugin) {

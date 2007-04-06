@@ -4,9 +4,6 @@
  **************************************************************************/
 package org.exoplatform.services.database;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.exoplatform.test.BasicTestCase;
 
 /**
@@ -51,10 +48,10 @@ public class TestQueryManager extends BasicTestCase {
     System.out.println("\n\n\n "+pamameterSql+"\n\n");
   }
   
-  private class Table {
-    private String table = "student";
-    private String id = "12345";
-  }
+//  private class Table {
+//    private String table = "student";
+//    private String id = "12345";
+//  }
 
   static public class Student {
 
