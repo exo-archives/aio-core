@@ -13,7 +13,6 @@ import java.util.List;
 
 import javax.sql.rowset.CachedRowSet;
 
-import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.database.annotation.Table;
 import org.exoplatform.services.listener.ListenerService;
 
@@ -209,7 +208,7 @@ public abstract class DAO<T extends DBObject> {
     Table table = bean.getClass().getAnnotation(Table.class);
     DBObjectEvent<T> event  = new DBObjectEvent<T>(bean);
     StringBuilder builder = new StringBuilder(prefix).append('.').append(table.name());
-    listeners_.invoke(builder.toString(), event);
+    listeners_.broadcast(builder.toString(), event);
   }
   
 }
