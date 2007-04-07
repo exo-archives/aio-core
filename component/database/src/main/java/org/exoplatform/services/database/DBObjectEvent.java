@@ -12,10 +12,10 @@ import org.exoplatform.services.listener.Event;
  *          nhudinhthuan@exoplatform.com
  * Apr 6, 2007  
  */
-public class DBObjectEvent<T extends DBObject> extends Event<T> {
+public class DBObjectEvent<E extends DAO,T extends DBObject> extends Event<E,T> {
   
-  public DBObjectEvent(T t) {
-    value = t;
+  public DBObjectEvent(String name, E e, T t) {
+    super(name, e, t);
   }
 
 }

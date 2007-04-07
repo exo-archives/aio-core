@@ -57,14 +57,7 @@ public class ReflectionMapper<T extends DBObject> implements DBObjectMapper<T> {
       } else if(value instanceof Date) {
         value =  new java.sql.Date(( (Date)value).getTime());
       }
-      String name = fields[i].getName();
-      int k = name.length() - 1;
-      while(k > -1){
-        if(Character.isLetterOrDigit(name.charAt(k)) ) break;
-        k--;
-      }
-      if(k < name.length() - 1) name = name.substring(0, k+1);
-      map.put(name, value.toString());
+      map.put(fields[i].getName(), value.toString());
     }
     if(clazz == DBObject.class) return;
     Class superClazz = clazz.getSuperclass();

@@ -6,6 +6,7 @@ package org.exoplatform.services.database;
 
 import java.util.List;
 
+import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.services.listener.ListenerService;
 
 /**
@@ -32,11 +33,15 @@ public  class StandardSQLDAO<T extends DBObject> extends DAO<T> {
   public T createInstance() throws Exception { return type_.newInstance(); }
 
   public T load(long id) throws Exception {
-    return super.loadInstance(datasource_.getQueryBuilder().createSelectQuery(type_, id));
+    return super.loadUnique(eXoDS_.getQueryBuilder().createSelectQuery(type_, id));
   }
   
-  public List<T> loadAll() throws Exception {
-    return super.loadByQuery(datasource_.getQueryBuilder().createSelectQuery(type_, -1));
+  public PageList loadAll() throws Exception {
+    QueryBuilder queryBuilder = eXoDS_.getQueryBuilder();
+    String query = queryBuilder.createSelectQuery(type_, -1);
+    StringBuilder queryCounter = new StringBuilder("SELECT COUNT(*) ");
+    queryCounter.append(query.substring(query.indexOf("FROM")));
+    return new StandardDBObjectPageList<T>(20, this, query, queryCounter.toString());
   }
   
   @SuppressWarnings("unchecked")
@@ -48,13 +53,12 @@ public  class StandardSQLDAO<T extends DBObject> extends DAO<T> {
         throw new Exception("The given bean " + bean.getClass() + " doesn't have an id") ;
       }
     }
-    execute("update", datasource_.getQueryBuilder().createUpdateQuery(type_), list);
+    execute(eXoDS_.getQueryBuilder().createUpdateQuery(type_), list);
   }    
   
   public void update(T bean) throws Exception {
-    String query = datasource_.getQueryBuilder().createUpdateQuery(type_, bean.getId());
+    String query = eXoDS_.getQueryBuilder().createUpdateQuery(type_, bean.getId());
     execute(query, bean);
-    invokeEvent("update", bean);
   }
   
   @SuppressWarnings("unchecked")
@@ -62,28 +66,27 @@ public  class StandardSQLDAO<T extends DBObject> extends DAO<T> {
     if(list == null) throw new Exception("The given beans null ") ;
     if(list.size() < 1) return;
     for(T bean  : list) {
-      if(bean.getId() == -1) bean.setId(datasource_.getIDGenerator().generateLongId(bean));
+      if(bean.getId() != -1) continue;
+      bean.setId(eXoDS_.getIDGenerator().generateLongId(bean));
     }
-    execute("insert", datasource_.getQueryBuilder().createInsertQuery(type_), list);
+    execute(eXoDS_.getQueryBuilder().createInsertQuery(type_), list);
   }
   
   public void save(T bean) throws Exception {
-    if(bean.getId() == -1) bean.setId(datasource_.getIDGenerator().generateLongId(bean));
-    execute(datasource_.getQueryBuilder().createInsertQuery(bean.getClass(), bean.getId()), bean);
-    invokeEvent("insert", bean);
+    if(bean.getId() == -1) bean.setId(eXoDS_.getIDGenerator().generateLongId(bean));
+    execute(eXoDS_.getQueryBuilder().createInsertQuery(bean.getClass(), bean.getId()), bean);
   }
+  
   
   public T remove(long id) throws Exception {
     T bean = load(id);
     if(bean == null) return null;
-    execute(datasource_.getQueryBuilder().createRemoveQuery(type_, id), (T)null);
-    invokeEvent("remove", bean);
+    execute(eXoDS_.getQueryBuilder().createRemoveQuery(type_, id), (T)null);
     return bean ;
   }
 
   public void remove(T bean) throws Exception {
-    execute(datasource_.getQueryBuilder().createRemoveQuery(type_, bean.getId()), (T)null);
-    invokeEvent("remove", bean);
+    execute(eXoDS_.getQueryBuilder().createRemoveQuery(type_, bean.getId()), (T)null);
   }
   
   public Class<T> getType() { return type_; }

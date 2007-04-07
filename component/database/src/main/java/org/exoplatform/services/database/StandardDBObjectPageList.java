@@ -14,20 +14,27 @@ import org.exoplatform.commons.utils.PageList;
  *          nhudinhthuan@exoplatform.com
  * Mar 30, 2007  
  */
-public abstract class DBPageList<T extends DBObject> extends PageList {
+public class StandardDBObjectPageList<T extends DBObject> extends PageList {
   
   protected DAO<T> dao_;
   
-  protected DBPageList(int pageSize, DAO<T> dao){
+  protected String query_;
+  
+  protected StandardDBObjectPageList(int pageSize, DAO<T> dao, String query, String queryCounter) throws Exception {
     super(pageSize);
     dao_ = dao;
-  }
-  
-  public List getAll() throws Exception { return dao_.loadAll(); }
-
-  protected void setAvailablePage(String sqlCounter) throws Exception {
-    Integer counter = dao_.<Integer>loadValue(sqlCounter);
+    query_ = query;
+    
+    Integer counter = dao_.<Integer>loadDBField(queryCounter);
     super.setAvailablePage(counter.intValue());
   }
   
+  protected void populateCurrentPage(int currentPage) throws Exception {
+    this.currentPage_ = currentPage;   
+    currentListPage_.clear(); 
+    dao_.loadPageList(this, query_);
+  }
+  
+  public List getAll() throws Exception { return null; }
+
 }

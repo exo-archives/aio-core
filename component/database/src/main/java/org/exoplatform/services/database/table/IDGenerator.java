@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.List;
 
+import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.services.database.DAO;
 import org.exoplatform.services.database.DBObject;
 import org.exoplatform.services.database.DBObjectMapper;
@@ -39,7 +40,7 @@ public class IDGenerator extends DAO<ExoLongID>  {
     Table table = ExoLongID.class.getAnnotation(Table.class) ;   
     StringBuilder builder = new StringBuilder("SELECT NAME, START FROM ");
     builder.append(table.name()).append(" WHERE name = '").append(name).append('\'');
-    return loadInstance(builder.toString()) ;
+    return loadUnique(builder.toString()) ;
   }
   
   public <T extends DBObject> long generateLongId(T bean) throws Exception {
@@ -113,7 +114,7 @@ public class IDGenerator extends DAO<ExoLongID>  {
   @SuppressWarnings("unused")
   public ExoLongID load(long id) throws Exception { return null; }
   
-  public List<ExoLongID> loadAll() throws Exception { return null; }
+  public PageList loadAll() throws Exception { return null; }
 
   @SuppressWarnings("unused")
   public ExoLongID remove(long id) throws Exception { return null; }
