@@ -8,6 +8,9 @@ import java.util.List;
 
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.database.DatabaseService;
+import org.exoplatform.services.database.ExoDatasource;
+import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.LogService;
 import org.exoplatform.services.log.LogUtil;
 import org.exoplatform.services.organization.jdbc.OrganizationServiceImpl;
@@ -43,7 +46,12 @@ public class TestJDBCOrganizationService extends BasicTestCase {
   public void setUp() throws Exception {
     if(!runtest)  return ;
     PortalContainer manager  = PortalContainer.getInstance();    
-    service_ = new OrganizationServiceImpl(null);
+    
+    DatabaseService service = 
+      (DatabaseService) manager.getComponentInstance("XAPoolTxSupportDBConnectionService") ;
+    ListenerService  listenerService = (ListenerService) manager.getComponentInstanceOfType(ListenerService.class) ;    
+    ExoDatasource dataSource = service.getDatasource();    
+    service_ = new OrganizationServiceImpl(listenerService, dataSource, null);
     LogUtil.setLevel("org.exoplatform.services.organization", LogService.DEBUG, true) ;
     LogUtil.setLevel("org.exoplatform.services.database", LogService.DEBUG, true) ;
     userHandler_ = service_.getUserHandler() ; 

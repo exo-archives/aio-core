@@ -12,6 +12,7 @@
  */
 package org.exoplatform.services.organization.jdbc;
 
+import org.exoplatform.services.database.DBObject;
 import org.exoplatform.services.database.annotation.Table;
 import org.exoplatform.services.database.annotation.TableField;
 import org.exoplatform.services.organization.Group;
@@ -26,7 +27,7 @@ import org.exoplatform.services.organization.Group;
         @TableField(name = "desc", type = "string", length = 1000)
     }
 )
-public class GroupImpl implements Group{
+public class GroupImpl extends DBObject implements Group {
   
   private String id  ;
   private String parentId  ;

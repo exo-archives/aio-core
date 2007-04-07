@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<configuration>           
+<configuration>  
   <external-component-plugins>  
     <target-component>org.exoplatform.services.organization.OrganizationService</target-component>       
     <component-plugin>
@@ -107,7 +107,7 @@
   <import>classpath:/conf/portal/activedirectory-organization-configuration.xml</import>   
   -->      
   
-  <import>classpath:/conf/portal/hibernate-organization-configuration.xml</import> 
+  <import>classpath:/conf/portal/jdbc-organization-configuration.xml</import> 
   <import>classpath:/conf/portal/organization-configuration.xml</import>   
   
 </configuration>

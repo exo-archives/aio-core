@@ -2,6 +2,7 @@ package org.exoplatform.services.organization.jdbc;
 
 import java.util.Date;
 
+import org.exoplatform.services.database.DBObject;
 import org.exoplatform.services.database.annotation.Table;
 import org.exoplatform.services.database.annotation.TableField;
 import org.exoplatform.services.organization.User;
@@ -20,9 +21,8 @@ import org.exoplatform.services.organization.User;
         @TableField(name = "organizationId", type = "string", length = 100)
     }
 )
-public class UserImpl implements User {
+public class UserImpl extends DBObject implements User {
 
-  private String id = null;
   private String userName = null;
   private String password = null;
   private String firstName = null;
@@ -38,9 +38,6 @@ public class UserImpl implements User {
   public UserImpl(String username) {
     this.userName = username;
   }
-
-  public String getId() { return id; }
-  public void setId(String id) { this.id = id; }
 
   public String getUserName() { return userName; }
   public void setUserName(String name) { this.userName = name; }
@@ -69,7 +66,7 @@ public class UserImpl implements User {
   public void setLastLoginTime(Date t) {   lastLoginTime = t ; }
 
   public String toString() {
-    return "User[" + id + "|" + userName + "]"+organizationId==null?"":("@"+organizationId);
+    return "User[" + dbObjectId_ + "|" + userName + "]"+organizationId==null?"":("@"+organizationId);
   }
 
   public String getOrganizationId() { return organizationId; }
