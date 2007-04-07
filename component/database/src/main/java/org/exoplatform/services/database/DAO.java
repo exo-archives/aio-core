@@ -13,7 +13,6 @@ import java.util.List;
 import javax.sql.rowset.CachedRowSet;
 
 import org.exoplatform.commons.utils.PageList;
-import org.exoplatform.services.listener.ListenerService;
 
 import com.sun.rowset.CachedRowSetImpl;
 
@@ -28,18 +27,15 @@ public abstract class DAO<T extends DBObject> {
   protected ExoDatasource eXoDS_ ;
   protected DBObjectMapper<T> mapper_; 
 
-  protected ListenerService listeners_;
 
-  public DAO(ListenerService listeners, ExoDatasource datasource) {
+  public DAO(ExoDatasource datasource) {
     eXoDS_ = datasource ;
     mapper_ = new ReflectionMapper<T>();
-    listeners_ = listeners;
   }
 
-  public DAO(ListenerService listenerService, ExoDatasource datasource, DBObjectMapper<T> mapper) {
+  public DAO(ExoDatasource datasource, DBObjectMapper<T> mapper) {
     eXoDS_ = datasource ;
     mapper_ = mapper;
-    listeners_ = listenerService;
   }
 
   public ExoDatasource getExoDatasource() { return eXoDS_ ; }
@@ -197,12 +193,5 @@ public abstract class DAO<T extends DBObject> {
       eXoDS_.closeConnection(connection) ; 
     }
   }
-
-//protected void invokeEvent(String prefix, T bean)  {    
-//Table table = bean.getClass().getAnnotation(Table.class);
-//DBObjectEvent<T> event  = new DBObjectEvent<T>(bean);
-//StringBuilder builder = new StringBuilder(prefix).append('.').append(table.name());
-//listeners_.broadcast(builder.toString(), event);
-//}
 
 }

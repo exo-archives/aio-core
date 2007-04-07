@@ -28,7 +28,7 @@ public class IDGenerator extends DAO<ExoLongID>  {
   private HashMap<Class, IDTracker> idTrackers_  ;
   
   public IDGenerator(ExoDatasource datasource) throws Exception {
-    super(null, datasource, new ExoLongIDMapper()) ;
+    super(datasource, new ExoLongIDMapper()) ;
     idTrackers_  = new HashMap<Class, IDTracker>();
     
     DBTableManager tableManager = datasource.getDBTableManager();

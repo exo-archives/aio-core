@@ -59,7 +59,7 @@ public class Mock extends DBObject {
     public String[][] toParameters(Mock bean) throws Exception {
       java.sql.Date date = new java.sql.Date(bean.getStart().getTimeInMillis());
       return new String[][] {
-          {"id", String.valueOf(bean.getId())}          ,
+          {"id", String.valueOf(bean.getDBObjectId())}          ,
           {"name", bean.getName()}                      ,
           {"status", String.valueOf(bean.getStatus())}  ,
           {"start", date.toString()}                    ,

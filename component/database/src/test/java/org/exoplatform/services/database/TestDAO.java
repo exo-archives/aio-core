@@ -50,7 +50,7 @@ public class TestDAO extends TestCase {
     list.add(new Mock("Hung", 4));
     dao.save(list);
     
-    Mock savedMock = dao.load(mock.getId());
+    Mock savedMock = dao.load(mock.getDBObjectId());
     assertEquals(mock.getName(), savedMock.getName());
     
     //reflection mapper
