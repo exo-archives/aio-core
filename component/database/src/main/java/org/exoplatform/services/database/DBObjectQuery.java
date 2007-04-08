@@ -21,7 +21,8 @@ public class DBObjectQuery <T extends DBObject>  {
   private Class<? extends DBObject> type_ ;
   private String orderBy_ ;
   private String groupBy_ ;
-  private List<Parameter>  parameters_ ;  
+  
+  private List<Parameter> parameters_ ;  
   private List<Parameter> selectParameter_ ;
   
   public DBObjectQuery(Class<T> type) {
@@ -31,48 +32,48 @@ public class DBObjectQuery <T extends DBObject>  {
   }
   
   public DBObjectQuery addEQ(String field, Object value) {
-    if(value != null) {
-      parameters_.add(new Parameter(" = ", field, value)) ;
-    }
+    if(value == null)  return this;
+    parameters_.add(new Parameter(field, " = ", value)) ;    
     return this ;
   }
   
   public DBObjectQuery addGT(String field, Object value) {
-    if(value != null) {
-      parameters_.add(new Parameter(" > ", field, value)) ;
-    }
+    if(value == null) return this;
+    parameters_.add(new Parameter(field, " > ", value)) ;
     return this ;
   }
   
   public DBObjectQuery addLT(String field, Object value) {
-    if(value != null) {
-      parameters_.add(new Parameter(" < ", field, value)) ;
-    }
+    if(value == null) return this;
+    parameters_.add(new Parameter(field, " < ", value)) ;
     return this ;
   }
   
   public DBObjectQuery addLIKE(String field, String value) {
-    if(value != null && value.length() > 0)  {
-      parameters_.add(new Parameter(" like ", field, optimizeInputString(value))) ;
+    if(value == null || value.length() < 1)   return this;
+    parameters_.add(new Parameter(field, " LIKE ", optimizeInputString(value))) ;
+    return this ;
+  }
+  
+  public DBObjectQuery addSUM(String field) {
+    selectParameter_.add(new Parameter("SUM", field)) ;
+    return this ;
+  }
+  
+  public DBObjectQuery addSelect(String field, String value) {
+    selectParameter_.add(new Parameter(field, " AS ", value)) ;
+    return this ;
+  }
+  
+  public DBObjectQuery addSelect(String...fields) {
+    for(String field : fields) {
+      selectParameter_.add(new Parameter(field, null, null)) ;
     }
     return this ;
   }
   
-  public String optimizeInputString(String value){
-    value = value.replace('*', '%');
-    value = value.replaceAll("'", "&#39;");
-    value = value.replaceAll("<", "&#60;");
-    value = value.replaceAll(">", "&#62;");
-    return value;
-  }
-  
-  public DBObjectQuery addSUM(String field) {
-    selectParameter_.add(new Parameter("sum", field)) ;
-    return this ;
-  }
-  
   public DBObjectQuery addSelect(String field) {
-    selectParameter_.add(new Parameter("fieldselect", field)) ;
+    selectParameter_.add(new Parameter(field, null, null)) ;
     return this ;
   }
   
@@ -102,26 +103,27 @@ public class DBObjectQuery <T extends DBObject>  {
   }
   
   public String toQuery() {
-    StringBuilder b = new StringBuilder(" SELECT * ") ;
+    StringBuilder builder = new StringBuilder("SELECT ") ;
+    if(selectParameter_.size() > 0) {
+      for(int i = 0; i < selectParameter_.size(); i ++) {
+        if(i > 0) builder.append(", ") ;
+        parameters_.get(i).build(builder);        
+      }
+    } else {
+      builder.append(" * ");
+    }
+    
     Table table = type_.getAnnotation(Table.class) ;   
-    b.append(" FROM ").append(table.name()) ;
+    builder.append(" FROM ").append(table.name()) ;
     if(parameters_.size() > 0) {
-      b.append(" WHERE ") ;
+      builder.append(" WHERE ") ;
       for(int i = 0; i < parameters_.size(); i ++) {
-        if(i > 0) b.append(" AND ") ;
-        Parameter p = parameters_.get(i) ;
-        if(p.value_ instanceof String) {
-          b.append(" ").append(p.field_).append(p.op_).append("'").append(p.value_).append("'") ;
-        } else if(p.value_ instanceof Date) {
-          String value = ft_.format((Date) p.value_) ;
-          b.append(" ").append(p.field_).append(p.op_).append("'").append(value).append("'") ;
-        } else {
-          b.append(" ").append(p.field_).append(p.op_).append(p.value_);
-        }
+        if(i > 0) builder.append(" AND ") ;
+        parameters_.get(i).build(builder);        
       }
     }
-    if(orderBy_ != null )   b.append(orderBy_ );
-    return b.toString() ;
+    if(orderBy_ != null )   builder.append(orderBy_ );
+    return builder.toString() ;
   }
   
  /* public String getHibernateGroupByQuery() {
@@ -189,21 +191,44 @@ public class DBObjectQuery <T extends DBObject>  {
     return b.toString() ;
   }*/
   
-  static class Parameter {
+  public String optimizeInputString(String value){
+    value = value.replace('*', '%');
+    value = value.replaceAll("'", "&#39;");
+    value = value.replaceAll("<", "&#60;");
+    value = value.replaceAll(">", "&#62;");
+    return value;
+  }
+  
+  static public class Parameter {
     
     String op_ ;
     String field_ ;
     String label_ ;
     Object value_ ;
     
-    Parameter(String op, String field , Object value) {
+    public Parameter(String field, String op, Object value) {
       op_ = op ;
       field_ = field ;
       value_ = value ;
     }
-    Parameter(String op, String field) {
+    
+    public Parameter(String op, String field) {
       op_ = op ;
       field_ = field ;      
     }    
+    
+    void build(StringBuilder builder) {
+      builder.append(' ').append(field_).append(op_);
+      if(op_ == null || op_.trim().length() < 1 || value_ == null) return ;
+      builder.append(' ');
+      if(CharSequence.class.isInstance(value_)) {
+        builder.append('\'').append(value_).append('\'') ;
+      } else if(value_ instanceof Date) {
+        String value = ft_.format((Date)value_) ;
+        builder.append("'").append(value).append("'") ;
+      } else {
+        builder.append(value_);
+      }
+    }
   }
 }

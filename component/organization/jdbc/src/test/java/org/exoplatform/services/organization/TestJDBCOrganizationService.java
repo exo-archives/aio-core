@@ -115,6 +115,9 @@ public class TestJDBCOrganizationService extends BasicTestCase {
     User savedUser = userHandler_.findUserByName(userName);
     assertEquals("Expect user name is: ", userName, savedUser.getUserName());
     
+    savedUser = userHandler_.findUserByName(userName);
+    assertEquals("Expect user name is: ", userName, savedUser.getUserName());
+    
     System.out.println("\n\n\n == la > "+savedUser.getUserName()+"\n\n");
 //    assertTrue("Found user instance", u != null);
 //    
