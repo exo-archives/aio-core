@@ -23,7 +23,7 @@ import org.exoplatform.services.organization.GroupHandler;
  *          nhudinhthuan@exoplatform.com
  * Apr 7, 2007  
  */
-public class GroupDAOImpl extends StandardSQLDAO<GroupImpl>  implements GroupHandler {
+public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHandler {
   
   public GroupDAOImpl(ListenerService lService, ExoDatasource datasource, DBObjectMapper<GroupImpl> mapper) {
     super(lService, datasource, mapper, GroupImpl.class);

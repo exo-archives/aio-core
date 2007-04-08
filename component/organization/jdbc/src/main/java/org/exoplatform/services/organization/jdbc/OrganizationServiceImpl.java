@@ -30,10 +30,11 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
   public OrganizationServiceImpl(ListenerService listenerService,  
                                  ExoDatasource datasource, CacheService cservice) throws Exception {
     userDAO_ = new UserDAOImpl(listenerService, datasource, new UserMapper()) ;   
-    userProfileDAO_ =  new UserProfileDAOImpl() ;
     groupDAO_ =  new GroupDAOImpl(listenerService, datasource, new GroupMapper()) ;
+    membershipTypeDAO_ = new MembershipTypeDAOImpl(listenerService, datasource, new MembershipTypeMapper()) ;
+
     membershipDAO_ = new MembershipDAOImpl() ;
-    membershipTypeDAO_ = new MembershipTypeDAOImpl() ;
+    userProfileDAO_ =  new UserProfileDAOImpl() ;
     
     DBTableManager dbManager = datasource.getDBTableManager() ;
     if(!dbManager.hasTable(UserImpl.class)) dbManager.createTable(UserImpl.class, true) ;

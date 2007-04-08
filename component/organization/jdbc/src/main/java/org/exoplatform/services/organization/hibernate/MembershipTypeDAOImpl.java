@@ -12,7 +12,6 @@ import org.exoplatform.services.database.HibernateService;
 import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.MembershipTypeHandler;
 import org.exoplatform.services.organization.impl.MembershipTypeImpl;
-import org.hibernate.Query;
 import org.hibernate.Session;
 /**
  * Created by The eXo Platform SARL
