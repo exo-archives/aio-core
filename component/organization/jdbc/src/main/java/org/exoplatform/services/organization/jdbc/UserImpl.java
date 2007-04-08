@@ -8,7 +8,7 @@ import org.exoplatform.services.database.annotation.TableField;
 import org.exoplatform.services.organization.User;
 
 @Table(
-    name = "USER" ,
+    name = "User" ,
     field = {
         @TableField(name = "userName", type = "string", length = 200, unique = true, nullable = false),
         @TableField(name = "password", type = "string", length = 100),

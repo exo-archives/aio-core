@@ -6,6 +6,7 @@ package org.exoplatform.services.organization.jdbc;
 
 import java.util.Date;
 
+import org.exoplatform.services.database.DBObject;
 import org.exoplatform.services.database.annotation.Table;
 import org.exoplatform.services.database.annotation.TableField;
 import org.exoplatform.services.organization.MembershipType;
@@ -27,7 +28,7 @@ import org.exoplatform.services.organization.MembershipType;
         @TableField(name = "modifiedDate", type = "date", length = 100)
     }
 )
-public class MembershipTypeImpl implements MembershipType {
+public class MembershipTypeImpl extends DBObject implements MembershipType {
 
   private String name ;
   private String description ;

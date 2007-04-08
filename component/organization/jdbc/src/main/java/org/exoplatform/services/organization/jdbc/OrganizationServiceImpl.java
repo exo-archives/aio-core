@@ -40,11 +40,16 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
     
   }
   
-  static public class UserMapper implements DBObjectMapper<UserImpl> {
+  static class UserMapper implements DBObjectMapper<UserImpl> {
 
     public String[][] toParameters(UserImpl bean) throws Exception {
-      java.sql.Date createdDate = new java.sql.Date(bean.getCreatedDate().getTime());
-      java.sql.Date lastLogin = new java.sql.Date(bean.getLastLoginTime().getTime());
+      Date date = bean.getCreatedDate();
+      if(date == null) date = Calendar.getInstance().getTime();
+      java.sql.Date createdDate = new java.sql.Date(date.getTime());
+      
+      date = bean.getLastLoginTime();
+      if(date == null) date = Calendar.getInstance().getTime();
+      java.sql.Date lastLogin = new java.sql.Date(date.getTime());
       return new String[][] {
           {"id", String.valueOf(bean.getDBObjectId()) },
           {"username", bean.getUserName() },
@@ -95,20 +100,128 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
   }
   
   
-  static public class GroupMapper implements DBObjectMapper<GroupImpl> {
+  static class GroupMapper implements DBObjectMapper<GroupImpl> {
 
     public String[][] toParameters(GroupImpl bean) throws Exception {
-      return null;
+      return new String[][] {
+          {"id", bean.getId() },
+          {"parentId",  bean.getParentId()},
+          {"groupName",  bean.getGroupName()},
+          {"label", bean.getLabel()},
+          {"desc", bean.getDescription()}
+      };
     }
 
-    public void mapUpdate(GroupImpl bean, PreparedStatement pstm) throws Exception {
+    public void mapUpdate(GroupImpl bean, PreparedStatement statement) throws Exception {
+      statement.setString(1, bean.getId());
+      statement.setString(2, bean.getParentId());
+      statement.setString(3, bean.getGroupName());
+      statement.setString(4, bean.getLabel());
+      statement.setString(5, bean.getDescription());
     }
 
-    public void mapResultSet(ResultSet res, GroupImpl bean) throws Exception {  
+    public void mapResultSet(ResultSet res, GroupImpl bean) throws Exception {
+      bean.setId(res.getString("id"));
+      bean.setParentId(res.getString("parentId"));
+      bean.setGroupName(res.getString("groupName"));
+      bean.setLabel(res.getString("label"));
+      bean.setDescription(res.getString("desc"));
     } 
   }
   
-  
+  static class MembershipTypeMapper implements DBObjectMapper<MembershipTypeImpl> {
 
+    public String[][] toParameters(MembershipTypeImpl bean) throws Exception {
+      Date date = bean.getCreatedDate();
+      if(date == null) date = Calendar.getInstance().getTime();
+      java.sql.Date createdDate = new java.sql.Date(date.getTime());
+      
+      date = bean.getModifiedDate();
+      if(date == null) date = Calendar.getInstance().getTime();
+      java.sql.Date modifiedDate = new java.sql.Date(date.getTime());
+      return new String[][] {
+          {"name", bean.getName() },
+          {"owner",  bean.getOwner()},
+          {"description",  bean.getDescription()},
+          {"createdDate", createdDate.toString() },
+          {"lastLoginTime", modifiedDate.toString()}     
+      };
+    }
+    
+    public void mapUpdate(MembershipTypeImpl bean, PreparedStatement statement) throws Exception {
+      statement.setString(1, bean.getName());
+      statement.setString(2, bean.getOwner());
+      statement.setString(3, bean.getDescription());
+      
+      Date createdDate = bean.getCreatedDate();
+      if(createdDate == null) createdDate = Calendar.getInstance().getTime();
+      statement.setDate(4, new java.sql.Date(createdDate.getTime()));
+      
+      Date lastLoginTime = bean.getModifiedDate();
+      if(lastLoginTime == null) lastLoginTime = Calendar.getInstance().getTime();
+      statement.setDate(5, new java.sql.Date(lastLoginTime.getTime()));
+    }
+    
+    public void mapResultSet(ResultSet res, MembershipTypeImpl bean) throws Exception {
+      bean.setName(res.getString("name"));
+      bean.setOwner(res.getString("owner"));
+      bean.setDescription(res.getString("description"));
+      
+      Calendar calendar = Calendar.getInstance();
+      res.getDate("createdDate", calendar);
+      bean.setCreatedDate(calendar.getTime());
+      
+      res.getDate("modifiedDate", calendar);
+      bean.setModifiedDate(calendar.getTime());
+    }
+  }
+  
+  static class MembershipMapper implements DBObjectMapper<MembershipImpl> {
+
+    public String[][] toParameters(MembershipImpl bean) throws Exception {
+      return new String[][] {
+          {"id", bean.getId() },
+          {"membershipType",  bean.getMembershipType()},
+          {"groupId",  bean.getGroupId()},
+          {"userName", bean.getUserName()}
+      };
+    }
+    
+    public void mapUpdate(MembershipImpl bean, PreparedStatement statement) throws Exception {
+      statement.setString(1, bean.getId());
+      statement.setString(2, bean.getMembershipType());
+      statement.setString(3, bean.getGroupId());
+      statement.setString(4, bean.getUserName());
+    }
+    
+    public void mapResultSet(ResultSet res, MembershipImpl bean) throws Exception {
+      bean.setId(res.getString("id"));
+      bean.setMembershipType(res.getString("membershipType"));
+      bean.setGroupId(res.getString("groupId"));
+      bean.setUserName(res.getString("userName"));
+    }
+    
+  }
+  
+  static class UserProfileMapper implements DBObjectMapper<UserProfileData> {
+
+    public String[][] toParameters(UserProfileData bean) throws Exception {
+      return new String[][] {
+          {"userName", bean.getUserName() },
+          {"profile",  bean.getProfile()}
+      };
+    }
+    
+    public void mapUpdate(UserProfileData bean, PreparedStatement statement) throws Exception {
+      statement.setString(1, bean.getUserName());
+      statement.setString(2, bean.getProfile());
+    }
+    
+    public void mapResultSet(ResultSet res, UserProfileData bean) throws Exception {
+      bean.setUserName(res.getString("userName"));
+      bean.setProfile(res.getString("profile"));
+    }
+    
+  }
 
 }

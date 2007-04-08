@@ -1,5 +1,6 @@
 package org.exoplatform.services.organization.jdbc;
 
+import org.exoplatform.services.database.DBObject;
 import org.exoplatform.services.database.annotation.Table;
 import org.exoplatform.services.database.annotation.TableField;
 import org.exoplatform.services.organization.Membership;
@@ -13,12 +14,12 @@ import org.exoplatform.services.organization.Membership;
         @TableField(name = "userName", type = "string", length = 500)
     }
 )
-public class MembershipImpl implements Membership {
+public class MembershipImpl extends DBObject implements Membership {
 
   private String id = null;  
   private String membershipType = "member";
-  private String userName = null ;
   private String groupId = null ;
+  private String userName = null ;
 
   public MembershipImpl() {
   }
