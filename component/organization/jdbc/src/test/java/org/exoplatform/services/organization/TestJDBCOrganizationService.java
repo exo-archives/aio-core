@@ -47,8 +47,7 @@ public class TestJDBCOrganizationService extends BasicTestCase {
     if(!runtest)  return ;
     PortalContainer manager  = PortalContainer.getInstance();    
     
-    DatabaseService service = 
-      (DatabaseService) manager.getComponentInstance("XAPoolTxSupportDBConnectionService") ;
+    DatabaseService service = (DatabaseService) manager.getComponentInstance(DatabaseService.class) ;
     ListenerService  listenerService = (ListenerService) manager.getComponentInstanceOfType(ListenerService.class) ;    
     ExoDatasource dataSource = service.getDatasource();    
     service_ = new OrganizationServiceImpl(listenerService, dataSource, null);
@@ -107,14 +106,17 @@ public class TestJDBCOrganizationService extends BasicTestCase {
   public void testUser() throws Exception {
     assertTrue(userHandler_ != null);
 //    if(!runtest)  return ;
-//    /* Create an user with UserName: test*/
-//    String USER = "test" ;   
+//    /* Create an user with UserName: thuannd*/
+    String userName = "thuannd" ;   
 //    
-//    createUser(USER) ;    
-//        
-//    User u = userHandler_.findUserByName(USER);    
+    User user = createUser(userName) ;
+    userHandler_.createUser(user, true);
+    
+    User savedUser = userHandler_.findUserByName(userName);
+    assertEquals("Expect user name is: ", userName, savedUser.getUserName());
+    
+    System.out.println("\n\n\n == la > "+savedUser.getUserName()+"\n\n");
 //    assertTrue("Found user instance", u != null);
-//    assertEquals("Expect user name is: ", USER, u.getUserName());   
 //    
 //    UserProfile up = profileHandler_.findUserProfileByName(USER);
 //    assertTrue("Expect user profile is found: ", up != null);
@@ -368,13 +370,11 @@ public class TestJDBCOrganizationService extends BasicTestCase {
 //  } 
   
   public User createUser(String userName) throws Exception {   
-    User user = userHandler_.createUserInstance() ;
-    user.setUserName(userName) ;
+    User user = userHandler_.createUserInstance(userName) ;
     user.setPassword("default") ;
     user.setFirstName("default") ;
     user.setLastName("default") ;
     user.setEmail("exo@exoportal.org") ;
-    userHandler_.createUser(user, true);
     return user ;
   }
 }

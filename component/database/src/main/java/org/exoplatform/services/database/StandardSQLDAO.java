@@ -57,20 +57,12 @@ public  class StandardSQLDAO<T extends DBObject> extends DAO<T> {
         throw new Exception("The given bean " + bean.getClass() + " doesn't have an id") ;
       }
     }
-    for(T bean : list) {
-      invokeEvent("pre", "update", bean);
-    }
     execute(eXoDS_.getQueryBuilder().createUpdateQuery(type_), list);
-    for(T bean : list) {
-      invokeEvent("post", "update", bean);
-    }
   }    
   
   public void update(T bean) throws Exception {
     String query = eXoDS_.getQueryBuilder().createUpdateQuery(type_, bean.getDBObjectId());
-    invokeEvent("pre", "update", bean);
     execute(query, bean);
-    invokeEvent("post", "update", bean);
   }
   
   @SuppressWarnings("unchecked")
@@ -81,36 +73,24 @@ public  class StandardSQLDAO<T extends DBObject> extends DAO<T> {
       if(bean.getDBObjectId() != -1) continue;
       bean.setDBObjectId(eXoDS_.getIDGenerator().generateLongId(bean));
     }
-    for(T bean : list) {
-      invokeEvent("pre", "insert", bean);
-    }
     execute(eXoDS_.getQueryBuilder().createInsertQuery(type_), list);
-    for(T bean : list) {
-      invokeEvent("post", "insert", bean);
-    }
   }
   
   public void save(T bean) throws Exception {
     if(bean.getDBObjectId() == -1) bean.setDBObjectId(eXoDS_.getIDGenerator().generateLongId(bean));
-    invokeEvent("pre", "save", bean);
     execute(eXoDS_.getQueryBuilder().createInsertQuery(bean.getClass(), bean.getDBObjectId()), bean);
-    invokeEvent("post", "save", bean);
   }
   
   
   public T remove(long id) throws Exception {
     T bean = load(id);
     if(bean == null) return null;
-    invokeEvent("pre", "remove", bean);
     execute(eXoDS_.getQueryBuilder().createRemoveQuery(type_, id), (T)null);
-    invokeEvent("post", "remove", bean);
     return bean ;
   }
 
   public void remove(T bean) throws Exception {
-    invokeEvent("pre", "remove", bean);
     execute(eXoDS_.getQueryBuilder().createRemoveQuery(type_, bean.getDBObjectId()), (T)null);
-    invokeEvent("post", "remove", bean);
   }
 
   

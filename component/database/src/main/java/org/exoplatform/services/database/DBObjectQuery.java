@@ -15,7 +15,7 @@ import org.exoplatform.services.database.annotation.Table;
  * @since Nov 25, 2004
  * @version $Id: ObjectQuery.java 6006 2006-06-06 10:01:27Z thangvn $
  */
-public class DBObjectQuery  {
+public class DBObjectQuery <T extends DBObject>  {
   
   private static SimpleDateFormat ft_ = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS") ;
   private Class<? extends DBObject> type_ ;
@@ -24,7 +24,7 @@ public class DBObjectQuery  {
   private List<Parameter>  parameters_ ;  
   private List<Parameter> selectParameter_ ;
   
-  public DBObjectQuery(Class<? extends DBObject> type) {
+  public DBObjectQuery(Class<T> type) {
     type_ = type ;
     parameters_ = new ArrayList<Parameter>(3) ;
     selectParameter_ = new ArrayList<Parameter>(10) ;
@@ -124,7 +124,7 @@ public class DBObjectQuery  {
     return b.toString() ;
   }
   
-  public String getHibernateGroupByQuery() {
+ /* public String getHibernateGroupByQuery() {
     StringBuilder b = new StringBuilder("SELECT ") ;
     if(selectParameter_.size() > 0){
       for(int i = 0; i < selectParameter_.size(); i++){
@@ -187,7 +187,7 @@ public class DBObjectQuery  {
       }
     }
     return b.toString() ;
-  }
+  }*/
   
   static class Parameter {
     

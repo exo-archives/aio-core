@@ -4,14 +4,12 @@
  **************************************************************************/
 package org.exoplatform.services.organization.jdbc;
 
-import java.util.List;
-
 import org.exoplatform.commons.utils.PageList;
-import org.exoplatform.services.database.DAO;
 import org.exoplatform.services.database.DBObjectMapper;
+import org.exoplatform.services.database.DBObjectQuery;
 import org.exoplatform.services.database.ExoDatasource;
+import org.exoplatform.services.database.StandardSQLDAO;
 import org.exoplatform.services.listener.ListenerService;
-import org.exoplatform.services.organization.Query;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserEventListener;
 import org.exoplatform.services.organization.UserHandler;
@@ -22,100 +20,31 @@ import org.exoplatform.services.organization.UserHandler;
  *          nhudinhthuan@exoplatform.com
  * Apr 7, 2007  
  */
-public class UserDAOImpl  extends DAO<UserImpl> implements  UserHandler {
+public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandler {
   
-  private Class<UserImpl> type_ = UserImpl.class;
+  public User createUserInstance() { return new UserImpl(); }
+
+  public User createUserInstance(String username) { return new UserImpl(username); }
   
-  protected ListenerService listenerService_;
   
-  public UserDAOImpl(ListenerService lService, ExoDatasource datasource, DBObjectMapper<UserImpl> mapper) {
-    super(datasource, mapper);
-    listenerService_ = lService;
+  public void createUser(User user, boolean broadcast) throws Exception {
+    UserImpl userImpl = (UserImpl)user;
+    if(broadcast) invokeEvent("pre", "save", userImpl);
+    super.save(userImpl);
+    if(broadcast) invokeEvent("post", "save", userImpl);
   }
-
-  @Override
-  public UserImpl createInstance() throws Exception {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public UserImpl load(long id) throws Exception {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public PageList loadAll() throws Exception {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public UserImpl remove(long id) throws Exception {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public void remove(UserImpl bean) throws Exception {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void save(List<UserImpl> beans) throws Exception {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void save(UserImpl bean) throws Exception {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void update(List<UserImpl> beans) throws Exception {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void update(UserImpl bean) throws Exception {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @SuppressWarnings("unused")
-  public void addUserEventListener(UserEventListener listener) {
-  }
-
+  
   public boolean authenticate(String username, String password) throws Exception {
     return false;
   }
 
-  public void createUser(User user, boolean broadcast) throws Exception {
-    // TODO Auto-generated method stub
-    
-  }
-
-  public User createUserInstance() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  public User createUserInstance(String username) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
   public User findUserByName(String userName) throws Exception {
-    // TODO Auto-generated method stub
-    return null;
+    DBObjectQuery<UserImpl> query = new DBObjectQuery<UserImpl>(UserImpl.class);
+    query.addLIKE("username", userName);
+    return loadUnique(query.toQuery());
   }
 
-  public PageList findUsers(Query query) throws Exception {
+  public PageList findUsers(org.exoplatform.services.organization.Query query) throws Exception {
     // TODO Auto-generated method stub
     return null;
   }
@@ -139,5 +68,12 @@ public class UserDAOImpl  extends DAO<UserImpl> implements  UserHandler {
     // TODO Auto-generated method stub
     
   }
+
+  public UserDAOImpl(ListenerService lService, ExoDatasource datasource, DBObjectMapper<UserImpl> mapper) {
+    super(lService, datasource, mapper, UserImpl.class);
+  }
+
+  @SuppressWarnings("unused")
+  public void addUserEventListener(UserEventListener listener) {}
 
 }

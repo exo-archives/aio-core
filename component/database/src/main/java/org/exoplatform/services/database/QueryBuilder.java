@@ -131,7 +131,7 @@ public class QueryBuilder {
   private String getQuery(Query query) {
     SQL [] queries = query.queries();
     for(SQL sql : queries){
-      if(sql.DBType() == databaseType) return sql.value();
+      if(sql.dbType() == databaseType) return sql.value();
     }
     return null;
   }

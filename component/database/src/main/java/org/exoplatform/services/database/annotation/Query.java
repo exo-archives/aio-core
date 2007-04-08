@@ -25,7 +25,7 @@ public @interface Query {
   @Retention(RetentionPolicy.RUNTIME)
   @Target({ElementType.TYPE})
   public static @interface SQL {
-    int DBType()  default ExoDatasource.STANDARD_DB_TYPE;
+    int dbType()  default ExoDatasource.STANDARD_DB_TYPE;
     String value();
   }
 }

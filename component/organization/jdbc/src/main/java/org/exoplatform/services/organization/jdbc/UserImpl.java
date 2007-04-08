@@ -8,16 +8,15 @@ import org.exoplatform.services.database.annotation.TableField;
 import org.exoplatform.services.organization.User;
 
 @Table(
-    name = "User" ,
+    name = "USER" ,
     field = {
-        @TableField(name = "id", type = "string", length = 100, unique = true, nullable = false),
-        @TableField(name = "userName", type = "string", length = 200),
+        @TableField(name = "userName", type = "string", length = 200, unique = true, nullable = false),
         @TableField(name = "password", type = "string", length = 100),
-        @TableField(name = "fisrtName", type = "string", length = 500),
+        @TableField(name = "firstName", type = "string", length = 500),
         @TableField(name = "lastName", type = "string", length = 200),
         @TableField(name = "email", type = "string", length = 200),
         @TableField(name = "createdDate", type = "date", length = 100),
-        @TableField(name = "lastLoginDate", type = "date", length = 100),
+        @TableField(name = "lastLoginTime", type = "date", length = 100),
         @TableField(name = "organizationId", type = "string", length = 100)
     }
 )
