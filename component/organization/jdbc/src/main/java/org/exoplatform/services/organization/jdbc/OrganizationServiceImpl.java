@@ -31,7 +31,7 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
                                  ExoDatasource datasource, CacheService cservice) throws Exception {
     userDAO_ = new UserDAOImpl(listenerService, datasource, new UserMapper()) ;   
     userProfileDAO_ =  new UserProfileDAOImpl() ;
-    groupDAO_ =  new GroupDAOImpl() ;
+    groupDAO_ =  new GroupDAOImpl(listenerService, datasource, new GroupMapper()) ;
     membershipDAO_ = new MembershipDAOImpl() ;
     membershipTypeDAO_ = new MembershipTypeDAOImpl() ;
     

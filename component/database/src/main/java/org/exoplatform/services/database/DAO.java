@@ -84,114 +84,114 @@ public abstract class DAO<T extends DBObject> {
   }
 
   protected T loadUnique(String query) throws Exception {
-    Connection connection = null;
-    Statement statement = null;
+    Connection connection = eXoDS_.getConnection() ;
     try{
-      connection = eXoDS_.getConnection() ;
-      statement = connection.createStatement() ;
-      ResultSet resultSet =  statement.executeQuery(query) ;
-      if(!resultSet.next()) return null ;
-      T bean =  createInstance() ;
-      mapper_.mapResultSet(resultSet, bean) ;
-      statement.close() ;
-      resultSet.close() ;
-      return bean ;
+      return loadUnique(connection, query);
     } catch (Exception e) {
       throw e;
     } finally {
-      if (statement != null) {
-        statement.close();
-        eXoDS_.closeConnection(connection) ;
-      }
+      eXoDS_.closeConnection(connection) ;
     }
+  }
+  
+  protected T loadUnique(Connection connection, String query) throws Exception {
+    Statement statement = connection.createStatement() ;
+    ResultSet resultSet =  statement.executeQuery(query) ;
+    if(!resultSet.next()) return null ;
+    T bean =  createInstance() ;
+    mapper_.mapResultSet(resultSet, bean) ;
+    resultSet.close() ;
+    statement.close() ;
+    return bean ;
   }
 
   protected void loadInstances(String loadQuery, List<T> list) throws Exception {
-    Connection connection = null;
-    Statement statement = null;
+    Connection connection = eXoDS_.getConnection() ;
     try{
-      connection = eXoDS_.getConnection() ;
-      statement = connection.createStatement() ;
-      ResultSet resultSet =  statement.executeQuery(loadQuery) ;
-      while (resultSet.next()) {
-        T bean = createInstance() ;
-        mapper_.mapResultSet(resultSet, bean) ;
-        list.add(bean) ;
-      }
-      resultSet.close() ;
+      loadInstances(connection, loadQuery, list);
     } catch (Exception e) {
       throw e;
     } finally {
-      if (statement == null) return ;
-      statement.close();
       eXoDS_.closeConnection(connection) ; 
     }
+  }
+  
+  protected void loadInstances(Connection connection, String loadQuery, List<T> list) throws Exception {
+    Statement statement = connection.createStatement() ;
+    ResultSet resultSet =  statement.executeQuery(loadQuery) ;
+    while (resultSet.next()) {
+      T bean = createInstance() ;
+      mapper_.mapResultSet(resultSet, bean) ;
+      list.add(bean) ;
+    }
+    resultSet.close() ;
+    statement.close();
   }
 
   protected void execute(String query, T bean) throws Exception {
-    Connection connection = null;
-    PreparedStatement statement = null;
+    Connection connection = eXoDS_.getConnection() ;
     try{
-      connection = eXoDS_.getConnection() ;
-      statement = connection.prepareStatement(query) ;
-      if(bean != null){
-        mapper_.mapUpdate(bean, statement) ;
-      }
-      System.out.println(" Executed query "+query) ;
-      statement.executeUpdate() ;
-      eXoDS_.commit(connection) ;
+      execute(connection, query, bean);
     } catch (Exception e) {
       throw e;
     } finally {
-      if (statement == null) return;
-      statement.close();
       eXoDS_.closeConnection(connection) ; 
     }
   }
+  
+  protected void execute(Connection connection, String query, T bean) throws Exception {
+    PreparedStatement statement = connection.prepareStatement(query) ;
+    if(bean != null) mapper_.mapUpdate(bean, statement) ;    
+    System.out.println(" Executed query "+query) ;
+    statement.executeUpdate() ;
+    eXoDS_.commit(connection) ;
+    statement.close();
+  }
 
-  @SuppressWarnings("unchecked")
   public <E> E loadDBField(String query) throws Exception {
-    Connection connection = null;
-    Statement statement = null;
+    Connection connection = eXoDS_.getConnection() ;
     try{
-      connection = eXoDS_.getConnection() ;
-      statement = connection.createStatement() ;
-      ResultSet resultSet =  statement.executeQuery(query) ;
-      if(!resultSet.next()) return null ;
-      E value =  (E)resultSet.getObject(1);
-      resultSet.close() ;
-      return value ;
+      return this.<E>loadDBField(connection, query);
     } catch (Exception e) {
       throw e;
     } finally {
-      if (statement != null) {
-        statement.close();
-        eXoDS_.closeConnection(connection) ; 
-      }
+      eXoDS_.closeConnection(connection) ; 
     }
+  }
+  
+  @SuppressWarnings("unchecked")
+  protected <E> E loadDBField(Connection connection, String query) throws Exception {
+    Statement statement = connection.createStatement() ;
+    ResultSet resultSet =  statement.executeQuery(query) ;
+    if(!resultSet.next()) return null ;
+    E value =  (E)resultSet.getObject(1);
+    resultSet.close() ;
+    statement.close();
+    return value ;
   }
 
   protected void execute(String template, List<T> beans) throws Exception {
-    Connection connection = null;
-    Statement statement = null;
-    try{
-      connection = eXoDS_.getConnection() ;
-      statement = connection.createStatement() ;
-      QueryBuilder builder = eXoDS_.getQueryBuilder();
-      for(T bean : beans) {
-        String query = builder.mapDataToSql(template, mapper_.toParameters(bean));
-        statement.addBatch(query);
-        System.out.println(" addBatch "+query) ;
-      }
-      statement.executeBatch();
-      eXoDS_.commit(connection) ;
+    Connection connection = eXoDS_.getConnection() ;
+    try {
+      execute(connection, template, beans);
     } catch (Exception e) {
       throw e;
     } finally {
-      if(statement == null) return ;
-      statement.close();
       eXoDS_.closeConnection(connection) ; 
     }
+  }
+  
+  protected void execute(Connection connection, String template, List<T> beans) throws Exception {
+    Statement statement = connection.createStatement() ;
+    QueryBuilder builder = eXoDS_.getQueryBuilder();
+    for(T bean : beans) {
+      String query = builder.mapDataToSql(template, mapper_.toParameters(bean));
+      statement.addBatch(query);
+      System.out.println(" addBatch "+query) ;
+    }
+    statement.executeBatch();
+    statement.close();
+    eXoDS_.commit(connection) ;
   }
 
 }

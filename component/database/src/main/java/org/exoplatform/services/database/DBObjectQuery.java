@@ -193,6 +193,8 @@ public class DBObjectQuery <T extends DBObject>  {
     return value;
   }
   
+  public List<Parameter> getParameters() { return parameters_; }
+  
   static public class Parameter {
     
     String op_ ;
@@ -225,4 +227,5 @@ public class DBObjectQuery <T extends DBObject>  {
       }
     }
   }
+  
 }
