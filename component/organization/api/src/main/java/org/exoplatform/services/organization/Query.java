@@ -13,6 +13,7 @@ import java.util.Date ;
  * Time: 1:12:22 PM
  */
 public class Query {
+  
   private String userName_ ;
   private String fname_ ;
   private String lname_ ;

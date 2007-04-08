@@ -55,7 +55,7 @@ public abstract class DAO<T extends DBObject> {
   abstract public T createInstance() throws Exception ;
 
   @SuppressWarnings("unchecked")
-  protected void loadPageList(StandardDBObjectPageList<T> pageList, String query) throws Exception {
+  protected void loadPageList(DBPageList<T> pageList, String query) throws Exception {
     Connection connection = null;
     Statement statement = null;
     try {

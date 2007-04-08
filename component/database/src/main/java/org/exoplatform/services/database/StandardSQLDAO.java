@@ -45,7 +45,7 @@ public  class StandardSQLDAO<T extends DBObject> extends DAO<T> {
     String query = queryBuilder.createSelectQuery(type_, -1);
     StringBuilder queryCounter = new StringBuilder("SELECT COUNT(*) ");
     queryCounter.append(query.substring(query.indexOf("FROM")));
-    return new StandardDBObjectPageList<T>(20, this, query, queryCounter.toString());
+    return new DBPageList<T>(20, this, query, queryCounter.toString());
   }
   
   @SuppressWarnings("unchecked")

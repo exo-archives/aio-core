@@ -4,9 +4,12 @@
  **************************************************************************/
 package org.exoplatform.services.organization.jdbc;
 
+import java.util.Calendar;
+
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.services.database.DBObjectMapper;
 import org.exoplatform.services.database.DBObjectQuery;
+import org.exoplatform.services.database.DBPageList;
 import org.exoplatform.services.database.ExoDatasource;
 import org.exoplatform.services.database.StandardSQLDAO;
 import org.exoplatform.services.listener.ListenerService;
@@ -22,6 +25,10 @@ import org.exoplatform.services.organization.UserHandler;
  */
 public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandler {
   
+  public UserDAOImpl(ListenerService lService, ExoDatasource datasource, DBObjectMapper<UserImpl> mapper) {
+    super(lService, datasource, mapper, UserImpl.class);
+  }
+  
   public User createUserInstance() { return new UserImpl(); }
 
   public User createUserInstance(String username) { return new UserImpl(username); }
@@ -29,13 +36,21 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
   
   public void createUser(User user, boolean broadcast) throws Exception {
     UserImpl userImpl = (UserImpl)user;
-    if(broadcast) invokeEvent("pre", "save", userImpl);
+    if(broadcast) invokeEvent("pre", "insert", userImpl);
     super.save(userImpl);
-    if(broadcast) invokeEvent("post", "save", userImpl);
+    if(broadcast) invokeEvent("post", "insert", userImpl);
   }
   
   public boolean authenticate(String username, String password) throws Exception {
-    return false;
+    User user = findUserByName(username);   
+    if(user == null) return false ;    
+    boolean authenticated = user.getPassword().equals(password) ;
+    if(authenticated){
+      UserImpl userImpl = (UserImpl)user;
+      userImpl.setLastLoginTime(Calendar.getInstance().getTime());      
+      saveUser(userImpl, false);
+    }
+    return authenticated;
   }
 
   public User findUserByName(String userName) throws Exception {
@@ -44,33 +59,42 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
     return loadUnique(query.toQuery());
   }
 
-  public PageList findUsers(org.exoplatform.services.organization.Query query) throws Exception {
-    // TODO Auto-generated method stub
-    return null;
+  public PageList findUsers(org.exoplatform.services.organization.Query orgQuery) throws Exception {
+    DBObjectQuery dbQuery = new DBObjectQuery<UserImpl>(UserImpl.class);
+    dbQuery.addLIKE("userName", orgQuery.getUserName()) ;
+    dbQuery.addLIKE("firstName", orgQuery.getFirstName() ) ;
+    dbQuery.addLIKE("lastName", orgQuery.getLastName()) ;
+    dbQuery.addLIKE("email", orgQuery.getEmail()) ;
+    dbQuery.addGT("lastLoginTime", orgQuery.getFromLoginDate()) ;
+    dbQuery.addLT("lastLoginTime", orgQuery.getToLoginDate()) ;
+    return new DBPageList<UserImpl>(20, this, dbQuery.toQuery(), dbQuery.toCountQuery());
   }
 
   public PageList findUsersByGroup(String groupId) throws Exception {
-    // TODO Auto-generated method stub
+    DBObjectQuery dbQuery = new DBObjectQuery<UserImpl>(UserImpl.class);
+//    dbQuery.addLIKE()
     return null;
   }
 
   public PageList getUserPageList(int pageSize) throws Exception {
-    // TODO Auto-generated method stub
-    return null;
+    DBObjectQuery dbQuery = new DBObjectQuery<UserImpl>(UserImpl.class);
+    return new DBPageList<UserImpl>(pageSize, this, dbQuery.toQuery(), dbQuery.toCountQuery());
   }
 
   public User removeUser(String userName, boolean broadcast) throws Exception {
-    // TODO Auto-generated method stub
-    return null;
+    UserImpl userImpl = (UserImpl) findUserByName(userName);
+    if(userImpl == null) return null;
+    if(broadcast) invokeEvent("pre", "delete", userImpl);
+    super.remove(userImpl);
+    if(broadcast) invokeEvent("post", "delete", userImpl);
+    return userImpl;
   }
 
   public void saveUser(User user, boolean broadcast) throws Exception {
-    // TODO Auto-generated method stub
-    
-  }
-
-  public UserDAOImpl(ListenerService lService, ExoDatasource datasource, DBObjectMapper<UserImpl> mapper) {
-    super(lService, datasource, mapper, UserImpl.class);
+    UserImpl userImpl = (UserImpl)user;
+    if(broadcast) invokeEvent("pre", "update", userImpl);
+    super.update(userImpl);
+    if(broadcast) invokeEvent("post", "update", userImpl);
   }
 
   @SuppressWarnings("unused")

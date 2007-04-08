@@ -126,6 +126,20 @@ public class DBObjectQuery <T extends DBObject>  {
     return builder.toString() ;
   }
   
+  public String toCountQuery() {
+    StringBuilder builder = new StringBuilder() ;
+    Table table = type_.getAnnotation(Table.class) ; 
+    builder.append("SELECT COUNT(*) FROM  ").append(table.name()) ;
+    if(parameters_.size() > 0) {
+      builder.append(" WHERE ") ;
+      for(int i = 0; i < parameters_.size(); i ++) {
+        if(i > 0) builder.append(" AND ") ;
+        parameters_.get(i).build(builder);        
+      }
+    }
+    return builder.toString() ;
+  }
+  
  /* public String getHibernateGroupByQuery() {
     StringBuilder b = new StringBuilder("SELECT ") ;
     if(selectParameter_.size() > 0){
@@ -169,27 +183,7 @@ public class DBObjectQuery <T extends DBObject>  {
     if(orderBy_ != null )   b.append(orderBy_ );
     return b.toString() ;
   }
-  public String getHibernateCountQuery() {
-    StringBuffer b = new StringBuffer() ;
-    Table table = type_.getAnnotation(Table.class) ; 
-    b.append("SELECT COUNT(*) FROM  ").append(table.name()) ;
-    if(parameters_.size() > 0) {
-      b.append(" WHERE ") ;
-      for(int i = 0; i < parameters_.size(); i ++) {
-        if(i > 0) b.append(" AND ") ;
-        Parameter p = parameters_.get(i) ;
-        if(p.value_ instanceof String) {
-          b.append(' ').append(p.field_).append(p.op_).append("'").append(p.value_).append("'") ;
-        } else if(p.value_ instanceof Date) {
-          String value = ft_.format((Date) p.value_) ;
-          b.append(' ').append(p.field_).append(p.op_).append("'").append(value).append("'") ;
-        } else {
-          b.append(' ').append(p.field_).append(p.op_).append(p.value_);
-        }
-      }
-    }
-    return b.toString() ;
-  }*/
+  */
   
   public String optimizeInputString(String value){
     value = value.replace('*', '%');
