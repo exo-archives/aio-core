@@ -10,6 +10,7 @@ import java.util.Collection;
 import org.exoplatform.commons.exception.UniqueObjectException;
 import org.exoplatform.services.database.DBObjectMapper;
 import org.exoplatform.services.database.DBObjectQuery;
+import org.exoplatform.services.database.DBPageList;
 import org.exoplatform.services.database.ExoDatasource;
 import org.exoplatform.services.database.StandardSQLDAO;
 import org.exoplatform.services.listener.ListenerService;
@@ -86,8 +87,10 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
   }
 
   public Collection findGroups(Group parent) throws Exception {
-    // TODO Auto-generated method stub
-    return null;
+    DBObjectQuery<GroupImpl> query = new DBObjectQuery<GroupImpl>(GroupImpl.class);
+    query.addLIKE("parentId", parent.getId());
+    DBPageList<GroupImpl> pageList = new DBPageList<GroupImpl>(20, this, query);
+    return pageList.getAll();
   }
 
   public Collection findGroupsOfUser(String user) throws Exception {
@@ -96,8 +99,9 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
   }
 
   public Collection getAllGroups() throws Exception {
-    // TODO Auto-generated method stub
-    return null;
+    DBObjectQuery<GroupImpl> query = new DBObjectQuery<GroupImpl>(GroupImpl.class);
+    DBPageList<GroupImpl> pageList = new DBPageList<GroupImpl>(20, this, query);
+    return pageList.getAll();
   }
   
   public void saveGroup(Group group, boolean broadcast) throws Exception {

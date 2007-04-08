@@ -77,8 +77,7 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
   }
 
   public PageList getUserPageList(int pageSize) throws Exception {
-    DBObjectQuery dbQuery = new DBObjectQuery<UserImpl>(UserImpl.class);
-    return new DBPageList<UserImpl>(pageSize, this, dbQuery.toQuery(), dbQuery.toCountQuery());
+    return new DBPageList<UserImpl>(pageSize, this, new DBObjectQuery<UserImpl>(UserImpl.class));
   }
 
   public User removeUser(String userName, boolean broadcast) throws Exception {

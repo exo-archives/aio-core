@@ -9,6 +9,7 @@ import java.util.Date;
 
 import org.exoplatform.services.database.DBObjectMapper;
 import org.exoplatform.services.database.DBObjectQuery;
+import org.exoplatform.services.database.DBPageList;
 import org.exoplatform.services.database.ExoDatasource;
 import org.exoplatform.services.database.StandardSQLDAO;
 import org.exoplatform.services.listener.ListenerService;
@@ -29,6 +30,7 @@ public class MembershipTypeDAOImpl extends StandardSQLDAO<MembershipTypeImpl> im
 
   public MembershipType createMembershipTypeInstance() { return new MembershipTypeImpl(); }
   
+  @SuppressWarnings("unused")
   public MembershipType createMembershipType(MembershipType mt, boolean broadcast) throws Exception {
     Date now = new Date() ;
     mt.setCreatedDate(now) ;
@@ -37,20 +39,21 @@ public class MembershipTypeDAOImpl extends StandardSQLDAO<MembershipTypeImpl> im
     return mt ;
   }
 
-
   public MembershipType findMembershipType(String name) throws Exception {
-    DBObjectQuery<UserImpl> query = new DBObjectQuery<UserImpl>(UserImpl.class);
+    DBObjectQuery<MembershipTypeImpl> query = new DBObjectQuery<MembershipTypeImpl>(MembershipTypeImpl.class);
     query.addLIKE("name", name);
     return loadUnique(query.toQuery());
   }
 
   public Collection findMembershipTypes() throws Exception {
-    // TODO Auto-generated method stub
-    return null;
+    DBObjectQuery<MembershipTypeImpl> query = new DBObjectQuery<MembershipTypeImpl>(MembershipTypeImpl.class);
+    DBPageList<MembershipTypeImpl> pageList = new DBPageList<MembershipTypeImpl>(20, this, query);
+    return pageList.getAll();
   }
 
+  @SuppressWarnings("unused")
   public MembershipType removeMembershipType(String name, boolean broadcast) throws Exception {
-    DBObjectQuery<UserImpl> query = new DBObjectQuery<UserImpl>(UserImpl.class);
+    DBObjectQuery<MembershipTypeImpl> query = new DBObjectQuery<MembershipTypeImpl>(MembershipTypeImpl.class);
     query.addLIKE("name", name);
     MembershipTypeImpl mt = loadUnique(query.toQuery());
     if(mt == null) return null;
@@ -58,6 +61,7 @@ public class MembershipTypeDAOImpl extends StandardSQLDAO<MembershipTypeImpl> im
     return mt;
   }
 
+  @SuppressWarnings("unused")
   public MembershipType saveMembershipType(MembershipType mt, boolean broadcast) throws Exception {
     Date now = new Date() ;
     mt.setModifiedDate(now) ;

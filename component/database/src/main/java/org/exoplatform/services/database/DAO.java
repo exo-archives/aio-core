@@ -10,11 +10,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
 
-import javax.sql.rowset.CachedRowSet;
-
 import org.exoplatform.commons.utils.PageList;
-
-import com.sun.rowset.CachedRowSetImpl;
 
 /**
  * Created by The eXo Platform SARL
@@ -53,35 +49,6 @@ public abstract class DAO<T extends DBObject> {
   abstract public T remove(long id) throws Exception ;
 
   abstract public T createInstance() throws Exception ;
-
-  @SuppressWarnings("unchecked")
-  protected void loadPageList(DBPageList<T> pageList, String query) throws Exception {
-    Connection connection = null;
-    Statement statement = null;
-    try {
-      connection = eXoDS_.getConnection() ;
-      statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-      ResultSet resultSet = statement.executeQuery(query);
-
-      CachedRowSet crs = new CachedRowSetImpl();
-      crs.setPageSize(pageList.getPageSize());
-      crs.populate(resultSet, (pageList.getCurrentPage() - 1) * pageList.getPageSize() + 1);
-
-      List<T>  list = pageList.currentPage();
-      while (resultSet.next()) {
-        T bean = createInstance() ;
-        mapper_.mapResultSet(resultSet, bean) ;
-        list.add(bean) ;
-      }
-      resultSet.close() ;
-    } catch (Exception e) {
-      throw e;
-    } finally {
-      if (statement == null) return ;
-      statement.close();
-      eXoDS_.closeConnection(connection) ;  
-    }
-  }
 
   protected T loadUnique(String query) throws Exception {
     Connection connection = eXoDS_.getConnection() ;
@@ -193,5 +160,7 @@ public abstract class DAO<T extends DBObject> {
     statement.close();
     eXoDS_.commit(connection) ;
   }
+
+  public DBObjectMapper<T> getDBObjectMapper() { return mapper_; }
 
 }
