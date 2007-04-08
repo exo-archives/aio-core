@@ -33,7 +33,7 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
     groupDAO_ =  new GroupDAOImpl(listenerService, datasource, new GroupMapper()) ;
     membershipTypeDAO_ = new MembershipTypeDAOImpl(listenerService, datasource, new MembershipTypeMapper()) ;
 
-    membershipDAO_ = new MembershipDAOImpl() ;
+    membershipDAO_ = new MembershipDAOImpl(listenerService, datasource, new MembershipMapper()) ;
     userProfileDAO_ =  new UserProfileDAOImpl() ;
     
     DBTableManager dbManager = datasource.getDBTableManager() ;
