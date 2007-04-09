@@ -59,6 +59,14 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
     return loadUnique(query.toQuery());
   }
 
+  /**
+   * Query(
+   *   name = "" ,
+   *   standardSQL = "..."
+   *   oracleSQL = "..."
+   * )
+   * 
+   */
   public PageList findUsers(org.exoplatform.services.organization.Query orgQuery) throws Exception {
     DBObjectQuery dbQuery = new DBObjectQuery<UserImpl>(UserImpl.class);
     dbQuery.addLIKE("userName", orgQuery.getUserName()) ;
@@ -83,6 +91,7 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
   public User removeUser(String userName, boolean broadcast) throws Exception {
     UserImpl userImpl = (UserImpl) findUserByName(userName);
     if(userImpl == null) return null;
+    //listenerService.broadcast("organization.user.preDelete", this,  userImpl) ;
     if(broadcast) invokeEvent("pre", "delete", userImpl);
     super.remove(userImpl);
     if(broadcast) invokeEvent("post", "delete", userImpl);

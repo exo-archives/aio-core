@@ -149,7 +149,7 @@ public abstract class DAO<T extends DBObject> {
   }
   
   protected void execute(Connection connection, String template, List<T> beans) throws Exception {
-    Statement statement = connection.createStatement() ;
+    PreparedStatement statement = connection.prepareStatement(template) ;
     QueryBuilder builder = eXoDS_.getQueryBuilder();
     for(T bean : beans) {
       String query = builder.mapDataToSql(template, mapper_.toParameters(bean));
