@@ -30,18 +30,21 @@ import org.exoplatform.services.organization.User;
  */
 public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements MembershipHandler {
   
+  protected ListenerService listenerService_;
+  
   public MembershipDAOImpl(ListenerService lService, ExoDatasource datasource, DBObjectMapper<MembershipImpl> mapper) {
-    super(lService, datasource, mapper, MembershipImpl.class);
+    super(datasource, mapper, MembershipImpl.class);
+    listenerService_ = lService;
   }
   
   public Membership createMembershipInstance() { return new MembershipImpl(); }
 
   public void createMembership(Membership membership, boolean broadcast) throws Exception {
     MembershipImpl membershipImpl = (MembershipImpl) membership;
-    if(broadcast) invokeEvent("pre", "insert", membershipImpl);
+    if(broadcast) listenerService_.broadcast("organization.membership.preSave", this, membershipImpl);
     membershipImpl.setId(IdentifierUtil.generateUUID(membership));
     super.save(membershipImpl);
-    if(broadcast) invokeEvent("post", "insert", membershipImpl);
+    if(broadcast) listenerService_.broadcast("organization.membership.postSave", this, membershipImpl);
   }
 
   public void linkMembership(User user, Group group, MembershipType mt, boolean broadcast) throws Exception {
@@ -86,10 +89,10 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
     try {
       MembershipImpl membershipImpl = super.loadUnique(connection, query.toQuery());
       if(membershipImpl == null) return null;
-      if(broadcast) invokeEvent("pre", "delete", membershipImpl);
+      if(broadcast) listenerService_.broadcast("organization.membership.preDelete", this, membershipImpl);
       String sql = eXoDS_.getQueryBuilder().createRemoveQuery(type_, membershipImpl.getDBObjectId());
       super.execute(connection, sql, (MembershipImpl)null);
-      if(broadcast) invokeEvent("post", "delete", membershipImpl);
+      if(broadcast) listenerService_.broadcast("organization.membership.postDelete", this, membershipImpl);
       return membershipImpl;
     }catch (Exception e) {
       throw e;
@@ -110,11 +113,11 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
     Connection connection = eXoDS_.getConnection();
     try {
       for(MembershipImpl membershipImpl : list) {
-        if(broadcast) invokeEvent("pre", "delete", membershipImpl);
+        if(broadcast) listenerService_.broadcast("organization.membership.preDelete", this, membershipImpl);
         if(membershipImpl == null) return null;
         String sql = eXoDS_.getQueryBuilder().createRemoveQuery(type_, membershipImpl.getDBObjectId());
         super.execute(connection, sql, (MembershipImpl)null);
-        if(broadcast) invokeEvent("post", "delete", membershipImpl);
+        if(broadcast) listenerService_.broadcast("organization.membership.postDelete", this, membershipImpl);
       }
       return list;
     }catch (Exception e) {

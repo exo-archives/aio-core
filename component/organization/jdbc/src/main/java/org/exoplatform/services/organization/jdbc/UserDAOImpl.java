@@ -25,8 +25,11 @@ import org.exoplatform.services.organization.UserHandler;
  */
 public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandler {
   
+  protected ListenerService listenerService_;
+  
   public UserDAOImpl(ListenerService lService, ExoDatasource datasource, DBObjectMapper<UserImpl> mapper) {
-    super(lService, datasource, mapper, UserImpl.class);
+    super(datasource, mapper, UserImpl.class);
+    listenerService_ = lService;
   }
   
   public User createUserInstance() { return new UserImpl(); }
@@ -36,9 +39,9 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
   
   public void createUser(User user, boolean broadcast) throws Exception {
     UserImpl userImpl = (UserImpl)user;
-    if(broadcast) invokeEvent("pre", "insert", userImpl);
+    if(broadcast) listenerService_.broadcast("organization.user.preSave", this, userImpl);
     super.save(userImpl);
-    if(broadcast) invokeEvent("post", "insert", userImpl);
+    if(broadcast) listenerService_.broadcast("organization.user.postSave", this, userImpl);
   }
   
   public boolean authenticate(String username, String password) throws Exception {
@@ -91,18 +94,17 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
   public User removeUser(String userName, boolean broadcast) throws Exception {
     UserImpl userImpl = (UserImpl) findUserByName(userName);
     if(userImpl == null) return null;
-    //listenerService.broadcast("organization.user.preDelete", this,  userImpl) ;
-    if(broadcast) invokeEvent("pre", "delete", userImpl);
+    if(broadcast) listenerService_.broadcast("organization.user.preDelete", this, userImpl);
     super.remove(userImpl);
-    if(broadcast) invokeEvent("post", "delete", userImpl);
+    if(broadcast) listenerService_.broadcast("organization.user.postDelete", this, userImpl);
     return userImpl;
   }
 
   public void saveUser(User user, boolean broadcast) throws Exception {
     UserImpl userImpl = (UserImpl)user;
-    if(broadcast) invokeEvent("pre", "update", userImpl);
+    if(broadcast) listenerService_.broadcast("organization.user.preUpdate", this, userImpl);
     super.update(userImpl);
-    if(broadcast) invokeEvent("post", "update", userImpl);
+    if(broadcast) listenerService_.broadcast("organization.user.postUpdate", this, userImpl);
   }
 
   @SuppressWarnings("unused")

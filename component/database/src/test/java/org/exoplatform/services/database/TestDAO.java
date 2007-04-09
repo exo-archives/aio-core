@@ -41,7 +41,7 @@ public class TestDAO extends TestCase {
     dbManager.createTable(Mock.class, true) ;
     assertEquals(dbManager.hasTable(Mock.class), true);
     
-    StandardSQLDAO<Mock>  dao = new StandardSQLDAO<Mock>(listenerService, dataSource, new Mock.MockMapper(), Mock.class);
+    StandardSQLDAO<Mock>  dao = new StandardSQLDAO<Mock>(dataSource, new Mock.MockMapper(), Mock.class);
     Mock mock = new Mock("Benj", 2);
     dao.save(mock);
     
@@ -54,7 +54,7 @@ public class TestDAO extends TestCase {
     assertEquals(mock.getName(), savedMock.getName());
     
     //reflection mapper
-    dao = new StandardSQLDAO<Mock>(listenerService,  dataSource, Mock.class);
+    dao = new StandardSQLDAO<Mock>(dataSource, Mock.class);
     list.clear();
     list.add(new Mock("Ha", 17));
     list.add(new Mock("Hoa", 6));

@@ -26,8 +26,11 @@ import org.exoplatform.services.organization.GroupHandler;
  */
 public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHandler {
   
+  protected ListenerService listenerService_;
+  
   public GroupDAOImpl(ListenerService lService, ExoDatasource datasource, DBObjectMapper<GroupImpl> mapper) {
-    super(lService, datasource, mapper, GroupImpl.class);
+    super(datasource, mapper, GroupImpl.class);
+    listenerService_ = lService;
   }
   
   public Group createGroupInstance() { return new GroupImpl(); }
@@ -59,7 +62,7 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
       throw new UniqueObjectException("OrganizationService.unique-group-exception",  args) ;
     }
 
-    if(broadcast) invokeEvent("pre", "insert", childImpl);
+    if(broadcast) listenerService_.broadcast("organization.group.preSave", this, childImpl);
     childImpl.setId(groupId);
     try {
       if(childImpl.getDBObjectId() == -1) {
@@ -67,7 +70,7 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
       }      
       long id = childImpl.getDBObjectId();
       execute(connection, eXoDS_.getQueryBuilder().createInsertQuery(type_, id), childImpl);
-      if(broadcast) invokeEvent("post", "insert", childImpl);
+      if(broadcast) listenerService_.broadcast("organization.group.postSave", this, childImpl);
     } catch (Exception e) {
       throw e;
     } finally {
@@ -106,16 +109,16 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
   
   public void saveGroup(Group group, boolean broadcast) throws Exception {
     GroupImpl groupImpl = (GroupImpl)group;
-    if(broadcast) invokeEvent("pre", "insert", groupImpl);
+    if(broadcast) listenerService_.broadcast("organization.group.preUpdate", this, groupImpl);
     super.save(groupImpl);
-    if(broadcast) invokeEvent("post", "insert", groupImpl);
+    if(broadcast) listenerService_.broadcast("organization.group.postUpdate", this, groupImpl);
   }
   
   public Group removeGroup(Group group, boolean broadcast) throws Exception {
     GroupImpl groupImpl = (GroupImpl)group;
-    if(broadcast) invokeEvent("pre", "delete", groupImpl);
+    if(broadcast) listenerService_.broadcast("organization.group.preDelete", this, groupImpl);
     super.remove(groupImpl);
-    if(broadcast) invokeEvent("post", "delete", groupImpl);
+    if(broadcast) listenerService_.broadcast("organization.group.postDelete", this, groupImpl);
     return group;
   }
 

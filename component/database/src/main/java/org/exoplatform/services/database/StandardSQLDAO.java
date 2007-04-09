@@ -20,18 +20,14 @@ public  class StandardSQLDAO<T extends DBObject> extends DAO<T> {
   
   protected Class<T> type_;
   
-  protected ListenerService listenerService_;
-  
-  public StandardSQLDAO(ListenerService lService, ExoDatasource datasource, Class<T> type) {
+  public StandardSQLDAO(ExoDatasource datasource, Class<T> type) {
     super(datasource);
     this.type_ = type;
-    listenerService_ = lService;
   }
   
-  public StandardSQLDAO(ListenerService lService, ExoDatasource datasource, DBObjectMapper<T> mapper, Class<T> type) {
+  public StandardSQLDAO(ExoDatasource datasource, DBObjectMapper<T> mapper, Class<T> type) {
     super(datasource, mapper) ;
     this.type_ = type;
-    listenerService_ = lService;
   }
   
   public T createInstance() throws Exception { return type_.newInstance(); }
@@ -94,12 +90,12 @@ public  class StandardSQLDAO<T extends DBObject> extends DAO<T> {
   }
 
   
-  protected void invokeEvent(String prefix, String action, T bean)  {    
-    Table table = bean.getClass().getAnnotation(Table.class);    
-    StringBuilder builder = new StringBuilder(prefix).append('.').append(action).append('.').append(table.name());
-    DBObjectEvent<StandardSQLDAO, T> event  = new DBObjectEvent<StandardSQLDAO, T>(builder.toString(), this, bean);
-    listenerService_.broadcast(event);
-  }
+//  protected void invokeEvent(String prefix, String action, T bean) throws Exception   {    
+//    Table table = bean.getClass().getAnnotation(Table.class);    
+//    StringBuilder builder = new StringBuilder(prefix).append('.').append(action).append('.').append(table.name());
+//    DBObjectEvent<StandardSQLDAO, T> event  = new DBObjectEvent<StandardSQLDAO, T>(builder.toString(), this, bean);
+//    listenerService_.broadcast(event);
+//  }
   
   public Class<T> getType() { return type_; }
 }

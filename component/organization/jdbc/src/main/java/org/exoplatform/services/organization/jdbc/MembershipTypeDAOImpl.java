@@ -12,7 +12,6 @@ import org.exoplatform.services.database.DBObjectQuery;
 import org.exoplatform.services.database.DBPageList;
 import org.exoplatform.services.database.ExoDatasource;
 import org.exoplatform.services.database.StandardSQLDAO;
-import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.MembershipTypeHandler;
 
@@ -24,8 +23,8 @@ import org.exoplatform.services.organization.MembershipTypeHandler;
  */
 public class MembershipTypeDAOImpl extends StandardSQLDAO<MembershipTypeImpl> implements MembershipTypeHandler {
   
-  public MembershipTypeDAOImpl(ListenerService lService, ExoDatasource datasource, DBObjectMapper<MembershipTypeImpl> mapper) {
-    super(lService, datasource, mapper, MembershipTypeImpl.class);
+  public MembershipTypeDAOImpl(ExoDatasource datasource, DBObjectMapper<MembershipTypeImpl> mapper) {
+    super(datasource, mapper, MembershipTypeImpl.class);
   }
 
   public MembershipType createMembershipTypeInstance() { return new MembershipTypeImpl(); }
