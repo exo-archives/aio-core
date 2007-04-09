@@ -36,7 +36,6 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
 
   public User createUserInstance(String username) { return new UserImpl(username); }
   
-  
   public void createUser(User user, boolean broadcast) throws Exception {
     UserImpl userImpl = (UserImpl)user;
     if(broadcast) listenerService_.broadcast("organization.user.preSave", this, userImpl);
