@@ -49,9 +49,9 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <skip>${test.skip}</skip>
-          <useFile>false</useFile>
-          <forkMode>pertest</forkMode><!--once , pertest -->
-          <testFailureIgnore>false</testFailureIgnore>
+          <useFile>true</useFile>
+          <forkMode>once</forkMode><!--once , pertest -->
+          <testFailureIgnore>true</testFailureIgnore>
           <includes>
             <include implementation="java.lang.String">**/${test.classes}*.java</include>
           </includes>
@@ -72,8 +72,8 @@
 
         <org.exoplatform.kernel.version>2.0.3</org.exoplatform.kernel.version>
         <org.exoplatform.core.version>2.0.3</org.exoplatform.core.version>
-        <test.classes>Test</test.classes>
-        <test.skip>true</test.skip>
+        <test.classes>Test*</test.classes>
+        <test.skip>false</test.skip>
       </properties>
     </profile>
   </profiles>

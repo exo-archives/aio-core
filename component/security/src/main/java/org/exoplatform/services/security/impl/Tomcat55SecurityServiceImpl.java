@@ -48,9 +48,11 @@ import org.exoplatform.services.security.SecurityService;
  */
 public class Tomcat55SecurityServiceImpl extends SecurityServiceImpl implements SecurityService {
 
-  public Tomcat55SecurityServiceImpl(LogService logService,
-      OrganizationService organizationService, InitParams params) {
-	  super(logService, organizationService, params);
+//  public Tomcat55SecurityServiceImpl(LogService logService,
+//      OrganizationService organizationService, InitParams params) {
+  public Tomcat55SecurityServiceImpl(
+        OrganizationService organizationService, InitParams params) {
+    super(organizationService, params);
    }
 
   //Use this for  tomcat 5.5.x
@@ -71,6 +73,7 @@ public class Tomcat55SecurityServiceImpl extends SecurityServiceImpl implements 
       value.getPrincipals().add(new RolePrincipalImpl(splittedGroupName[0]));
     }
     getSubjects().put(userName, value);
+    currentUserHolder.set(userName);
   }
 
 }

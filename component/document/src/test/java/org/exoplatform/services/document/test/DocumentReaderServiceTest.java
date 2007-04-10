@@ -16,11 +16,11 @@ import org.exoplatform.test.BasicTestCase;
  * @author: Phung Hai Nam
  * @email: phunghainam@gmail.com
  */
-public class TestDocumentReaderService extends BasicTestCase {
+public class DocumentReaderServiceTest extends BasicTestCase {
 
   DocumentReaderService service_;
 
-  public TestDocumentReaderService(String name) {
+  public DocumentReaderServiceTest(String name) {
     super(name);
   }
 

@@ -15,22 +15,21 @@ import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.RootContainer;
-import org.exoplatform.services.log.LogService;
+import junit.framework.TestCase;
+
+import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.security.SecurityService;
 import org.exoplatform.services.security.UserPrincipal;
 import org.exoplatform.services.security.jaas.BasicCallbackHandler;
-import org.exoplatform.test.BasicTestCase;
 
 /**
  * Created y the eXo platform team
  * User: Benjamin Mestrallet
  * Date: 28 avr. 2004
  */
-public class TestLoginModule extends BasicTestCase {
+public class TestLoginModule extends TestCase {
   protected static SecurityService service_;
   protected static OrganizationService orgService_;
 
@@ -43,26 +42,34 @@ public class TestLoginModule extends BasicTestCase {
   protected void setUp() throws Exception {
     if (service_ == null) {
       System.setProperty("java.security.auth.login.config", "src/main/resource/login.conf" );
-      PortalContainer manager = PortalContainer.getInstance() ;
+//      PortalContainer manager = PortalContainer.getInstance() ;
+      StandaloneContainer.setConfigurationPath("src/main/java/conf/standalone/test-configuration.xml");
+      
+      StandaloneContainer manager = StandaloneContainer.getInstance() ;
+
       orgService_ = 
         (OrganizationService) manager.getComponentInstanceOfType(OrganizationService.class);
-      ((LogService) manager.getComponentInstanceOfType(LogService.class)).
-          setLogLevel("org.exoplatform.services.security", LogService.DEBUG, false);
+//      ((LogService) manager.getComponentInstanceOfType(LogService.class)).
+//          setLogLevel("org.exoplatform.services.security", LogService.DEBUG, false);
       service_ = (SecurityService) manager.getComponentInstanceOfType(SecurityService.class);
     }
   }
 
   public void testLogin() throws Exception {
-    String LOGIN = "loginuser" ;
+    String LOGIN = "exo" ;
+    
+    System.out.println(">>>>>>>>>>>>>>>>>> "+orgService_);
     User user = orgService_.getUserHandler().createUserInstance();
     user.setUserName(LOGIN);
-    user.setPassword("password");
+    user.setPassword("exo");
     user.setFirstName("Exo") ;
     user.setLastName("Platform") ;
     user.setEmail("exo@exoportal.org") ;
     orgService_.getUserHandler().createUser(user, true);
     
-    BasicCallbackHandler handler = new BasicCallbackHandler(LOGIN, "password@default".toCharArray());
+//    BasicCallbackHandler handler = new BasicCallbackHandler(LOGIN, "password@default".toCharArray());
+    BasicCallbackHandler handler = new BasicCallbackHandler(LOGIN, "exo".toCharArray());
+
     LoginContext loginContext = new LoginContext("eXo", handler);
     loginContext.login();
     assertNotNull(loginContext.getSubject());

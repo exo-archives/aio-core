@@ -16,7 +16,9 @@ import javax.security.auth.spi.LoginModule;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.StandaloneContainer;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.security.SecurityService;
+import org.exoplatform.services.security.impl.CredentialsImpl;
 
 /**
  * Created y the eXo platform team
@@ -24,14 +26,15 @@ import org.exoplatform.services.security.SecurityService;
  * Date: 28 avr. 2004
  */
 public class StandaloneLoginModule implements LoginModule {
-  
+
+  private static Log log_ = ExoLogger.getLogger("core.StandaloneLoginModule");
+
   private SecurityService securityService_;
   private boolean success_;
   private String username_;
   private Subject subject_;
   private CallbackHandler callbackHandler_;
   private Map sharedState_;
-  private Log log_ ;
   
   public StandaloneLoginModule() {
     this.success_ = false;
@@ -63,15 +66,17 @@ public class StandaloneLoginModule implements LoginModule {
       } 
       securityService_ = 
         (SecurityService) container.getComponentInstanceOfType(SecurityService.class);
-      log_ = securityService_.getLog() ;
+      //log_ = securityService_.getLog() ;
       
       if (username_ == null) {
-        log_.debug("No user name entered");
+        if(log_.isDebugEnabled())
+          log_.debug("No user name entered");
         success_ = false;
         return false;
       }
       if (password == null) {
-        log_.debug("No password entered");
+        if(log_.isDebugEnabled())
+          log_.debug("No password entered");
         success_ = false;
         return false;
       }
@@ -82,14 +87,15 @@ public class StandaloneLoginModule implements LoginModule {
       ((PasswordCallback) callbacks[1]).clearPassword();
       success_ = securityService_.authenticate(this.username_, password);
       if (!success_) {
-        log_.debug("Authentication failed");
-        throw new LoginException("Authentication failed");
+        if(log_.isDebugEnabled())
+          log_.debug("Authentication failed");
+        throw new LoginException("Authentication failed User: "+this.username_+" "+password);
       }
       subject_.getPrivateCredentials().add(password);
-//      S ystem.out.println("StandaloneLoginModule.login: succeeded");
+      subject_.getPublicCredentials().add(new CredentialsImpl(this.username_, password.toCharArray()));
+      
       return true;
     } catch (Exception e) {
-      //e.printStackTrace();
       log_.error("error while trying to login", e);
       throw new LoginException("Authentication failed");
     }
@@ -104,26 +110,23 @@ public class StandaloneLoginModule implements LoginModule {
         throw new LoginException("error while filling subject with Principal in commit() of BasicLoginModule");
       }
     }
-//    S ystem.out.println("StandaloneLoginModule.commit: succeeded = " + success_);
     return success_;
   }
   
   public boolean abort() throws LoginException {
-//    S ystem.out.println("StandaloneLoginModule.abort");
-    log_.debug("call abort()") ;
+    if(log_.isDebugEnabled())
+      log_.debug("call abort()") ;
     clear();
-//    S ystem.out.println("StandaloneLoginModule.abort: succeeded = " + success_);
     if(success_)
       return true;
     return false;
   }
   
   public boolean logout() throws LoginException {
-//    S ystem.out.println("StandaloneLoginModule.logout");
-    log_.debug("logout user: " + username_ ) ;
+    if(log_.isDebugEnabled())
+      log_.debug("logout user: " + username_ ) ;
     securityService_.removeSubject(username_);
     clear();
-//    S ystem.out.println("StandaloneLoginModule.abort: succeeded = true");
     return true;
   }
   

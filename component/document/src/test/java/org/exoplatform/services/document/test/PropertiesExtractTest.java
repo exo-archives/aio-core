@@ -16,11 +16,11 @@ import junit.framework.TestCase;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.document.DocumentReaderService;
 
-public class TestPropertiesExtract extends TestCase {
+public class PropertiesExtractTest extends TestCase {
 
   DocumentReaderService service_;
 
-  public TestPropertiesExtract(String name) {
+  public PropertiesExtractTest(String name) {
     super(name);
   }
 

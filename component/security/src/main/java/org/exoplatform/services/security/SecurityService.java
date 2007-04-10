@@ -19,6 +19,11 @@ public interface SecurityService {
   public Subject getSubject(String userName);
   public void setUpAndCacheSubject(String userName, Subject value) throws Exception;
   public void removeSubject(String userName);
+  
+  /**
+   * @return current thread's subject (stored as ThreadLocal)
+   */
+  Subject getCurrentSubject();
 
   public void addSubjectEventListener(SubjectEventListener subjectEventListener);
 

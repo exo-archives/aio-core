@@ -21,7 +21,7 @@ import org.apache.commons.logging.Log;
 import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
-import org.exoplatform.services.log.LogService;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.security.SecurityService;
@@ -35,15 +35,16 @@ import org.exoplatform.services.security.sso.impl.BaseSSOAuthentication;
  */
 public class SecurityServiceImpl implements SecurityService {
 
+  protected static Log log_ = ExoLogger.getLogger("core.SecurityServiceImpl");
+
   private Map subjects;
-  private Log log_;
   private OrganizationService orgService_;
   private String authentication_;
   private BaseSSOAuthentication SSOAuthentication_;
+  protected static ThreadLocal <String> currentUserHolder = new ThreadLocal <String>();
 
-  public SecurityServiceImpl(LogService logService,
+  public SecurityServiceImpl(
       OrganizationService organizationService, InitParams params) {
-    log_ = logService.getLog("org.exoplatform.services.security");
     orgService_ = organizationService;
     subjects = new HashMap();
     ValueParam param = params.getValueParam("security.authentication");
@@ -85,6 +86,8 @@ public class SecurityServiceImpl implements SecurityService {
     }
     value.getPrincipals().add(roleGroup);
     subjects.put(userName, value);
+    
+    currentUserHolder.set(userName);
   }
   
   //Use this for  tomcat 5.5.x
@@ -177,6 +180,19 @@ public class SecurityServiceImpl implements SecurityService {
     log_.debug("remove subject for user " + userName);
     subjects.remove(userName);
   }
+  
+  
+  /* (non-Javadoc)
+   * @see org.exoplatform.services.security.SecurityService#getCurrentSubject()
+   */
+  public Subject getCurrentSubject() {
+    String userName = currentUserHolder.get();
+    if(userName == null)
+      return null;
+    else
+      return (Subject)subjects.get(userName);
+  }
+
 
   public void addSubjectEventListener(SubjectEventListener subjectEventListener) {
     // To change body of implemented methods use File | Settings | File

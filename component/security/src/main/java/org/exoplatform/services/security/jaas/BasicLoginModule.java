@@ -19,7 +19,9 @@ import org.apache.commons.logging.Log;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.security.SecurityService;
+import org.exoplatform.services.security.impl.CredentialsImpl;
 
 /**
  * Created y the eXo platform team
@@ -29,7 +31,9 @@ import org.exoplatform.services.security.SecurityService;
 public class BasicLoginModule implements LoginModule {
   
   private static final String DEFAULT_DOMAIN = "portal";
-  
+
+  private static Log log_ = ExoLogger.getLogger("core.BasicLoginModule");
+
   private SecurityService securityService_;
   private boolean success_;
   private String username_;
@@ -38,7 +42,6 @@ public class BasicLoginModule implements LoginModule {
   private CallbackHandler callbackHandler_;
   private Map sharedState_;
   private Map options_;
-  private Log log_ ;
   
   public BasicLoginModule() {
     this.success_ = false;
@@ -96,7 +99,7 @@ public class BasicLoginModule implements LoginModule {
       }
       securityService_ = 
         (SecurityService) authContainer.getComponentInstanceOfType(SecurityService.class);
-      log_ = securityService_.getLog() ;     
+      //log_ = securityService_.getLog() ;     
       
       if (username_ == null) {
         success_ = false;
@@ -113,14 +116,18 @@ public class BasicLoginModule implements LoginModule {
       ((PasswordCallback) callbacks[1]).clearPassword();
       success_ = securityService_.authenticate(this.username_, password);
       if (!success_) {
-        log_.debug("Authentication failed");
-        throw new LoginException("Authentication failed");
+        if(log_.isDebugEnabled())
+          log_.debug("Authentication failed");
+        throw new LoginException("Authentication failed. User: "+this.username_+" "+password);
       }
       subject_.getPrivateCredentials().add(password);
+      subject_.getPublicCredentials().add(new CredentialsImpl(this.username_, password.toCharArray()));
+      
       return true;
     } catch (Exception e) {
       e.printStackTrace();
-      log_.error("error while trying to login", e);
+      if(log_.isDebugEnabled())
+        log_.error("error while trying to login", e);
       throw new LoginException("Authentication failed");
     } finally {
       if(authContainer != null) {
@@ -151,7 +158,7 @@ public class BasicLoginModule implements LoginModule {
         for(ComponentRequestLifecycle component : components) component.startRequest(authContainer) ;
         securityService_.setUpAndCacheSubject(username_, subject_);
       } catch (Exception e) {
-        throw new LoginException("error while filling subject with Principal in commit() of BasicLoginModule");
+        throw new LoginException("error while filling subject with Principal in commit() of BasicLoginModule "+e);
       } finally {
         if(authContainer != null) {
           for(ComponentRequestLifecycle component : components) component.startRequest(authContainer) ;
@@ -163,7 +170,8 @@ public class BasicLoginModule implements LoginModule {
   }
   
   public boolean abort() throws LoginException {
-    log_.debug("call abort()") ;
+    if(log_.isDebugEnabled())
+      log_.debug("call abort()") ;
     clear();
     if(success_)
       return true;
@@ -171,7 +179,8 @@ public class BasicLoginModule implements LoginModule {
   }
   
   public boolean logout() throws LoginException {
-    log_.debug("logout user: " + username_ ) ;
+    if(log_.isDebugEnabled())
+      log_.debug("logout user: " + username_ ) ;
     securityService_.removeSubject(username_);
     clear();
     return true;
