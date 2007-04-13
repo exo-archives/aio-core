@@ -85,4 +85,12 @@ public class DocumentReaderServiceTest extends BasicTestCase {
     String text = service_.getDocumentReader("text/plain").getContentAsText(is);
     System.out.println(text);
   }
+
+  public void testOODocumentReaderService() throws Exception {
+    File f = new File("src/test/resources/subscription.odt");
+    InputStream is = new FileInputStream(f);
+    String text = service_.getDocumentReader("application/vnd.oasis.opendocument.text").getContentAsText( is);
+    System.out.println(text);
+  }
+
 }

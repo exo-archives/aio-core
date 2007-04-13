@@ -66,6 +66,15 @@ public class PropertiesExtractTest extends TestCase {
     printProps(props);
     
   }
+
+  public void testOODocumentReaderService() throws Exception {
+    File f = new File("src/test/resources/subscription.odt");
+    InputStream is = new FileInputStream(f);
+    Properties props = service_.getDocumentReader("application/vnd.oasis.opendocument.text").getProperties(is);
+    printProps(props);
+
+  }
+
 /*
   public void testHTMLDocumentReaderService() throws Exception {
     InputStream is = null;
