@@ -71,7 +71,9 @@ public class POIPropertiesReader {
       poiFSReader.registerListener(readerListener,
           SummaryInformation.DEFAULT_STREAM_NAME);
       poiFSReader.read(is);
-    } finally {
+    } catch (IOException ie) {
+      // This exception cause by POIFS
+    }finally {
       if (is != null) {
         try {
           is.close();
