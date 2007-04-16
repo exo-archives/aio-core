@@ -193,7 +193,13 @@ public class SecurityServiceImpl implements SecurityService {
       return (Subject)subjects.get(userName);
   }
 
-
+  /* (non-Javadoc)
+   * @see org.exoplatform.services.security.SecurityService#setCurrentUser(java.lang.String)
+   */
+  public void setCurrentUser(String userName) {
+    this.currentUserHolder.set(userName);
+  }
+  
   public void addSubjectEventListener(SubjectEventListener subjectEventListener) {
     // To change body of implemented methods use File | Settings | File
     // Templates.

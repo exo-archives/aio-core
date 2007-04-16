@@ -24,6 +24,12 @@ public interface SecurityService {
    * @return current thread's subject (stored as ThreadLocal)
    */
   Subject getCurrentSubject();
+  
+  /**
+   * sets thread local user name
+   * @param userName
+   */
+  void setCurrentUser(String userName);
 
   public void addSubjectEventListener(SubjectEventListener subjectEventListener);
 
