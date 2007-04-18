@@ -6,7 +6,7 @@
   <import>classpath:/conf/portal/activedirectory-organization-configuration.xml</import>   
   -->      
   
-  <import>classpath:/conf/portal/jdbc-organization-configuration.xml</import> 
+  <import>classpath:/conf/portal/hibernate-organization-configuration.xml</import> 
   <import>classpath:/conf/portal/test-organization-configuration.xml</import>   
   
 </configuration>
