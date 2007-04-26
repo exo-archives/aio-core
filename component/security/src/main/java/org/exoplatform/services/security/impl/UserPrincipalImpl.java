@@ -12,8 +12,7 @@ import org.exoplatform.services.security.UserPrincipal;
  * User: Benjamin Mestrallet
  * Date: 28 avr. 2004
  */
- public class UserPrincipalImpl extends BasePrincipal
-    implements UserPrincipal{
+ public class UserPrincipalImpl extends BasePrincipal implements UserPrincipal{
   public UserPrincipalImpl(String name) {
     super(name);
   }

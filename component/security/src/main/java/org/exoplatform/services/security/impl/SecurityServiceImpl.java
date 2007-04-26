@@ -55,7 +55,7 @@ public class SecurityServiceImpl implements SecurityService {
       authentication_ = param.getValue();
     if (authentication_ == null || authentication_.equals(""))
       authentication_ = SecurityService.STANDALONE_AUTHENTICATION;
-    
+
   }
 
   public boolean authenticate(String login, String password) throws Exception {   
@@ -86,10 +86,10 @@ public class SecurityServiceImpl implements SecurityService {
     }
     value.getPrincipals().add(roleGroup);
     subjects.put(userName, value);
-    
+
     currentUserHolder.set(userName);
   }
-  
+
   //Use this for  tomcat 5.5.x
   public void setUpAndCacheSubjectTomcat55(String userName, Subject value) throws Exception {
     Set principals = value.getPrincipals();
@@ -132,7 +132,7 @@ public class SecurityServiceImpl implements SecurityService {
     Iterator groups;
     try {
       groups = orgService_.getGroupHandler().findGroupsOfUser(userId)
-          .iterator();
+      .iterator();
     } catch (Exception e) {
       return false;
     }
@@ -147,7 +147,7 @@ public class SecurityServiceImpl implements SecurityService {
         org.exoplatform.services.organization.Group group = (org.exoplatform.services.organization.Group) groups.next();
         try {
           Iterator memberships = orgService_.getMembershipHandler()
-              .findMembershipsByUserAndGroup(userId, group.getId()).iterator();
+          .findMembershipsByUserAndGroup(userId, group.getId()).iterator();
           while (memberships.hasNext()) {
             Membership membership = (Membership) memberships.next();
             if (membership.getMembershipType().equals(membershipName))
@@ -167,7 +167,7 @@ public class SecurityServiceImpl implements SecurityService {
     String membershipName = roleExpression.substring(0, roleExpression
         .indexOf(":"));
     String groupName = roleExpression
-        .substring(roleExpression.indexOf(":") + 1);
+    .substring(roleExpression.indexOf(":") + 1);
     return hasMembershipInGroup(user, membershipName, groupName);
   }
 
@@ -180,8 +180,8 @@ public class SecurityServiceImpl implements SecurityService {
     log_.debug("remove subject for user " + userName);
     subjects.remove(userName);
   }
-  
-  
+
+
   /* (non-Javadoc)
    * @see org.exoplatform.services.security.SecurityService#getCurrentSubject()
    */
@@ -199,22 +199,22 @@ public class SecurityServiceImpl implements SecurityService {
   public void setCurrentUser(String userName) {
     this.currentUserHolder.set(userName);
   }
-  
+
   public void addSubjectEventListener(SubjectEventListener subjectEventListener) {
     // To change body of implemented methods use File | Settings | File
     // Templates.
   }
 
   public String getSSOAuthentication() {
-  	if (SSOAuthentication_ != null) 
-  		return SSOAuthentication_.getSSOAuthenticationConfig().getAuthenticationName() ;
-  	else return null ;
+    if (SSOAuthentication_ != null) 
+      return SSOAuthentication_.getSSOAuthenticationConfig().getAuthenticationName() ;
+    else return null ;
   }
 
   public SSOAuthenticationConfig getSSOAuthenticationConfig() {
-  	if (SSOAuthentication_ != null) 
-  		return SSOAuthentication_.getSSOAuthenticationConfig() ;
-  	else return null ;
+    if (SSOAuthentication_ != null) 
+      return SSOAuthentication_.getSSOAuthenticationConfig() ;
+    else return null ;
   }
 
   public boolean isSSOAuthentication() {
@@ -228,21 +228,21 @@ public class SecurityServiceImpl implements SecurityService {
   public String getProxyTicket(String userName, String urlOfTargetService) throws Exception {
     if (!this.isSSOAuthentication())
       throw new Exception("Portal is configured for standalone authentication. "
-              + "No proxy authentication feature available !") ;
-    
-  	if (SSOAuthentication_ == null)
-  		throw new Exception("No SSO authentication configured !") ;
-  	
+          + "No proxy authentication feature available !") ;
+
+    if (SSOAuthentication_ == null)
+      throw new Exception("No SSO authentication configured !") ;
+
     Iterator iter = this.getSubject(userName).getPrivateCredentials().iterator();
     if (!iter.hasNext()) return null;
-    
-  	return SSOAuthentication_.getProxyTicket((String) iter.next(), urlOfTargetService) ;
+
+    return SSOAuthentication_.getProxyTicket((String) iter.next(), urlOfTargetService) ;
   }
 
   public void setSSOAuthenticationPlugin(ComponentPlugin plugin) {
     SSOAuthentication_ = (BaseSSOAuthentication) plugin ;
   }
-  
+
   public Log getLog() {
     return log_;
   }
@@ -254,7 +254,7 @@ public class SecurityServiceImpl implements SecurityService {
    * @return the list of subjects for the specific user
    */
   public Map getSubjects() {
-	return subjects;
+    return subjects;
   }
 
   /**
@@ -264,6 +264,6 @@ public class SecurityServiceImpl implements SecurityService {
    * @return the OrganizationService to be used when processing the user
    */
   public OrganizationService getOrgService() {
-	return orgService_;
+    return orgService_;
   }
 }
