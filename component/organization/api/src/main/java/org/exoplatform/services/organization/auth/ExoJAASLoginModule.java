@@ -5,9 +5,11 @@
 package org.exoplatform.services.organization.auth;
 
 import java.security.Principal;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -17,6 +19,7 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
@@ -26,7 +29,7 @@ import org.exoplatform.services.organization.OrganizationService;
  * User:  Tuan Nguyen
  * Date: May 6th, 2007
  */
-abstract public class ExoJAASLoginModule implements LoginModule {
+public class ExoJAASLoginModule implements LoginModule {
   private Subject subject_;
   private CallbackHandler callbackHandler_;
   
@@ -34,14 +37,14 @@ abstract public class ExoJAASLoginModule implements LoginModule {
     System.out.println("In constructor of TomcatLoginModule : " + hashCode()) ;
   }
   
-  public void initialize(Subject subject, CallbackHandler callbackHandler, Map sharedState, Map options) {
+  final public void initialize(Subject subject, CallbackHandler callbackHandler, Map sharedState, Map options) {
     System.out.println("In initialize of TomcatLoginModule") ;
     info(subject) ;
     this.subject_ = subject;
     this.callbackHandler_ = callbackHandler;
   }
   
-  public boolean login() throws LoginException {
+  final public boolean login() throws LoginException {
     System.out.println("In login of TomcatLoginModule") ;
     Callback[] callbacks = new Callback[2];
     callbacks[0] = new NameCallback("Username");
@@ -83,17 +86,17 @@ abstract public class ExoJAASLoginModule implements LoginModule {
     }
   }
   
-  public boolean commit() throws LoginException {
+  final public boolean commit() throws LoginException {
     System.out.println("In commit of TomcatLoginModule") ;
     return true ;
   }
   
-  public boolean abort() throws LoginException {
+  final public boolean abort() throws LoginException {
     System.out.println("In abort of TomcatLoginModule") ;
     return true  ;
   }
   
-  public boolean logout() throws LoginException {
+  final public boolean logout() throws LoginException {
     System.out.println("In logout of TomcatLoginModule, It seems this method is never called in tomcat") ;
     return  true ;
   }
@@ -113,5 +116,15 @@ abstract public class ExoJAASLoginModule implements LoginModule {
     System.out.println(b) ;
   }
   
-  abstract protected void populateRolePrincipals(OrganizationService service, String username, Subject subject) throws Exception ;
+  protected void populateRolePrincipals(OrganizationService service, String username, Subject subject) throws Exception {
+    Set principals = subject.getPrincipals();
+    Collection groups = groups = service.getGroupHandler().findGroupsOfUser(username);
+    for (Iterator iter = groups.iterator(); iter.hasNext();) {
+      org.exoplatform.services.organization.Group group = 
+        (org.exoplatform.services.organization.Group) iter.next();
+      String groupId = group.getId();
+      String[] splittedGroupName = StringUtils.split(groupId, "/");
+      principals.add(new RolePrincipal(splittedGroupName[0]));
+    }
+  }
 }
