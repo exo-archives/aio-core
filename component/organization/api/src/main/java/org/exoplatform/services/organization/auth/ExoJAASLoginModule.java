@@ -69,9 +69,13 @@ public class ExoJAASLoginModule implements LoginModule {
         subject_.getPublicCredentials().add(new UserPrincipal(username));
         OrganizationService orgService =
           (OrganizationService) pcontainer.getComponentInstanceOfType(OrganizationService.class) ;
-        boolean success =  orgService.getUserHandler().authenticate(username, password) ;
-        if(success) populateRolePrincipals(orgService, username, subject_) ;
-        return success ;
+        if(orgService.getUserHandler().authenticate(username, password)) {
+          populateRolePrincipals(orgService, username, subject_) ;
+          return true;
+        } else {
+          // An exception needs to be thrown, returning false is not enough
+          throw new LoginException("Authentication failed");
+        }
       }
     } catch (Exception e) {
       e.printStackTrace();
