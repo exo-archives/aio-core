@@ -45,6 +45,13 @@ public class DocumentReaderServiceTest extends BasicTestCase {
     String text = service_.getDocumentReader("application/msword").getContentAsText(is);
     System.out.println(text);
   }
+  
+  public void testWordTemplateReaderService() throws Exception {    
+    File testFile = new File("src/test/resources/test.dot");
+    InputStream inStream = new FileInputStream(testFile);    
+    String text = service_.getDocumentReader("application/msworddot").getContentAsText(inStream);
+    System.out.println("TEXT: " + text);
+  }
 
   public void testPPTDocumentReaderService() throws Exception {
     InputStream is = null;

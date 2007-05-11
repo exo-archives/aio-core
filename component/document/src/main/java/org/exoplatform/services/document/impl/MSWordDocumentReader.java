@@ -27,7 +27,11 @@ public class MSWordDocumentReader extends BaseDocumentReader {
    * @return The application/msword mime type.
    */
   public String[] getMimeTypes() {
-    return new String[] { "application/msword" };
+    return new String[] {
+        "application/msword",
+        "application/msworddoc",
+        "application/msworddot"
+    };
   }
 
   /**

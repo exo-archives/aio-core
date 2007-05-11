@@ -36,7 +36,8 @@ public class OpenOfficeDocumentReader extends BaseDocumentReader {
    * @see org.exoplatform.services.document.DocumentReader#getMimeTypes()
    */
   public String[] getMimeTypes() {
-    return new String[] { "application/vnd.oasis.opendocument.database",
+    return new String[] {
+        "application/vnd.oasis.opendocument.database",
         "application/vnd.oasis.opendocument.formula",
         "application/vnd.oasis.opendocument.graphics",
         "application/vnd.oasis.opendocument.presentation",
