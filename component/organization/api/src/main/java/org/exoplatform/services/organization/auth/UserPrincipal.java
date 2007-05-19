@@ -5,7 +5,6 @@
 package org.exoplatform.services.organization.auth;
 
 import java.security.Principal;
-
 /**
  * Created y the eXo platform team
  * User:  Tuan Nguyen

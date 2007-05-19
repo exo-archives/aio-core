@@ -23,7 +23,6 @@
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.component.common</artifactId>
       <version>${org.exoplatform.kernel.version}</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
@@ -42,6 +41,13 @@
       <groupId>org.exoplatform.core</groupId>
       <artifactId>exo.core.component.database</artifactId>
       <version>${org.exoplatform.core.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>jcr</groupId>
+      <artifactId>jcr</artifactId>
+      <version>1.0</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 

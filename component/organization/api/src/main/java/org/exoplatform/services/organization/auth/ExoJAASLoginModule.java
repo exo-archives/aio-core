@@ -4,12 +4,8 @@
  */
 package org.exoplatform.services.organization.auth;
 
-import java.security.Principal;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -19,11 +15,9 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
-import org.apache.commons.lang.StringUtils;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
-import org.exoplatform.services.organization.OrganizationService;
 /**
  * Created y the eXo platform team
  * User:  Tuan Nguyen
@@ -32,14 +26,12 @@ import org.exoplatform.services.organization.OrganizationService;
 public class ExoJAASLoginModule implements LoginModule {
   private Subject subject_;
   private CallbackHandler callbackHandler_;
+  private Map sharedState_ ;
   
-  public ExoJAASLoginModule() {
-    System.out.println("In constructor of TomcatLoginModule : " + hashCode()) ;
-  }
+  public ExoJAASLoginModule() { }
   
   final public void initialize(Subject subject, CallbackHandler callbackHandler, Map sharedState, Map options) {
-    System.out.println("In initialize of TomcatLoginModule") ;
-    info(subject) ;
+    sharedState_ = sharedState ;
     this.subject_ = subject;
     this.callbackHandler_ = callbackHandler;
   }
@@ -65,12 +57,14 @@ public class ExoJAASLoginModule implements LoginModule {
       if (username == null ||  password == null) return false;
       else {
         ((PasswordCallback) callbacks[1]).clearPassword();
+        sharedState_.put("javax.security.auth.login.name", username);
+        sharedState_.put("javax.security.auth.login.password", password);
+        
         subject_.getPrivateCredentials().add(password);
-        subject_.getPublicCredentials().add(new UserPrincipal(username));
-        OrganizationService orgService =
-          (OrganizationService) pcontainer.getComponentInstanceOfType(OrganizationService.class) ;
-        if(orgService.getUserHandler().authenticate(username, password)) {
-          populateRolePrincipals(orgService, username, subject_) ;
+        subject_.getPublicCredentials().add(new UserPrincipal(username)) ;
+        AuthenticationService authService =
+          (AuthenticationService) pcontainer.getComponentInstanceOfType(AuthenticationService.class) ;
+        if(authService.login(new Identity(username, username, password, subject_))) {
           return true;
         } else {
           // An exception needs to be thrown, returning false is not enough
@@ -103,32 +97,5 @@ public class ExoJAASLoginModule implements LoginModule {
   final public boolean logout() throws LoginException {
     System.out.println("In logout of TomcatLoginModule, It seems this method is never called in tomcat") ;
     return  true ;
-  }
-  
-  private void info(Subject subject) {
-    StringBuilder b = new StringBuilder() ;
-    Iterator<Principal> i = subject.getPrincipals().iterator() ;
-    b.append("Subject: ") ;
-    b.append("\n  Principal: ") ;
-    while(i.hasNext())  b.append(i.next().getName()).append(", ")  ;
-    b.append("\n  Public Credential : ") ;
-    Iterator ci = subject.getPublicCredentials().iterator() ;
-    while(ci.hasNext())  b.append(i.next()).append(", ") ;
-    b.append("\n  Private Credential : ") ;
-    Iterator pi = subject.getPublicCredentials().iterator() ;
-    while(pi.hasNext())  b.append(i.next()).append(", ") ;
-    System.out.println(b) ;
-  }
-  
-  protected void populateRolePrincipals(OrganizationService service, String username, Subject subject) throws Exception {
-    Set principals = subject.getPrincipals();
-    Collection groups = groups = service.getGroupHandler().findGroupsOfUser(username);
-    for (Iterator iter = groups.iterator(); iter.hasNext();) {
-      org.exoplatform.services.organization.Group group = 
-        (org.exoplatform.services.organization.Group) iter.next();
-      String groupId = group.getId();
-      String[] splittedGroupName = StringUtils.split(groupId, "/");
-      principals.add(new RolePrincipal(splittedGroupName[0]));
-    }
   }
 }

@@ -12,7 +12,6 @@ import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 
 import org.exoplatform.container.xml.InitParams;
-
 /**
  * Created by The eXo Platform SARL
  * Author : Thuannd
