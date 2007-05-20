@@ -17,12 +17,11 @@ import org.exoplatform.services.organization.OrganizationService;
  */
 public class AuthenticationService {
   private ThreadLocal <Identity> currentIdentity_ = new ThreadLocal <Identity>();
-  private Map<String, Identity>  identities_ ;
+  private Map<String, Identity>  identities_ = new HashMap<String, Identity>() ;;
   private ListenerService listenerService_ ;
   private OrganizationService orgService_ ;
   
-  public AuthenticationService(ListenerService listenerService, OrganizationService orgService) {
-    identities_ =  new HashMap<String, Identity>() ;
+  public AuthenticationService(ListenerService listenerService, OrganizationService orgService)  {
     listenerService_ = listenerService ;
     orgService_ =  orgService ;
   }
@@ -30,7 +29,7 @@ public class AuthenticationService {
   public boolean login(Identity identity) throws Exception {
     if(orgService_.getUserHandler().authenticate(identity.getUsername(), identity.getPassword())) {
       identities_.put(identity.getSessionId(), identity) ;
-      listenerService_.broadcast("exo.service.authentication.login", this, identity) ; 
+      listenerService_.broadcast("exo.service.authentication.login", this, identity) ;
       return true ;
     } else {
       return false ;
@@ -38,7 +37,7 @@ public class AuthenticationService {
   }
   
   public Identity getIdentityBySessionId(String sessionId) throws Exception {
-    return identities_.get(sessionId) ;
+    return  identities_.get(sessionId) ;
   }
   
   public Identity getCurrentIdentity() { return currentIdentity_.get() ; }

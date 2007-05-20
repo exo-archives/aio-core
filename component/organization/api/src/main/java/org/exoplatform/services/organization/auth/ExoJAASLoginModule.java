@@ -26,12 +26,11 @@ import org.exoplatform.container.component.ComponentRequestLifecycle;
 public class ExoJAASLoginModule implements LoginModule {
   private Subject subject_;
   private CallbackHandler callbackHandler_;
-  private Map sharedState_ ;
+  private Identity identity_ ;
   
   public ExoJAASLoginModule() { }
   
   final public void initialize(Subject subject, CallbackHandler callbackHandler, Map sharedState, Map options) {
-    sharedState_ = sharedState ;
     this.subject_ = subject;
     this.callbackHandler_ = callbackHandler;
   }
@@ -41,35 +40,35 @@ public class ExoJAASLoginModule implements LoginModule {
     Callback[] callbacks = new Callback[2];
     callbacks[0] = new NameCallback("Username");
     callbacks[1] = new PasswordCallback("Password", false);    
-    List<ComponentRequestLifecycle> components = null ;
-    PortalContainer pcontainer = null;
     try {                 
       callbackHandler_.handle( callbacks);     
       String username = ((NameCallback) callbacks[0]).getName();      
       String password = new String(((PasswordCallback) callbacks[1]).getPassword());
+      ((PasswordCallback) callbacks[1]).clearPassword();
+      if (username == null ||  password == null) return false;
+      identity_ = new Identity(username, username, password, subject_) ;
+      return true ;
+    } catch (Exception e) {
+      throw new LoginException("Authentication failed");
+    } 
+  }
+  
+  final public boolean commit() throws LoginException {
+    List<ComponentRequestLifecycle> components = null ;
+    PortalContainer pcontainer = null;
+    try {                 
       pcontainer = RootContainer.getInstance().getPortalContainer("portal");
       PortalContainer.setInstance(pcontainer) ;
       components = pcontainer.getComponentInstancesOfType(ComponentRequestLifecycle.class);
       for(ComponentRequestLifecycle component : components) { 
         component.startRequest(pcontainer) ;
-      }
-      
-      if (username == null ||  password == null) return false;
-      else {
-        ((PasswordCallback) callbacks[1]).clearPassword();
-        sharedState_.put("javax.security.auth.login.name", username);
-        sharedState_.put("javax.security.auth.login.password", password);
-        
-        subject_.getPrivateCredentials().add(password);
-        subject_.getPublicCredentials().add(new UserPrincipal(username)) ;
-        AuthenticationService authService =
-          (AuthenticationService) pcontainer.getComponentInstanceOfType(AuthenticationService.class) ;
-        if(authService.login(new Identity(username, username, password, subject_))) {
-          return true;
-        } else {
-          // An exception needs to be thrown, returning false is not enough
-          throw new LoginException("Authentication failed");
-        }
+      }      
+      AuthenticationService authService =
+        (AuthenticationService) pcontainer.getComponentInstanceOfType(AuthenticationService.class) ;
+      if(authService.login(identity_)) {
+        return true;
+      } else {
+        throw new LoginException("Authentication failed");
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -82,11 +81,6 @@ public class ExoJAASLoginModule implements LoginModule {
         PortalContainer.setInstance(null) ;
       }
     }
-  }
-  
-  final public boolean commit() throws LoginException {
-    System.out.println("In commit of TomcatLoginModule") ;
-    return true ;
   }
   
   final public boolean abort() throws LoginException {
