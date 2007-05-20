@@ -15,23 +15,20 @@ import javax.security.auth.Subject;
 public class Identity {
   private String  sessionId_ ;
   private String  username_ ;
-  private String  password_ ;
   private Subject subject_ ;
   
   public Identity(String sessionId, String username, String password) {
-    this(sessionId, username, password, new Subject()) ;
+    this(sessionId, username, new Subject()) ;
   }
   
-  public Identity(String sessionId, String username, String password, Subject subject) {
+  public Identity(String sessionId, String username, Subject subject) {
     sessionId_ = sessionId ;
     username_ = username ;
-    password_ = password ;
     subject_  =  subject ;
   }
   
   public String getSessionId() { return sessionId_ ; }
   public String getUsername()  { return username_ ; }
-  public String getPassword()  { return password_ ; }
   public Subject getSubject()  { return subject_ ;}
   
 }

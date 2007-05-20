@@ -26,15 +26,19 @@ public class AuthenticationService {
     orgService_ =  orgService ;
   }
   
-  public boolean login(Identity identity) throws Exception {
-    if(orgService_.getUserHandler().authenticate(identity.getUsername(), identity.getPassword())) {
-      identities_.put(identity.getSessionId(), identity) ;
-      listenerService_.broadcast("exo.service.authentication.login", this, identity) ;
+  public boolean login(String userName, String password) throws Exception {
+    if(orgService_.getUserHandler().authenticate(userName, password)) {
       return true ;
     } else {
       return false ;
     }
   }
+  
+  public void broadcastAuthentication(Identity identity) throws Exception {
+	identities_.put(identity.getSessionId(), identity) ;
+    listenerService_.broadcast("exo.service.authentication.login", this, identity) ;
+  }
+  
   
   public Identity getIdentityBySessionId(String sessionId) throws Exception {
     return  identities_.get(sessionId) ;

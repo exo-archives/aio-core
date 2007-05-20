@@ -19,7 +19,7 @@ import org.exoplatform.services.organization.OrganizationService;
  * User: Brice Revenant
  * Date: May 6th, 2007
  */
-public class JonasLoginModule extends ExoJAASLoginModule {
+public class JonasLoginModule extends ExoLoginJAASLoginModule {
   
   protected void populateRolePrincipals(OrganizationService service, String username, Subject subject) throws Exception {
     subject.getPrincipals().add(new UserPrincipal(username));

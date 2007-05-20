@@ -17,7 +17,7 @@ import org.exoplatform.services.organization.OrganizationService;
  * User:  Tuan Nguyen
  * Date: May 6th, 2007
  */
-public class TomcatLoginModule extends ExoJAASLoginModule {
+public class TomcatLoginModule extends ExoLoginJAASLoginModule {
   
   protected void populateRolePrincipals(OrganizationService service, String username, Subject subject) throws Exception {
     Set principals = subject.getPrincipals();
