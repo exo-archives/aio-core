@@ -12,6 +12,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
+import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
@@ -26,6 +27,30 @@ public class ExoBroadcastJAASLoginModule implements LoginModule {
   
   public ExoBroadcastJAASLoginModule() { }
   
+  public ExoContainer getContainer() {
+    return RootContainer.getInstance().getPortalContainer("portal");	  
+  }
+  
+  public void preProcessOperations() {
+    PortalContainer container = (PortalContainer) getContainer();
+    PortalContainer.setInstance(container) ;
+    List<ComponentRequestLifecycle> components = container.getComponentInstancesOfType(ComponentRequestLifecycle.class);
+    for(ComponentRequestLifecycle component : components) { 
+      component.startRequest(container) ;
+    }        
+  }
+
+  public void postProcessOperations() {
+    PortalContainer container = (PortalContainer) getContainer();
+    List<ComponentRequestLifecycle> components = container.getComponentInstancesOfType(ComponentRequestLifecycle.class);
+    if(components != null) {
+      for(ComponentRequestLifecycle component : components) {
+        component.endRequest(container) ;
+      }
+      PortalContainer.setInstance(null) ;
+    }    
+  }  
+  
   final public void initialize(Subject subject, CallbackHandler callbackHandler, Map sharedState, Map options) {
     this.subject_ = subject;
     this.sharedState_ = sharedState;
@@ -36,20 +61,13 @@ public class ExoBroadcastJAASLoginModule implements LoginModule {
   }
   
   final public boolean commit() throws LoginException {
-    List<ComponentRequestLifecycle> components = null ;
-    PortalContainer pcontainer = null;
     try {                 
       String username = (String) sharedState_.get("javax.security.auth.login.name"); 	
       
-      //TODO use parameter for portal here!
-      pcontainer = RootContainer.getInstance().getPortalContainer("portal");
-      PortalContainer.setInstance(pcontainer) ;
-      components = pcontainer.getComponentInstancesOfType(ComponentRequestLifecycle.class);
-      for(ComponentRequestLifecycle component : components) { 
-        component.startRequest(pcontainer) ;
-      }      
+      ExoContainer container = getContainer();
+      preProcessOperations();
       AuthenticationService authService =
-        (AuthenticationService) pcontainer.getComponentInstanceOfType(AuthenticationService.class) ;
+        (AuthenticationService) container.getComponentInstanceOfType(AuthenticationService.class) ;
       Identity identity = new Identity(username, username, subject_);
       authService.broadcastAuthentication(identity);
       return true;
@@ -57,12 +75,7 @@ public class ExoBroadcastJAASLoginModule implements LoginModule {
       e.printStackTrace();
       throw new LoginException("Authentication failed");
     } finally {
-      if(components != null) {
-        for(ComponentRequestLifecycle component : components) {
-          component.endRequest(pcontainer) ;
-        }
-        PortalContainer.setInstance(null) ;
-      }
+      postProcessOperations();
     }
   }
   
@@ -75,4 +88,6 @@ public class ExoBroadcastJAASLoginModule implements LoginModule {
     System.out.println("In logout of TomcatLoginModule, It seems this method is never called in tomcat") ;
     return  true ;
   }
+
+
 }
