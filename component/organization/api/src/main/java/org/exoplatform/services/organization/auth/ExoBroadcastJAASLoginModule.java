@@ -27,11 +27,11 @@ public class ExoBroadcastJAASLoginModule implements LoginModule {
   
   public ExoBroadcastJAASLoginModule() { }
   
-  public ExoContainer getContainer() {
+  public ExoContainer getContainer() throws Exception {
     return RootContainer.getInstance().getPortalContainer("portal");	  
   }
   
-  public void preProcessOperations() {
+  public void preProcessOperations() throws Exception {
     PortalContainer container = (PortalContainer) getContainer();
     PortalContainer.setInstance(container) ;
     List<ComponentRequestLifecycle> components = container.getComponentInstancesOfType(ComponentRequestLifecycle.class);
@@ -40,7 +40,7 @@ public class ExoBroadcastJAASLoginModule implements LoginModule {
     }        
   }
 
-  public void postProcessOperations() {
+  public void postProcessOperations() throws Exception {
     PortalContainer container = (PortalContainer) getContainer();
     List<ComponentRequestLifecycle> components = container.getComponentInstancesOfType(ComponentRequestLifecycle.class);
     if(components != null) {
@@ -61,21 +61,23 @@ public class ExoBroadcastJAASLoginModule implements LoginModule {
   }
   
   final public boolean commit() throws LoginException {
-    try {                 
-      String username = (String) sharedState_.get("javax.security.auth.login.name"); 	
-      
-      ExoContainer container = getContainer();
-      preProcessOperations();
-      AuthenticationService authService =
-        (AuthenticationService) container.getComponentInstanceOfType(AuthenticationService.class) ;
-      Identity identity = new Identity(username, username, subject_);
-      authService.broadcastAuthentication(identity);
-      return true;
+    try {
+      try {
+        String username = (String) sharedState_.get("javax.security.auth.login.name"); 	
+        
+        ExoContainer container = getContainer();
+        preProcessOperations();
+        AuthenticationService authService =
+          (AuthenticationService) container.getComponentInstanceOfType(AuthenticationService.class) ;
+        Identity identity = new Identity(username, username, subject_);
+        authService.broadcastAuthentication(identity);
+        return true;
+      } finally {
+        postProcessOperations();
+      }
     } catch (Exception e) {
       e.printStackTrace();
-      throw new LoginException("Authentication failed");
-    } finally {
-      postProcessOperations();
+      throw new LoginException("Authentication failed. Exception " + e);
     }
   }
   

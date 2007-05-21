@@ -33,11 +33,11 @@ public class ExoLoginJAASLoginModule implements LoginModule {
   public ExoLoginJAASLoginModule() { }
   
   
-  public ExoContainer getContainer() {
+  public ExoContainer getContainer() throws Exception {
     return RootContainer.getInstance().getPortalContainer("portal");      
   }
   
-  public void preProcessOperations() {
+  public void preProcessOperations() throws Exception {
     PortalContainer container = (PortalContainer) getContainer();
     PortalContainer.setInstance(container) ;
     List<ComponentRequestLifecycle> components = container.getComponentInstancesOfType(ComponentRequestLifecycle.class);
@@ -46,7 +46,7 @@ public class ExoLoginJAASLoginModule implements LoginModule {
     }        
   }
 
-  public void postProcessOperations() {
+  public void postProcessOperations() throws Exception {
     PortalContainer container = (PortalContainer) getContainer();
     List<ComponentRequestLifecycle> components = container.getComponentInstancesOfType(ComponentRequestLifecycle.class);
     if(components != null) {
@@ -69,29 +69,32 @@ public class ExoLoginJAASLoginModule implements LoginModule {
     callbacks[0] = new NameCallback("Username");
     callbacks[1] = new PasswordCallback("Password", false);    
     ExoContainer container = null;
-    try {                 
-      callbackHandler_.handle( callbacks);     
-      String username = ((NameCallback) callbacks[0]).getName();      
-      String password = new String(((PasswordCallback) callbacks[1]).getPassword());
-      ((PasswordCallback) callbacks[1]).clearPassword();
-      if (username == null ||  password == null) return false;
-      sharedState_.put("javax.security.auth.login.name", username);
+    try { 
+      try {
+        callbackHandler_.handle( callbacks);     
+        String username = ((NameCallback) callbacks[0]).getName();      
+        String password = new String(((PasswordCallback) callbacks[1]).getPassword());
+        ((PasswordCallback) callbacks[1]).clearPassword();
+        if (username == null ||  password == null) return false;
+        sharedState_.put("javax.security.auth.login.name", username);
+        
+        container = getContainer();
+        preProcessOperations();    
+        AuthenticationService authService =
+            (AuthenticationService) container.getComponentInstanceOfType(AuthenticationService.class) ;      
       
-      container = getContainer();
-      preProcessOperations();    
-      AuthenticationService authService =
-          (AuthenticationService) container.getComponentInstanceOfType(AuthenticationService.class) ;      
-    
-      if(authService.login(username, password)) {
-          return true;
-        } else {
-          throw new LoginException("Authentication failed");
-        }
+        if(authService.login(username, password)) {
+            return true;
+          } else {
+            throw new LoginException("Authentication failed");
+          }
+      } finally {
+        postProcessOperations();
+      }
     } catch (Exception e) {
-      throw new LoginException("Authentication failed");
-    } finally {
-      postProcessOperations();
-    }    
+      e.printStackTrace();
+      throw new LoginException("Authentication failed. Exception " + e);
+    }
   }
   
   final public boolean commit() throws LoginException {
