@@ -8,6 +8,7 @@ package org.exoplatform.services.security.impl;
 import javax.jcr.Credentials;
 import javax.jcr.SimpleCredentials;
 
+
 /**
  * Created by The eXo Platform SARL        .
  * @author <a href="mailto:gennady.azarenkov@exoplatform.com">Gennady Azarenkov</a>
