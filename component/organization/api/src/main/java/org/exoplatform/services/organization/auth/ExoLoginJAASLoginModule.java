@@ -25,6 +25,8 @@ import org.exoplatform.services.log.ExoLogger;
  * Created y the eXo platform team
  * User:  Tuan Nguyen
  * Date: May 6th, 2007
+ * 
+ * @version $Id$
  */
 public class ExoLoginJAASLoginModule implements LoginModule {
   

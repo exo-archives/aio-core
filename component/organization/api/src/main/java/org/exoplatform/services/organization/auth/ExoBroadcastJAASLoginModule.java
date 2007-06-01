@@ -22,10 +22,12 @@ import org.exoplatform.services.log.ExoLogger;
  * Created y the eXo platform team
  * User:  Tuan Nguyen
  * Date: May 6th, 2007
+ * 
+ * @version $Id$
  */
 public class ExoBroadcastJAASLoginModule implements LoginModule {
   
-  private Log      log = ExoLogger.getLogger("kernel.ExoLoginJAASLoginModule");
+  private Log      log = ExoLogger.getLogger("kernel.ExoBroadcastJAASLoginModule");
   
   private Subject subject_;
   private Map sharedState_;
