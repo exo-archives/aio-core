@@ -15,16 +15,21 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
+import org.apache.commons.logging.Log;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
+import org.exoplatform.services.log.ExoLogger;
 /**
  * Created y the eXo platform team
  * User:  Tuan Nguyen
  * Date: May 6th, 2007
  */
 public class ExoLoginJAASLoginModule implements LoginModule {
+  
+  private Log      log = ExoLogger.getLogger("kernel.ExoLoginJAASLoginModule");
+  
   private Subject subject_;
   private CallbackHandler callbackHandler_;
   private Identity identity_ ;
@@ -64,7 +69,9 @@ public class ExoLoginJAASLoginModule implements LoginModule {
   }
   
   final public boolean login() throws LoginException {
-    System.out.println("In login of TomcatLoginModule") ;
+    if (log.isDebugEnabled())
+      log.debug("In login of TomcatLoginModule") ;
+    
     Callback[] callbacks = new Callback[2];
     callbacks[0] = new NameCallback("Username");
     callbacks[1] = new PasswordCallback("Password", false);    
@@ -102,12 +109,14 @@ public class ExoLoginJAASLoginModule implements LoginModule {
   }
   
   final public boolean abort() throws LoginException {
-    System.out.println("In abort of TomcatLoginModule") ;
+    if (log.isDebugEnabled())
+      log.debug("In abort of TomcatLoginModule");
     return true  ;
   }
   
   final public boolean logout() throws LoginException {
-    System.out.println("In logout of TomcatLoginModule, It seems this method is never called in tomcat") ;
+    if (log.isDebugEnabled())
+      log.debug("In logout of TomcatLoginModule, It seems this method is never called in tomcat") ;
     return  true ;
   }
 }
