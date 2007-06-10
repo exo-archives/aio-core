@@ -22,7 +22,6 @@ import org.exoplatform.services.organization.OrganizationService;
  */
 public class JonasAuthenticationListener extends Listener<AuthenticationService, Identity> {
   public void onEvent(Event<AuthenticationService, Identity> event)  throws Exception {
-    System.out.println("==================================================================>");
     OrganizationService service = event.getSource().getOrganizationService() ;
     Identity identity = event.getData() ;
     Subject subject = identity.getSubject() ;
@@ -38,6 +37,5 @@ public class JonasAuthenticationListener extends Listener<AuthenticationService,
       roleGroup.addMember(new RolePrincipal(splittedGroupName[0]));
     }
     subject.getPrincipals().add(roleGroup);
-    System.out.println("==================================================================>");
   }
 }

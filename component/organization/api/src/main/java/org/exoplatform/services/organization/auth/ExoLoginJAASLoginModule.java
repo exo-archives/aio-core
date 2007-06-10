@@ -86,7 +86,7 @@ public class ExoLoginJAASLoginModule implements LoginModule {
         ((PasswordCallback) callbacks[1]).clearPassword();
         if (username == null ||  password == null) return false;
         sharedState_.put("javax.security.auth.login.name", username);
-        
+        subject_.getPrivateCredentials().add(password);
         container = getContainer();
         preProcessOperations();    
         AuthenticationService authService =
