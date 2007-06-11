@@ -31,6 +31,7 @@ public class ExoBroadcastJAASLoginModule implements LoginModule {
   
   private Subject subject_;
   private Map sharedState_;
+  private PortalContainer cachedContainer_ = null;
   
   public ExoBroadcastJAASLoginModule() { }
   
@@ -39,8 +40,12 @@ public class ExoBroadcastJAASLoginModule implements LoginModule {
   }
   
   public void preProcessOperations() throws Exception {
-    PortalContainer container = (PortalContainer) getContainer();
-    PortalContainer.setInstance(container) ;
+    cachedContainer_ = PortalContainer.getInstance();
+    PortalContainer container = cachedContainer_;
+    if(container == null) {
+      container = (PortalContainer) getContainer();
+      PortalContainer.setInstance(container) ;
+    }    
     List<ComponentRequestLifecycle> components = container.getComponentInstancesOfType(ComponentRequestLifecycle.class);
     for(ComponentRequestLifecycle component : components) { 
       component.startRequest(container) ;
@@ -54,8 +59,10 @@ public class ExoBroadcastJAASLoginModule implements LoginModule {
       for(ComponentRequestLifecycle component : components) {
         component.endRequest(container) ;
       }
-      PortalContainer.setInstance(null) ;
-    }    
+    }
+    // Previously, the Portal Container was set to null.
+    // It is mandatory to restore a previous instance if existing.
+    PortalContainer.setInstance(cachedContainer_) ;
   }  
   
   final public void initialize(Subject subject, CallbackHandler callbackHandler, Map sharedState, Map options) {
