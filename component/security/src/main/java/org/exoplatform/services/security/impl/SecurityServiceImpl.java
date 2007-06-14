@@ -129,36 +129,27 @@ public class SecurityServiceImpl implements SecurityService {
 
   public boolean hasMembershipInGroup(String userId, String membershipName,
       String groupName) {
-    Iterator groups;
+    
     try {
-      groups = orgService_.getGroupHandler().findGroupsOfUser(userId)
-      .iterator();
-    } catch (Exception e) {
+      if ("*".equals(membershipName)) {
+        // Determine if there exists at least one membership
+        return
+          ! orgService_.getMembershipHandler().findMembershipsByUserAndGroup(
+            userId,
+            groupName).isEmpty();
+      } else {
+        // Determine if there exists the membership of specified type
+        return 
+          orgService_.getMembershipHandler().findMembershipByUserGroupAndType(
+            userId,
+            groupName,
+            membershipName) != null;
+      }
+    }
+    catch(Exception e) {
+      e.printStackTrace();
       return false;
     }
-    if ("*".equals(membershipName)) {
-      while (groups.hasNext()) {
-        org.exoplatform.services.organization.Group group = (org.exoplatform.services.organization.Group) groups.next();
-        if (groupName.equals(group.getId()))
-          return true;
-      }
-    } else {
-      while (groups.hasNext()) {
-        org.exoplatform.services.organization.Group group = (org.exoplatform.services.organization.Group) groups.next();
-        try {
-          Iterator memberships = orgService_.getMembershipHandler()
-          .findMembershipsByUserAndGroup(userId, group.getId()).iterator();
-          while (memberships.hasNext()) {
-            Membership membership = (Membership) memberships.next();
-            if (membership.getMembershipType().equals(membershipName))
-              return true;
-          }
-        } catch (Exception e) {
-          return false;
-        }
-      }
-    }
-    return false;
   }
 
   public boolean hasMembershipInGroup(String user, String roleExpression) {
