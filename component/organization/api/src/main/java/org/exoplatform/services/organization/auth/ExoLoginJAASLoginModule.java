@@ -107,9 +107,15 @@ public class ExoLoginJAASLoginModule implements LoginModule {
       } finally {
         postProcessOperations();
       }
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new LoginException("Authentication failed. Exception " + e);
+    } catch (final Throwable e) {
+      throw new LoginException(e.toString()) {
+        private static final long serialVersionUID = 5843336633846631565L; // autogen by eclipse
+        
+        @Override
+        public Throwable getCause() {
+          return e;
+        }
+      };
     }
   }
   
