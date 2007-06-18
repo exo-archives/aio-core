@@ -35,7 +35,11 @@ public class AuthenticationService {
   }
   
   public void broadcastAuthentication(Identity identity) throws Exception {
-	identities_.put(identity.getSessionId(), identity) ;
+    
+    identities_.put(identity.getSessionId(), identity) ;
+    // [PN] 18.06.07
+    currentIdentity_.set(identity);
+    
     listenerService_.broadcast("exo.service.authentication.login", this, identity) ;
   }
   
@@ -44,8 +48,13 @@ public class AuthenticationService {
     return  identities_.get(sessionId) ;
   }
   
-  public Identity getCurrentIdentity() { return currentIdentity_.get() ; }
-  public void setCurrentIdentity(Identity identity) { currentIdentity_.set(identity) ; }
+  public Identity getCurrentIdentity() { 
+    return currentIdentity_.get() ; 
+  }
+  
+  public void setCurrentIdentity(Identity identity) { 
+    currentIdentity_.set(identity) ; 
+  }
   
   public void logout(String sessionId) throws Exception {
     Identity identity =  identities_.remove(sessionId) ;
