@@ -5,6 +5,7 @@
 package org.exoplatform.services.organization.jdbc;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -57,34 +58,48 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
   }
 
   public Membership findMembership(String id) throws Exception {
-    // TODO Auto-generated method stub
-    return null;
+    DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
+    query.addLIKE("membershipId", id);
+    return loadUnique(query.toQuery());
   }
 
   public Membership findMembershipByUserGroupAndType(String userName, String groupId, String type) throws Exception {
-    // TODO Auto-generated method stub
-    return null;
+    DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
+    query.addLIKE("userName", userName);
+    query.addLIKE("groupId", groupId);
+    query.addLIKE("membershipType", type);
+    return loadUnique(query.toQuery());
   }
   
   public Collection findMembershipsByGroup(Group group) throws Exception {
-    // TODO Auto-generated method stub
-    return null;
+    List<MembershipImpl> list = new ArrayList<MembershipImpl>();
+    DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
+    query.addLIKE("groupId", group.getId());
+    loadInstances(query.toQuery(), list);
+    return list;
   }
 
   public Collection findMembershipsByUser(String userName) throws Exception {
-    // TODO Auto-generated method stub
-    return null;
+    List<MembershipImpl> list = new ArrayList<MembershipImpl>();
+    DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
+    query.addLIKE("userName", userName);
+    loadInstances(query.toQuery(), list);
+    return list;
   }
 
   public Collection findMembershipsByUserAndGroup(String userName, String groupId) throws Exception {
-    // TODO Auto-generated method stub
-    return null;
+    List<MembershipImpl> list = new ArrayList<MembershipImpl>();
+    DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
+    query.addLIKE("userName", userName);
+    query.addLIKE("groupId", groupId);
+    loadInstances(query.toQuery(), list);
+    return list;
   }
 
 
   public Membership removeMembership(String id, boolean broadcast) throws Exception {
     DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
-    query.addLIKE("id", id);
+    query.addLIKE("membershipId", id);
     Connection connection = eXoDS_.getConnection();
     try {
       MembershipImpl membershipImpl = super.loadUnique(connection, query.toQuery());
@@ -101,9 +116,14 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
     }
   }
 
+  @SuppressWarnings("unchecked")
   public Collection removeMembershipByUser(String username, boolean broadcast) throws Exception {
-    DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
-    query.addLIKE("userName", username);
+//    DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
+//    query.addLIKE("userName", username);
+    List<Membership> members = (List<Membership>) findMembershipsByUser(username);
+    for(Membership member: members){
+      removeMembership(member.getId(), true);
+    }
     return null;
   }
   
@@ -129,6 +149,8 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
   
   
   @SuppressWarnings("unchecked")
-  public void addMembershipEventListener(MembershipEventListener listener) { }
+  public void addMembershipEventListener(MembershipEventListener listener) { 
+    throw new RuntimeException("This method is not supported anymore, please use the new api") ;
+  }
 
 }

@@ -18,6 +18,15 @@ import java.util.Collection;
  * removeGroup broadcast the event at each phase so the listeners can handle the event properly  
  */
 public interface GroupHandler {
+  final static public String PRE_DELETE_GROUP_EVENT = "organization.group.preDelete" ;
+  final static public String POST_DELETE_GROUP_EVENT = "organization.group.postDelete" ;
+  
+  final static public String PRE_CREATE_GROUP_EVENT = "organization.group.preCreate" ;
+  final static public String POST_CREATE_GROUP_EVENT = "organization.group.postCreate" ;
+  
+  final static public String PRE_UPDATE_GROUP_EVENT = "organization.group.preUpdate" ;
+  final static public String POST_UPDATE_GROUP_EVENT = "organization.group.postUpdate" ;
+  
   /**
    * @return a new object instance that implement the Group interface
    */

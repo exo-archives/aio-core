@@ -72,7 +72,6 @@ public class ReflectionMapper<T extends DBObject> implements DBObjectMapper<T> {
     
     ResultSetMetaData rsmd = resultSet.getMetaData();
     int numberOfColumns = rsmd.getColumnCount();
-    
     for(int i=1; i<=numberOfColumns; i++) {
       String name  = rsmd.getColumnName(i);
       TableField tableField = searchTableField(tableFields, name);

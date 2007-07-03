@@ -22,6 +22,14 @@ public interface UserProfileHandler {
    * yet
    */
   public UserProfile createUserProfileInstance() ;
+  
+  /**
+   * @return  return a new UserProfile implementation instance. This instance is not persited
+   * yet
+   * @param userName  The user profile record with the username 
+   */
+  public UserProfile createUserProfileInstance(String userName) ;
+  
   /**
    * This method should persist  the profile instance to the database. If the profile 
    * is not existed yet. the method should create a new user profile record. If there is

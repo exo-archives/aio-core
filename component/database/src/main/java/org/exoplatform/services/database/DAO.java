@@ -7,6 +7,7 @@ package org.exoplatform.services.database;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
@@ -63,8 +64,9 @@ public abstract class DAO<T extends DBObject> {
   
   protected T loadUnique(Connection connection, String query) throws Exception {
     Statement statement = connection.createStatement() ;
-    ResultSet resultSet =  statement.executeQuery(query) ;
-    if(!resultSet.next()) return null ;
+//    System.out.println(" Executed query: "+query) ;
+    ResultSet resultSet =  statement.executeQuery(query) ;  
+    if(!resultSet.next()) {return null ;}
     T bean =  createInstance() ;
     mapper_.mapResultSet(resultSet, bean) ;
     resultSet.close() ;
@@ -109,7 +111,7 @@ public abstract class DAO<T extends DBObject> {
   protected void execute(Connection connection, String query, T bean) throws Exception {
     PreparedStatement statement = connection.prepareStatement(query) ;
     if(bean != null) mapper_.mapUpdate(bean, statement) ;    
-    System.out.println(" Executed query "+query) ;
+//    System.out.println(" Executed query: "+query) ;
     statement.executeUpdate() ;
     eXoDS_.commit(connection) ;
     statement.close();

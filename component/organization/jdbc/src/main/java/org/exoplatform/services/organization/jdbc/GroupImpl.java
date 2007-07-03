@@ -18,9 +18,9 @@ import org.exoplatform.services.database.annotation.TableField;
 import org.exoplatform.services.organization.Group;
 
 @Table(
-    name = "Group" ,
+    name = "GroupUsers" ,
     field = {
-        @TableField(name = "id", type = "string", length = 100, unique = true, nullable = false),
+        @TableField(name = "groupId", type = "string", length = 100, unique = true, nullable = false),
         @TableField(name = "parentId", type = "string", length = 100),
         @TableField(name = "groupName", type = "string", length = 500),
         @TableField(name = "label", type = "string", length = 500),
@@ -29,7 +29,7 @@ import org.exoplatform.services.organization.Group;
 )
 public class GroupImpl extends DBObject implements Group {
   
-  private String id  ;
+  private String groupId  ;
   private String parentId  ;
   private String groupName ;
   private String label ;
@@ -40,8 +40,8 @@ public class GroupImpl extends DBObject implements Group {
   
   public GroupImpl(String name) { groupName = name ; }
   
-  public String getId() { return id; }
-  public void setId(String id) { this.id = id; }
+  public String getId() { return groupId; }
+  public void setId(String id) { this.groupId = id; }
   
   public String getParentId() { return parentId ; }
   public void setParentId(String parentId) { this.parentId = parentId; }
@@ -55,5 +55,5 @@ public class GroupImpl extends DBObject implements Group {
   public String getDescription() { return desc ; }
   public void   setDescription(String s)  { desc = s ; }
 
-  public String toString() { return "Group[" + id + "|" + groupName + "]"; }
+  public String toString() { return "Group[" + groupId + "|" + groupName + "]"; }
 }

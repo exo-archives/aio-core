@@ -26,7 +26,7 @@ import com.thoughtworks.xstream.io.xml.XppDriver;
     }
 )
 public class UserProfileData extends DBObject {
-  
+  //TODO:  use jibx
   static transient private XStream xstream_ ; 
   
   private String userName ;

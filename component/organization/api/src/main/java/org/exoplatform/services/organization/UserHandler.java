@@ -19,6 +19,14 @@ import org.exoplatform.commons.utils.PageList;
  * the event at each phase so the listeners can handle the event properly  
  */
 public interface UserHandler {
+  final static public String PRE_DELETE_USER_EVENT = "organization.user.preDelete" ;
+  final static public String POST_DELETE_USER_EVENT = "organization.user.postDelete" ;
+  
+  final static public String PRE_CREATE_USER_EVENT = "organization.user.preCreate" ;
+  final static public String POST_CREATE_USER_EVENT = "organization.user.postCreate" ;
+  
+  final static public String PRE_UPDATE_USER_EVENT = "organization.user.preUpdate" ;
+  final static public String POST_UPDATE_USER_EVENT = "organization.user.postUpdate" ;
   /**
    * @deprecated
    * This method create  an  User instance that implement the  User interface. The user instance

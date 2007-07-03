@@ -8,7 +8,7 @@ import org.exoplatform.services.organization.Membership;
 @Table(
     name = "Membership" ,
     field = {
-        @TableField(name = "id", type = "string", length = 100, unique = true, nullable = false),
+        @TableField(name = "membershipId", type = "string", length = 100, unique = true, nullable = false),
         @TableField(name = "membershipType", type = "string", length = 100),
         @TableField(name = "groupId", type = "string", length = 100),
         @TableField(name = "userName", type = "string", length = 500)

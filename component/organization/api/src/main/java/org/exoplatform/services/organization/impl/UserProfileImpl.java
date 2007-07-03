@@ -22,6 +22,11 @@ public class UserProfileImpl  implements UserProfile  {
   public UserProfileImpl() {
   }
   
+  public UserProfileImpl(String userName) {
+    this.userName = userName;
+    attributes = new HashMap<String, String>() ;
+  }
+  
   public UserProfileImpl(String userName , Map<String,String> map) {
   	this.userName = userName ;
     attributes = map;

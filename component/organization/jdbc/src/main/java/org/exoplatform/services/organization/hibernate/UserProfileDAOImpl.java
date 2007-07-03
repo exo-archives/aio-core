@@ -51,6 +51,9 @@ public class UserProfileDAOImpl implements UserProfileHandler {
     return new UserProfileImpl() ; 
   }
   
+  public UserProfile createUserProfileInstance(String userName) {
+   return new UserProfileImpl(userName);
+  }
   void createUserProfileEntry(UserProfile up, Session session) throws Exception {
   	UserProfileData upd = new UserProfileData() ;
     upd.setUserProfile(up) ; 
@@ -120,4 +123,6 @@ public class UserProfileDAOImpl implements UserProfileHandler {
   public Collection findUserProfiles() throws Exception {
     return null ;
   }
+
+  
 }

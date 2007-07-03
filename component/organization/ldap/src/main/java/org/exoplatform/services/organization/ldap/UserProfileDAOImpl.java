@@ -42,6 +42,10 @@ public class UserProfileDAOImpl extends BaseDAO implements  UserProfileHandler {
     return new UserProfileImpl() ; 
   }
   
+  public UserProfile createUserProfileInstance(String userName) {
+    return new UserProfileImpl(userName) ; 
+  }
+  
   public void createUser(UserProfile profile, boolean broadcast) throws Exception {     
     LdapContext ctx  = ldapService_.getLdapContext();
     String profileDN = ldapAttrMapping_.membershipTypeNameAttr
@@ -105,5 +109,7 @@ public class UserProfileDAOImpl extends BaseDAO implements  UserProfileHandler {
   public void addUserProfileEventListener(UserProfileEventListener listener) {
     listeners_.add(listener) ;
   }
+
+
 
 }

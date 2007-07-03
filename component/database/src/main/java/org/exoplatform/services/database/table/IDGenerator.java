@@ -67,7 +67,7 @@ public class IDGenerator extends DAO<ExoLongID>  {
       idTrackers_.put(type, idTracker) ;
     }
 
-    System.out.println("+++>>" + load(1))  ;
+//    System.out.println("+++>>" + load(1))  ;
 
     long generatedId = ++idTracker.currentId ;
     if(generatedId > idTracker.blockTracker.getCurrentBlockId() + ExoLongID.BLOCK_SIZE) {

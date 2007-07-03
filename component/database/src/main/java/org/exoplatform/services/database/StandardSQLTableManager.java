@@ -31,7 +31,11 @@ public class StandardSQLTableManager extends DBTableManager {
     if(table == null) {
       throw new Exception("Cannot find the annotation for class " + type.getClass().getName()) ;
     }
-    
+//    try{
+//      int k = 3/0;
+//    }catch (Exception e) {
+//      e.printStackTrace();
+//    }
     StringBuilder builder = new StringBuilder(1000) ;
     builder.append("CREATE TABLE ").append(table.name()).append(" (") ;
     builder.  append("id BIGINT PRIMARY KEY, ");
@@ -59,14 +63,13 @@ public class StandardSQLTableManager extends DBTableManager {
       if(i !=  fields.length - 1) builder.append(", ");
     }
     builder.append(")") ;
+    
     // print  out  the  sql string 
     Connection connection = xaDatasource_.getXAConnection().getConnection() ;
     Statement statement = connection.createStatement();
-    
-    if(dropIfExist) statement.execute("DROP TABLE IF EXISTS " + table.name());
     System.out.println("QUERY: \n  " + builder + "\n");
+    if(dropIfExist && hasTable(type)) statement.execute("DROP TABLE IF EXISTS " + table.name());
     statement.execute(builder.toString()) ;
-    
     statement.close() ;
     connection.commit() ;
     connection.close() ;

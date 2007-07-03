@@ -9,9 +9,9 @@ import java.sql.ResultSet;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.database.DBObjectMapper;
 import org.exoplatform.services.database.DBTableManager;
+import org.exoplatform.services.database.DatabaseService;
 import org.exoplatform.services.database.ExoDatasource;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.organization.BaseOrganizationService;
@@ -28,17 +28,21 @@ import org.picocontainer.Startable;
 public class OrganizationServiceImpl extends  BaseOrganizationService implements  Startable {
 
   public OrganizationServiceImpl(ListenerService listenerService,  
-                                 ExoDatasource datasource, CacheService cservice) throws Exception {
+                                 DatabaseService dbService) throws Exception {
+    ExoDatasource datasource = dbService.getDatasource();  
     userDAO_ = new UserDAOImpl(listenerService, datasource, new UserMapper()) ;   
     groupDAO_ =  new GroupDAOImpl(listenerService, datasource, new GroupMapper()) ;
     membershipTypeDAO_ = new MembershipTypeDAOImpl(datasource, new MembershipTypeMapper()) ;
 
     membershipDAO_ = new MembershipDAOImpl(listenerService, datasource, new MembershipMapper()) ;
-    userProfileDAO_ =  new UserProfileDAOImpl() ;
+    userProfileDAO_ =  new UserProfileDAOImpl(listenerService, datasource, new UserProfileMapper() ) ;
     
     DBTableManager dbManager = datasource.getDBTableManager() ;
     if(!dbManager.hasTable(UserImpl.class)) dbManager.createTable(UserImpl.class, true) ;
-    
+    if(!dbManager.hasTable(GroupImpl.class)) dbManager.createTable(GroupImpl.class, true) ;
+    if(!dbManager.hasTable(MembershipTypeImpl.class)) dbManager.createTable(MembershipTypeImpl.class, true) ;
+    if(!dbManager.hasTable(UserProfileData.class)) dbManager.createTable(UserProfileData.class, true) ;
+    if(!dbManager.hasTable(MembershipImpl.class)) dbManager.createTable(MembershipImpl.class, true) ;
   }
   
   static class UserMapper implements DBObjectMapper<UserImpl> {
@@ -83,6 +87,7 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
     }
 
     public void mapResultSet(ResultSet res, UserImpl bean) throws Exception {  
+      bean.setDBObjectId(res.getLong("id"));
       bean.setUserName(res.getString("username"));
       bean.setPassword(res.getString("password"));
       bean.setFirstName(res.getString("firstname"));
@@ -105,7 +110,7 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
 
     public String[][] toParameters(GroupImpl bean) throws Exception {
       return new String[][] {
-          {"id", bean.getId() },
+          {"groupId", bean.getId() },
           {"parentId",  bean.getParentId()},
           {"groupName",  bean.getGroupName()},
           {"label", bean.getLabel()},
@@ -122,7 +127,8 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
     }
 
     public void mapResultSet(ResultSet res, GroupImpl bean) throws Exception {
-      bean.setId(res.getString("id"));
+      bean.setDBObjectId(res.getLong("id"));
+      bean.setId(res.getString("groupId"));
       bean.setParentId(res.getString("parentId"));
       bean.setGroupName(res.getString("groupName"));
       bean.setLabel(res.getString("label"));
@@ -164,6 +170,7 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
     }
     
     public void mapResultSet(ResultSet res, MembershipTypeImpl bean) throws Exception {
+      bean.setDBObjectId(res.getLong("id"));
       bean.setName(res.getString("name"));
       bean.setOwner(res.getString("owner"));
       bean.setDescription(res.getString("description"));
@@ -181,7 +188,7 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
 
     public String[][] toParameters(MembershipImpl bean) throws Exception {
       return new String[][] {
-          {"id", bean.getId() },
+          {"membershipId", bean.getId() },
           {"membershipType",  bean.getMembershipType()},
           {"groupId",  bean.getGroupId()},
           {"userName", bean.getUserName()}
@@ -196,7 +203,8 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
     }
     
     public void mapResultSet(ResultSet res, MembershipImpl bean) throws Exception {
-      bean.setId(res.getString("id"));
+      bean.setDBObjectId(res.getLong("id"));
+      bean.setId(res.getString("membershipId"));
       bean.setMembershipType(res.getString("membershipType"));
       bean.setGroupId(res.getString("groupId"));
       bean.setUserName(res.getString("userName"));
@@ -219,6 +227,7 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
     }
     
     public void mapResultSet(ResultSet res, UserProfileData bean) throws Exception {
+      bean.setDBObjectId(res.getLong("id"));
       bean.setUserName(res.getString("userName"));
       bean.setProfile(res.getString("profile"));
     }

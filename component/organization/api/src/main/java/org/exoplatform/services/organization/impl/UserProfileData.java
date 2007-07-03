@@ -55,7 +55,10 @@ public class UserProfileData {
   }
 
   public void setUserProfile(org.exoplatform.services.organization.UserProfile up) { 
-    if(up == null) profile = "";
+    if(up == null) {
+      profile = ""; 
+      return;
+    }
   	UserProfileImpl impl = (UserProfileImpl) up ;
   	userName = up.getUserName() ;
   	XStream xstream = getXStream() ;

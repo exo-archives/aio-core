@@ -10,30 +10,45 @@
     <type>org.exoplatform.services.database.jdbc.DBSchemaCreator</type>
   </component>
 
-  <component> 
-    <key>org.exoplatform.services.database.DatabaseService</key>
-    <type>org.exoplatform.services.database.impl.XAPoolTxSupportDatabaseService</type>
-    <init-params>
-      <properties-param>
-        <name>default</name>
-        <description>Connection configuration</description>
-        <property name='connection.driver' value='org.hsqldb.jdbcDriver'/>
-        <property name='connection.url' value='jdbc:hsqldb:mem:db/default'/>
-        <property name='connection.login' value='sa'/>
-        <property name='connection.password' value=''/>
-        <property name='connection.min-size' value='3'/>
-        <property name='connection.max-size' value='5'/>
-      </properties-param>
-      <properties-param>
-        <name>custom</name>
-        <description>Connection configuration</description>
-        <property name='connection.driver' value='org.hsqldb.jdbcDriver'/>
-        <property name='connection.url' value='jdbc:hsqldb:mem:db/custom'/>
-        <property name='connection.login' value='sa'/>
-        <property name='connection.password' value=''/>
-        <property name='connection.min-size' value='3'/>
-        <property name='connection.max-size' value='5'/>
-      </properties-param>
-    </init-params>
-  </component> 
+  <component>
+    <key>org.exoplatform.services.organization.OrganizationService</key>
+    <type>org.exoplatform.services.organization.jdbc.OrganizationServiceImpl</type>
+  </component>
+  
+
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.listener.ListenerService</target-component>
+    
+    <component-plugin>
+      <name>organization.user.preDelete</name>
+		  <set-method>addListener</set-method>
+      <type>org.exoplatform.services.organization.jdbc.listeners.RemoveUserProfileListener</type>
+		</component-plugin>
+		
+		<component-plugin>
+      <name>organization.user.postCreate</name>
+		  <set-method>addListener</set-method>
+      <type>org.exoplatform.services.organization.jdbc.listeners.CreateUserListener</type>
+		</component-plugin>
+		
+		<component-plugin>
+      <name>organization.user.preDelete</name>
+		  <set-method>addListener</set-method>
+      <type>org.exoplatform.services.organization.jdbc.listeners.RemoveMembershipListener</type>
+		</component-plugin>
+		
+		<component-plugin>
+      <name>organization.group.preDelete</name>
+		  <set-method>addListener</set-method>
+      <type>org.exoplatform.services.organization.jdbc.listeners.RemoveMembershipListener</type>
+		</component-plugin>
+		
+		<component-plugin>
+      <name>organization.group.preDelete</name>
+		  <set-method>addListener</set-method>
+      <type>org.exoplatform.services.organization.jdbc.listeners.RemoveGroupListener</type>
+		</component-plugin>
+		
+  </external-component-plugins>
 </configuration>  
