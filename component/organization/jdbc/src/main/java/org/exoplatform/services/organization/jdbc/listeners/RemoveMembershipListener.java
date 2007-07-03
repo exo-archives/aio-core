@@ -4,16 +4,21 @@
  **************************************************************************/
 package org.exoplatform.services.organization.jdbc.listeners;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.exoplatform.services.database.DBObjectQuery;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.MembershipHandler;
 import org.exoplatform.services.organization.MembershipType;
+import org.exoplatform.services.organization.MembershipTypeHandler;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.jdbc.MembershipDAOImpl;
+import org.exoplatform.services.organization.jdbc.MembershipImpl;
 /**
  * Created by The eXo Platform SARL
  * Author : Le Bien Thuy
@@ -33,18 +38,21 @@ public class RemoveMembershipListener extends Listener<Object, Object>{
     MembershipHandler membershipHanler = service_.getMembershipHandler();
     if(target instanceof User){
       User user = (User) target;
-      System.out.println("\n\nRemove all Membership by User: " + user.getUserName() + "\n\n");
+//      System.out.println("\n\nRemove all Membership by User: " + user.getUserName() + "\n\n");
       membershipHanler.removeMembershipByUser(user.getUserName(), true);
     } else if (target instanceof Group){
       Group group = (Group) target;
-      System.out.println("\n\nRemove all Membership by Group: " + group.getGroupName() + "\n\n");
+//      System.out.println("\n\nRemove all Membership by Group: " + group.getGroupName() + "\n\n");
       List<Membership> members = (List<Membership>) membershipHanler.findMembershipsByGroup( group);
       for(Membership member: members){
         membershipHanler.removeMembership(member.getId(), true);
       }
     } else if( target instanceof MembershipType){
       MembershipType memberType = (MembershipType) target;
-      System.out.println("\n\nRemove all Membership by MemberType: " + memberType.getName() + "\n\n");
+      MembershipDAOImpl mtHandler = (MembershipDAOImpl) service_.getMembershipTypeHandler();
+      DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
+      query.addLIKE("membershipType", memberType.getName());
+      mtHandler.removeMemberships(query, true);
     }
   }
 }

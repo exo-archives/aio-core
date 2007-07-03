@@ -48,7 +48,8 @@ public class DBPageList<T extends DBObject> extends PageList {
   
   protected void populateCurrentPage(int currentPage) throws Exception {
     this.currentPage_ = currentPage;   
-    currentListPage_.clear(); 
+    if(currentListPage_ != null) currentListPage_.clear(); 
+    else currentListPage_ = new ArrayList<T>();
     loadPageList(this, query_);
   }
   
@@ -64,12 +65,12 @@ public class DBPageList<T extends DBObject> extends PageList {
       crs.setPageSize(pageList.getPageSize());
       crs.populate(resultSet, (pageList.getCurrentPage() - 1) * pageList.getPageSize() + 1);
 
-      List<T>  list = pageList.currentPage();
-      while (resultSet.next()) {
+      while (crs.next()) {
         T bean = dao_.createInstance() ;
-        dao_.getDBObjectMapper().mapResultSet(resultSet, bean) ;
-        list.add(bean) ;
+        dao_.getDBObjectMapper().mapResultSet(crs, bean) ;
+        currentListPage_.add(bean) ;
       }
+      
       resultSet.close() ;
       statement.close();
     } catch (Exception e) {

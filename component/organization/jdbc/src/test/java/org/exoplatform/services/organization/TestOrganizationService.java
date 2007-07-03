@@ -60,7 +60,7 @@ public class TestOrganizationService extends BasicTestCase {
   
   protected String getDescription() {
     if(!runtest)  return "" ;
-    return "test hibernate organization service";
+    return "\n\n***************** Test organization service ***********************\n\n";
   }
   
   public void testUserPageSize() throws Exception{    
@@ -123,9 +123,14 @@ public class TestOrganizationService extends BasicTestCase {
     up = profileHandler_.findUserProfileByName(USER);
     assertEquals("expect first name is", "Exo(Update)", u.getFirstName());
     assertEquals("Expect profile is updated: user.gender is ", "male", up.getUserInfoMap().get("user.gender"));
-//    PageList piterator = userHandler_.getUserPageList(10) ;
-//    assertTrue (piterator.currentPage().size() == 2) ;
-    
+    try{
+    PageList piterator = userHandler_.getUserPageList(10) ;
+    List list =  piterator.getPage(1);
+    System.out.println("\n\n\n===> Size: " + list.size());
+    assertTrue (piterator.currentPage().size() == 2) ;
+    }catch(Exception e){
+      e.printStackTrace();
+    }
     /* Remove a user:  
      * Expect result: user and it's profile will be removed 
      */
