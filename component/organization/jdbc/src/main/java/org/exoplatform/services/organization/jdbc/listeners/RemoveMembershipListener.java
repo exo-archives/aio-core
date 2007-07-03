@@ -34,6 +34,7 @@ public class RemoveMembershipListener extends Listener<Object, Object>{
   
   @SuppressWarnings("unchecked")
   public void onEvent(Event<Object, Object> event) throws Exception {
+    
     Object target = event.getData();
     MembershipHandler membershipHanler = service_.getMembershipHandler();
     if(target instanceof User){
@@ -48,11 +49,13 @@ public class RemoveMembershipListener extends Listener<Object, Object>{
         membershipHanler.removeMembership(member.getId(), true);
       }
     } else if( target instanceof MembershipType){
+      try{
       MembershipType memberType = (MembershipType) target;
-      MembershipDAOImpl mtHandler = (MembershipDAOImpl) service_.getMembershipTypeHandler();
+      MembershipDAOImpl mtHandler = (MembershipDAOImpl) service_.getMembershipHandler();
       DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
       query.addLIKE("membershipType", memberType.getName());
       mtHandler.removeMemberships(query, true);
+      }catch(Exception e){ e.printStackTrace(); }
     }
   }
 }

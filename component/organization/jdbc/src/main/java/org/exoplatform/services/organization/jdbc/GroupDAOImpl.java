@@ -105,9 +105,10 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
   }
 
   public Collection findGroups(Group parent) throws Exception {
-    if(parent == null ) return null;
+    String parentId = "/";
+    if(parent != null ) parentId = parent.getId();
     DBObjectQuery<GroupImpl> query = new DBObjectQuery<GroupImpl>(GroupImpl.class);
-    query.addLIKE("parentId", parent.getId());
+    query.addLIKE("parentId", parentId);
     DBPageList<GroupImpl> pageList = new DBPageList<GroupImpl>(20, this, query);
     return pageList.getAll();
   }

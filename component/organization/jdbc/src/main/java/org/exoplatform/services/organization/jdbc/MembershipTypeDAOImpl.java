@@ -12,6 +12,8 @@ import org.exoplatform.services.database.DBObjectQuery;
 import org.exoplatform.services.database.DBPageList;
 import org.exoplatform.services.database.ExoDatasource;
 import org.exoplatform.services.database.StandardSQLDAO;
+import org.exoplatform.services.listener.ListenerService;
+import org.exoplatform.services.organization.GroupHandler;
 import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.MembershipTypeHandler;
 
@@ -22,9 +24,10 @@ import org.exoplatform.services.organization.MembershipTypeHandler;
  * Apr 7, 2007  
  */
 public class MembershipTypeDAOImpl extends StandardSQLDAO<MembershipTypeImpl> implements MembershipTypeHandler {
-  
-  public MembershipTypeDAOImpl(ExoDatasource datasource, DBObjectMapper<MembershipTypeImpl> mapper) {
+  protected ListenerService listenerService_;
+  public MembershipTypeDAOImpl(ListenerService lService,ExoDatasource datasource, DBObjectMapper<MembershipTypeImpl> mapper) {
     super(datasource, mapper, MembershipTypeImpl.class);
+    listenerService_ = lService;;
   }
 
   public MembershipType createMembershipTypeInstance() { return new MembershipTypeImpl(); }
@@ -56,7 +59,9 @@ public class MembershipTypeDAOImpl extends StandardSQLDAO<MembershipTypeImpl> im
     query.addLIKE("name", name);
     MembershipTypeImpl mt = loadUnique(query.toQuery());
     if(mt == null) return null;
+    if(broadcast) listenerService_.broadcast(MembershipTypeHandler.PRE_DELETE_MEMBERSHIP_TYPE_EVENT, this, mt);
     super.remove(mt);
+    if(broadcast) listenerService_.broadcast(MembershipTypeHandler.POST_DELETE_MEMBERSHIP_TYPE_EVENT, this, mt);
     return mt;
   }
 

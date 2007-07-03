@@ -33,15 +33,18 @@ public class CreateUserListener extends Listener<UserDAOImpl, User> {
     UserProfile profile = service_.getUserProfileHandler().createUserProfileInstance(event.getData().getUserName());
     service_.getUserProfileHandler().saveUserProfile(profile, true);
     GroupHandler groupHandler = service_.getGroupHandler();
-    Group g = groupHandler.findGroupById("/user");
-    if(g == null) {
-      g = groupHandler.createGroupInstance();
-      g.setGroupName("user");
-      groupHandler.addChild(null, g, true);
-    }
+    Group g = groupHandler.findGroupById("/users");
     MembershipTypeHandler membershipTypeHandler = service_.getMembershipTypeHandler();
     MembershipType memberType = membershipTypeHandler.findMembershipType("member");
-    if(memberType == null) {
+    
+//    if(g == null || memberType == null) return;
+    
+    if(g == null ) { 
+      g = groupHandler.createGroupInstance();
+      g.setGroupName("users");
+      groupHandler.addChild(null, g, true);
+    }
+    if(memberType == null) { 
       memberType = membershipTypeHandler.createMembershipTypeInstance();
       memberType.setName("member");
       membershipTypeHandler.createMembershipType(memberType, true);

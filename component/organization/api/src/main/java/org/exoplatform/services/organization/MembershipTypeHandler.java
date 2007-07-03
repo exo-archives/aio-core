@@ -24,6 +24,8 @@ import java.util.Collection;
  * implement this and broadcast  the event properly. 
  */
 public interface MembershipTypeHandler {
+  public static String PRE_DELETE_MEMBERSHIP_TYPE_EVENT = "organization.membershipType.preDelete";
+  public static String POST_DELETE_MEMBERSHIP_TYPE_EVENT = "porganization.membershipType.postDelete";
   /**
    * @return a new object instance that implement the MembershipType interface
    */

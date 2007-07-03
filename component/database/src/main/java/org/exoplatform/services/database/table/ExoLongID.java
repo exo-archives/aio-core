@@ -42,9 +42,9 @@ public class ExoLongID extends DBObject {
   public void setCurrentBlockId(long start) { this.currentBlockId = start ; }
 
   public void setNextBlock() { 
-    System.out.println("======> last block id: " + currentBlockId); 
+//    System.out.println("======> last block id: " + currentBlockId); 
     this.currentBlockId = this.currentBlockId + BLOCK_SIZE ;
-    System.out.println("======> currentBlockId: " + currentBlockId); 
+//    System.out.println("======> currentBlockId: " + currentBlockId); 
   }
  
 }
