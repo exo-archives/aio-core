@@ -197,7 +197,7 @@ public class OpenOfficeDocumentReader extends BaseDocumentReader {
     public void endElement(java.lang.String namespaceURI,
         java.lang.String localName, java.lang.String qName) throws SAXException {
       if(curPropertyName != null) {
-        props.put(curPropertyName, curPropertyValue);
+        props.put(curPropertyName, curPropertyValue.toString());
         curPropertyValue = new StringBuffer();
         curPropertyName = null;
       }
