@@ -36,7 +36,7 @@
     <dependency>
       <groupId>poi</groupId>
       <artifactId>poi</artifactId>
-      <version>3.0-alpha1</version>
+      <version>3.0-FINAL</version>
       <scope>compile</scope>
     </dependency>
 
@@ -50,19 +50,18 @@
 
   <build>
 
-    <plugins>
-      
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <skip>${exo.test.skip}</skip>
-            <includes>
-              <include>**/DocumentReaderServiceTest.java</include>
-            </includes>
-          </configuration>
-        </plugin>
-  </plugins>
+		<plugins>
+		   <plugin>
+		      <groupId>org.apache.maven.plugins</groupId>
+		      <artifactId>maven-surefire-plugin</artifactId>
+		      <configuration>
+		        <skip>false</skip>
+		        <includes>
+		          <include>**/PropertiesExtractTest.java</include>
+		        </includes>
+		      </configuration>
+		    </plugin>
+    </plugins>
   </build>
 
 </project>
