@@ -10,7 +10,7 @@ import java.util.List;
 import org.exoplatform.services.database.annotation.Query;
 import org.exoplatform.services.database.annotation.Table;
 import org.exoplatform.services.database.annotation.TableField;
-import org.exoplatform.services.database.annotation.Query.SQL;
+import org.jgroups.util.ExposedDataOutputStream;
 
 /**
  * Created by The eXo Platform SARL
@@ -129,11 +129,28 @@ public class QueryBuilder {
   }
   
   private String getQuery(Query query) {
-    SQL [] queries = query.queries();
-    for(SQL sql : queries){
-      if(sql.dbType() == databaseType) return sql.value();
+    switch(databaseType) {
+    case ExoDatasource.STANDARD_DB_TYPE :
+      return query.standardSQL();
+    case ExoDatasource.HSQL_DB_TYPE :
+      if(query.hsqlSQL().length() > 0) return query.hsqlSQL();
+    case ExoDatasource.MYSQL_DB_TYPE :
+      if(query.mysqlSQL().length() > 0) return query.mysqlSQL();
+    case ExoDatasource.MSSQL_DB_TYPE:
+      if(query.mssqlSQL().length() > 0) return query.mssqlSQL();
+    case ExoDatasource.ORACLE_DB_TYPE:
+      if(query.oracleSQL().length() > 0) return query.oracleSQL();  
+    case ExoDatasource.DB2_DB_TYPE:
+      if(query.db2SQL().length() > 0) return query.db2SQL();
+    case ExoDatasource.DERBY_DB_TYPE:
+      if(query.derbySQL().length() > 0) return query.derbySQL();
+    case ExoDatasource.POSTGRES_DB_TYPE:
+      if(query.postgresSQL().length() > 0) return query.postgresSQL();
+    case ExoDatasource.SYSBASE_DB_TYPE:
+      if(query.sysbaseSQL().length() > 0) return query.sysbaseSQL();  
+    default :
+      return query.standardSQL();
     }
-    return null;
   }
   
   public String mapDataToSql(String template, String[][] parameters) throws Exception {

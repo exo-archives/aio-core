@@ -40,8 +40,7 @@ public class UserDAOImpl implements  UserHandler {
   private ExoCache cache_ ;
   private List<UserEventListener> listeners_  = new ArrayList<UserEventListener>(3);
 
-  public UserDAOImpl(HibernateService service, 
-                          CacheService cservice) throws Exception {
+  public UserDAOImpl(HibernateService service, CacheService cservice) throws Exception {
     service_ = service ; 
     cache_ = cservice.getCacheInstance(UserImpl.class.getName()) ;
   }

@@ -24,6 +24,9 @@ public class ExoDatasource {
   final public static int DB2_DB_TYPE  = 3;
   final public static int DERBY_DB_TYPE  = 4;
   final public static int   ORACLE_DB_TYPE  = 5;
+  final public static int MSSQL_DB_TYPE  = 6;
+  final public static int SYSBASE_DB_TYPE  = 7;
+  final public static int POSTGRES_DB_TYPE  = 8;
   
   private DataSource xaDatasource_  ;
   private DBTableManager tableManager_ ;

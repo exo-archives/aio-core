@@ -9,7 +9,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.exoplatform.services.database.ExoDatasource;
 /**
  * Created by The eXo Platform SARL
  * Author : Nhu Dinh Thuan
@@ -18,14 +17,15 @@ import org.exoplatform.services.database.ExoDatasource;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
-public @interface Query {
+public @interface Query {  
   String name() ;
-  SQL [] queries();
-  
-  @Retention(RetentionPolicy.RUNTIME)
-  @Target({ElementType.TYPE})
-  public static @interface SQL {
-    int dbType()  default ExoDatasource.STANDARD_DB_TYPE;
-    String value();
-  }
+  String standardSQL();
+  String mysqlSQL() default "";
+  String mssqlSQL() default "";
+  String oracleSQL() default "";
+  String postgresSQL() default "";
+  String hsqlSQL() default "";
+  String derbySQL() default "";
+  String sysbaseSQL() default "";
+  String db2SQL() default "";
 }
