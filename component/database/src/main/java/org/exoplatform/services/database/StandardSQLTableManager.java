@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javax.sql.XADataSource;
+import javax.sql.DataSource;
 
 import org.exoplatform.services.database.annotation.Table;
 import org.exoplatform.services.database.annotation.TableField;
@@ -20,7 +20,7 @@ import org.exoplatform.services.database.annotation.TableField;
  */
 public class StandardSQLTableManager extends DBTableManager {
   
-  private XADataSource xaDatasource_ ;
+  private DataSource xaDatasource_ ;
   
   public StandardSQLTableManager(ExoDatasource  datasource)  {
     xaDatasource_ = datasource.getDatasource() ;
@@ -65,7 +65,7 @@ public class StandardSQLTableManager extends DBTableManager {
     builder.append(")") ;
     
     // print  out  the  sql string 
-    Connection connection = xaDatasource_.getXAConnection().getConnection() ;
+    Connection connection = xaDatasource_.getConnection() ;
     Statement statement = connection.createStatement();
     System.out.println("QUERY: \n  " + builder + "\n");
     if(dropIfExist && hasTable(type)) statement.execute("DROP TABLE IF EXISTS " + table.name());
@@ -80,7 +80,7 @@ public class StandardSQLTableManager extends DBTableManager {
     if (table == null) {
       throw new Exception("Can not find the annotation for class " + type.getClass().getName());
     }
-    Connection conn = xaDatasource_.getXAConnection().getConnection();
+    Connection conn = xaDatasource_.getConnection();
     Statement s = conn.createStatement();
     s.execute("DROP TABLE " + table.name());
     s.close();
@@ -93,7 +93,7 @@ public class StandardSQLTableManager extends DBTableManager {
     if (table == null) {
       throw new Exception("Can not find the annotation for class " + type.getClass().getName());
     }
-    Connection connection = xaDatasource_.getXAConnection().getConnection();
+    Connection connection = xaDatasource_.getConnection();
     Statement statement = connection.createStatement();
     try {
       if(statement.execute("SELECT 1 FROM " + table.name()) == true) return true;      

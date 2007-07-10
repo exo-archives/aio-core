@@ -9,7 +9,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.sql.DataSource;
+import javax.sql.XADataSource;
+
 import org.enhydra.jdbc.standard.StandardXADataSource;
+import org.enhydra.jdbc.pool.StandardXAPoolDataSource ;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.PropertiesParam;
 import org.exoplatform.services.database.DatabaseService;
@@ -49,12 +53,12 @@ public class XAPoolTxSupportDatabaseService implements DatabaseService {
   
   
   public Connection getConnection() throws Exception {
-    return   defaultDS_.getXAConnection() .getConnection() ;
+    return   defaultDS_.getConnection() ;
   }
   
   public Connection getConnection(String dsName) throws Exception {
     ExoDatasource ds = datasources_.get(dsName) ;
-    return  ds.getXAConnection().getConnection();
+    return  ds.getConnection();
   }
   
   public void closeConnection(Connection conn) throws Exception {
@@ -64,15 +68,22 @@ public class XAPoolTxSupportDatabaseService implements DatabaseService {
   public TransactionService getTransactionService() throws Exception { return txService_ ; }
   
   
-  private  StandardXADataSource createDatasource(Map<String,String> props) throws Exception {
+  private DataSource createDatasource(Map<String,String> props) throws Exception {
     StandardXADataSource ds = new StandardXADataSource();
     ds.setDriverName(props.get("connection.driver")) ;
     ds.setUrl(props.get("connection.url")) ;
     ds.setUser(props.get("connection.login")) ;
     ds.setPassword(props.get("connection.password")) ;
-    ds.setMinCon(Integer.parseInt(props.get("connection.min-size"))) ;
-    ds.setMaxCon(Integer.parseInt(props.get("connection.max-size"))) ;
+    //ds.setMinCon(Integer.parseInt(props.get("connection.min-size"))) ;
+    //ds.setMaxCon(Integer.parseInt(props.get("connection.max-size"))) ;
     ds.setTransactionManager(txService_.getTransactionManager()) ;
-    return ds ;
+    
+    StandardXAPoolDataSource pool = new StandardXAPoolDataSource(3);
+    pool.setMinSize(Integer.parseInt(props.get("connection.min-size"))) ;
+    pool.setMaxSize(Integer.parseInt(props.get("connection.max-size"))) ;
+    //pool.setUser(props.get("connection.login")) ;
+    //pool.setPassword(props.get("connection.password")) ;
+    pool.setDataSource(ds) ;
+    return pool ;
   }
 }

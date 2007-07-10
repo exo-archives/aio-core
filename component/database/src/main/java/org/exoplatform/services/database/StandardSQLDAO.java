@@ -7,8 +7,6 @@ package org.exoplatform.services.database;
 import java.util.List;
 
 import org.exoplatform.commons.utils.PageList;
-import org.exoplatform.services.database.annotation.Table;
-import org.exoplatform.services.listener.ListenerService;
 
 /**
  * Created by The eXo Platform SARL

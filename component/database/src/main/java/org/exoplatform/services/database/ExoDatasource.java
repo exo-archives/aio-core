@@ -7,8 +7,7 @@ package org.exoplatform.services.database;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 
-import javax.sql.XAConnection;
-import javax.sql.XADataSource;
+import javax.sql.DataSource;
 
 import org.exoplatform.services.database.table.IDGenerator;
 /**
@@ -26,7 +25,7 @@ public class ExoDatasource {
   final public static int DERBY_DB_TYPE  = 4;
   final public static int   ORACLE_DB_TYPE  = 5;
   
-  private XADataSource xaDatasource_  ;
+  private DataSource xaDatasource_  ;
   private DBTableManager tableManager_ ;
   private IDGenerator  idGenerator_ ;
   private QueryBuilder queryManager_;
@@ -34,9 +33,9 @@ public class ExoDatasource {
   private String databaseVersion_ ;
   private int dbType_ = STANDARD_DB_TYPE;
   
-  public ExoDatasource(XADataSource ds) throws Exception {
+  public ExoDatasource(DataSource ds) throws Exception {
     xaDatasource_ = ds ;
-    DatabaseMetaData metaData = ds.getXAConnection().getConnection().getMetaData() ;
+    DatabaseMetaData metaData = ds.getConnection().getMetaData() ;
     databaseName_ = metaData.getDatabaseProductName() ;
     databaseVersion_ = metaData.getDatabaseProductVersion() ;
     
@@ -60,14 +59,10 @@ public class ExoDatasource {
     queryManager_ = new QueryBuilder(dbType_);
   }
   
-  public XADataSource getDatasource() { return xaDatasource_ ;}
-
-  public XAConnection getXAConnection() throws Exception {
-    return  xaDatasource_.getXAConnection() ;
-  }
+  public DataSource getDatasource() { return xaDatasource_ ;}
 
   public Connection getConnection() throws Exception {
-    return xaDatasource_.getXAConnection().getConnection() ;
+    return xaDatasource_.getConnection() ;
   }
   
   public void closeConnection(Connection conn) throws Exception {
