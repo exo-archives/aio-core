@@ -23,8 +23,10 @@ public abstract class DAO<T extends DBObject> {
 
   protected ExoDatasource eXoDS_ ;
   protected DBObjectMapper<T> mapper_; 
-
-
+//TODO need remove
+  static int totalQueryTime = 0;
+  static int totalBathTime = 0;
+  static int totalCloseConnect = 0;
   public DAO(ExoDatasource datasource) {
     eXoDS_ = datasource ;
     mapper_ = new ReflectionMapper<T>();
@@ -63,15 +65,22 @@ public abstract class DAO<T extends DBObject> {
   }
   
   protected T loadUnique(Connection connection, String query) throws Exception {
-    Statement statement = connection.createStatement() ;
-//    System.out.println(" Executed query: "+query) ;
-    ResultSet resultSet =  statement.executeQuery(query) ;  
-    if(!resultSet.next()) {return null ;}
-    T bean =  createInstance() ;
-    mapper_.mapResultSet(resultSet, bean) ;
-    resultSet.close() ;
-    statement.close() ;
-    return bean ;
+    Statement statement = null;
+    try{
+      statement = connection.createStatement() ;
+    System.out.println(" Executed query: "+query) ;
+//      long startGet = System.currentTimeMillis();
+      ResultSet resultSet =  statement.executeQuery(query) ;  
+//      totalQueryTime += System.currentTimeMillis() - startGet;
+//      System.out.println(" \n\n\n == > total time to Query " + totalQueryTime+"\n\n");
+      if(!resultSet.next()) {return null ;}
+      T bean =  createInstance() ;
+      mapper_.mapResultSet(resultSet, bean) ;
+      resultSet.close() ;
+      return bean ;
+    } finally {
+      if(statement != null) statement.close() ;
+    }
   }
 
   protected void loadInstances(String loadQuery, List<T> list) throws Exception {
@@ -87,7 +96,10 @@ public abstract class DAO<T extends DBObject> {
   
   protected void loadInstances(Connection connection, String loadQuery, List<T> list) throws Exception {
     Statement statement = connection.createStatement() ;
+//    long startGet = System.currentTimeMillis();
     ResultSet resultSet =  statement.executeQuery(loadQuery) ;
+//    totalQueryTime += System.currentTimeMillis() - startGet;
+//    System.out.println(" \n\n\n == > total time to Query " + totalQueryTime+"\n\n");
     while (resultSet.next()) {
       T bean = createInstance() ;
       mapper_.mapResultSet(resultSet, bean) ;
@@ -112,7 +124,10 @@ public abstract class DAO<T extends DBObject> {
     PreparedStatement statement = connection.prepareStatement(query) ;
     if(bean != null) mapper_.mapUpdate(bean, statement) ;    
 //    System.out.println(" Executed query: "+query) ;
+    long startGet = System.currentTimeMillis();
     statement.executeUpdate() ;
+    totalQueryTime += System.currentTimeMillis() - startGet;
+//    System.out.println(" \n\n\n == > total time to Query " + totalQueryTime+"\n\n");
     eXoDS_.commit(connection) ;
     statement.close();
   }
@@ -131,7 +146,10 @@ public abstract class DAO<T extends DBObject> {
   @SuppressWarnings("unchecked")
   protected <E> E loadDBField(Connection connection, String query) throws Exception {
     Statement statement = connection.createStatement() ;
+    long startGet = System.currentTimeMillis();
     ResultSet resultSet =  statement.executeQuery(query) ;
+    totalQueryTime += System.currentTimeMillis() - startGet;
+//    System.out.println(" \n\n\n == > total time to Query " + totalQueryTime+"\n\n");
     if(!resultSet.next()) return null ;
     E value =  (E)resultSet.getObject(1);
     resultSet.close() ;

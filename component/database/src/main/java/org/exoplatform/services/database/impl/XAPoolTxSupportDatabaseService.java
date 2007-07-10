@@ -10,10 +10,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.sql.DataSource;
-import javax.sql.XADataSource;
 
+import org.enhydra.jdbc.pool.StandardXAPoolDataSource;
 import org.enhydra.jdbc.standard.StandardXADataSource;
-import org.enhydra.jdbc.pool.StandardXAPoolDataSource ;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.PropertiesParam;
 import org.exoplatform.services.database.DatabaseService;
@@ -62,7 +61,7 @@ public class XAPoolTxSupportDatabaseService implements DatabaseService {
   }
   
   public void closeConnection(Connection conn) throws Exception {
-    conn.close() ;
+    defaultDS_.closeConnection(conn) ;
   }
   
   public TransactionService getTransactionService() throws Exception { return txService_ ; }
@@ -81,8 +80,8 @@ public class XAPoolTxSupportDatabaseService implements DatabaseService {
     StandardXAPoolDataSource pool = new StandardXAPoolDataSource(3);
     pool.setMinSize(Integer.parseInt(props.get("connection.min-size"))) ;
     pool.setMaxSize(Integer.parseInt(props.get("connection.max-size"))) ;
-    //pool.setUser(props.get("connection.login")) ;
-    //pool.setPassword(props.get("connection.password")) ;
+    pool.setUser(props.get("connection.login")) ;
+    pool.setPassword(props.get("connection.password")) ;
     pool.setDataSource(ds) ;
     return pool ;
   }

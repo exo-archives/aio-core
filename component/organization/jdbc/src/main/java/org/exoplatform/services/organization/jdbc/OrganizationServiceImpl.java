@@ -38,11 +38,22 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
     userProfileDAO_ =  new UserProfileDAOImpl(listenerService, datasource, new UserProfileMapper() ) ;
     
     DBTableManager dbManager = datasource.getDBTableManager() ;
-    if(!dbManager.hasTable(UserImpl.class)) dbManager.createTable(UserImpl.class, true) ;
-    if(!dbManager.hasTable(GroupImpl.class)) dbManager.createTable(GroupImpl.class, true) ;
-    if(!dbManager.hasTable(MembershipTypeImpl.class)) dbManager.createTable(MembershipTypeImpl.class, true) ;
-    if(!dbManager.hasTable(UserProfileData.class)) dbManager.createTable(UserProfileData.class, true) ;
-    if(!dbManager.hasTable(MembershipImpl.class)) dbManager.createTable(MembershipImpl.class, true) ;
+//    try{
+      if(!dbManager.hasTable(UserImpl.class))
+        dbManager.createTable(UserImpl.class, false) ;
+//      int k = 3/0;
+//    } catch(Exception e) {
+//      e.printStackTrace();
+//    }
+   
+    if(!dbManager.hasTable(GroupImpl.class)) 
+      dbManager.createTable(GroupImpl.class, false) ;
+    if(!dbManager.hasTable(MembershipTypeImpl.class)) 
+      dbManager.createTable(MembershipTypeImpl.class, false) ;
+    if(!dbManager.hasTable(UserProfileData.class)) 
+      dbManager.createTable(UserProfileData.class, false) ;
+    if(!dbManager.hasTable(MembershipImpl.class))
+      dbManager.createTable(MembershipImpl.class, false) ;
   }
   
   static class UserMapper implements DBObjectMapper<UserImpl> {
@@ -56,15 +67,15 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
       if(date == null) date = Calendar.getInstance().getTime();
       java.sql.Date lastLogin = new java.sql.Date(date.getTime());
       return new String[][] {
-          {"id", String.valueOf(bean.getDBObjectId()) },
-          {"username", bean.getUserName() },
-          {"password", bean.getPassword() },
-          {"firstname",bean.getFirstName() },
-          {"lastname", bean.getLastName() },
-          {"email",    bean.getEmail() },
-          {"createdDate", createdDate.toString() },
-          {"lastLoginTime", lastLogin.toString()},
-          {"organizationId", bean.getOrganizationId()}
+          {"ID", String.valueOf(bean.getDBObjectId()) },
+          {"USER_NAME", bean.getUserName() },
+          {"PASSWORD", bean.getPassword() },
+          {"FIRST_NAME",bean.getFirstName() },
+          {"LAST_NAME", bean.getLastName() },
+          {"EMAIL",    bean.getEmail() },
+          {"CREATED_DATE", createdDate.toString() },
+          {"LAST_LOGIN_TIME", lastLogin.toString()},
+          {"ORGANIZATION_ID", bean.getOrganizationId()}
       };
     }
 
@@ -87,21 +98,21 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
     }
 
     public void mapResultSet(ResultSet res, UserImpl bean) throws Exception {  
-      bean.setDBObjectId(res.getLong("id"));
-      bean.setUserName(res.getString("username"));
-      bean.setPassword(res.getString("password"));
-      bean.setFirstName(res.getString("firstname"));
-      bean.setLastName(res.getString("lastname"));
-      bean.setEmail(res.getString("email"));
+      bean.setDBObjectId(res.getLong("ID"));
+      bean.setUserName(res.getString("USER_NAME"));
+      bean.setPassword(res.getString("PASSWORD"));
+      bean.setFirstName(res.getString("FIRST_NAME"));
+      bean.setLastName(res.getString("LAST_NAME"));
+      bean.setEmail(res.getString("EMAIL"));
       
       Calendar calendar = Calendar.getInstance();
-      res.getDate("createdDate", calendar);
+      res.getDate("CREATED_DATE", calendar);
       bean.setCreatedDate(calendar.getTime());
       
-      res.getDate("lastLoginTime", calendar);
+      res.getDate("LAST_LOGIN_TIME", calendar);
       bean.setLastLoginTime(calendar.getTime());
       
-      bean.setOrganizationId(res.getString("organizationId"));
+      bean.setOrganizationId(res.getString("ORGANIZATION_ID"));
     } 
   }
   
@@ -110,11 +121,11 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
 
     public String[][] toParameters(GroupImpl bean) throws Exception {
       return new String[][] {
-          {"groupId", bean.getId() },
-          {"parentId",  bean.getParentId()},
-          {"groupName",  bean.getGroupName()},
-          {"label", bean.getLabel()},
-          {"desc", bean.getDescription()}
+          {"GROUP_ID", bean.getId() },
+          {"PARENT_ID",  bean.getParentId()},
+          {"GROUP_NAME",  bean.getGroupName()},
+          {"LABEL", bean.getLabel()},
+          {"GROUP_DESC", bean.getDescription()}
       };
     }
 
@@ -127,12 +138,12 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
     }
 
     public void mapResultSet(ResultSet res, GroupImpl bean) throws Exception {
-      bean.setDBObjectId(res.getLong("id"));
-      bean.setId(res.getString("groupId"));
-      bean.setParentId(res.getString("parentId"));
-      bean.setGroupName(res.getString("groupName"));
-      bean.setLabel(res.getString("label"));
-      bean.setDescription(res.getString("desc"));
+      bean.setDBObjectId(res.getLong("ID"));
+      bean.setId(res.getString("GROUP_ID"));
+      bean.setParentId(res.getString("PARENT_ID"));
+      bean.setGroupName(res.getString("GROUP_NAME"));
+      bean.setLabel(res.getString("LABEL"));
+      bean.setDescription(res.getString("GROUP_DESC"));
     } 
   }
   
@@ -147,11 +158,11 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
       if(date == null) date = Calendar.getInstance().getTime();
       java.sql.Date modifiedDate = new java.sql.Date(date.getTime());
       return new String[][] {
-          {"name", bean.getName() },
-          {"owner",  bean.getOwner()},
-          {"description",  bean.getDescription()},
-          {"createdDate", createdDate.toString() },
-          {"lastLoginTime", modifiedDate.toString()}     
+          {"MT_NAME", bean.getName() },
+          {"MT_OWNER",  bean.getOwner()},
+          {"MT_DESCRIPTION",  bean.getDescription()},
+          {"CREATED_DATE", createdDate.toString() },
+          {"LAST_LOGIN_TIME", modifiedDate.toString()}     
       };
     }
     
@@ -170,16 +181,16 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
     }
     
     public void mapResultSet(ResultSet res, MembershipTypeImpl bean) throws Exception {
-      bean.setDBObjectId(res.getLong("id"));
-      bean.setName(res.getString("name"));
-      bean.setOwner(res.getString("owner"));
-      bean.setDescription(res.getString("description"));
+      bean.setDBObjectId(res.getLong("ID"));
+      bean.setName(res.getString("MT_NAME"));
+      bean.setOwner(res.getString("MT_OWNER"));
+      bean.setDescription(res.getString("MT_DESCRIPTION"));
       
       Calendar calendar = Calendar.getInstance();
-      res.getDate("createdDate", calendar);
+      res.getDate("CREATED_DATE", calendar);
       bean.setCreatedDate(calendar.getTime());
       
-      res.getDate("modifiedDate", calendar);
+      res.getDate("MODIFIED_DATE", calendar);
       bean.setModifiedDate(calendar.getTime());
     }
   }
@@ -188,10 +199,10 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
 
     public String[][] toParameters(MembershipImpl bean) throws Exception {
       return new String[][] {
-          {"membershipId", bean.getId() },
-          {"membershipType",  bean.getMembershipType()},
-          {"groupId",  bean.getGroupId()},
-          {"userName", bean.getUserName()}
+          {"MEMBERSHIP_ID", bean.getId() },
+          {"MEMBERSHIP_TYPE",  bean.getMembershipType()},
+          {"GROUP_ID",  bean.getGroupId()},
+          {"USER_NAME", bean.getUserName()}
       };
     }
     
@@ -203,11 +214,11 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
     }
     
     public void mapResultSet(ResultSet res, MembershipImpl bean) throws Exception {
-      bean.setDBObjectId(res.getLong("id"));
-      bean.setId(res.getString("membershipId"));
-      bean.setMembershipType(res.getString("membershipType"));
-      bean.setGroupId(res.getString("groupId"));
-      bean.setUserName(res.getString("userName"));
+      bean.setDBObjectId(res.getLong("ID"));
+      bean.setId(res.getString("MEMBERSHIP_ID"));
+      bean.setMembershipType(res.getString("MEMBERSHIP_TYPE"));
+      bean.setGroupId(res.getString("GROUP_ID"));
+      bean.setUserName(res.getString("USER_NAME"));
     }
     
   }
@@ -216,8 +227,8 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
 
     public String[][] toParameters(UserProfileData bean) throws Exception {
       return new String[][] {
-          {"userName", bean.getUserName() },
-          {"profile",  bean.getProfile()}
+          {"USER_NAME", bean.getUserName() },
+          {"PROFILE",  bean.getProfile()}
       };
     }
     
@@ -227,9 +238,9 @@ public class OrganizationServiceImpl extends  BaseOrganizationService implements
     }
     
     public void mapResultSet(ResultSet res, UserProfileData bean) throws Exception {
-      bean.setDBObjectId(res.getLong("id"));
-      bean.setUserName(res.getString("userName"));
-      bean.setProfile(res.getString("profile"));
+      bean.setDBObjectId(res.getLong("ID"));
+      bean.setUserName(res.getString("USER_NAME"));
+      bean.setProfile(res.getString("PROFILE"));
     }
     
   }

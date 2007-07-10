@@ -15,10 +15,10 @@ import org.exoplatform.services.database.annotation.TableField;
  * Mar 16, 2007  
  */
 @Table(
-    name = "ExoLongID" ,
+    name = "EXO_LONG_ID" ,
     field = {
-        @TableField(name = "name", type = "string", length = 500, unique = true, nullable = false),
-        @TableField(name = "start", type = "long")
+        @TableField(name = "EXO_NAME", type = "string", length = 500, unique = true, nullable = false),
+        @TableField(name = "EXO_START", type = "long")
     }
 )
 public class ExoLongID extends DBObject {

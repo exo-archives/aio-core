@@ -37,7 +37,7 @@ public class QueryBuilder {
       if (i !=  fields.length - 1) query.append(", ") ;      
     }
     query.append(" FROM ").append(table.name());
-    if(id > -1) query.append(" WHERE id = ").append(id);
+    if(id > -1) query.append(" WHERE ID = ").append(id);
     return query.toString() ;
   }
   
@@ -49,7 +49,7 @@ public class QueryBuilder {
     for(int i = 0; i <  fields.length; i++) {
       TableField  field =  fields[i] ;
       query.append(field.name()).append(" = '$").append(field.name()).append('\'') ;
-      if (i !=  fields.length - 1) query.append(", ") ; else query.append(" WHERE id = $id");   
+      if (i !=  fields.length - 1) query.append(", ") ; else query.append(" WHERE ID = $id");   
     }
     return query.toString() ;
   }
@@ -58,7 +58,7 @@ public class QueryBuilder {
     Table table = type.getAnnotation(Table.class) ;
     TableField[]  fields =  table.field() ;
     
-    StringBuilder query = new StringBuilder("INSERT INTO ").append(table.name()).append("(id, ");
+    StringBuilder query = new StringBuilder("INSERT INTO ").append(table.name()).append("(ID, ");
     for(int i = 0; i <  fields.length; i++) {
       TableField  field =  fields[i] ;
       query.append(field.name()) ;
@@ -80,7 +80,7 @@ public class QueryBuilder {
     for(int i = 0; i <  fields.length; i++) {
       TableField  field =  fields[i] ;
       query.append(field.name()).append(" = ?") ;
-      if (i !=  fields.length - 1) query.append(", "); else query.append(" WHERE id = ").append(id); 
+      if (i !=  fields.length - 1) query.append(", "); else query.append(" WHERE ID = ").append(id); 
     }
     
     return query.toString() ;
@@ -90,7 +90,7 @@ public class QueryBuilder {
     Table table = clazz.getAnnotation(Table.class);
     TableField[]  fields =  table.field() ;
     
-    StringBuilder query = new StringBuilder("INSERT INTO ").append(table.name()).append("(id, ");
+    StringBuilder query = new StringBuilder("INSERT INTO ").append(table.name()).append("(ID, ");
     for(int i = 0; i <  fields.length; i++) {
       TableField  field =  fields[i] ;
       query.append(field.name()) ;
@@ -110,7 +110,7 @@ public class QueryBuilder {
   public <T extends DBObject> String createRemoveQuery(Class<T> type, long id) throws Exception {
     Table table = type.getAnnotation(Table.class) ;
     StringBuilder builder = new StringBuilder("DELETE FROM ");
-    builder.append(table.name()).append(" WHERE id = ").append(id).toString();
+    builder.append(table.name()).append(" WHERE ID = ").append(id).toString();
     return builder.toString();
   }
   

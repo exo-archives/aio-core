@@ -53,7 +53,7 @@ public class RemoveMembershipListener extends Listener<Object, Object>{
       MembershipType memberType = (MembershipType) target;
       MembershipDAOImpl mtHandler = (MembershipDAOImpl) service_.getMembershipHandler();
       DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
-      query.addLIKE("membershipType", memberType.getName());
+      query.addLIKE("MEMBERSHIP_TYPE", memberType.getName());
       mtHandler.removeMemberships(query, true);
       }catch(Exception e){ e.printStackTrace(); }
     }

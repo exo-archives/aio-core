@@ -26,10 +26,39 @@
     </dependency>
 
     <dependency>
+      <groupId>com.microsoft</groupId>
+      <artifactId>sqljdbc</artifactId>
+      <version>1.1.1501</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.ibm.db2</groupId>
+      <artifactId>db2jcc</artifactId>
+      <version>9.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.ibm.db2</groupId>
+      <artifactId>db2jcc_license_cu</artifactId>
+      <version>9.1</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>oracle</groupId>
+      <artifactId>ojdbc</artifactId>
+      <version>1.4</version>
+    </dependency>    
+    
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql-jdbc3</artifactId>
+      <version>8.2-505</version>
+    </dependency>
+    
+    <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
       <version>5.0.5</version>
     </dependency>
-
   </dependencies>
 </project>

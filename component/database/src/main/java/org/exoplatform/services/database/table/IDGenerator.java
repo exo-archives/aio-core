@@ -38,8 +38,8 @@ public class IDGenerator extends DAO<ExoLongID>  {
   
   public ExoLongID loadObjectByName(String name) throws Exception {
     Table table = ExoLongID.class.getAnnotation(Table.class) ;   
-    StringBuilder builder = new StringBuilder("SELECT NAME, START FROM ");
-    builder.append(table.name()).append(" WHERE name = '").append(name).append('\'');
+    StringBuilder builder = new StringBuilder("SELECT EXO_NAME, EXO_START FROM ");
+    builder.append(table.name()).append(" WHERE EXO_NAME = '").append(name).append('\'');
     return loadUnique(builder.toString()) ;
   }
   

@@ -43,7 +43,7 @@ public class MembershipTypeDAOImpl extends StandardSQLDAO<MembershipTypeImpl> im
 
   public MembershipType findMembershipType(String name) throws Exception {
     DBObjectQuery<MembershipTypeImpl> query = new DBObjectQuery<MembershipTypeImpl>(MembershipTypeImpl.class);
-    query.addLIKE("name", name);
+    query.addLIKE("MT_NAME", name);
     return loadUnique(query.toQuery());
   }
 
@@ -56,7 +56,7 @@ public class MembershipTypeDAOImpl extends StandardSQLDAO<MembershipTypeImpl> im
   @SuppressWarnings("unused")
   public MembershipType removeMembershipType(String name, boolean broadcast) throws Exception {
     DBObjectQuery<MembershipTypeImpl> query = new DBObjectQuery<MembershipTypeImpl>(MembershipTypeImpl.class);
-    query.addLIKE("name", name);
+    query.addLIKE("MT_NAME", name);
     MembershipTypeImpl mt = loadUnique(query.toQuery());
     if(mt == null) return null;
     if(broadcast) listenerService_.broadcast(MembershipTypeHandler.PRE_DELETE_MEMBERSHIP_TYPE_EVENT, this, mt);

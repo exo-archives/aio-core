@@ -18,13 +18,13 @@ import org.exoplatform.services.database.annotation.TableField;
 import org.exoplatform.services.organization.Group;
 
 @Table(
-    name = "GroupUsers" ,
+    name = "EXO_GROUP" ,
     field = {
-        @TableField(name = "groupId", type = "string", length = 100, unique = true, nullable = false),
-        @TableField(name = "parentId", type = "string", length = 100),
-        @TableField(name = "groupName", type = "string", length = 500),
-        @TableField(name = "label", type = "string", length = 500),
-        @TableField(name = "desc", type = "string", length = 1000)
+        @TableField(name = "GROUP_ID", type = "string", length = 100, unique = true, nullable = false),
+        @TableField(name = "PARENT_ID", type = "string", length = 100),
+        @TableField(name = "GROUP_NAME", type = "string", length = 500),
+        @TableField(name = "LABEL", type = "string", length = 500),
+        @TableField(name = "GROUP_DESC", type = "string", length = 1000)
     }
 )
 public class GroupImpl extends DBObject implements Group {

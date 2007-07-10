@@ -19,10 +19,10 @@ import com.thoughtworks.xstream.io.xml.XppDriver;
  * Apr 8, 2007  
  */
 @Table(
-    name = "UserProfile" ,
+    name = "EXO_USER_PROFILE" ,
     field = {
-        @TableField(name = "userName", type = "string", length = 100, unique = true, nullable = false),
-        @TableField(name = "profile", type = "string", length = 2000)
+        @TableField(name = "USER_NAME", type = "string", length = 100, unique = true, nullable = false),
+        @TableField(name = "PROFILE", type = "string", length = 2000)
     }
 )
 public class UserProfileData extends DBObject {

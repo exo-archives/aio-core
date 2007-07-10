@@ -8,16 +8,16 @@ import org.exoplatform.services.database.annotation.TableField;
 import org.exoplatform.services.organization.User;
 
 @Table(
-    name = "User" ,
+    name = "EXO_USER" ,
     field = {
-        @TableField(name = "userName", type = "string", length = 200, unique = true, nullable = false),
-        @TableField(name = "password", type = "string", length = 100),
-        @TableField(name = "firstName", type = "string", length = 500),
-        @TableField(name = "lastName", type = "string", length = 200),
-        @TableField(name = "email", type = "string", length = 200),
-        @TableField(name = "createdDate", type = "date", length = 100),
-        @TableField(name = "lastLoginTime", type = "date", length = 100),
-        @TableField(name = "organizationId", type = "string", length = 100)
+        @TableField(name = "USER_NAME", type = "string", length = 200, unique = true, nullable = false),
+        @TableField(name = "PASSWORD", type = "string", length = 100),
+        @TableField(name = "FIRST_NAME", type = "string", length = 500),
+        @TableField(name = "LAST_NAME", type = "string", length = 200),
+        @TableField(name = "EMAIL", type = "string", length = 200),
+        @TableField(name = "CREATED_DATE", type = "date", length = 100),
+        @TableField(name = "LAST_LOGIN_TIME", type = "date", length = 100),
+        @TableField(name = "ORGANIZATION_ID", type = "string", length = 100)
     }
 )
 public class UserImpl extends DBObject implements User {

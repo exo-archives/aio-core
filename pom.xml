@@ -49,7 +49,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <skip>${test.skip}</skip>
-          <useFile>true</useFile>
+          <useFile>false</useFile>
           <forkMode>once</forkMode><!--once , pertest -->
           <testFailureIgnore>true</testFailureIgnore>
           <includes>

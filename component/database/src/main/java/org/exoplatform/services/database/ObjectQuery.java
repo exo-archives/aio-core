@@ -51,7 +51,7 @@ public class ObjectQuery {
   
   public ObjectQuery addLIKE(String field, String value) {
     if(value != null && value.length() > 0)  {
-      parameters_.add(new Parameter(" like ", field, optimizeInputString(value))) ;
+      parameters_.add(new Parameter(" LIKE ", field, optimizeInputString(value))) ;
     }
     return this ;
   }
@@ -63,15 +63,15 @@ public class ObjectQuery {
     return value;
   }
   public ObjectQuery addSUM(String field) {
-    selectParameter_.add(new Parameter("sum", field)) ;
+    selectParameter_.add(new Parameter("SUM", field)) ;
     return this ;
   }
   public ObjectQuery addSelect(String field) {
-    selectParameter_.add(new Parameter("fieldselect", field)) ;
+    selectParameter_.add(new Parameter("FIELDSELECT", field)) ;
     return this ;
   }
   public ObjectQuery addSelectCount(String type) {
-    selectParameter_.add(new Parameter("countselect", type)) ;
+    selectParameter_.add(new Parameter("COUNTSELECT", type)) ;
     return this ;
   }
   public ObjectQuery addSelectMaxMin(String op, String field) {
@@ -80,17 +80,17 @@ public class ObjectQuery {
   }
   
   public ObjectQuery setGroupBy(String field) {
-    groupBy_ = " group by o." + field ;
+    groupBy_ = " GROUP BY o." + field ;
     return this ;
   }
   
   public ObjectQuery setAscOrderBy(String field) {
-    orderBy_ = " order by o." + field + " asc";
+    orderBy_ = " ORDER BY o." + field + " asc";
     return this ;
   }
   
   public ObjectQuery setDescOrderBy(String field) {
-    orderBy_ = " order by o." + field + " desc";
+    orderBy_ = " ORDER BY o." + field + " desc";
     return this ;
   }
   
@@ -98,9 +98,9 @@ public class ObjectQuery {
     StringBuffer b = new StringBuffer() ;
     b.append("from o in class ").append(type_.getName()) ;
     if(parameters_.size() > 0) {
-      b.append(" where ") ;
+      b.append(" WHERE ") ;
       for(int i = 0; i < parameters_.size(); i ++) {
-        if(i > 0) b.append(" and ") ;
+        if(i > 0) b.append(" AND ") ;
         Parameter p = parameters_.get(i) ;
         if(p.value_ instanceof String) {
           b.append(" o.").append(p.field_).append(p.op_).append("'").append(p.value_).append("'") ;
@@ -125,7 +125,7 @@ public class ObjectQuery {
         if(p.op_.equals("fieldselect")){
           b.append("o.").append(p.field_) ;
         }else if(p.op_.equals("countselect")){
-          b.append("count");
+          b.append("COUNT");
           if (p.field_ != "" || p.field_.length() > 0){
             b.append("(").append(p.field_).append(" o)");
           }else{
@@ -148,7 +148,7 @@ public class ObjectQuery {
         } else if(p.value_ instanceof Date) {
           String value = ft_.format((Date) p.value_) ;
           b.append(" o.").append(p.field_).append(p.op_).append("'").append(value).append("'") ;
-        } else if(p.op_.equals("max") || p.op_.equals("min")){
+        } else if(p.op_.equals("MAX") || p.op_.equals("MIN")){
           b.append(p.op_).append("(").append("o.").append(p.field_).append(") ");
         } else{
           b.append(" o.").append(p.field_).append(p.op_).append(p.value_);
@@ -161,11 +161,11 @@ public class ObjectQuery {
   }
   public String getHibernateCountQuery() {
     StringBuffer b = new StringBuffer() ;
-    b.append("select count(o) from o in class ").append(type_.getName()) ;
+    b.append("SELECT COUNT(o) FROM o IN CLASS ").append(type_.getName()) ;
     if(parameters_.size() > 0) {
-      b.append(" where ") ;
+      b.append(" WHERE ") ;
       for(int i = 0; i < parameters_.size(); i ++) {
-        if(i > 0) b.append(" and ") ;
+        if(i > 0) b.append(" AND ") ;
         Parameter p = parameters_.get(i) ;
         if(p.value_ instanceof String) {
           b.append(" o.").append(p.field_).append(p.op_).append("'").append(p.value_).append("'") ;

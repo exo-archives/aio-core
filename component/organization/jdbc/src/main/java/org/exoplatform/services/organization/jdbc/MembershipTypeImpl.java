@@ -19,13 +19,13 @@ import org.exoplatform.services.organization.MembershipType;
  * Time: 1:12:22 PM
  */
 @Table(
-    name = "MembershipType" ,
+    name = "EXO_MEMBERSHIP_TYPE" ,
     field = {
-        @TableField(name = "name", type = "string", length = 200, unique = true, nullable = false),
-        @TableField(name = "owner", type = "string", length = 100),
-        @TableField(name = "description", type = "string", length = 500),
-        @TableField(name = "createdDate", type = "date", length = 100),
-        @TableField(name = "modifiedDate", type = "date", length = 100)
+        @TableField(name = "MT_NAME", type = "string", length = 200, unique = true, nullable = false),
+        @TableField(name = "MT_OWNER", type = "string", length = 100),
+        @TableField(name = "MT_DESCRIPTION", type = "string", length = 500),
+        @TableField(name = "CREATED_DATE", type = "date", length = 100),
+        @TableField(name = "MODIFIED_DATE", type = "date", length = 100)
     }
 )
 public class MembershipTypeImpl extends DBObject implements MembershipType {

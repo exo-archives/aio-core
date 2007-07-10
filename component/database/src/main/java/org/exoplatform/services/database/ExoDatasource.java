@@ -23,7 +23,12 @@ public class ExoDatasource {
   final public static int MYSQL_DB_TYPE  = 2;
   final public static int DB2_DB_TYPE  = 3;
   final public static int DERBY_DB_TYPE  = 4;
-  final public static int   ORACLE_DB_TYPE  = 5;
+  final public static int ORACLE_DB_TYPE  = 5;
+  final public static int SQL_SERVER_TYPE = 6;
+  //TODO need remove
+  static int totalGetConnect = 0;
+//  static int totalCommit = 0;
+//  static int totalCloseConnect = 0;
   final public static int MSSQL_DB_TYPE  = 6;
   final public static int SYSBASE_DB_TYPE  = 7;
   final public static int POSTGRES_DB_TYPE  = 8;
@@ -35,14 +40,17 @@ public class ExoDatasource {
   private String databaseName_ ;
   private String databaseVersion_ ;
   private int dbType_ = STANDARD_DB_TYPE;
+  Connection conn ;
   
   public ExoDatasource(DataSource ds) throws Exception {
     xaDatasource_ = ds ;
     DatabaseMetaData metaData = ds.getConnection().getMetaData() ;
     databaseName_ = metaData.getDatabaseProductName() ;
     databaseVersion_ = metaData.getDatabaseProductVersion() ;
-    
+  
+     
     String dbname = databaseName_.toLowerCase() ;
+    System.out.println("\n\n\n\n------->DB Name: " + dbname + "\n\n\n\n");
     if(dbname.indexOf("oracle") >= 0) {
       dbType_ = ORACLE_DB_TYPE ;
     } else if(dbname.indexOf("hsql") >= 0) {
@@ -53,6 +61,8 @@ public class ExoDatasource {
       dbType_ = DERBY_DB_TYPE ;
     } else if(dbname.indexOf("db2") >= 0) {
       dbType_ = DB2_DB_TYPE ;
+    }else if(dbname.indexOf("server") >= 0) {
+      dbType_ = SQL_SERVER_TYPE;
     } else {
       dbType_ = STANDARD_DB_TYPE ;
     }
@@ -69,11 +79,18 @@ public class ExoDatasource {
   }
   
   public void closeConnection(Connection conn) throws Exception {
+//    long startGet = System.currentTimeMillis();
     conn.close() ;
+//    totalCloseConnect += System.currentTimeMillis() - startGet;
+//    System.out.println(" \n\n\n == > total time to Close connection "+totalCloseConnect+"\n\n");
   }
   
   public void commit(Connection conn) throws Exception {
+//    long startGet = System.currentTimeMillis();
+    conn.setAutoCommit(false);
     conn.commit() ;
+//    totalCommit += System.currentTimeMillis() - startGet;
+//    System.out.println(" \n\n\n == > total time to Commit "+totalCommit+"\n\n");
   }
 
   public  DBTableManager getDBTableManager()  { return tableManager_ ; }

@@ -4,6 +4,7 @@
  **************************************************************************/
 package org.exoplatform.services.database;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -33,8 +34,14 @@ public class DBPageList<T extends DBObject> extends PageList {
     dao_ = dao;
     query_ = query.toQuery();
     
-    Integer counter = dao_.<Integer>loadDBField(query.toCountQuery());
-    super.setAvailablePage(counter.intValue());
+    Object retObj = dao_.<Object>loadDBField(query.toCountQuery());
+    if(retObj instanceof  Integer) {
+      super.setAvailablePage(((Integer)retObj).intValue());
+    }else if (retObj instanceof BigDecimal){
+      super.setAvailablePage(((BigDecimal)retObj).intValue());
+    }else{
+      super.setAvailablePage(((Long)retObj).intValue());
+    }
   }
   
   public DBPageList(int pageSize, DAO<T> dao, String query, String queryCounter) throws Exception {
@@ -42,8 +49,15 @@ public class DBPageList<T extends DBObject> extends PageList {
     dao_ = dao;
     query_ = query;
     
-    Integer counter = dao_.<Integer>loadDBField(queryCounter);
-    super.setAvailablePage(counter.intValue());
+    Object retObj = dao_.<Object>loadDBField(queryCounter);
+    if(retObj instanceof  Integer) {
+      super.setAvailablePage(((Integer)retObj).intValue());
+    }else if (retObj instanceof BigDecimal){
+      super.setAvailablePage(((BigDecimal)retObj).intValue());
+    }else {
+      super.setAvailablePage(((Long)retObj).intValue());
+    }
+//    super.setAvailablePage(counter.intValue());
   }
   
   protected void populateCurrentPage(int currentPage) throws Exception {

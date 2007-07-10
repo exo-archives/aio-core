@@ -8,8 +8,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javax.sql.DataSource;
-
 import org.exoplatform.services.database.annotation.Table;
 import org.exoplatform.services.database.annotation.TableField;
 /**
@@ -20,10 +18,10 @@ import org.exoplatform.services.database.annotation.TableField;
  */
 public class StandardSQLTableManager extends DBTableManager {
   
-  private DataSource xaDatasource_ ;
+  private ExoDatasource exoDatasource;
   
   public StandardSQLTableManager(ExoDatasource  datasource)  {
-    xaDatasource_ = datasource.getDatasource() ;
+    exoDatasource = datasource;
   }
   
   public <T extends DBObject> void createTable(Class<T>  type,  boolean dropIfExist) throws Exception {
@@ -31,14 +29,9 @@ public class StandardSQLTableManager extends DBTableManager {
     if(table == null) {
       throw new Exception("Cannot find the annotation for class " + type.getClass().getName()) ;
     }
-//    try{
-//      int k = 3/0;
-//    }catch (Exception e) {
-//      e.printStackTrace();
-//    }
     StringBuilder builder = new StringBuilder(1000) ;
     builder.append("CREATE TABLE ").append(table.name()).append(" (") ;
-    builder.  append("id BIGINT PRIMARY KEY, ");
+    appendId(builder);
     TableField[]  fields = table.field() ; 
     for(int i = 0; i <  fields.length; i++) {
       TableField field = fields[i] ;
@@ -48,7 +41,7 @@ public class StandardSQLTableManager extends DBTableManager {
       } else if("int".equals(fieldType)) {
         appendIntegerField(field, builder);
       } else if("long".equals(fieldType)) {
-        appendLongField(field, builder);
+          appendLongField(field, builder);
       } else if("float".equals(fieldType)) {
         appendFloatField(field, builder);
       } else if("double".equals(fieldType)) {
@@ -56,7 +49,7 @@ public class StandardSQLTableManager extends DBTableManager {
       } else if("boolean".equals(fieldType)) {
         appendBooleanField(field, builder);
       } else if("date".equals(fieldType)) {
-        appendDateField(field, builder);
+          appendDateField(field, builder);
       } else if("binary".equals(fieldType)) {
         appendBinaryField(field, builder);
       }
@@ -65,27 +58,28 @@ public class StandardSQLTableManager extends DBTableManager {
     builder.append(")") ;
     
     // print  out  the  sql string 
-    Connection connection = xaDatasource_.getConnection() ;
-    Statement statement = connection.createStatement();
+    Connection conn = exoDatasource.getConnection() ;
+    conn.setAutoCommit(false);
+    Statement statement = conn.createStatement();
     System.out.println("QUERY: \n  " + builder + "\n");
     if(dropIfExist && hasTable(type)) statement.execute("DROP TABLE IF EXISTS " + table.name());
     statement.execute(builder.toString()) ;
     statement.close() ;
-    connection.commit() ;
-    connection.close() ;
+    conn.commit() ;
+    exoDatasource.closeConnection(conn);
   }
-  
+
   public <T extends DBObject> void dropTable(Class<T>  type) throws Exception {
     Table table = type.getAnnotation(Table.class);
     if (table == null) {
       throw new Exception("Can not find the annotation for class " + type.getClass().getName());
     }
-    Connection conn = xaDatasource_.getConnection();
+    Connection conn = exoDatasource.getConnection();
     Statement s = conn.createStatement();
     s.execute("DROP TABLE " + table.name());
     s.close();
     conn.commit();
-    conn.close();    
+    exoDatasource.closeConnection(conn);  
   }
   
   public <T extends DBObject> boolean hasTable(Class<T> type)  throws Exception {
@@ -93,7 +87,7 @@ public class StandardSQLTableManager extends DBTableManager {
     if (table == null) {
       throw new Exception("Can not find the annotation for class " + type.getClass().getName());
     }
-    Connection connection = xaDatasource_.getConnection();
+    Connection connection = exoDatasource.getConnection();
     Statement statement = connection.createStatement();
     try {
       if(statement.execute("SELECT 1 FROM " + table.name()) == true) return true;      
@@ -101,9 +95,13 @@ public class StandardSQLTableManager extends DBTableManager {
       return false;      
     } finally {
       statement.close();
-      connection.close();
+      exoDatasource.closeConnection(connection);
     }
     return false;
+  }
+  
+  protected void appendId(StringBuilder builder) {
+    builder.append("ID BIGINT NOT NULL PRIMARY KEY, ");
   }
   
   protected void appendStringField(TableField field, StringBuilder builder) throws Exception {   
@@ -136,6 +134,9 @@ public class StandardSQLTableManager extends DBTableManager {
   
   protected void appendDateField(TableField field, StringBuilder builder) {
     builder. append(field.name()).append(" DATE");
+  }
+  protected void appendDateTimeField(TableField field, StringBuilder builder) {
+    builder. append(field.name()).append(" DATETIME");
   }
   
   protected void appendBinaryField(TableField field, StringBuilder builder) {

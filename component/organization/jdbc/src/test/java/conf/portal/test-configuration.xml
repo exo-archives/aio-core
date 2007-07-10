@@ -1,51 +1,90 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <configuration>  
-  <!--  
-  <import>classpath:/conf/portal/hibernate-organization-configuration.xml</import> 
-  <import>classpath:/conf/portal/ldap-organization-configuration.xml</import> 
-  <import>classpath:/conf/portal/activedirectory-organization-configuration.xml</import>   
-  -->      
-
   <component> 
     <key>org.exoplatform.services.database.DatabaseService</key>
     <type>org.exoplatform.services.database.impl.XAPoolTxSupportDatabaseService</type>
     <init-params>
-      <properties-param>
+     <!-- ORACLE -->
+       
+     <!-- <properties-param>        
         <name>default</name>
         <description>Connection configuration</description>
-        <property name='connection.driver' value='com.mysql.jdbc.Driver'/>
-        <property name='connection.url' value='jdbc:mysql://192.168.1.15:3306/exodb?relaxAutoCommit=true&amp;autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf8'/>
+        <property name='connection.driver' value='oracle.jdbc.OracleDriver'/>
+        <property name='connection.url' value='jdbc:oracle:thin:@//192.168.1.20:1521/xe'/>
         <property name='connection.login' value='exo'/>
         <property name='connection.password' value='exo'/>
         <property name='connection.min-size' value='3'/>
         <property name='connection.max-size' value='5'/>
-      </properties-param>
-      <!--
-        HSQL
-        <property name='connection.driver' value='org.hsqldb.jdbcDriver'/>
-        <property name='connection.url' value='jdbc:hsqldb:mem:db/default'/>
-        <property name='connection.login' value='sa'/>
-        <property name='connection.password' value=''/>
+      </properties-param>-->
+      
+     <!-- SQL_SERVER-->
+    <!--  <properties-param>
+        <name>default</name>
+        <description>Connection configuration</description>
+        <property name='connection.driver' value='com.microsoft.sqlserver.jdbc.SQLServerDriver'/>
+        <property name='connection.url' value='jdbc:sqlserver://192.168.1.19:1433;databaseName=exodb'/>
+        <property name='connection.login' value='exo'/>
+        <property name='connection.password' value='exo'/>
         <property name='connection.min-size' value='3'/>
         <property name='connection.max-size' value='5'/>
-
-      <properties-param>
-        <name>custom</name>
+      </properties-param>-->
+      
+     <!-- DB2-->
+     <!-- <properties-param>
+        <name>default</name>
+        <description>Connection configuration</description>
+        <property name='connection.driver' value='com.ibm.db2.jcc.DB2Driver'/>
+        <property name='connection.url' value='jdbc:db2://192.168.1.20:50000/exodb'/>
+        <property name='connection.login' value='exoinst'/>
+        <property name='connection.password' value='exo'/>
+        <property name='connection.min-size' value='3'/>
+        <property name='connection.max-size' value='5'/>
+      </properties-param> -->     
+      
+     <!-- POSTGRES-->
+     <!-- <properties-param>
+        <name>default</name>
+        <description>Connection configuration</description>
+        <property name='connection.driver' value='org.postgresql.Driver'/>
+        <property name='connection.url' value='jdbc:postgresql://192.168.1.20:5432/exodb'/>
+        <property name='connection.login' value='exo'/>
+        <property name='connection.password' value='exo'/>
+        <property name='connection.min-size' value='3'/>
+        <property name='connection.max-size' value='5'/>
+      </properties-param>-->
+            
+     <!-- MYSQL-->
+      <!--<properties-param>      
+        <name>default</name>
+        <description>Connection configuration</description>
+        <property name='connection.driver' value='com.mysql.jdbc.Driver'/>
+        <property name='connection.url' 
+          value='jdbc:mysql://192.168.1.20:3306/exodb?relaxAutoCommit=true&amp;autoReconnect=false&amp;useUnicode=true&amp;characterEncoding=utf8'/>
+        <property name='connection.login' value='exo'/>
+        <property name='connection.password' value='exo'/>
+        <property name='connection.min-size' value='3'/>
+        <property name='connection.max-size' value='5'/>
+      </properties-param>-->
+               
+      <!--HSQL-->
+	    <properties-param>
+        <name>default</name>
         <description>Connection configuration</description>
         <property name='connection.driver' value='org.hsqldb.jdbcDriver'/>
-        <property name='connection.url' value='jdbc:hsqldb:mem:db/custom'/>
-        <property name='connection.login' value='sa'/>
-        <property name='connection.password' value=''/>
-        <property name='connection.min-size' value='3'/>
-        <property name='connection.max-size' value='5'/>
+	      <property name='connection.url' value='jdbc:hsqldb:mem:db/default'/>
+	      <property name='connection.login' value='sa'/>
+	      <property name='connection.password' value=''/>
+	      <property name='connection.min-size' value='3'/>
+	      <property name='connection.max-size' value='5'/>
       </properties-param>
-      -->
+      
     </init-params>
   </component> 
-  
-<!--  <import>classpath:/conf/portal/hibernate-organization-configuration.xml</import> 
+
+  <!--  <import>classpath:/conf/portal/hibernate-organization-configuration.xml</import> 
   -->
   <import>classpath:/conf/portal/jdbc-organization-configuration.xml</import> 
-  
+
   <import>classpath:/conf/portal/test-organization-configuration.xml</import>   
-  </configuration>
+  <remove-configuration>org.exoplatform.services.database.HibernateService</remove-configuration>
+</configuration>

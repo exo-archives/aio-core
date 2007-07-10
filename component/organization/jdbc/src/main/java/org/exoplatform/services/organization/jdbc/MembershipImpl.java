@@ -6,12 +6,12 @@ import org.exoplatform.services.database.annotation.TableField;
 import org.exoplatform.services.organization.Membership;
 
 @Table(
-    name = "Membership" ,
+    name = "EX0_MEMBERSHIP" ,
     field = {
-        @TableField(name = "membershipId", type = "string", length = 100, unique = true, nullable = false),
-        @TableField(name = "membershipType", type = "string", length = 100),
-        @TableField(name = "groupId", type = "string", length = 100),
-        @TableField(name = "userName", type = "string", length = 500)
+        @TableField(name = "MEMBERSHIP_ID", type = "string", length = 100, unique = true, nullable = false),
+        @TableField(name = "MEMBERSHIP_TYPE", type = "string", length = 100),
+        @TableField(name = "GROUP_ID", type = "string", length = 100),
+        @TableField(name = "USER_NAME", type = "string", length = 500)
     }
 )
 public class MembershipImpl extends DBObject implements Membership {

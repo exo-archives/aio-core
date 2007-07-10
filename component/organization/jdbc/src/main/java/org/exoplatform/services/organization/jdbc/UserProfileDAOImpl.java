@@ -51,7 +51,7 @@ public class UserProfileDAOImpl  extends StandardSQLDAO<UserProfileData> impleme
   
   private UserProfileData findUserProfileDataByName(String userName) throws Exception{
     DBObjectQuery<UserProfileData> query = new DBObjectQuery<UserProfileData>(UserProfileData.class);
-    query.addLIKE("username", userName);
+    query.addLIKE("USER_NAME", userName);
     return loadUnique(query.toQuery());
   }
   

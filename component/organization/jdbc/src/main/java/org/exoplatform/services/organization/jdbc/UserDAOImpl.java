@@ -68,7 +68,7 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
 
   public User findUserByName(String userName) throws Exception {
     DBObjectQuery<UserImpl> query = new DBObjectQuery<UserImpl>(UserImpl.class);
-    query.addLIKE("username", userName);
+    query.addLIKE("USER_NAME", userName);
     return loadUnique(query.toQuery());
   }
 
@@ -82,12 +82,12 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
    */
   public PageList findUsers(org.exoplatform.services.organization.Query orgQuery) throws Exception {
     DBObjectQuery dbQuery = new DBObjectQuery<UserImpl>(UserImpl.class);
-    dbQuery.addLIKE("userName", orgQuery.getUserName()) ;
-    dbQuery.addLIKE("firstName", orgQuery.getFirstName() ) ;
-    dbQuery.addLIKE("lastName", orgQuery.getLastName()) ;
-    dbQuery.addLIKE("email", orgQuery.getEmail()) ;
-    dbQuery.addGT("lastLoginTime", orgQuery.getFromLoginDate()) ;
-    dbQuery.addLT("lastLoginTime", orgQuery.getToLoginDate()) ;
+    dbQuery.addLIKE("USER_NAME", orgQuery.getUserName()) ;
+    dbQuery.addLIKE("FIRST_NAME", orgQuery.getFirstName() ) ;
+    dbQuery.addLIKE("LAST_NAME", orgQuery.getLastName()) ;
+    dbQuery.addLIKE("EMAIL", orgQuery.getEmail()) ;
+    dbQuery.addGT("LAST_LOGIN_TIME", orgQuery.getFromLoginDate()) ;
+    dbQuery.addLT("LAST_LOGIN_TIME", orgQuery.getToLoginDate()) ;
     return new DBPageList<UserImpl>(20, this, dbQuery.toQuery(), dbQuery.toCountQuery());
   }
 
