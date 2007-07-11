@@ -25,8 +25,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private OrganizationService orgService_ ;
   
   public AuthenticationServiceImpl(ListenerService listenerService, OrganizationService orgService)  {
+    System.out.println("  INIT AuthenticationService...................... ");
     listenerService_ = listenerService ;
     orgService_ =  orgService ;
+    System.out.println("  END AuthenticationService...................... ");
   }
   
   public boolean login(String userName, String password) throws Exception {

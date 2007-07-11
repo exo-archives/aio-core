@@ -5,7 +5,6 @@
 package org.exoplatform.services.organization;
 
 import org.exoplatform.commons.utils.PageList;
-
 /**
  * Created by The eXo Platform SARL
  * Author : Tuan Nguyen

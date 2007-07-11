@@ -9,10 +9,8 @@ import javax.security.auth.Subject;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.exception.ExoServiceException;
-import org.exoplatform.services.log.LogService;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.security.SecurityService;
-
 /**
  * Use with
  * <code>
@@ -75,5 +73,4 @@ public class Tomcat55SecurityServiceImpl extends SecurityServiceImpl implements 
     getSubjects().put(userName, value);
     currentUserHolder.set(userName);
   }
-
 }

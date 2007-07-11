@@ -28,6 +28,7 @@ import org.exoplatform.services.organization.Group;
     }
 )
 public class GroupImpl extends DBObject implements Group {
+  final static public String GROUP_ID_FIELD = "GROUP_ID" ;
   
   private String groupId  ;
   private String parentId  ;
@@ -36,6 +37,7 @@ public class GroupImpl extends DBObject implements Group {
   private String desc ;
   
   public GroupImpl()  {
+  
   }
   
   public GroupImpl(String name) { groupName = name ; }

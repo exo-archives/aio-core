@@ -7,7 +7,6 @@ package org.exoplatform.services.database;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
@@ -123,7 +122,7 @@ public abstract class DAO<T extends DBObject> {
   protected void execute(Connection connection, String query, T bean) throws Exception {
     PreparedStatement statement = connection.prepareStatement(query) ;
     if(bean != null) mapper_.mapUpdate(bean, statement) ;    
-//    System.out.println(" Executed query: "+query) ;
+//   System.out.println(" Executed query: "+query) ;
     long startGet = System.currentTimeMillis();
     statement.executeUpdate() ;
     totalQueryTime += System.currentTimeMillis() - startGet;

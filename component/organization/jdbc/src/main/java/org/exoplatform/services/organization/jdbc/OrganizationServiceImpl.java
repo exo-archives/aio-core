@@ -15,7 +15,6 @@ import org.exoplatform.services.database.DatabaseService;
 import org.exoplatform.services.database.ExoDatasource;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.organization.BaseOrganizationService;
-import org.picocontainer.Startable;
 /**
  * Created by The eXo Platform SARL
  * Author : Mestrallet Benjamin
@@ -25,7 +24,7 @@ import org.picocontainer.Startable;
  * Date: Aug 22, 2003
  * Time: 4:51:21 PM
  */
-public class OrganizationServiceImpl extends  BaseOrganizationService implements  Startable {
+public class OrganizationServiceImpl extends  BaseOrganizationService {
 
   public OrganizationServiceImpl(ListenerService listenerService,  
                                  DatabaseService dbService) throws Exception {
