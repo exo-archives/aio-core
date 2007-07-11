@@ -93,6 +93,7 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
 
   @SuppressWarnings("unchecked")
   public Collection findGroupByMembership(String userName, String membershipType) throws Exception {
+    if(userName == null || membershipType == null) return null;
     MembershipHandler membershipHandler = getMembershipHandler();
     List<Membership> members = (List<Membership>) membershipHandler.findMembershipsByUser(userName);
     List<Group> groups = new ArrayList<Group>();

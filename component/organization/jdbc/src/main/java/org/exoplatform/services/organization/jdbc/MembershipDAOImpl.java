@@ -58,12 +58,14 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
   }
 
   public Membership findMembership(String id) throws Exception {
+    if(id == null ) return null;
     DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
     query.addLIKE("MEMBERSHIP_ID", id);
     return loadUnique(query.toQuery());
   }
 
   public Membership findMembershipByUserGroupAndType(String userName, String groupId, String type) throws Exception {
+    if(userName == null || groupId == null || type == null) return null;
     DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
     query.addLIKE("USER_NAME", userName);
     query.addLIKE("GROUP_ID", groupId);
@@ -72,6 +74,7 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
   }
   
   public Collection findMembershipsByGroup(Group group) throws Exception {
+    if(group == null) return null;
     List<MembershipImpl> list = new ArrayList<MembershipImpl>();
     DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
     query.addLIKE("GROUP_ID", group.getId());
@@ -80,6 +83,7 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
   }
 
   public Collection findMembershipsByUser(String userName) throws Exception {
+    if(userName == null) return null;
     List<MembershipImpl> list = new ArrayList<MembershipImpl>();
     DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
     query.addLIKE("USER_NAME", userName);
@@ -88,6 +92,7 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
   }
 
   public Collection findMembershipsByUserAndGroup(String userName, String groupId) throws Exception {
+    if(userName ==null || groupId == null) return null;
     List<MembershipImpl> list = new ArrayList<MembershipImpl>();
     DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
     query.addLIKE("USER_NAME", userName);
