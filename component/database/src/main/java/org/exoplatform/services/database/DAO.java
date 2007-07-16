@@ -67,7 +67,7 @@ public abstract class DAO<T extends DBObject> {
     Statement statement = null;
     try{
       statement = connection.createStatement() ;
-    System.out.println(" Executed query: "+query) ;
+//    System.out.println(" Executed query: "+query) ;
 //      long startGet = System.currentTimeMillis();
       ResultSet resultSet =  statement.executeQuery(query) ;  
 //      totalQueryTime += System.currentTimeMillis() - startGet;
@@ -123,9 +123,9 @@ public abstract class DAO<T extends DBObject> {
     PreparedStatement statement = connection.prepareStatement(query) ;
     if(bean != null) mapper_.mapUpdate(bean, statement) ;    
 //   System.out.println(" Executed query: "+query) ;
-    long startGet = System.currentTimeMillis();
+//    long startGet = System.currentTimeMillis();
     statement.executeUpdate() ;
-    totalQueryTime += System.currentTimeMillis() - startGet;
+//    totalQueryTime += System.currentTimeMillis() - startGet;
 //    System.out.println(" \n\n\n == > total time to Query " + totalQueryTime+"\n\n");
     eXoDS_.commit(connection) ;
     statement.close();
