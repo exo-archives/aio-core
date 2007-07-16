@@ -59,39 +59,39 @@ public class TestOrganizationService extends BasicTestCase {
     return "\n\n***************** Test organization service ***********************\n\n";
   }
   
-  public void testUserPageSize() throws Exception{    
-    runtest = false;
-    if(!runtest)  return ;
-    /* Create an user with UserName: test*/
-    String USER = "test" ;
-    int s = 15;
-    
-    try{
-      for( int i=0; i<s; i++)
-        userHandler_.removeUser(USER+"_"+String.valueOf(i), true);
-    }catch( Exception exp){}
-    
-    for( int i=0; i<s; i++) createUser(USER+"_"+String.valueOf(i)) ; 
-    Query query = new Query() ;
-    PageList users =  userHandler_.findUsers(query) ;    
-    System.out.println("\n\n\n\n\n\n size: " + users.getAvailablePage()) ;
-   
-    List list  = users.getPage( 1);
-    for( Object ele : list){
-      User u = (User)ele;
-      System.out.println( u.getUserName() + " and "+u.getEmail());
-    }
-    System.out.println("\n\n\n\n page 2:");
-    list  = users.getPage( 4);
-    System.out.println("size : "+list.size());
-    for( Object ele : list){
-      User u = (User)ele;
-      System.out.println( u.getUserName() + " and "+u.getEmail());
-    }    
-    System.out.println("\n\n\n\n");    
-  }
-  
-  
+//  public void testUserPageSize() throws Exception{    
+//    runtest = false;
+//    if(!runtest)  return ;
+//    /* Create an user with UserName: test*/
+//    String USER = "test" ;
+//    int s = 15;
+//    
+//    try{
+//      for( int i=0; i<s; i++)
+//        userHandler_.removeUser(USER+"_"+String.valueOf(i), true);
+//    }catch( Exception exp){}
+//    
+//    for( int i=0; i<s; i++) createUser(USER+"_"+String.valueOf(i)) ; 
+//    Query query = new Query() ;
+//    PageList users =  userHandler_.findUsers(query) ;    
+//    System.out.println("\n\n\n\n\n\n size: " + users.getAvailablePage()) ;
+//   
+//    List list  = users.getPage( 1);
+//    for( Object ele : list){
+//      User u = (User)ele;
+//      System.out.println( u.getUserName() + " and "+u.getEmail());
+//    }
+//    System.out.println("\n\n\n\n page 2:");
+//    list  = users.getPage( 4);
+//    System.out.println("size : "+list.size());
+//    for( Object ele : list){
+//      User u = (User)ele;
+//      System.out.println( u.getUserName() + " and "+u.getEmail());
+//    }    
+//    System.out.println("\n\n\n\n");    
+//  }
+//  
+//  
   public void testUser() throws Exception {    
     try{
     if(!runtest)  return ;
@@ -199,184 +199,184 @@ public class TestOrganizationService extends BasicTestCase {
     }
   }
 //  
-  public void testMembershipType() throws Exception {   
-      try{
-    if(!runtest)  return ;
-    /* Create a membershipType */
-    String testType = "testType" ; 
-    MembershipType mt = mtHandler_.createMembershipTypeInstance();
-    mt.setName(testType) ;
-    mt.setDescription("This is a test") ;
-    mt.setOwner("exo") ;    
-    mtHandler_.createMembershipType(mt, true);
-    assertEquals("Expect mebershiptype is:", testType, mtHandler_.findMembershipType(testType).getName()) ;
-    
-    /* Update MembershipType's information */
-    String desc = "This is a test (update)" ;
-    mt.setDescription(desc) ;
-    mtHandler_.saveMembershipType(mt, true);
-    assertEquals("Expect membershiptype's description", 
-                  desc, mtHandler_.findMembershipType(testType).getDescription());
-    
-    /* create another membershipType */
-    mt = mtHandler_.createMembershipTypeInstance() ;
-    mt.setName("anothertype") ;
-    mt.setOwner("exo") ;
-    mtHandler_.createMembershipType(mt, true) ;
-    
-    /* find all membership type 
-     * Expect result: 3 membershipType: "testmembership", "anothertype" 
-     *                and "member"(default membership type)
-     */
-    Collection ms = mtHandler_.findMembershipTypes() ;
-    assertEquals("Expect 3 membership in collection: ", 3 , ms.size());
-
-    /* remove "testmembership" */
-    mtHandler_.removeMembershipType(testType, true) ;
-    assertEquals("Membership type has been removed:", null, mtHandler_.findMembershipType(testType)) ;
-    assertEquals("Expect 2 membership in collection(1 is default): ", 2, mtHandler_.findMembershipTypes().size()) ;
-    
-    /* remove "anothertype" */
-    mtHandler_.removeMembershipType("anothertype", true) ;
-    assertEquals("Membership type has been removed:", null, mtHandler_.findMembershipType("anothertype")) ;
-    assertEquals("Expect 1 membership in collection(default type): ", 1, mtHandler_.findMembershipTypes().size()) ;
-    /*All membershipType was removed(except default membership)*/
-     } catch(Exception e) { e.printStackTrace(); }
-  }
-
-  @SuppressWarnings("unchecked")
-  public void testMembership() throws Exception {    
-    if(!runtest)  return ;
-    try {
-    /* Create 2 user: benj and tuan*/
-    User user = createUser(Benj) ;
-    User user2 = createUser(Tuan) ;
-    
-    /* Create "Group1" */
-    Group group = groupHandler_.createGroupInstance() ;
-    group.setGroupName(Group1);
-    groupHandler_.createGroup(group, true);
-    /*Create "Group2" */
-    group = groupHandler_.createGroupInstance() ;
-    group.setGroupName( Group2);
-    groupHandler_.createGroup(group, true);
-    
-    /* Create membership1 and assign Benj to "Group1" with this membership */
-    String testType = "testmembership" ;
-    MembershipType mt = mtHandler_.createMembershipTypeInstance() ;
-    mt.setName( testType) ;
-    mtHandler_.createMembershipType(mt, true);
-     
-    membershipHandler_.linkMembership( user, groupHandler_.findGroupById("/"+Group1), mt, true);     
-    membershipHandler_.linkMembership( user, groupHandler_.findGroupById("/"+Group2), mt, true); 
-    membershipHandler_.linkMembership( user2, groupHandler_.findGroupById("/"+Group2), mt, true);
-    
-    mt = mtHandler_.createMembershipTypeInstance() ;
-    mt.setName("membershipType2") ;
-    mtHandler_.createMembershipType(mt, true);
-    membershipHandler_.linkMembership( user, groupHandler_.findGroupById("/"+ Group2), mt, true);    
-    
-    mt = mtHandler_.createMembershipTypeInstance() ;
-    mt.setName( "membershipType3") ;
-    Membership membership3 = membershipHandler_.createMembershipInstance();
-    membership3.setMembershipType( mt.getName()) ;       
-    membershipHandler_.linkMembership( user, groupHandler_.findGroupById("/"+Group2), mt, true);
-  
-    /* find all memberships in group2
-     * Expect result: 4 membership: 3 for Benj(testmebership, membershipType2, membershipType3)
-     *                            : 1 for Tuan(testmembership)
-     * */
-    System.out.println(" --------- find memberships by group -------------");
-    Collection<Membership> mems = membershipHandler_.findMembershipsByGroup(groupHandler_.findGroupById("/"+Group2));    
-    assertEquals("Expect number of membership in group 2 is: ",4, mems.size()) ;
-    
-    /* find all memberships in "Group2" relate with Benj
-     * Expect result: 3 membership
-     */
-    System.out.println(" --------- find memberships by user and group--------------");
-    mems = membershipHandler_.findMembershipsByUserAndGroup(Benj, "/"+Group2);
-    assertEquals("Expect number of membership in "+Group2+" relate with benj is: ", 3, mems.size());
-    
-    /* find all memberships of Benj in all group
-     * Expect result: 5 membership: 3 memberships in "Group2", 1 membership in "Users" (default)
-     *                            : 1 membership in "group1"                
-     */
-    System.out.println(" --------- find memberships by user-------------");
-    mems = membershipHandler_.findMembershipsByUser(Benj) ;
-    assertEquals("expect membership is: " , 5, mems.size()) ;
-    
-    /* find memberships of Benj in "Group2" with membership type: testType
-     *  Expect result: 1 membership with membershipType is "testType" (testmembership)
-     * */
-    System.out.println("---------- find membership by User, Group and Type-----------") ;
-    Membership membership = 
-                 membershipHandler_.findMembershipByUserGroupAndType(Benj, "/"+Group2, testType);
-    assertTrue("Expect membership is found:", membership != null);
-    assertEquals("Expect membership type is: ", testType, membership.getMembershipType()) ;
-    assertEquals("Expect groupId of this membership is: ","/"+Group2 ,membership.getGroupId());
-    assertEquals("Expect user of this membership is: ", Benj, membership.getUserName());
-
-    /* find all groups of Benj
-     * Expect result: 3 group: "Group1", "Group2" and "user" ("user" is default group)  
-     * */
-    System.out.println(" --------- find groups by user -------------");
-    Collection<Group> groups = groupHandler_.findGroupsOfUser(Benj) ;
-    assertEquals("expect group is: " , 3,  groups.size());
-      
-    /* find all groups has membership type "TYPE" relate with Benj 
-     * expect result: 2 group: "Group1" and "Group2"
-     */
-    System.out.println("---------- find group of a user by membership-----------") ;
-    groups = groupHandler_.findGroupByMembership( Benj, testType) ; 
-    assertEquals("expect group is: " , 2,  groups.size());
-    
-    /* remove a membership */
-    System.out.println("----------------- removed a membership ---------------------") ;
-   String memId = membershipHandler_.findMembershipByUserGroupAndType(Benj,"/"+Group2,
-                                                                      "membershipType3").getId() ;
-   membershipHandler_.removeMembership( memId, true) ;
-   assertTrue("Membership was removed: ",
-      membershipHandler_.findMembershipByUserGroupAndType(Benj,"/"+Group2, "membershipType3") == null );
-    
-   /* remove a user
-     * Expect result: all membership related with user will be remove
-     * */
-     System.out.println("----------------- removed a user----------------------") ;
-     userHandler_.removeUser(Tuan, true) ;
-     assertTrue("This user was removed", userHandler_.findUserByName(Tuan)== null) ;
-     
-     mems = membershipHandler_.findMembershipsByUser(Tuan) ;
-     if(mems != null)assertTrue ("All membership related with this user was removed:", mems.isEmpty()) ;    
-    
-   /*  Remove a group
-     * Expect result: all membership associate with this group will be removed
-     * */
-    System.out.println("----------------- removed a group------------") ;
-    groupHandler_.removeGroup(groupHandler_.findGroupById("/" + Group1),true) ;
-    assertTrue ("This group was removed", groupHandler_.findGroupById("/" + Group1)==null) ;
-    
-    /*Remove a MembershipType
-     * Expect result: All membership have this type will be removed*/
-     
-    System.out.println("----------------- removed a membershipType------------") ;
-    mtHandler_.removeMembershipType(testType, true) ;
-    assertTrue("This membershipType was removed: ", mtHandler_.findMembershipType(testType)==null) ;
-    //     Check all memberships associate with all groups 
-    //     * to guarantee that no membership associate with removed membershipType
-   
-    groups = groupHandler_.findGroups(groupHandler_.findGroupById("/")) ;    
-    System.out.println("\n\n\n--------------Size:" + groups);
-    for(Group g: groups) {
-      mems = membershipHandler_.findMembershipsByGroup(g);      
-      for(Membership m:mems) {
-       assertFalse("MembershipType of this membership is not: "+ testType,
-                       m.getMembershipType().equalsIgnoreCase(testType)) ;
-      }
-    }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  } 
+//  public void testMembershipType() throws Exception {   
+//      try{
+//    if(!runtest)  return ;
+//    /* Create a membershipType */
+//    String testType = "testType" ; 
+//    MembershipType mt = mtHandler_.createMembershipTypeInstance();
+//    mt.setName(testType) ;
+//    mt.setDescription("This is a test") ;
+//    mt.setOwner("exo") ;    
+//    mtHandler_.createMembershipType(mt, true);
+//    assertEquals("Expect mebershiptype is:", testType, mtHandler_.findMembershipType(testType).getName()) ;
+//    
+//    /* Update MembershipType's information */
+//    String desc = "This is a test (update)" ;
+//    mt.setDescription(desc) ;
+//    mtHandler_.saveMembershipType(mt, true);
+//    assertEquals("Expect membershiptype's description", 
+//                  desc, mtHandler_.findMembershipType(testType).getDescription());
+//    
+//    /* create another membershipType */
+//    mt = mtHandler_.createMembershipTypeInstance() ;
+//    mt.setName("anothertype") ;
+//    mt.setOwner("exo") ;
+//    mtHandler_.createMembershipType(mt, true) ;
+//    
+//    /* find all membership type 
+//     * Expect result: 3 membershipType: "testmembership", "anothertype" 
+//     *                and "member"(default membership type)
+//     */
+//    Collection ms = mtHandler_.findMembershipTypes() ;
+//    assertEquals("Expect 3 membership in collection: ", 3 , ms.size());
+//
+//    /* remove "testmembership" */
+//    mtHandler_.removeMembershipType(testType, true) ;
+//    assertEquals("Membership type has been removed:", null, mtHandler_.findMembershipType(testType)) ;
+//    assertEquals("Expect 2 membership in collection(1 is default): ", 2, mtHandler_.findMembershipTypes().size()) ;
+//    
+//    /* remove "anothertype" */
+//    mtHandler_.removeMembershipType("anothertype", true) ;
+//    assertEquals("Membership type has been removed:", null, mtHandler_.findMembershipType("anothertype")) ;
+//    assertEquals("Expect 1 membership in collection(default type): ", 1, mtHandler_.findMembershipTypes().size()) ;
+//    /*All membershipType was removed(except default membership)*/
+//     } catch(Exception e) { e.printStackTrace(); }
+//  }
+//
+//  @SuppressWarnings("unchecked")
+//  public void testMembership() throws Exception {    
+//    if(!runtest)  return ;
+//    try {
+//    /* Create 2 user: benj and tuan*/
+//    User user = createUser(Benj) ;
+//    User user2 = createUser(Tuan) ;
+//    
+//    /* Create "Group1" */
+//    Group group = groupHandler_.createGroupInstance() ;
+//    group.setGroupName(Group1);
+//    groupHandler_.createGroup(group, true);
+//    /*Create "Group2" */
+//    group = groupHandler_.createGroupInstance() ;
+//    group.setGroupName( Group2);
+//    groupHandler_.createGroup(group, true);
+//    
+//    /* Create membership1 and assign Benj to "Group1" with this membership */
+//    String testType = "testmembership" ;
+//    MembershipType mt = mtHandler_.createMembershipTypeInstance() ;
+//    mt.setName( testType) ;
+//    mtHandler_.createMembershipType(mt, true);
+//     
+//    membershipHandler_.linkMembership( user, groupHandler_.findGroupById("/"+Group1), mt, true);     
+//    membershipHandler_.linkMembership( user, groupHandler_.findGroupById("/"+Group2), mt, true); 
+//    membershipHandler_.linkMembership( user2, groupHandler_.findGroupById("/"+Group2), mt, true);
+//    
+//    mt = mtHandler_.createMembershipTypeInstance() ;
+//    mt.setName("membershipType2") ;
+//    mtHandler_.createMembershipType(mt, true);
+//    membershipHandler_.linkMembership( user, groupHandler_.findGroupById("/"+ Group2), mt, true);    
+//    
+//    mt = mtHandler_.createMembershipTypeInstance() ;
+//    mt.setName( "membershipType3") ;
+//    Membership membership3 = membershipHandler_.createMembershipInstance();
+//    membership3.setMembershipType( mt.getName()) ;       
+//    membershipHandler_.linkMembership( user, groupHandler_.findGroupById("/"+Group2), mt, true);
+//  
+//    /* find all memberships in group2
+//     * Expect result: 4 membership: 3 for Benj(testmebership, membershipType2, membershipType3)
+//     *                            : 1 for Tuan(testmembership)
+//     * */
+//    System.out.println(" --------- find memberships by group -------------");
+//    Collection<Membership> mems = membershipHandler_.findMembershipsByGroup(groupHandler_.findGroupById("/"+Group2));    
+//    assertEquals("Expect number of membership in group 2 is: ",4, mems.size()) ;
+//    
+//    /* find all memberships in "Group2" relate with Benj
+//     * Expect result: 3 membership
+//     */
+//    System.out.println(" --------- find memberships by user and group--------------");
+//    mems = membershipHandler_.findMembershipsByUserAndGroup(Benj, "/"+Group2);
+//    assertEquals("Expect number of membership in "+Group2+" relate with benj is: ", 3, mems.size());
+//    
+//    /* find all memberships of Benj in all group
+//     * Expect result: 5 membership: 3 memberships in "Group2", 1 membership in "Users" (default)
+//     *                            : 1 membership in "group1"                
+//     */
+//    System.out.println(" --------- find memberships by user-------------");
+//    mems = membershipHandler_.findMembershipsByUser(Benj) ;
+//    assertEquals("expect membership is: " , 5, mems.size()) ;
+//    
+//    /* find memberships of Benj in "Group2" with membership type: testType
+//     *  Expect result: 1 membership with membershipType is "testType" (testmembership)
+//     * */
+//    System.out.println("---------- find membership by User, Group and Type-----------") ;
+//    Membership membership = 
+//                 membershipHandler_.findMembershipByUserGroupAndType(Benj, "/"+Group2, testType);
+//    assertTrue("Expect membership is found:", membership != null);
+//    assertEquals("Expect membership type is: ", testType, membership.getMembershipType()) ;
+//    assertEquals("Expect groupId of this membership is: ","/"+Group2 ,membership.getGroupId());
+//    assertEquals("Expect user of this membership is: ", Benj, membership.getUserName());
+//
+//    /* find all groups of Benj
+//     * Expect result: 3 group: "Group1", "Group2" and "user" ("user" is default group)  
+//     * */
+//    System.out.println(" --------- find groups by user -------------");
+//    Collection<Group> groups = groupHandler_.findGroupsOfUser(Benj) ;
+//    assertEquals("expect group is: " , 3,  groups.size());
+//      
+//    /* find all groups has membership type "TYPE" relate with Benj 
+//     * expect result: 2 group: "Group1" and "Group2"
+//     */
+//    System.out.println("---------- find group of a user by membership-----------") ;
+//    groups = groupHandler_.findGroupByMembership( Benj, testType) ; 
+//    assertEquals("expect group is: " , 2,  groups.size());
+//    
+//    /* remove a membership */
+//    System.out.println("----------------- removed a membership ---------------------") ;
+//   String memId = membershipHandler_.findMembershipByUserGroupAndType(Benj,"/"+Group2,
+//                                                                      "membershipType3").getId() ;
+//   membershipHandler_.removeMembership( memId, true) ;
+//   assertTrue("Membership was removed: ",
+//      membershipHandler_.findMembershipByUserGroupAndType(Benj,"/"+Group2, "membershipType3") == null );
+//    
+//   /* remove a user
+//     * Expect result: all membership related with user will be remove
+//     * */
+//     System.out.println("----------------- removed a user----------------------") ;
+//     userHandler_.removeUser(Tuan, true) ;
+//     assertTrue("This user was removed", userHandler_.findUserByName(Tuan)== null) ;
+//     
+//     mems = membershipHandler_.findMembershipsByUser(Tuan) ;
+//     if(mems != null)assertTrue ("All membership related with this user was removed:", mems.isEmpty()) ;    
+//    
+//   /*  Remove a group
+//     * Expect result: all membership associate with this group will be removed
+//     * */
+//    System.out.println("----------------- removed a group------------") ;
+//    groupHandler_.removeGroup(groupHandler_.findGroupById("/" + Group1),true) ;
+//    assertTrue ("This group was removed", groupHandler_.findGroupById("/" + Group1)==null) ;
+//    
+//    /*Remove a MembershipType
+//     * Expect result: All membership have this type will be removed*/
+//     
+//    System.out.println("----------------- removed a membershipType------------") ;
+//    mtHandler_.removeMembershipType(testType, true) ;
+//    assertTrue("This membershipType was removed: ", mtHandler_.findMembershipType(testType)==null) ;
+//    //     Check all memberships associate with all groups 
+//    //     * to guarantee that no membership associate with removed membershipType
+//   
+//    groups = groupHandler_.findGroups(groupHandler_.findGroupById("/")) ;    
+//    System.out.println("\n\n\n--------------Size:" + groups);
+//    for(Group g: groups) {
+//      mems = membershipHandler_.findMembershipsByGroup(g);      
+//      for(Membership m:mems) {
+//       assertFalse("MembershipType of this membership is not: "+ testType,
+//                       m.getMembershipType().equalsIgnoreCase(testType)) ;
+//      }
+//    }
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//    }
+//  } 
   
   public User createUser(String userName) throws Exception {   
     User user = userHandler_.createUserInstance() ;

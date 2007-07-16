@@ -46,6 +46,7 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
   public User createUserInstance(String username) { return new UserImpl(username); }
   
   public void createUser(User user, boolean broadcast) throws Exception {
+    System.out.println("+++++++++++CREATE USER " + user.getUserName());
     UserImpl userImpl = (UserImpl)user;
     if(broadcast) listenerService_.broadcast(UserHandler.PRE_CREATE_USER_EVENT, this, userImpl);
     super.save(userImpl);
@@ -54,10 +55,10 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
   
   public boolean authenticate(String username, String password) throws Exception {
     User user = findUserByName(username);   
-    
     if(user == null) return false ;    
     
     boolean authenticated = user.getPassword().equals(password) ;
+//    System.out.println("+++++++++++AUTHENTICATE USERNAME " + username + " AND PASS " + password + " - " + authenticated);
     if(authenticated){
       UserImpl userImpl = (UserImpl)user;
       userImpl.setLastLoginTime(Calendar.getInstance().getTime());      
@@ -69,7 +70,9 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
   public User findUserByName(String userName) throws Exception {
     DBObjectQuery<UserImpl> query = new DBObjectQuery<UserImpl>(UserImpl.class);
     query.addLIKE("USER_NAME", userName);
-    return loadUnique(query.toQuery());
+    User user = loadUnique(query.toQuery());;
+//    System.out.println("+++++++++++FIND USER BY USER NAME " + userName + " - " + (user!=null));
+    return user;
   }
 
   /**
@@ -93,6 +96,7 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
 
   @SuppressWarnings("unchecked")
   public PageList findUsersByGroup(String groupId) throws Exception {
+//    System.out.println("+++++++++++FIND USER BY GROUP_ID " + groupId);
     PortalContainer manager  = PortalContainer.getInstance();    
     OrganizationService service = (OrganizationService) manager.getComponentInstanceOfType(OrganizationService.class);
     MembershipHandler membershipHandler = service.getMembershipHandler();

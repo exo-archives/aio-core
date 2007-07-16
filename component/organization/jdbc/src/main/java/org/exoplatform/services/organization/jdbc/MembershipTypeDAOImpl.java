@@ -34,6 +34,7 @@ public class MembershipTypeDAOImpl extends StandardSQLDAO<MembershipTypeImpl> im
   
   @SuppressWarnings("unused")
   public MembershipType createMembershipType(MembershipType mt, boolean broadcast) throws Exception {
+//    System.out.println("==========CREATE MT " + mt.getName());
     Date now = new Date() ;
     mt.setCreatedDate(now) ;
     mt.setModifiedDate(now) ;
@@ -44,12 +45,16 @@ public class MembershipTypeDAOImpl extends StandardSQLDAO<MembershipTypeImpl> im
   public MembershipType findMembershipType(String name) throws Exception {
     DBObjectQuery<MembershipTypeImpl> query = new DBObjectQuery<MembershipTypeImpl>(MembershipTypeImpl.class);
     query.addLIKE("MT_NAME", name);
-    return loadUnique(query.toQuery());
+    MembershipType mt = loadUnique(query.toQuery());;
+//    System.out.println("===========FIND MT BY NAME" + name + " - " + (mt!=null));
+    return mt;
   }
 
   public Collection findMembershipTypes() throws Exception {
+    
     DBObjectQuery<MembershipTypeImpl> query = new DBObjectQuery<MembershipTypeImpl>(MembershipTypeImpl.class);
     DBPageList<MembershipTypeImpl> pageList = new DBPageList<MembershipTypeImpl>(20, this, query);
+//    System.out.println("==========FIND ALL OF MT Size = " + pageList.getAvailable());
     return pageList.getAll();
   }
 

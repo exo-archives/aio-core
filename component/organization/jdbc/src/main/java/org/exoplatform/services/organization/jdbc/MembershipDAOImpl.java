@@ -49,6 +49,7 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
   }
 
   public void linkMembership(User user, Group group, MembershipType mt, boolean broadcast) throws Exception {
+//    System.out.println("LINK MEMBER SHIP (" + user.getUserName() + ", " + group.getId() + " , " + mt.getName() + ");");
     MembershipImpl membership = new MembershipImpl();
     membership.setUserName(user.getUserName());
     membership.setMembershipType(mt.getName()) ;    
@@ -65,20 +66,26 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
   }
 
   public Membership findMembershipByUserGroupAndType(String userName, String groupId, String type) throws Exception {
+    
     if(userName == null || groupId == null || type == null) return null;
     DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
     query.addLIKE("USER_NAME", userName);
     query.addLIKE("GROUP_ID", groupId);
     query.addLIKE("MEMBERSHIP_TYPE", type);
-    return loadUnique(query.toQuery());
+    Membership member = loadUnique(query.toQuery());
+//    System.out.println("FIND MEMBERSHIP BY USER " + userName + ", GROUP " + groupId + ", TYPE " + type  + " - " + (member!=null));
+    return member;
   }
   
   public Collection findMembershipsByGroup(Group group) throws Exception {
+   
     if(group == null) return null;
     List<MembershipImpl> list = new ArrayList<MembershipImpl>();
     DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
     query.addLIKE("GROUP_ID", group.getId());
     loadInstances(query.toQuery(), list);
+    
+    
     return list;
   }
 
@@ -88,6 +95,7 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
     DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
     query.addLIKE("USER_NAME", userName);
     loadInstances(query.toQuery(), list);
+//    System.out.println("FIND MEMBERSHIP BY USER " + userName + " Size = " + list.size());
     return list;
   }
 
@@ -98,6 +106,7 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
     query.addLIKE("USER_NAME", userName);
     query.addLIKE("GROUP_ID", groupId);
     loadInstances(query.toQuery(), list);
+//    System.out.println("FIND MEMBERSHIP BY USER " + userName + ", GROUP " + groupId + " Size = " + list.size() );
     return list;
   }
 

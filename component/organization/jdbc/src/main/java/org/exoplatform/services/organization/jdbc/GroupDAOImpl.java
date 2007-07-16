@@ -46,6 +46,7 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
   }
 
   public void addChild(Group parent, Group child, boolean broadcast) throws Exception {
+    
     GroupImpl childImpl = (GroupImpl) child ; 
     String groupId =  "/" + child.getGroupName() ;
     Connection connection = eXoDS_.getConnection();
@@ -71,6 +72,8 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
 
     if(broadcast) listenerService_.broadcast("organization.group.preSave", this, childImpl);
     childImpl.setId(groupId);
+//    System.out.println("----------ADD GROUP " + child.getId() + " into Group" + child.getParentId());
+    
     try {
       if(childImpl.getDBObjectId() == -1) {
         childImpl.setDBObjectId(eXoDS_.getIDGenerator().generateLongId(childImpl));
@@ -88,11 +91,14 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
   public Group findGroupById(String groupId) throws Exception {
     DBObjectQuery<GroupImpl> query = new DBObjectQuery<GroupImpl>(GroupImpl.class);
     query.addLIKE("GROUP_ID", groupId);
-    return super.loadUnique(query.toQuery());
+    Group g = super.loadUnique(query.toQuery());
+//    System.out.println("----------FIND GROUP BY ID: " + groupId + " _ " + (g!=null));
+    return g;
   }
 
   @SuppressWarnings("unchecked")
   public Collection findGroupByMembership(String userName, String membershipType) throws Exception {
+    
     if(userName == null || membershipType == null) return null;
     MembershipHandler membershipHandler = getMembershipHandler();
     List<Membership> members = (List<Membership>) membershipHandler.findMembershipsByUser(userName);
@@ -102,6 +108,7 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
       Group g = findGroupById(member.getGroupId());
       if(g!=null) groups.add(g);
     }
+//    System.out.println("----------FIND GROUP BY USERNAME AND TYPE: " + userName + " - " + membershipType + " - " + (groups!=null));
     return groups;  
   }
 
@@ -111,6 +118,8 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
     DBObjectQuery<GroupImpl> query = new DBObjectQuery<GroupImpl>(GroupImpl.class);
     query.addLIKE("PARENT_ID", parentId);
     DBPageList<GroupImpl> pageList = new DBPageList<GroupImpl>(20, this, query);
+//    System.out.print("----------FIND GROUP BY PARENT: " + parent);
+    System.out.println(" Size = " + pageList.getAvailable());
     return pageList.getAll();
   }
 
@@ -123,6 +132,7 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
       Group g = findGroupById(member.getGroupId());
       if(g!=null && !hasGroup(groups, g)) groups.add(g);
     }
+//    System.out.println("----------FIND GROUP BY USER: " + user + " - " + (groups!=null));
     return groups;
   }
   
