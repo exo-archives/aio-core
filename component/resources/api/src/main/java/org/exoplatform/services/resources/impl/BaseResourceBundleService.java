@@ -17,6 +17,7 @@ import org.exoplatform.commons.utils.IOUtil;
 import org.exoplatform.commons.utils.MapResourceBundle;
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValuesParam;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
@@ -43,13 +44,18 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
   @SuppressWarnings("unchecked")
   protected void initParams(InitParams params) throws Exception {
     classpathResources_ = params.getValuesParam("classpath.resources").getValues();
-    List  prnames = params.getValuesParam("portal.resource.names").getValues();
+
+    //resources name can use for portlets
+    List prnames =  params.getValuesParam("portal.resource.names").getValues();
     portalResourceBundleNames_ = new String[prnames.size()] ;
     for(int i = 0; i < prnames.size(); i++) {
       portalResourceBundleNames_[i] = (String)prnames.get(i) ; 
     }
-    PageList pl  = findResourceDescriptions(new  Query(null, null)) ;
+
+    PageList pl  = findResourceDescriptions(new Query(null, null)) ;
     if(pl.getAvailable() > 0)  return ;
+
+  //init resources
     List<String> initResources = params.getValuesParam("init.resources").getValues();
     for(String resource : initResources) {
       initResources(resource, Thread.currentThread().getContextClassLoader()) ;
