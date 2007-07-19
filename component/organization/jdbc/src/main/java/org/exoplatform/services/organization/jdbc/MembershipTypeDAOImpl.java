@@ -4,6 +4,7 @@
  **************************************************************************/
 package org.exoplatform.services.organization.jdbc;
 
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 
@@ -13,7 +14,6 @@ import org.exoplatform.services.database.DBPageList;
 import org.exoplatform.services.database.ExoDatasource;
 import org.exoplatform.services.database.StandardSQLDAO;
 import org.exoplatform.services.listener.ListenerService;
-import org.exoplatform.services.organization.GroupHandler;
 import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.MembershipTypeHandler;
 
@@ -24,6 +24,7 @@ import org.exoplatform.services.organization.MembershipTypeHandler;
  * Apr 7, 2007  
  */
 public class MembershipTypeDAOImpl extends StandardSQLDAO<MembershipTypeImpl> implements MembershipTypeHandler {
+  
   protected ListenerService listenerService_;
   public MembershipTypeDAOImpl(ListenerService lService,ExoDatasource datasource, DBObjectMapper<MembershipTypeImpl> mapper) {
     super(datasource, mapper, MembershipTypeImpl.class);
@@ -35,7 +36,7 @@ public class MembershipTypeDAOImpl extends StandardSQLDAO<MembershipTypeImpl> im
   @SuppressWarnings("unused")
   public MembershipType createMembershipType(MembershipType mt, boolean broadcast) throws Exception {
 //    System.out.println("==========CREATE MT " + mt.getName());
-    Date now = new Date() ;
+    Date now = Calendar.getInstance().getTime() ;
     mt.setCreatedDate(now) ;
     mt.setModifiedDate(now) ;
     super.save((MembershipTypeImpl)mt);
@@ -51,7 +52,6 @@ public class MembershipTypeDAOImpl extends StandardSQLDAO<MembershipTypeImpl> im
   }
 
   public Collection findMembershipTypes() throws Exception {
-    
     DBObjectQuery<MembershipTypeImpl> query = new DBObjectQuery<MembershipTypeImpl>(MembershipTypeImpl.class);
     DBPageList<MembershipTypeImpl> pageList = new DBPageList<MembershipTypeImpl>(20, this, query);
 //    System.out.println("==========FIND ALL OF MT Size = " + pageList.getAvailable());
@@ -72,8 +72,7 @@ public class MembershipTypeDAOImpl extends StandardSQLDAO<MembershipTypeImpl> im
 
   @SuppressWarnings("unused")
   public MembershipType saveMembershipType(MembershipType mt, boolean broadcast) throws Exception {
-    Date now = new Date() ;
-    mt.setModifiedDate(now) ;
+    mt.setModifiedDate(Calendar.getInstance().getTime()) ;
     super.update((MembershipTypeImpl)mt);
     return mt ;
   }
