@@ -17,7 +17,7 @@ import org.exoplatform.container.xml.InitParams;
  * @version: $Id: OrganizationDatabaseInitializer.java 13079 2007-03-01 15:30:35Z tuan08 $
  */
 public class OrganizationDatabaseInitializer 
-extends BaseComponentPlugin implements OrganizationServiceInitializer, ComponentPlugin {
+  extends BaseComponentPlugin implements OrganizationServiceInitializer, ComponentPlugin {
   
   private OrganizationConfig config_ ;
   

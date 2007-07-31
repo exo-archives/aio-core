@@ -15,6 +15,10 @@ import org.exoplatform.services.database.table.IDGenerator;
  * Author : Tuan Nguyen
  *          tuan08@users.sourceforge.net
  * Apr 4, 2006
+ * 
+ * This class is a wrapper class for the  java.sql.Datasource class. In additional to the 
+ * java.sql.Datasource method such getConnection().. The ExoDatasource provice 2 other methods: 
+ * DBTableManager getDBTableManager and IDGenerator getIDGenerator() 
  */
 public class ExoDatasource {
   
@@ -42,6 +46,14 @@ public class ExoDatasource {
   private int dbType_ = STANDARD_DB_TYPE;
   Connection conn ;
   
+  /**
+   * The constructor should:
+   * 1. Keep track of the datasource object
+   * 2. Create the DBTableManager object base on the datasource information such database type , version
+   * 3. Create an IDGenerator for the datasource
+   * @param ds
+   * @throws Exception
+   */
   public ExoDatasource(DataSource ds) throws Exception {
     xaDatasource_ = ds ;
     DatabaseMetaData metaData = ds.getConnection().getMetaData() ;
@@ -72,12 +84,28 @@ public class ExoDatasource {
     queryManager_ = new QueryBuilder(dbType_);
   }
   
+  /**
+   * This method should return the real Datasource object
+   * @return
+   */
   public DataSource getDatasource() { return xaDatasource_ ;}
 
+  /**
+   * This method should call the datasource getConnection method and return the Connection object. The
+   * developer can add some debug code or broadcast an event here.
+   * @return
+   * @throws Exception
+   */
   public Connection getConnection() throws Exception {
     return xaDatasource_.getConnection() ;
   }
   
+  /**
+   * This method should  delegate to the method close of the Connection  object. The developer can 
+   * add debug or broadcast an event here.
+   * @param conn
+   * @throws Exception
+   */
   public void closeConnection(Connection conn) throws Exception {
 //    long startGet = System.currentTimeMillis();
     conn.close() ;
@@ -85,6 +113,12 @@ public class ExoDatasource {
 //    System.out.println(" \n\n\n == > total time to Close connection "+totalCloseConnect+"\n\n");
   }
   
+  /**
+   * This method should delegate to the commit() method of the Connection object. The developer can
+   * add the debug code here
+   * @param conn
+   * @throws Exception
+   */
   public void commit(Connection conn) throws Exception {
 //    long startGet = System.currentTimeMillis();
     conn.setAutoCommit(false);
@@ -93,8 +127,18 @@ public class ExoDatasource {
 //    System.out.println(" \n\n\n == > total time to Commit "+totalCommit+"\n\n");
   }
 
+  /**
+   * This method should return the DBTableManager object. The DBTableManager object should be 
+   * initialized in the constructor according to the database type and version 
+   * @return
+   */
   public  DBTableManager getDBTableManager()  { return tableManager_ ; }
   
+  /**
+   * This mthod should return the IDGenerator object,  the developer can use the id generator to generate
+   * an unique long id for an db object
+   * @return
+   */
   public  IDGenerator  getIDGenerator() { return idGenerator_ ; }
   
   public int getDatabaseType()  { return dbType_ ; }
