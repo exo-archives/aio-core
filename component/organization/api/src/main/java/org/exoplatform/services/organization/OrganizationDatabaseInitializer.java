@@ -72,6 +72,7 @@ public class OrganizationDatabaseInitializer
         Group group = orgService.getGroupHandler().createGroupInstance();      
         group.setGroupName(data.getName());
         group.setDescription(data.getDescription()) ;
+        group.setLabel(data.getLabel()) ;
         if(parentId == null || parentId.length() == 0){     
           orgService.getGroupHandler().addChild(null, group, true) ;
         } else {
