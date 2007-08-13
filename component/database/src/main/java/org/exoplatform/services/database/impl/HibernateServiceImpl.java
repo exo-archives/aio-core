@@ -54,10 +54,14 @@ public class HibernateServiceImpl implements HibernateService, ComponentRequestL
 	    Property p = (Property) properties.next();
 	    conf_.setProperty(p.getName(), p.getValue());
 	  }
+    
+    // Replace the potential "java.io.tmpdir" variable in the connection URL
     String  connectionURL = conf_.getProperty("hibernate.connection.url") ;
-    connectionURL = connectionURL.replace("${java.io.tmpdir}", System.getProperty("java.io.tmpdir")) ;
-    conf_.setProperty("hibernate.connection.url", connectionURL) ;
-	}
+    if(connectionURL != null) {
+      connectionURL = connectionURL.replace("${java.io.tmpdir}", System.getProperty("java.io.tmpdir")) ;
+      conf_.setProperty("hibernate.connection.url", connectionURL) ;
+    }
+  }
 	
 	public void addPlugin(ComponentPlugin plugin) {
 	  if(plugin instanceof AddHibernateMappingPlugin) {
