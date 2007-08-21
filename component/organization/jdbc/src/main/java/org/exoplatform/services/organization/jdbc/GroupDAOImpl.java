@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
 import org.exoplatform.commons.exception.UniqueObjectException;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.database.DBObjectMapper;
@@ -17,6 +18,7 @@ import org.exoplatform.services.database.DBPageList;
 import org.exoplatform.services.database.ExoDatasource;
 import org.exoplatform.services.database.StandardSQLDAO;
 import org.exoplatform.services.listener.ListenerService;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.GroupEventListener;
 import org.exoplatform.services.organization.GroupHandler;
@@ -25,12 +27,12 @@ import org.exoplatform.services.organization.MembershipHandler;
 import org.exoplatform.services.organization.OrganizationService;
 
 /**
- * Created by The eXo Platform SARL
- * Author : Nhu Dinh Thuan
- *          nhudinhthuan@exoplatform.com
+ * Created by The eXo Platform SAS
  * Apr 7, 2007  
  */
 public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHandler {
+  
+  protected static Log log = ExoLogger.getLogger("organization:GroupDAOImpl");
   
   protected ListenerService listenerService_;
   
@@ -72,7 +74,8 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
 
     if(broadcast) listenerService_.broadcast("organization.group.preSave", this, childImpl);
     childImpl.setId(groupId);
-//    System.out.println("----------ADD GROUP " + child.getId() + " into Group" + child.getParentId());
+    if(log.isDebugEnabled())
+      log.debug("----------ADD GROUP " + child.getId() + " into Group" + child.getParentId());
     
     try {
       if(childImpl.getDBObjectId() == -1) {
@@ -92,7 +95,8 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
     DBObjectQuery<GroupImpl> query = new DBObjectQuery<GroupImpl>(GroupImpl.class);
     query.addLIKE("GROUP_ID", groupId);
     Group g = super.loadUnique(query.toQuery());
-//    System.out.println("----------FIND GROUP BY ID: " + groupId + " _ " + (g!=null));
+    if(log.isDebugEnabled())
+      log.debug("----------FIND GROUP BY ID: " + groupId + " _ " + (g!=null));
     return g;
   }
 
@@ -108,7 +112,8 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
       Group g = findGroupById(member.getGroupId());
       if(g!=null) groups.add(g);
     }
-//    System.out.println("----------FIND GROUP BY USERNAME AND TYPE: " + userName + " - " + membershipType + " - " + (groups!=null));
+    if(log.isDebugEnabled())
+      log.debug("----------FIND GROUP BY USERNAME AND TYPE: " + userName + " - " + membershipType + " - ");
     return groups;  
   }
 
@@ -118,8 +123,10 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
     DBObjectQuery<GroupImpl> query = new DBObjectQuery<GroupImpl>(GroupImpl.class);
     query.addLIKE("PARENT_ID", parentId);
     DBPageList<GroupImpl> pageList = new DBPageList<GroupImpl>(20, this, query);
-//    System.out.print("----------FIND GROUP BY PARENT: " + parent);
-    System.out.println(" Size = " + pageList.getAvailable());
+    if(log.isDebugEnabled()) {
+      log.debug("----------FIND GROUP BY PARENT: " + parent);
+      log.debug(" Size = " + pageList.getAvailable());
+    }
     return pageList.getAll();
   }
 
@@ -132,7 +139,8 @@ public class GroupDAOImpl extends StandardSQLDAO<GroupImpl> implements GroupHand
       Group g = findGroupById(member.getGroupId());
       if(g!=null && !hasGroup(groups, g)) groups.add(g);
     }
-//    System.out.println("----------FIND GROUP BY USER: " + user + " - " + (groups!=null));
+    if(log.isDebugEnabled())
+      log.debug("----------FIND GROUP BY USER: " + user + " - " + (groups!=null));
     return groups;
   }
   

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
 import org.exoplatform.commons.utils.IdentifierUtil;
 import org.exoplatform.services.database.DBObjectMapper;
 import org.exoplatform.services.database.DBObjectQuery;
@@ -16,6 +17,7 @@ import org.exoplatform.services.database.DBPageList;
 import org.exoplatform.services.database.ExoDatasource;
 import org.exoplatform.services.database.StandardSQLDAO;
 import org.exoplatform.services.listener.ListenerService;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.MembershipEventListener;
@@ -24,12 +26,12 @@ import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.User;
 
 /**
- * Created by The eXo Platform SARL
- * Author : Nhu Dinh Thuan
- *          nhudinhthuan@exoplatform.com
+ * Created by The eXo Platform SAS
  * Apr 7, 2007  
  */
 public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements MembershipHandler {
+  
+  protected static Log log = ExoLogger.getLogger("organization:MembershipDAOImpl");
   
   protected ListenerService listenerService_;
   
@@ -49,7 +51,8 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
   }
 
   public void linkMembership(User user, Group group, MembershipType mt, boolean broadcast) throws Exception {
-//    System.out.println("LINK MEMBER SHIP (" + user.getUserName() + ", " + group.getId() + " , " + mt.getName() + ");");
+    if(log.isDebugEnabled())
+	  log.debug("LINK MEMBER SHIP (" + user.getUserName() + ", " + group.getId() + " , " + mt.getName() + ");");
     MembershipImpl membership = new MembershipImpl();
     membership.setUserName(user.getUserName());
     membership.setMembershipType(mt.getName()) ;    
@@ -73,7 +76,8 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
     query.addLIKE("GROUP_ID", groupId);
     query.addLIKE("MEMBERSHIP_TYPE", type);
     Membership member = loadUnique(query.toQuery());
-//    System.out.println("FIND MEMBERSHIP BY USER " + userName + ", GROUP " + groupId + ", TYPE " + type  + " - " + (member!=null));
+    if(log.isDebugEnabled())
+	  log.debug("FIND MEMBERSHIP BY USER " + userName + ", GROUP " + groupId + ", TYPE " + type  + " - " + (member!=null));
     return member;
   }
   
@@ -84,8 +88,6 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
     DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
     query.addLIKE("GROUP_ID", group.getId());
     loadInstances(query.toQuery(), list);
-    
-    
     return list;
   }
 
@@ -95,7 +97,8 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
     DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
     query.addLIKE("USER_NAME", userName);
     loadInstances(query.toQuery(), list);
-//    System.out.println("FIND MEMBERSHIP BY USER " + userName + " Size = " + list.size());
+    if(log.isDebugEnabled())
+	  log.debug("FIND MEMBERSHIP BY USER " + userName + " Size = " + list.size());
     return list;
   }
 
@@ -106,7 +109,8 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
     query.addLIKE("USER_NAME", userName);
     query.addLIKE("GROUP_ID", groupId);
     loadInstances(query.toQuery(), list);
-//    System.out.println("FIND MEMBERSHIP BY USER " + userName + ", GROUP " + groupId + " Size = " + list.size() );
+    if(log.isDebugEnabled())
+	  log.debug("FIND MEMBERSHIP BY USER " + userName + ", GROUP " + groupId + " Size = " + list.size() );
     return list;
   }
 

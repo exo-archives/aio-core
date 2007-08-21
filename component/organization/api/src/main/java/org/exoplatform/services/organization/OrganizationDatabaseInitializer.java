@@ -6,18 +6,17 @@ package org.exoplatform.services.organization;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
-/**
- * Jul 20, 2004 
- * @author: Tuan Nguyen
- * @email:   tuan08@users.sourceforge.net
- * @version: $Id: OrganizationDatabaseInitializer.java 13079 2007-03-01 15:30:35Z tuan08 $
- */
+import org.exoplatform.services.log.ExoLogger;
+
 public class OrganizationDatabaseInitializer 
   extends BaseComponentPlugin implements OrganizationServiceInitializer, ComponentPlugin {
+
+  protected static Log log = ExoLogger.getLogger("organization:OrganizationDatabaseInitializer");
   
   private OrganizationConfig config_ ;
   
@@ -143,6 +142,6 @@ public class OrganizationDatabaseInitializer
   }
   
   private  void  printInfo(String message) {
-    if(printInfo_) System.out.println(message) ;
+    if(printInfo_) log.info(message) ;
   }
 }

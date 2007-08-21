@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
 import org.exoplatform.commons.utils.ObjectPageList;
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.PortalContainer;
@@ -17,6 +18,7 @@ import org.exoplatform.services.database.DBPageList;
 import org.exoplatform.services.database.ExoDatasource;
 import org.exoplatform.services.database.StandardSQLDAO;
 import org.exoplatform.services.listener.ListenerService;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.GroupHandler;
 import org.exoplatform.services.organization.Membership;
@@ -27,12 +29,12 @@ import org.exoplatform.services.organization.UserEventListener;
 import org.exoplatform.services.organization.UserHandler;
 
 /**
- * Created by The eXo Platform SARL
- * Author : Nhu Dinh Thuan
- *          nhudinhthuan@exoplatform.com
+ * Created by The eXo Platform SAS
  * Apr 7, 2007  
  */
 public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandler {
+  
+  protected static Log log = ExoLogger.getLogger("organization:UserDAOImpl");
   
   protected ListenerService listenerService_;
   
@@ -46,7 +48,8 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
   public User createUserInstance(String username) { return new UserImpl(username); }
   
   public void createUser(User user, boolean broadcast) throws Exception {
-    System.out.println("+++++++++++CREATE USER " + user.getUserName());
+	if(log.isDebugEnabled())
+      log.debug("----------- CREATE USER " + user.getUserName());
     UserImpl userImpl = (UserImpl)user;
     if(broadcast) listenerService_.broadcast(UserHandler.PRE_CREATE_USER_EVENT, this, userImpl);
     super.save(userImpl);
@@ -58,7 +61,8 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
     if(user == null) return false ;    
     
     boolean authenticated = user.getPassword().equals(password) ;
-//    System.out.println("+++++++++++AUTHENTICATE USERNAME " + username + " AND PASS " + password + " - " + authenticated);
+	if(log.isDebugEnabled())
+      log.debug("+++++++++++AUTHENTICATE USERNAME " + username + " AND PASS " + password + " - " + authenticated);
     if(authenticated){
       UserImpl userImpl = (UserImpl)user;
       userImpl.setLastLoginTime(Calendar.getInstance().getTime());      
@@ -71,7 +75,8 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
     DBObjectQuery<UserImpl> query = new DBObjectQuery<UserImpl>(UserImpl.class);
     query.addLIKE("USER_NAME", userName);
     User user = loadUnique(query.toQuery());;
-//    System.out.println("+++++++++++FIND USER BY USER NAME " + userName + " - " + (user!=null));
+	if(log.isDebugEnabled())
+      log.debug("+++++++++++FIND USER BY USER NAME " + userName + " - " + (user!=null));
     return user;
   }
 
@@ -96,7 +101,8 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
 
   @SuppressWarnings("unchecked")
   public PageList findUsersByGroup(String groupId) throws Exception {
-//    System.out.println("+++++++++++FIND USER BY GROUP_ID " + groupId);
+	if(log.isDebugEnabled())
+      log.debug("+++++++++++FIND USER BY GROUP_ID " + groupId);
     PortalContainer manager  = PortalContainer.getInstance();    
     OrganizationService service = (OrganizationService) manager.getComponentInstanceOfType(OrganizationService.class);
     MembershipHandler membershipHandler = service.getMembershipHandler();

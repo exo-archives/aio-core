@@ -8,23 +8,24 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
 import org.exoplatform.services.database.DBObjectMapper;
 import org.exoplatform.services.database.DBObjectQuery;
 import org.exoplatform.services.database.ExoDatasource;
 import org.exoplatform.services.database.StandardSQLDAO;
 import org.exoplatform.services.listener.ListenerService;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.UserProfileEventListener;
 import org.exoplatform.services.organization.UserProfileHandler;
 
 /**
- * Created by The eXo Platform SARL
- * Author : Nhu Dinh Thuan
- *          nhudinhthuan@exoplatform.com
+ * Created by The eXo Platform SAS
  * Apr 7, 2007  
  */
 public class UserProfileDAOImpl  extends StandardSQLDAO<UserProfileData> implements UserProfileHandler {
 
+  protected static Log log = ExoLogger.getLogger("organization:UserProfileDAOImpl");
   
   protected ListenerService listenerService_;
   
@@ -39,7 +40,8 @@ public class UserProfileDAOImpl  extends StandardSQLDAO<UserProfileData> impleme
   }
   
   public UserProfile createUserProfileInstance(String userName) {
-//    System.out.println("\n\n\n----------------Create Profile with userName = " + userName);
+	if(log.isDebugEnabled())
+      log.debug("----------------Create Profile with userName = " + userName);
     return new  UserProfileData(userName).getUserProfile();
   }
   
@@ -77,7 +79,6 @@ public class UserProfileDAOImpl  extends StandardSQLDAO<UserProfileData> impleme
 
   public void saveUserProfile(UserProfile profile, boolean broadcast) throws Exception {
     UserProfileData userImpl = findUserProfileDataByName(profile.getUserName());
-//    System.out.println("\n\n==========> Yes. Tim thay roi: " + userImpl);
     if(userImpl == null ) {
       userImpl = new UserProfileData(profile.getUserName());
       userImpl.setUserProfile(profile);

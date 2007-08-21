@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright 2001-2007 The eXo Platform SARL         All rights reserved.  *
+ * Copyright 2001-2007 The eXo Platform SAS         All rights reserved.  *
  * Please look at license.txt in info directory for more license detail.   *
  **************************************************************************/
 package org.exoplatform.services.database.table;
@@ -9,9 +9,7 @@ import org.exoplatform.services.database.annotation.Table;
 import org.exoplatform.services.database.annotation.TableField;
 
 /**
- * Created by The eXo Platform SARL
- * Author : Tuan Nguyen
- *          tuan.nguyen@exoplatform.com
+ * Created by The eXo Platform SAS
  * Mar 16, 2007  
  */
 @Table(
@@ -42,9 +40,7 @@ public class ExoLongID extends DBObject {
   public void setCurrentBlockId(long start) { this.currentBlockId = start ; }
 
   public void setNextBlock() { 
-//    System.out.println("======> last block id: " + currentBlockId); 
     this.currentBlockId = this.currentBlockId + BLOCK_SIZE ;
-//    System.out.println("======> currentBlockId: " + currentBlockId); 
   }
  
 }

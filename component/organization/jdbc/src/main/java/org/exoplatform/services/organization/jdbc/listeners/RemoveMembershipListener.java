@@ -7,9 +7,11 @@ package org.exoplatform.services.organization.jdbc.listeners;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
 import org.exoplatform.services.database.DBObjectQuery;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.MembershipHandler;
@@ -28,6 +30,8 @@ import org.exoplatform.services.organization.jdbc.MembershipImpl;
 public class RemoveMembershipListener extends Listener<Object, Object>{
   private OrganizationService service_ ;
   
+  protected static Log log = ExoLogger.getLogger("organization:RemoveMembershipListener");
+  
   public RemoveMembershipListener(OrganizationService service) {
     service_ = service ;
   }
@@ -39,11 +43,11 @@ public class RemoveMembershipListener extends Listener<Object, Object>{
     MembershipHandler membershipHanler = service_.getMembershipHandler();
     if(target instanceof User){
       User user = (User) target;
-//      System.out.println("\n\nRemove all Membership by User: " + user.getUserName() + "\n\n");
+      log.info("Remove all Membership by User: " + user.getUserName());
       membershipHanler.removeMembershipByUser(user.getUserName(), true);
     } else if (target instanceof Group){
       Group group = (Group) target;
-//      System.out.println("\n\nRemove all Membership by Group: " + group.getGroupName() + "\n\n");
+      log.info("Remove all Membership by Group: " + group.getGroupName());
       List<Membership> members = (List<Membership>) membershipHanler.findMembershipsByGroup( group);
       for(Membership member: members){
         membershipHanler.removeMembership(member.getId(), true);
@@ -55,7 +59,7 @@ public class RemoveMembershipListener extends Listener<Object, Object>{
       DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
       query.addLIKE("MEMBERSHIP_TYPE", memberType.getName());
       mtHandler.removeMemberships(query, true);
-      }catch(Exception e){ e.printStackTrace(); }
+      } catch(Exception e){ log.error("Error while removing a Membership", e); }
     }
   }
 }

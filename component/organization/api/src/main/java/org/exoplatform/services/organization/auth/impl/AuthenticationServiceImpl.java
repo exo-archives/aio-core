@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright 2001-2007 The eXo Platform SARL         All rights reserved.  *
+ * Copyright 2001-2007 The eXo Platform SAS         All rights reserved.  *
  * Please look at license.txt in info directory for more license detail.   *
  **************************************************************************/
 package org.exoplatform.services.organization.auth.impl;
@@ -7,28 +7,31 @@ package org.exoplatform.services.organization.auth.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
 import org.exoplatform.services.listener.ListenerService;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.auth.AuthenticationService;
 import org.exoplatform.services.organization.auth.Identity;
 
 /**
- * Created by The eXo Platform SARL
- * Author : Tuan Nguyen
- *          tuan.nguyen@exoplatform.com
+ * Created by The eXo Platform SAS
  * May 17, 2007  
  */
 public class AuthenticationServiceImpl implements AuthenticationService {
+  
+  protected static Log log = ExoLogger.getLogger("authenticationService");
+  
   private ThreadLocal <Identity> currentIdentity_ = new ThreadLocal <Identity>();
   private Map<String, Identity>  identities_ = new HashMap<String, Identity>() ;;
   private ListenerService listenerService_ ;
   private OrganizationService orgService_ ;
   
   public AuthenticationServiceImpl(ListenerService listenerService, OrganizationService orgService)  {
-    System.out.println("  INIT AuthenticationService...................... ");
+    log.info("Start AuthenticationService init ...................... ");
     listenerService_ = listenerService ;
     orgService_ =  orgService ;
-    System.out.println("  END AuthenticationService...................... ");
+    log.info("End AuthenticationService init ...................... ");
   }
   
   public boolean login(String userName, String password) throws Exception {
