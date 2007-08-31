@@ -1,0 +1,57 @@
+<project>
+  <parent>
+    <groupId>org.exoplatform.core</groupId>
+    <artifactId>config</artifactId>
+    <version>2.0.3</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>exo.core.component.organization.pam</artifactId>
+  <version>${org.exoplatform.core.version}</version>
+  <description></description>
+  
+  <dependencies>
+  	<!--dependency>
+  		<groupId>commons-logging</groupId>
+  		<artifactId>commons-logging</artifactId>
+  		<version>1.1</version>
+  	</dependency-->
+  	<dependency>
+  		<groupId>org.exoplatform.core</groupId>
+  		<artifactId>exo.core.component.organization.api</artifactId>
+  		<version>${org.exoplatform.core.version}</version>
+  	</dependency>
+  </dependencies>
+  
+  <build>
+  	<plugins>
+  		<plugin>
+  			<groupId>org.apache.maven.plugins</groupId>
+  			<artifactId>maven-antrun-plugin</artifactId>
+  			<configuration>
+  				<tasks>
+						<exec executable="javah">
+							<arg value="-classpath"/><arg file="target/classes"/>
+							<arg value="-d"/><arg file="src/main/c"/>
+							<arg value="-force"/>
+							<arg value="org.exoplatform.services.organization.auth.pam.Pam"/>
+						</exec>
+  					<exec executable="make">
+  						<arg value="--directory=src/main/c"/>
+  						<arg value="libjpam.x86"/>
+						</exec>
+						<mkdir dir="${basedir}/target/c"/>
+						<copy todir="${basedir}/target/c">
+							<fileset dir="src/main/c">
+								<include name="*.so"/>
+							</fileset>
+						</copy>
+  					<exec executable="make">
+  						<arg value="--directory=src/main/c"/>
+  						<arg value="clean"/>
+						</exec>
+  				</tasks>
+  			</configuration>
+  		</plugin>
+  	</plugins>
+  </build>
+</project>

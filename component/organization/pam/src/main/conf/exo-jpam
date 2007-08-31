@@ -1,0 +1,5 @@
+#%PAM-1.0
+auth      required    pam_env.so
+auth      required    pam_unix2.so	
+auth      required    pam_group.so
+account   required    pam_unix2.so
