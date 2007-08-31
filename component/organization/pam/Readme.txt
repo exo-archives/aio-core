@@ -12,7 +12,7 @@ target/classes:.. \
 org.exoplatform.services.organization.auth.pam.Pam __username__ __password__
 
   For testing JAAS module run script: test-jaas.sh.
-  NOTE! Check classpath in script and command line given belowe before run it!!!
+  NOTE! Check classpath in script and command line given above before run it!!!
 
 
 3. If you like to use this do the next steps:
