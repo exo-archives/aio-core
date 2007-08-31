@@ -5,9 +5,10 @@ This tools for authentication native linux user in Java application.
   
   NOTE! Java and C library you can find in target folder. 
 
-2. For test builded and configured jpam tools run comman: 
+2. For test builded and configured jpam tools run command (or exec ./test-jpam.sh): 
 
 java -cp /usr/maven2/repository/commons-logging/commons-logging/1.1/commons-logging-1.1.jar:\
+/usr/maven2/repository/org/exoplatform/kernel/exo.kernel.component.common/2.0.3/exo.kernel.component.common-2.0.3.jar:\
 target/classes:.. \
 org.exoplatform.services.organization.auth.pam.Pam __username__ __password__
 
