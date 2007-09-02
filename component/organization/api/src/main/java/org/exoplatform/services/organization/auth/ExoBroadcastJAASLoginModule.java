@@ -78,7 +78,6 @@ public class ExoBroadcastJAASLoginModule implements LoginModule {
     try {
       try {
         String username = (String) sharedState_.get("javax.security.auth.login.name"); 	
-        
         ExoContainer container = getContainer();
         preProcessOperations();
         AuthenticationService authService =
