@@ -179,7 +179,11 @@ public class Pam {
    * @return String[] groups.
    */
   public String[] getGroups() {
-    return groups().trim().split(" ");
+    String g = groups();
+    if (g != null) {
+      return g.trim().split(" ");
+    } 
+    throw new NullPointerException("Can't get groups for current user!");
   }
 
   /**
