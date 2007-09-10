@@ -77,6 +77,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pwd.h>
+#include <grp.h>
 
 //Mac OS X has its PAM libraries in a different place
 #ifdef __APPLE__
@@ -306,24 +308,32 @@ JNIEXPORT jstring JNICALL Java_org_exoplatform_services_organization_auth_pam_Pa
     	return NULL;
     }
 
-    /* prepare string of system command */
-    char cmd[256] = "groups ";
-    strcat(cmd, username);
-
-    FILE* p = popen(cmd, "r"); /* exec system command */
-    if (p == NULL) { /* if system command filed and etc */
-    	return NULL;
+    int ng = 0;
+    gid_t *groups = NULL;
+    
+    struct passwd *pw = getpwnam(username);
+    if (pw == NULL) {
+        return NULL;
     }
 
-    char *c;
+    /* prepare string for result */
+    char str[10000] = "";
+
+    if (getgrouplist(username, pw->pw_gid, NULL, &ng) < 0) {
+        groups = (gid_t *) malloc(ng * sizeof (gid_t));
+        getgrouplist(username, pw->pw_gid, groups, &ng);
+    }
+
     int i = 0;
-    getline(&c, &i, p);
+    for(i = 0; i < ng; i++) {
+        strcat(str, getgrgid(groups[i])->gr_name);
+        strcat(str, " ");
+	}
     
-    pclose(p);
-    
-    jstring s = (*env)->NewStringUTF(env, c);
-    if (c) {
-    	free(c);
-    }
+    jstring s = (*env)->NewStringUTF(env, str);
+
+    free(groups);
+
     return s;
 }
+
