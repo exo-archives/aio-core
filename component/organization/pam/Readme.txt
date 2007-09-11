@@ -5,16 +5,14 @@ This tools for authentication native linux user in Java application.
   
   NOTE! Java and C library you can find in target folder. 
 
-2. For test builded and configured jpam tools run command (or exec ./test-jpam.sh): 
+2. For test builded and configured jpam tools run:
+   NOTE: Before run script chaeck it fro right classpath!
 
-java -cp /usr/maven2/repository/commons-logging/commons-logging/1.1/commons-logging-1.1.jar:\
-/usr/maven2/repository/org/exoplatform/kernel/exo.kernel.component.common/2.0.3/exo.kernel.component.common-2.0.3.jar:\
-target/classes:.. \
-org.exoplatform.services.organization.auth.pam.Pam __username__ __password__
+     './test-jpam.sh _username_ _password_' 
 
-  For testing JAAS module run script: test-jaas.sh.
-  NOTE! Check classpath in script and command line given above before run it!!!
+  For testing JAAS module run script:
 
+     './test-jaas.sh'
 
 3. If you like to use this do the next steps:
 

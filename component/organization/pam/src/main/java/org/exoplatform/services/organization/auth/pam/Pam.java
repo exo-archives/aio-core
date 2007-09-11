@@ -179,9 +179,9 @@ public class Pam {
    * @return String[] groups.
    */
   public String[] getGroups() {
-    String g = groups();
+    String[] g = groups();
     if (g != null) {
-      return g.trim().split(" ");
+      return g;
     } 
     throw new NullPointerException("Can't get groups for current user!");
   }
@@ -190,6 +190,6 @@ public class Pam {
    * C native method. Get groups for current user.
    * @return groups.
    */
-  private native String groups();
+  private native String[] groups();
 
 }

@@ -26,9 +26,9 @@ JNIEXPORT jint JNICALL Java_org_exoplatform_services_organization_auth_pam_Pam_a
 /*
  * Class:     org_exoplatform_services_organization_auth_pam_Pam
  * Method:    groups
- * Signature: ()Ljava/lang/String;
+ * Signature: ()[Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_exoplatform_services_organization_auth_pam_Pam_groups
+JNIEXPORT jobjectArray JNICALL Java_org_exoplatform_services_organization_auth_pam_Pam_groups
   (JNIEnv *, jobject);
 
 #ifdef __cplusplus

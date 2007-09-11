@@ -301,7 +301,7 @@ JNIEXPORT jint JNICALL Java_org_exoplatform_services_organization_auth_pam_Pam_a
  * Method:    groups
  * Signature: (Ljava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_exoplatform_services_organization_auth_pam_Pam_groups (JNIEnv *env, jobject jobj) {
+JNIEXPORT jobjectArray JNICALL Java_org_exoplatform_services_organization_auth_pam_Pam_groups (JNIEnv *env, jobject jobj) {
     
     /* check is authentication OK */
     if (status != 0) {
@@ -310,30 +310,28 @@ JNIEXPORT jstring JNICALL Java_org_exoplatform_services_organization_auth_pam_Pa
 
     int ng = 0;
     gid_t *groups = NULL;
-    
     struct passwd *pw = getpwnam(username);
     if (pw == NULL) {
         return NULL;
     }
 
-    /* prepare string for result */
-    char str[10000] = "";
-
     if (getgrouplist(username, pw->pw_gid, NULL, &ng) < 0) {
         groups = (gid_t *) malloc(ng * sizeof (gid_t));
         getgrouplist(username, pw->pw_gid, groups, &ng);
+    } else {
+        return NULL; 
     }
 
-    int i = 0;
+    jstring jstr = (*env)->NewStringUTF(env, "");
+    jobjectArray jgroups = (*env)->NewObjectArray(env, ng, (*env)->GetObjectClass(env, jstr), jstr);
+
+    int i;
     for(i = 0; i < ng; i++) {
-        strcat(str, getgrgid(groups[i])->gr_name);
-        strcat(str, " ");
+        (*env)->SetObjectArrayElement(env, jgroups, i, (*env)->NewStringUTF(env, getgrgid(groups[i])->gr_name));
 	}
     
-    jstring s = (*env)->NewStringUTF(env, str);
-
     free(groups);
 
-    return s;
+    return jgroups;
 }
 
