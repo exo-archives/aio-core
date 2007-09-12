@@ -51,20 +51,13 @@ import java.util.Set;
  */
 public class JpamLoginModule implements LoginModule {
 
-  private static Log logger = ExoLogger.getLogger("Pam");
-
+  private static final Log LOGGER = ExoLogger.getLogger("Pam");
   private static final String SERVICE_NAME_OPTION = "serviceName";
-
   private Subject subject;
-
   private CallbackHandler callbackHandler;
-
   private Map sharedState;
-
   private Map options;
-
   private Pam pam;
-
   private boolean loginStatus = false;
 
   /**
@@ -142,19 +135,17 @@ public class JpamLoginModule implements LoginModule {
     try {
       callbackHandler.handle(callbacks);
     } catch (IOException e) {
-      logger.error("IOException handling login: " + e.getMessage(), e);
+      LOGGER.error("IOException handling login: " + e.getMessage(), e);
       throw new LoginException(e.getMessage());
     } catch (UnsupportedCallbackException e) {
-      logger.error("UnsupportedCallbackException handling login: " + e.getMessage(), e);
+      LOGGER.error("UnsupportedCallbackException handling login: " + e.getMessage(), e);
       throw new LoginException(e.getMessage());
     }
     username = nameCallback.getName();
     password = String.copyValueOf(passwordCallback.getPassword());
-    boolean authenticated = false;
     PamReturnValue pamReturnValue = pam.authenticate(username, password);
     if (pamReturnValue.equals(PamReturnValue.PAM_SUCCESS)) {
-      authenticated = true;
-      loginStatus = authenticated;
+      loginStatus = true;
       subject.getPrincipals().add(new UserPrincipal(username));
     } else if (pamReturnValue.equals(PamReturnValue.PAM_ACCT_EXPIRED)) {
       throw new AccountExpiredException(PamReturnValue.PAM_ACCT_EXPIRED.toString());
@@ -163,21 +154,21 @@ public class JpamLoginModule implements LoginModule {
     } else {
       throw new FailedLoginException(pamReturnValue.toString());
     }
-    return authenticated;
+    return loginStatus;
   }
 
   
   private Pam createPam() {
     String serviceName = (String) options.get(SERVICE_NAME_OPTION);
     if (serviceName == null) {
-      logger.debug("No serviceName configured in JAAS configuration file. "
+      LOGGER.debug("No serviceName configured in JAAS configuration file. "
           + "Using default service name of "
           + Pam.DEFAULT_SERVICE_NAME);
       serviceName = Pam.DEFAULT_SERVICE_NAME;
     } else {
-      logger.debug("Using service name of "
+      LOGGER.debug("Using service name of "
           + serviceName
-          + " from JAAS configuration file");
+          + " from JAAS configuration file.");
     }
     return new Pam(serviceName);
   }

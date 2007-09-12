@@ -34,7 +34,7 @@ import org.exoplatform.services.log.ExoLogger;
  */
 
 public class Pam {
-  private static Log logger = ExoLogger.getLogger("Pam");
+  private static final Log LOGGER = ExoLogger.getLogger("Pam");
   private static final String JPAM_SHARED_LIBRARY_NAME = "jpam";
 
   private String serviceName;
@@ -94,15 +94,14 @@ public class Pam {
    * toolkit is set to DEBUG, the shared library will emit debug information to
    * the console.
    * 
-   * @param username the username to be authenticated
-   * @param credentials the credentials to use in the authentication .e.g a
-   *          password
+   * @param username the username to be authenticated.
+   * @param password the password.
    * @return true if the <code>PamReturnValue</code> is
    *         {@link PamReturnValue#PAM_SUCCESS}
    */
-  public boolean authenticateSuccessful(String username, String credentials) {
+  public boolean authenticateSuccessful(String username, String password) {
     PamReturnValue success = PamReturnValue.PAM_SUCCESS;
-    PamReturnValue actual = authenticate(username, credentials);
+    PamReturnValue actual = authenticate(username, password);
     return actual.equals(success);
   }
 
@@ -111,26 +110,26 @@ public class Pam {
    * {@link PamReturnValue} is returned <p/> This method is threadsafe.
    * 
    * @param username
-   * @param credentials
+   * @param password
    * @return a PAM specific return value
    * @throws NullPointerException if any of the parameters are null
    * @see #authenticateSuccessful(String, String)
    */
-  public PamReturnValue authenticate(String username, String credentials)
+  public PamReturnValue authenticate(String username, String password)
       throws NullPointerException {
-    boolean debug = logger.isDebugEnabled();
-    logger.debug("Debug mode active.");
+    boolean debug = LOGGER.isDebugEnabled();
+    LOGGER.debug("Debug mode active.");
     if (serviceName == null) {
       throw new NullPointerException("Service name is null");
     } else if (username == null) {
       throw new NullPointerException("User name is null");
-    } else if (credentials == null) {
-      throw new NullPointerException("Credentials are null");
+    } else if (password == null) {
+      throw new NullPointerException("Password is null");
     }
     synchronized (Pam.class) {
       PamReturnValue pamReturnValue =
         PamReturnValue.fromId(authenticate(serviceName, username,
-          credentials, debug));
+          password, debug));
       return pamReturnValue;
     }
   }
@@ -141,7 +140,7 @@ public class Pam {
   public static void main(String[] args) {
     Pam pam = new Pam();
     PamReturnValue pamReturnValue = pam.authenticate(args[0], args[1]);
-    logger.info("Response: " + pamReturnValue);
+    LOGGER.info("Response: " + pamReturnValue);
   }
 
   /**
@@ -150,7 +149,7 @@ public class Pam {
    * 
    * @param serviceName the pam.d config file to use
    * @param username the username to be authenticated
-   * @param credentials the credentials to be authenticated
+   * @param password the passwords to be authenticated
    * @param debug if true, debugging information will be emitted
    * @return an integer, which can be converted to a {@link PamReturnValue}
    *         using {@link PamReturnValue#fromId(int)}
