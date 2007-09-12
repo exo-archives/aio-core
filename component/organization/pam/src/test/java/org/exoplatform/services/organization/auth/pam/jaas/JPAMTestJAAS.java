@@ -31,7 +31,7 @@ public class JPAMTestJAAS {
    * @param args
    */
   public static void main(String[] args) throws Exception {
-    LoginContext loginContext = new LoginContext("exo-jpam",
+    LoginContext loginContext = new LoginContext("exo-domain",
         new JPAMTestJAAS().new JpamCallbackHandler());
     loginContext.login();
     System.out.println(">>> Login seccessful");
