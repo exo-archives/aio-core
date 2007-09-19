@@ -45,7 +45,6 @@ public class OrganizationConfig {
   
   static public class Group {
     private String name ;
-    private String type ;
     private String description ;
     private String parentId ;
     //TODO: Tung.Pham added
@@ -60,9 +59,6 @@ public class OrganizationConfig {
     
     public String getParentId() {  return parentId; }
     public void setParentId(String parentId) {  this.parentId = parentId;  }
-    
-    public String getType() {   return type; }
-    public void setType(String type) {  this.type = type;  }
     
     public String getLabel() { return label; }
     public void setLabel(String label) { this.label = label; }
