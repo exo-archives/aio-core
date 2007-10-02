@@ -10,13 +10,14 @@ import java.security.Principal;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.HashSet;
+import java.io.Serializable;
 
 /**
  * Created y the eXo platform team
  * User: Benjamin Mestrallet
  * Date: 29 avr. 2004
  */
-public class JAASGroup implements Group {
+public class JAASGroup implements Group, Serializable {
   public static final String ROLES = "Roles";
 
   private String name = null;

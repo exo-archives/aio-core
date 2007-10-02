@@ -4,6 +4,7 @@
  */
 package org.exoplatform.services.organization.auth;
 
+import java.io.Serializable;
 import java.security.Principal;
 
 /**
@@ -11,7 +12,7 @@ import java.security.Principal;
  * User:  Tuan Nguyen
  * Date: May 6th, 2007
  */
-public class RolePrincipal implements Principal {
+public class RolePrincipal implements Principal, Serializable {
 
   private String name;
 
