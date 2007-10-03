@@ -147,8 +147,8 @@ public class JpamLoginModule implements LoginModule {
     if (pamReturnValue.equals(PamReturnValue.PAM_SUCCESS)) {
       loginStatus_ = true;
       subject_.getPrincipals().add(new UserPrincipal(username));
-//      sharedState_.put("javax.security.auth.login.name", username);
-//      subject_.getPrivateCredentials().add(password);
+      sharedState_.put("javax.security.auth.login.name", username);
+      subject_.getPrivateCredentials().add(password);
     } else if (pamReturnValue.equals(PamReturnValue.PAM_ACCT_EXPIRED)) {
       throw new AccountExpiredException(PamReturnValue.PAM_ACCT_EXPIRED.toString());
     } else if (pamReturnValue.equals(PamReturnValue.PAM_CRED_EXPIRED)) {
