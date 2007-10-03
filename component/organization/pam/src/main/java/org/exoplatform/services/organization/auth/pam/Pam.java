@@ -37,7 +37,7 @@ public class Pam {
   private static final Log LOGGER = ExoLogger.getLogger("Pam");
   private static final String JPAM_SHARED_LIBRARY_NAME = "jpam";
 
-  private String serviceName;
+  private String serviceName_;
 
   /**
    * The default service name of "exo-jpam". <p/> This service is expected to
@@ -71,7 +71,7 @@ public class Pam {
     } else if (serviceName.length() == 0) {
       throw new IllegalArgumentException("Service name is empty");
     }
-    this.serviceName = serviceName;
+    this.serviceName_ = serviceName;
   }
 
   /**
@@ -119,7 +119,7 @@ public class Pam {
       throws NullPointerException {
     boolean debug = LOGGER.isDebugEnabled();
     LOGGER.debug("Debug mode active.");
-    if (serviceName == null) {
+    if (serviceName_ == null) {
       throw new NullPointerException("Service name is null");
     } else if (username == null) {
       throw new NullPointerException("User name is null");
@@ -128,7 +128,7 @@ public class Pam {
     }
     synchronized (Pam.class) {
       PamReturnValue pamReturnValue =
-        PamReturnValue.fromId(authenticate(serviceName, username,
+        PamReturnValue.fromId(authenticate(serviceName_, username,
           password, debug));
       return pamReturnValue;
     }
@@ -170,7 +170,7 @@ public class Pam {
    * @return the servicename this PAM object is using
    */
   public String getServiceName() {
-    return serviceName;
+    return serviceName_;
   }
 
   /**

@@ -177,7 +177,7 @@ static int PAM_conv(int num_msg, const struct pam_message **msg, struct pam_resp
   return PAM_SUCCESS;
 }
 
-JNIEXPORT void JNICALL Java_org_exoplatform_services_auth_pam_Pam_nativeMethod(JNIEnv *env, jobject obj) {
+JNIEXPORT void JNICALL Java_org_exoplatform_services_organization_auth_pam_Pam_nativeMethod(JNIEnv *env, jobject obj) {
   jclass cls = (*env)->GetObjectClass(env, obj);
   jmethodID mid = (*env)->GetMethodID(env, cls, "callback", "()V");
   if (mid == NULL) {

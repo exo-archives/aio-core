@@ -18,6 +18,7 @@ package org.exoplatform.services.organization.auth.pam.jaas;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.organization.auth.JAASGroup;
 import org.exoplatform.services.organization.auth.UserPrincipal;
 import org.exoplatform.services.organization.auth.pam.Pam;
 import org.exoplatform.services.organization.auth.pam.PamReturnValue;
@@ -34,9 +35,7 @@ import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A <code>LoginModule</code> which invokes JPAM. This can be used from
@@ -51,14 +50,14 @@ import java.util.Set;
  */
 public class JpamLoginModule implements LoginModule {
 
-  private static final Log LOGGER = ExoLogger.getLogger("Pam");
+  private static final Log LOGGER = ExoLogger.getLogger("JAASPam");
   private static final String SERVICE_NAME_OPTION = "serviceName";
-  private Subject subject;
-  private CallbackHandler callbackHandler;
-  private Map sharedState;
-  private Map options;
-  private Pam pam;
-  private boolean loginStatus = false;
+  private Subject subject_;
+  private CallbackHandler callbackHandler_;
+  private Map sharedState_;
+  private Map options_;
+  private Pam pam_;
+  private boolean loginStatus_ = false;
 
   /**
    * Method to abort the authentication process (phase 2). <p/>
@@ -98,12 +97,13 @@ public class JpamLoginModule implements LoginModule {
    * @throws javax.security.auth.login.LoginException if the commit fails
    */
   public boolean commit() throws LoginException {
-    String[] groups = pam.getGroups();
-    Set < Principal > principals = subject.getPrincipals();
+    String[] groups = pam_.getGroups();
+    JAASGroup jaasGroup = new JAASGroup("Groups");
     for (String g : groups) {
-      principals.add(new GroupPrincipal(g));
+      jaasGroup.addMember(new GroupPrincipal(g));
     }
-    return loginStatus;
+    subject_.getPrincipals().add(jaasGroup);    
+    return loginStatus_;
   }
 
   /**
@@ -122,7 +122,7 @@ public class JpamLoginModule implements LoginModule {
    */
   public boolean login() throws LoginException {
     
-    pam = createPam();
+    pam_ = createPam();
 
     Callback[] callbacks = new Callback[2];
     String username = null;
@@ -133,7 +133,7 @@ public class JpamLoginModule implements LoginModule {
     callbacks[1] = passwordCallback;
 
     try {
-      callbackHandler.handle(callbacks);
+      callbackHandler_.handle(callbacks);
     } catch (IOException e) {
       LOGGER.error("IOException handling login: " + e.getMessage(), e);
       throw new LoginException(e.getMessage());
@@ -143,10 +143,12 @@ public class JpamLoginModule implements LoginModule {
     }
     username = nameCallback.getName();
     password = String.copyValueOf(passwordCallback.getPassword());
-    PamReturnValue pamReturnValue = pam.authenticate(username, password);
+    PamReturnValue pamReturnValue = pam_.authenticate(username, password);
     if (pamReturnValue.equals(PamReturnValue.PAM_SUCCESS)) {
-      loginStatus = true;
-      subject.getPrincipals().add(new UserPrincipal(username));
+      loginStatus_ = true;
+      subject_.getPrincipals().add(new UserPrincipal(username));
+//      sharedState_.put("javax.security.auth.login.name", username);
+//      subject_.getPrivateCredentials().add(password);
     } else if (pamReturnValue.equals(PamReturnValue.PAM_ACCT_EXPIRED)) {
       throw new AccountExpiredException(PamReturnValue.PAM_ACCT_EXPIRED.toString());
     } else if (pamReturnValue.equals(PamReturnValue.PAM_CRED_EXPIRED)) {
@@ -154,12 +156,12 @@ public class JpamLoginModule implements LoginModule {
     } else {
       throw new FailedLoginException(pamReturnValue.toString());
     }
-    return loginStatus;
+    return loginStatus_;
   }
 
   
   private Pam createPam() {
-    String serviceName = (String) options.get(SERVICE_NAME_OPTION);
+    String serviceName = (String) options_.get(SERVICE_NAME_OPTION);
     if (serviceName == null) {
       LOGGER.debug("No serviceName configured in JAAS configuration file. "
           + "Using default service name of "
@@ -211,17 +213,17 @@ public class JpamLoginModule implements LoginModule {
   public void initialize(Subject subject, CallbackHandler callbackHandler,
       Map sharedState, Map options) {
     
-    this.subject = subject;
-    this.callbackHandler = callbackHandler;
-    this.sharedState = sharedState;
-    this.options = options;
+    this.subject_ = subject;
+    this.callbackHandler_ = callbackHandler;
+    this.sharedState_ = sharedState;
+    this.options_ = options;
   }
 
   /**
    * Get the underlying PAM object
    */
   public Pam getPam() {
-    return pam;
+    return pam_;
   }
   
 }
