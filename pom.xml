@@ -14,9 +14,11 @@
     <module>component/organization/api</module>
     <module>component/organization/jdbc</module>
     <module>component/organization/ldap</module>
+    <module>component/organization/pam</module>
     <module>component/security</module>
     <module>component/xml-processing</module>
     <module>component/resources/api</module>
+    <module>ejb/organization</module>
   </modules>
 
   <build>

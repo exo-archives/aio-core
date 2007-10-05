@@ -7,6 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.core.component.organization.pam</artifactId>
   <version>${org.exoplatform.core.version}</version>
+  <name>JPam Login Module</name>
   <description></description>
   
   <dependencies>
