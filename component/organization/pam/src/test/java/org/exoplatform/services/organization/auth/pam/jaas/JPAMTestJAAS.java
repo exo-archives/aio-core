@@ -3,9 +3,11 @@
  * Please look at license.txt in info directory for more license detail.   *
  **************************************************************************/
 package org.exoplatform.services.organization.auth.pam.jaas;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Enumeration;
 import java.util.Set;
 
 import javax.security.auth.callback.Callback;
@@ -16,8 +18,10 @@ import javax.security.auth.callback.TextOutputCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
 
+import org.exoplatform.services.organization.auth.JAASGroup;
 import org.exoplatform.services.organization.auth.pam.jaas.GroupPrincipal;
 
+import static java.lang.System.out;
 
 /**
  * Just for test JpamLoginModule!!!
@@ -34,14 +38,19 @@ public class JPAMTestJAAS {
     LoginContext loginContext = new LoginContext("exo-domain",
         new JPAMTestJAAS().new JpamCallbackHandler());
     loginContext.login();
-    System.out.println(">>> Login seccessful");
-    System.out.println(loginContext.getSubject());
-    Set < GroupPrincipal > gprincipals =
-      loginContext.getSubject().getPrincipals(GroupPrincipal.class);
+    out.println(">>> Login seccessful");
+    out.println(loginContext.getSubject());
+    Set<JAASGroup> gprincipals = loginContext.getSubject().getPrincipals(
+        JAASGroup.class);
     if (gprincipals != null && gprincipals.size() != 0) {
-      System.out.println(">>> User is memebr of groups : ");
-      for (GroupPrincipal gp : gprincipals) {
-        System.out.println(gp.getName());
+      out.println(">>> User is memebr of groups : ");
+      for (JAASGroup gp : gprincipals) {
+        out.print(gp.getName() + " : ");
+        Enumeration<GroupPrincipal> g = gp.members();
+        while (g.hasMoreElements()) {
+          out.print(g.nextElement().getName() + "; ");
+        }
+        out.println();
       }
     }
     loginContext.logout();
@@ -49,26 +58,28 @@ public class JPAMTestJAAS {
 
   class JpamCallbackHandler implements CallbackHandler {
 
-    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+    public void handle(Callback[] callbacks) throws IOException,
+        UnsupportedCallbackException {
 
-      BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-      
+      BufferedReader reader = new BufferedReader(new InputStreamReader(
+          System.in));
+
       for (int i = 0; i < callbacks.length; i++) {
         if (callbacks[i] instanceof TextOutputCallback) {
           TextOutputCallback toc = (TextOutputCallback) callbacks[i];
           switch (toc.getMessageType()) {
-            case TextOutputCallback.INFORMATION:
-              System.out.println(toc.getMessage());
-              break;
-            case TextOutputCallback.ERROR:
-              System.out.println("ERROR: " + toc.getMessage());
-              break;
-            case TextOutputCallback.WARNING:
-              System.out.println("WARNING: " + toc.getMessage());
-              break;
-            default:
-              throw new IOException("Unsupported message type: "
-                  + toc.getMessageType());
+          case TextOutputCallback.INFORMATION:
+            System.out.println(toc.getMessage());
+            break;
+          case TextOutputCallback.ERROR:
+            System.out.println("ERROR: " + toc.getMessage());
+            break;
+          case TextOutputCallback.WARNING:
+            System.out.println("WARNING: " + toc.getMessage());
+            break;
+          default:
+            throw new IOException("Unsupported message type: "
+                + toc.getMessageType());
           }
 
         } else if (callbacks[i] instanceof NameCallback) {
@@ -80,11 +91,12 @@ public class JPAMTestJAAS {
           System.out.print(pc.getPrompt());
           pc.setPassword(reader.readLine().trim().toCharArray());
         } else {
-          throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
+          throw new UnsupportedCallbackException(callbacks[i],
+              "Unrecognized Callback");
         }
       }
     }
-    
+
   }
 
 }
