@@ -40,7 +40,7 @@ public class TextPlainDocumentReader extends BaseDocumentReader {
    */
   public String getContentAsText(InputStream is) throws Exception {
     
-    byte[] buffer = new byte[0x2000];
+    byte[] buffer = new byte[2048];
     int len;
     ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
     while ((len = is.read(buffer)) > 0) 

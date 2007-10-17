@@ -44,7 +44,7 @@ public class XMLDocumentReader extends BaseDocumentReader {
    * @return The string only with text from file content.
    */
   public String getContentAsText(InputStream is) throws Exception {
-    byte[] buffer = new byte[0x2000];
+    byte[] buffer = new byte[2048];
     int len;
     ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
     while ((len = is.read(buffer)) > 0) 
@@ -52,20 +52,6 @@ public class XMLDocumentReader extends BaseDocumentReader {
     bos.close();
     String xml = new String(bos.toByteArray());
     return delete(xml);
-    
-//    String text = "";
-//  try {
-//  int size = is.available();
-//  byte b[] = new byte[size];
-//  is.read(b);
-//  String xml = new String(bos.toByteArray());
-//  text = this.delete(xml);
-//}
-//catch(Exception e){
-//}
-//return text ;
-
-
   }
 
   /* (non-Javadoc)

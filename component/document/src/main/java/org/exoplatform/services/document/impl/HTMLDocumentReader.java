@@ -59,7 +59,7 @@ public class HTMLDocumentReader extends BaseDocumentReader {
     String refined_text = new String();
     try
     {
-     byte[] buffer = new byte[0x2000];
+     byte[] buffer = new byte[2048];
      int len;
      ByteArrayOutputStream bos = new ByteArrayOutputStream();
      while ((len = is.read(buffer)) > 0)

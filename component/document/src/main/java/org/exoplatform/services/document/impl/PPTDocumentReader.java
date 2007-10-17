@@ -35,14 +35,8 @@ public class PPTDocumentReader extends BaseDocumentReader {
    * @throws Exception
    */
   public String getContentAsText(InputStream is) throws Exception {
-    String text = null;
-    try {
-      PowerPointExtractor ppe = new PowerPointExtractor(is);
-      text = ppe.getText(true,true) ;
-    }
-    finally {
-    }
-    return text ;
+    PowerPointExtractor ppe = new PowerPointExtractor(is);
+    return ppe.getText(true,true) ;
   }
   
   /* (non-Javadoc)

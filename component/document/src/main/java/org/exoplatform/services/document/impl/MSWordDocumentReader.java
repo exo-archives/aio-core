@@ -43,7 +43,7 @@ public class MSWordDocumentReader extends BaseDocumentReader {
    * @throws Exception
    */
   public String getContentAsText(InputStream is) throws Exception {
-    String text = null;
+    String text = "";
     try {
       HWPFDocument doc = new HWPFDocument(is);
       Range range = doc.getRange();
