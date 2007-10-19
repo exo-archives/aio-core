@@ -55,7 +55,7 @@ public class POIPropertiesReader {
 //            if(docInfo.getProducer() != null)
 //              props.put(DCMetaData.PUBLISHER, docInfo.getProducer());
             if(si.getSubject() != null && si.getSubject().length() > 0)
-              props.put(DCMetaData.DESCRIPTION, si.getSubject());
+              props.put(DCMetaData.SUBJECT, si.getSubject());
             if(si.getTitle() != null && si.getTitle().length() > 0)
               props.put(DCMetaData.TITLE, si.getTitle());
 
