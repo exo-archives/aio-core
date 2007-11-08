@@ -101,15 +101,26 @@ public class DummyOrganizationService extends BaseOrganizationService {
 
       while (it.hasNext()) {
         User usr = it.next();
-        if (usr.getUserName().equals(userName))
+        if (usr.getUserName().equals(userName)) {
+          usr.setFirstName("_" + userName);
+          usr.setEmail(userName + "@mail.com");
           return usr;
+        }
       }
 
       return null;
     }
 
     public PageList findUsersByGroup(String groupId) throws Exception {
-      return null;
+      List<User> users = new ArrayList<User>();
+      if (groupId.startsWith("exo")) {
+        users.add(new UserImpl("exo"));
+        users.add(new UserImpl("exo1"));
+        users.add(new UserImpl("exo2"));
+      }
+      if (groupId.startsWith("admin"))
+        users.add(new UserImpl("admin"));
+      return new ObjectPageList(users, 10);
     }
 
     public PageList getUserPageList(int pageSize) throws Exception {
@@ -117,7 +128,7 @@ public class DummyOrganizationService extends BaseOrganizationService {
     }
 
     public PageList findUsers(Query query) throws Exception {
-      return null;
+      return new ObjectPageList(users, 10);
     }
 
     public void addUserEventListener(UserEventListener listener) {
@@ -183,7 +194,8 @@ public class DummyOrganizationService extends BaseOrganizationService {
     }
 
     public Group findGroupById(String groupId) throws Exception {
-      return null;
+      Group group = new DummyGroup("/" + groupId, groupId);
+      return group;
     }
 
     public Collection findGroups(Group parent) throws Exception {
@@ -194,7 +206,10 @@ public class DummyOrganizationService extends BaseOrganizationService {
     }
 
     public Collection getAllGroups() {
-      return null;
+      ArrayList groups = new ArrayList();
+      groups.add(new DummyGroup("/exo", "exo"));
+      groups.add(new DummyGroup("/admin", "admin"));
+      return groups;
     }
 
     public Collection findGroupsOfUser(String user) throws Exception {
