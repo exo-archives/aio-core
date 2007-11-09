@@ -206,14 +206,14 @@ public class DummyOrganizationService extends BaseOrganizationService {
     }
 
     public Collection getAllGroups() {
-      ArrayList groups = new ArrayList();
+      List<Group> groups = new ArrayList<Group>();
       groups.add(new DummyGroup("/exo", "exo"));
       groups.add(new DummyGroup("/admin", "admin"));
       return groups;
     }
 
     public Collection findGroupsOfUser(String user) throws Exception {
-      ArrayList groups = new ArrayList(1);
+      List<Group> groups = new ArrayList<Group>(1);
       if (user.startsWith("exo"))
         groups.add(new DummyGroup("/exo", "exo"));
       if (user.startsWith("admin"))
