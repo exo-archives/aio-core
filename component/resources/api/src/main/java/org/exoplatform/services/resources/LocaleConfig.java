@@ -38,7 +38,7 @@ public interface LocaleConfig {
   
   public ResourceBundle getMergeResourceBundle(String[] names);
   
-  public ResourceBundle getOwnerResourceBundle(String owner);
+  public ResourceBundle getNavigationResourceBundle(String ownerType, String ownerId);
   
   public void setInput(HttpServletRequest req)  throws java.io.UnsupportedEncodingException;
   

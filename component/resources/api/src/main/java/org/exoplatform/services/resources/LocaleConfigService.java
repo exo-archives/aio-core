@@ -25,6 +25,6 @@ public interface LocaleConfigService {
   /**
    * @return All the LocalConfig that manage by the service 
    */
-  public Collection getLocalConfigs();
+  public Collection<LocaleConfig> getLocalConfigs();
   
 }

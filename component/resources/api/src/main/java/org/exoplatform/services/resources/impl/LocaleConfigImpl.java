@@ -75,19 +75,8 @@ public class LocaleConfigImpl implements LocaleConfig {
     return res ;
   }
   
-  public ResourceBundle getOwnerResourceBundle(String owner) {
-    PortalContainer manager = PortalContainer.getInstance() ; 
-    ResourceBundleService service = 
-      (ResourceBundleService)manager.getComponentInstanceOfType(ResourceBundleService.class) ;
-    try {
-      ResourceBundle res = service.getResourceBundle("locale.users." + owner, locale_) ;
-      if(res == null ) {
-        res = service.getResourceBundle("locale.users.default", locale_) ;
-      }
-      return res ;
-    } catch (Exception ex) {
-      return service.getResourceBundle("locale.users.default", locale_) ;
-    }
+  public ResourceBundle getNavigationResourceBundle(String ownerType, String ownerId) {
+    return getResourceBundle("locale.navigation." + ownerType + "." + ownerId.replaceAll("/",".")) ;
   }
   
   public void setInput(HttpServletRequest req) throws java.io.UnsupportedEncodingException {

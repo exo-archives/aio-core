@@ -17,7 +17,6 @@ import org.exoplatform.commons.utils.IOUtil;
 import org.exoplatform.commons.utils.MapResourceBundle;
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.container.xml.ValuesParam;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
@@ -92,10 +91,10 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
     String name = baseName.replace('.', '/');
     String fileName = null;
     try {
-      Collection localeConfigs = localeService_.getLocalConfigs();
+      Collection<LocaleConfig> localeConfigs = localeService_.getLocalConfigs();
       String defaultLang = localeService_.getDefaultLocaleConfig().getLanguage();
-      for (Iterator iter = localeConfigs.iterator(); iter.hasNext();) {
-        LocaleConfig localeConfig = (LocaleConfig) iter.next();
+      for (Iterator<LocaleConfig> iter = localeConfigs.iterator(); iter.hasNext();) {
+        LocaleConfig localeConfig = iter.next();
         String language = localeConfig.getLanguage();
         if (defaultLang.equals(language)) {
           fileName = name + ".properties";
