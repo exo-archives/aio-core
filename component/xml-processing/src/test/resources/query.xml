@@ -1,0 +1,3 @@
+<query  source="samples/ejb-jar.xml" destination="samples/ejb-jar1.xml">
+   <select xpath="//ejb-jar/enterprise-beans/message-driven/ejb-name"/>
+</query>

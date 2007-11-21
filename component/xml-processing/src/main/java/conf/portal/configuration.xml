@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<configuration>  
+	<component>
+		<type>org.exoplatform.services.xml.resolving.impl.simple.SimpleDirResolvingServiceImpl</type>
+	</component>
+	<component>
+		<type>org.exoplatform.services.xml.transform.impl.html.TidyTransformerServiceImpl</type>
+	</component>
+	<component>
+		<type>org.exoplatform.services.xml.transform.impl.trax.TRAXTransformerServiceImpl</type>
+	</component>
+	<component>
+		<type>org.exoplatform.services.xml.transform.impl.EncodingMapImpl</type>
+	</component>	
+</configuration>
