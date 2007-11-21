@@ -1,3 +1,0 @@
-<query  source="tmp/addresses.xml" destination="tmp/test-addr.out">
-   <select xpath="."/>
-</query>
