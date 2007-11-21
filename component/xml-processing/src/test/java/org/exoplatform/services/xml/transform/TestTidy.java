@@ -4,25 +4,22 @@
  **/
 package org.exoplatform.services.xml.transform;
 
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.sax.TransformerHandler;
-import javax.xml.transform.sax.SAXTransformerFactory;
-import javax.xml.transform.sax.SAXResult;
-
-import org.exoplatform.container.PortalContainer;
-
-import org.exoplatform.services.xml.transform.html.HTMLTransformer;
-import org.exoplatform.services.xml.transform.html.HTMLTransformerService;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.util.Properties;
 
-import org.exoplatform.services.log.LogService;
-import org.exoplatform.container.RootContainer;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.commons.logging.Log;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.xml.transform.html.HTMLTransformer;
+import org.exoplatform.services.xml.transform.html.HTMLTransformerService;
 
 
 /**
@@ -46,17 +43,17 @@ public class TestTidy extends BaseTest {
 
   public void testTidy() throws Exception {
     try {
-      String OUTPUT_FILENAME = "tmp/rss-out_"+getTimeStamp()+"_xhtml.xhtml";
+      String OUTPUT_FILENAME = "target/rss-out_"+getTimeStamp()+"_xhtml.xhtml";
 
-      FileInputStream inputFileInputStream =
-                new FileInputStream("tmp/rss-out.html");
+      InputStream res = getClass().getClassLoader().getResourceAsStream(
+      "rss-out.html");
 
       //output file
       OutputStream outputFileOutputStream =
                 new FileOutputStream(OUTPUT_FILENAME);
 
       htmlTransformer.initResult(new StreamResult(outputFileOutputStream));
-      htmlTransformer.transform(new StreamSource(inputFileInputStream));
+      htmlTransformer.transform(new StreamSource(res));
 
       outputFileOutputStream.close();
 
@@ -75,24 +72,24 @@ public class TestTidy extends BaseTest {
   }
 
   public void testSAXResultType() throws Exception {
+    InputStream res = getClass().getClassLoader().getResourceAsStream(
+    "rss-out.xhtml");
 
-      FileInputStream inputFileInputStream =
-              new FileInputStream("tmp/rss-out.html");
-      assertTrue("Empty input file",inputFileInputStream.available() > 0);
+      assertTrue("Empty input file",res.available() > 0);
 
       //create empty transformation
       TransformerHandler transformHandler = //a copy of the source to the result
               ((SAXTransformerFactory) SAXTransformerFactory.newInstance()).
               newTransformerHandler();
 
-      String  OUTPUT_FILENAME = "tmp/rss-out_"+getTimeStamp()+"_html2sax.xhtml";
+      String  OUTPUT_FILENAME = "target/rss-out_"+getTimeStamp()+"_html2sax.xhtml";
       OutputStream output = new FileOutputStream(OUTPUT_FILENAME);
 
       transformHandler.setResult(new StreamResult(output));
 
       SAXResult saxResult = new SAXResult(transformHandler);
       htmlTransformer.initResult(saxResult);
-      htmlTransformer.transform(new StreamSource(inputFileInputStream));
+      htmlTransformer.transform(new StreamSource(res));
 
 
       output.flush();

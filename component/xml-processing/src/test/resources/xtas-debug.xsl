@@ -2,13 +2,11 @@
   version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias"
+  xmlns:xtas="http://xtas.sourceforge.net"
   xmlns:jcr="http://www.jcp.org/jcr/1.0"
-  xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
-  xmlns:pt="http://www.jcp.org/jcr/pt/1.0"
-  xmlns:sv="http://www.jcp.org/jcr/sv/1.0"
   >
 
-<!-- Ver 1.1 (with jcr ns) -->
+<!-- Ver 1.2 -->
 
 <xsl:namespace-alias stylesheet-prefix="axsl" result-prefix="xsl"/>
 
@@ -16,7 +14,9 @@
 
 <xsl:template match="/">
   <axsl:stylesheet  version="1.0">
-  <axsl:output method="xml" indent="no" omit-xml-declaration="yes"/>
+  <axsl:output method="xml" indent="yes" omit-xml-declaration="yes"/>
+  <axsl:param name="generate-info" select="0"/>
+  <axsl:param name="sourceId" select="null"/>
 
     <xsl:apply-templates/>
 
@@ -31,14 +31,17 @@
 
 <xsl:template match="select">
 
-
    <axsl:template  match="/">
-
-      <axsl:copy-of select="{@xpath}"/>
-
+       <xsl:element name="xtas:query">
+          <axsl:attribute name="xtas:source">
+            <axsl:value-of select="$sourceId"/> 
+          </axsl:attribute>
+          <axsl:attribute name="xtas:xpath">
+            <xsl:value-of select="@xpath"/> 
+          </axsl:attribute>
+          <axsl:copy-of select="{@xpath}"/>
+       </xsl:element>
    </axsl:template>
-
-
 
 </xsl:template>
 
@@ -54,16 +57,8 @@
 
     </axsl:template>
 
-
    <axsl:template  match="{@xpath}">
-
-       <axsl:copy>
-         <axsl:apply-templates 
-           select="@*|*|text()|processing-instruction()"/>
-       </axsl:copy>
-
-      <xsl:copy-of select="//append/*"/>
-
+      <xsl:copy-of select="//append/value/node()"/>
    </axsl:template>
 
 </xsl:template>
@@ -101,6 +96,35 @@
    <axsl:template  match="{@xpath}">
 
       <xsl:copy-of select="//update/node()"/>
+
+   </axsl:template>
+
+</xsl:template>
+
+<!-- Resource queries EXPERIMENTAL! 
+    (worked but query does not use it for a while) -->
+
+<xsl:template match="create">
+
+   <axsl:template  match="/">
+
+      <axsl:processing-instruction name="resource">
+         type="create" id="<xsl:value-of select="@resource"/>"
+      </axsl:processing-instruction>
+
+      <xsl:copy-of select="/create/*"/>
+
+   </axsl:template>
+
+</xsl:template>
+
+<xsl:template match="drop">
+
+   <axsl:template  match="/">
+
+      <axsl:processing-instruction name="resource">
+         type="drop" id="<xsl:value-of select="@resource"/>"
+      </axsl:processing-instruction>
 
    </axsl:template>
 

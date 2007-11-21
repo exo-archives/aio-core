@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query  source="tmp/ejb-jar.xml" destination="tmp/out12.xml">
+   <select xpath="//ejb-jar/enterprise-beans/message-driven"/>
+   <select xpath="//ejb-jar/enterprise-beans/message-driven"/>
+</query>

@@ -6,31 +6,28 @@
  */
 package org.exoplatform.services.xml.transform.impl;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
-import org.xml.sax.SAXException;
 
 import org.apache.commons.logging.Log;
-
+import org.apache.commons.logging.LogFactory;
+import org.exoplatform.services.xml.resolving.XMLResolvingService;
 import org.exoplatform.services.xml.transform.AbstractTransformer;
 import org.exoplatform.services.xml.transform.NotSupportedIOTypeException;
-import org.exoplatform.services.log.LogService;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.services.xml.resolving.XMLResolvingService;
-import org.apache.commons.logging.LogFactory;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 
 
@@ -66,8 +63,8 @@ public abstract class TransformerBase implements AbstractTransformer {
      * @todo change. Must no use explicit parser class name
      */
     static public XMLReader getXMLReader() throws SAXException {
-       return XMLReaderFactory.
-               createXMLReader("org.apache.xerces.parsers.SAXParser");
+       return XMLReaderFactory.createXMLReader();
+//               createXMLReader("org.apache.xerces.parsers.SAXParser");
     }
 
     /**

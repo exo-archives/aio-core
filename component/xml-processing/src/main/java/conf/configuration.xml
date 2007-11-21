@@ -3,7 +3,4 @@
 	<component>
 		<type>org.exoplatform.services.xml.resolving.impl.simple.SimpleDirResolvingServiceImpl</type>
 	</component>
-	<component>
-		<type>org.exoplatform.services.xml.querying.impl.xtas.XMLQueryingServiceImpl</type>
-	</component>  
 </configuration>

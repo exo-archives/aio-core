@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ejb-jar SYSTEM "ejb-jar_2_0.dtd">
+
+<ejb-jar>
+    <enterprise-beans>
+        <message-driven>
+           <ejb-name>ListenerBean</ejb-name>
+           <ejb-class>ListenerBean</ejb-class>
+           <transaction-type>Container</transaction-type>
+           <acknowledge-mode>auto-acknowledge</acknowledge-mode>
+           <message-driven-destination>
+               <destination-type>javax.jms.Topic</destination-type>
+               <subscription-durability>nondurable</subscription-durability>
+           </message-driven-destination>
+           <security-identity>
+               <run-as>
+                  <role-name>ADMIN</role-name>
+               </run-as>
+           </security-identity>
+       </message-driven>
+   </enterprise-beans>
+</ejb-jar>
+

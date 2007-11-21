@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+
+<mapping>
+
+  <class name="org.exoplatform.services.xml.querying.impl.xtas.EmployeeBean">
+    <map-to xml="employee"/>
+    <field name="id" type="java.lang.String" >
+         <bind-xml name="id" node="attribute"/>
+    </field>
+    <field name="firstname" type="java.lang.String" >
+         <bind-xml name="firstname" node="element"/>
+    </field>
+    <field name="lastname" type="java.lang.String" >
+         <bind-xml name="lastname" node="element"/>
+    </field>
+    <field name="telephone" type="java.lang.String" >
+         <bind-xml name="telephone" node="element"/>
+    </field>
+    <field name="address" type="org.exoplatform.services.xml.querying.impl.xtas.Address" >
+         <bind-xml name="address" node="element"/>
+    </field>
+
+  </class>
+
+  <class name="org.exoplatform.services.xml.querying.impl.xtas.Address">
+
+    <field name="street1" type="java.lang.String" >
+         <bind-xml name="street1" node="element"/>
+    </field>
+    <field name="street2" type="java.lang.String" >
+         <bind-xml name="street2" node="element"/>
+    </field>
+    <field name="city" type="java.lang.String" >
+         <bind-xml name="city" node="element"/>
+    </field>
+    <field name="country" type="java.lang.String" >
+         <bind-xml name="country" node="element"/>
+    </field>
+    <field name="zip" type="java.lang.String" >
+         <bind-xml name="zip" node="element"/>
+    </field>
+
+  </class>
+
+</mapping>
