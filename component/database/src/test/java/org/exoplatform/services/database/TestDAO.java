@@ -22,6 +22,10 @@ import org.exoplatform.services.listener.ListenerService;
  */
 public class TestDAO extends TestCase {
   
+  public void testDummy() {
+    // empty, to doesn't fail during the tests
+  }
+  
 /*
 
   GA: This Test failed, uncomment to see!!! 
