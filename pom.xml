@@ -51,12 +51,16 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <skip>${test.skip}</skip>
-          <useFile>false</useFile>
-          <forkMode>once</forkMode><!--once , pertest -->
-          <testFailureIgnore>true</testFailureIgnore>
-          <includes>
-            <include implementation="java.lang.String">**/${test.classes}*.java</include>
-          </includes>
+          <useFile>${exo.test.use.file}</useFile>
+          <childDelegation>false</childDelegation>
+		  <forkMode>never</forkMode>
+          <testFailureIgnore>${exo.test.failure.ignore}</testFailureIgnore>
+          <excludes>
+            <exclude>**/DBCreatorTest.java</exclude>
+		    <exclude>**/TestOrganizationService.java</exclude>
+		    <exclude>**/CurrentSubjectTest.java</exclude>
+		    <exclude>**/*$*</exclude>
+          </excludes>
         </configuration>
       </plugin>
     </plugins>
@@ -64,7 +68,7 @@
 
   <profiles>
     <profile>
-      <id>default</id>  
+      <id>default</id>
       <activation>
         <property><name>default</name></property>
         <activeByDefault>true</activeByDefault>

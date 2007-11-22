@@ -31,45 +31,34 @@ public class PropertiesExtractTest extends TestCase {
   }
 
   public void testPDFDocumentReaderService() throws Exception {
-    InputStream is = null;
-    File f = new File("src/test/resources/test.pdf");
-    //File f = new File("src/test/resources/portlet-1_0-prd-spec.pdf");
-    
-    is = new FileInputStream(f);
+    InputStream is = PropertiesExtractTest.class.getResourceAsStream("/test.pdf");
     Properties props = service_.getDocumentReader("application/pdf").getProperties(is);
     printProps(props);
   }
 
   
   public void testWordDocumentReaderService() throws Exception {
-    InputStream is = null;
-    File f = new File("src/test/resources/test.doc");
-    is = new FileInputStream(f);
+    InputStream is = PropertiesExtractTest.class.getResourceAsStream("/test.doc");
     Properties props = service_.getDocumentReader("application/msword").getProperties(is);
     printProps(props);
   }
 
   public void testPPTDocumentReaderService() throws Exception {
-    InputStream is = null;
-    File f = new File("src/test/resources/test.ppt");
-    is = new FileInputStream(f);
+    InputStream is = PropertiesExtractTest.class.getResourceAsStream("/test.doc");
     Properties props = service_.getDocumentReader("application/powerpoint").getProperties(is);
     printProps(props);
 
   }
 
   public void testExcelDocumentReaderService() throws Exception {
-    InputStream is = null;
-    File f = new File("src/test/resources/test.xls");
-    is = new FileInputStream(f);
+    InputStream is = PropertiesExtractTest.class.getResourceAsStream("/test.xls");
     Properties props = service_.getDocumentReader("application/excel").getProperties(is);
     printProps(props);
     
   }
 
   public void testOODocumentReaderService() throws Exception {
-    File f = new File("src/test/resources/subscription.odt");
-    InputStream is = new FileInputStream(f);
+    InputStream is = PropertiesExtractTest.class.getResourceAsStream("/subscription.odt");
     Properties props = service_.getDocumentReader("application/vnd.oasis.opendocument.text").getProperties(is);
     printProps(props);
 

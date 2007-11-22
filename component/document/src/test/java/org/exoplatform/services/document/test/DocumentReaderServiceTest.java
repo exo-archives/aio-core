@@ -31,71 +31,55 @@ public class DocumentReaderServiceTest extends BasicTestCase {
   }
 
   public void testPDFDocumentReaderService() throws Exception {
-    InputStream is = null;
-    File f = new File("src/test/resources/test.pdf");
-    is = new FileInputStream(f);
+    InputStream is = DocumentReaderServiceTest.class.getResourceAsStream("/test.pdf");
     String text = service_.getDocumentReader("application/pdf").getContentAsText( is);
     System.out.println(text);
   }
 
   public void testWordDocumentReaderService() throws Exception {
-    InputStream is = null;
-    File f = new File("src/test/resources/test.doc");
-    is = new FileInputStream(f);
+    InputStream is = DocumentReaderServiceTest.class.getResourceAsStream("/test.doc");
     String text = service_.getDocumentReader("application/msword").getContentAsText(is);
     System.out.println(text);
   }
   
-  public void testWordTemplateReaderService() throws Exception {    
-    File testFile = new File("src/test/resources/test.dot");
-    InputStream inStream = new FileInputStream(testFile);    
+  public void testWordTemplateReaderService() throws Exception {   
+    InputStream inStream = DocumentReaderServiceTest.class.getResourceAsStream("/test.dot");
     String text = service_.getDocumentReader("application/msworddot").getContentAsText(inStream);
     System.out.println("TEXT: " + text);
   }
 
   public void testPPTDocumentReaderService() throws Exception {
-    InputStream is = null;
-    File f = new File("src/test/resources/test.ppt");
-    is = new FileInputStream(f);
+    InputStream is = DocumentReaderServiceTest.class.getResourceAsStream("/test.ppt");
     String text = service_.getDocumentReader("application/powerpoint").getContentAsText(is);
     System.out.println(text);
   }
 
   public void testExcelDocumentReaderService() throws Exception {
-    InputStream is = null;
-    File f = new File("src/test/resources/test.xls");
-    is = new FileInputStream(f);
+    InputStream is = DocumentReaderServiceTest.class.getResourceAsStream("/test.xls");
     String text = service_.getDocumentReader("application/excel").getContentAsText(is);
     System.out.println(text);
   }
 
   public void testHTMLDocumentReaderService() throws Exception {
-    InputStream is = null;
-    File f = new File("src/test/resources/test.html");
-    is = new FileInputStream(f);
+    InputStream is = DocumentReaderServiceTest.class.getResourceAsStream("/test.html");
     String text = service_.getDocumentReader("text/html").getContentAsText(is);
     System.out.println(text);
   }
 
   public void testXMLDocumentReaderService() throws Exception {
-    InputStream is = null;
-    File f = new File("src/test/resources/test.xml");
-    is = new FileInputStream(f);
+    InputStream is = DocumentReaderServiceTest.class.getResourceAsStream("/test.xml");
     String text = service_.getDocumentReader("text/xml").getContentAsText(is);
     System.out.println(text);
   }
 
   public void testTextPlainDocumentReaderService() throws Exception {
-    InputStream is = null;
-    File f = new File("src/test/resources/test.txt");
-    is = new FileInputStream(f);
+    InputStream is = DocumentReaderServiceTest.class.getResourceAsStream("/test.txt");
     String text = service_.getDocumentReader("text/plain").getContentAsText(is);
     System.out.println(text);
   }
 
   public void testOODocumentReaderService() throws Exception {
-    File f = new File("src/test/resources/subscription.odt");
-    InputStream is = new FileInputStream(f);
+    InputStream is = DocumentReaderServiceTest.class.getResourceAsStream("/subscription.odt");
     String text = service_.getDocumentReader("application/vnd.oasis.opendocument.text").getContentAsText( is);
     System.out.println(text);
   }

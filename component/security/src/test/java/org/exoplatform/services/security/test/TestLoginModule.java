@@ -41,9 +41,11 @@ public class TestLoginModule extends TestCase {
 
   protected void setUp() throws Exception {
     if (service_ == null) {
-      System.setProperty("java.security.auth.login.config", "src/main/resource/login.conf" );
-//      PortalContainer manager = PortalContainer.getInstance() ;
-      StandaloneContainer.setConfigurationPath("src/main/java/conf/standalone/test-configuration.xml");
+      String containerConf = TestLoginModule.class.getResource("/conf/standalone/test-configuration.xml").toString();
+      String loginConf = TestLoginModule.class.getResource("/login.conf").toString();      
+      StandaloneContainer.addConfigurationURL(containerConf);
+      if (System.getProperty("java.security.auth.login.config") == null)
+        System.setProperty("java.security.auth.login.config", loginConf);
       
       StandaloneContainer manager = StandaloneContainer.getInstance() ;
 
