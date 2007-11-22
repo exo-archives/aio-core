@@ -134,6 +134,5 @@ public class TidyTransformerImpl extends TransformerBase implements
   protected String getCurrentIANAEncoding() {
     EncodingMap encodingMap = new EncodingMapImpl();
     return encodingMap.convertJava2IANA(System.getProperty("file.encoding"));
-
   }
 }

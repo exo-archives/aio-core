@@ -363,7 +363,7 @@ public class EncodingMapImpl implements EncodingMap {
     addIANA2JavaMapping("US", "ASCII");
     addIANA2JavaMapping("IBM367", "ASCII");
     addIANA2JavaMapping("CP367", "ASCII");
-    addIANA2JavaMapping("UTF-8", "UTF8");
+    addIANA2JavaMapping("UTF-8", "UTF-8");
     addIANA2JavaMapping("UTF-16", "UTF-16");
     addIANA2JavaMapping("UTF-16BE", "UnicodeBig");
     addIANA2JavaMapping("UTF-16LE", "UnicodeLittle");
