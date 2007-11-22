@@ -79,7 +79,7 @@ public class DocumentReaderServiceTest extends BasicTestCase {
   }
 
   public void testOODocumentReaderService() throws Exception {
-    InputStream is = DocumentReaderServiceTest.class.getResourceAsStream("/subscription.odt");
+    InputStream is = DocumentReaderServiceTest.class.getResourceAsStream("/test.odt");
     String text = service_.getDocumentReader("application/vnd.oasis.opendocument.text").getContentAsText( is);
     System.out.println(text);
   }

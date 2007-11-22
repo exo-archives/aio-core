@@ -44,7 +44,7 @@ public class PropertiesExtractTest extends TestCase {
   }
 
   public void testPPTDocumentReaderService() throws Exception {
-    InputStream is = PropertiesExtractTest.class.getResourceAsStream("/test.doc");
+    InputStream is = PropertiesExtractTest.class.getResourceAsStream("/test.ppt");
     Properties props = service_.getDocumentReader("application/powerpoint").getProperties(is);
     printProps(props);
 
@@ -58,7 +58,7 @@ public class PropertiesExtractTest extends TestCase {
   }
 
   public void testOODocumentReaderService() throws Exception {
-    InputStream is = PropertiesExtractTest.class.getResourceAsStream("/subscription.odt");
+    InputStream is = PropertiesExtractTest.class.getResourceAsStream("/test.odt");
     Properties props = service_.getDocumentReader("application/vnd.oasis.opendocument.text").getProperties(is);
     printProps(props);
 
