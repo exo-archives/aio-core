@@ -176,7 +176,6 @@ public abstract class TransformerBase implements AbstractTransformer {
           xmlReader.setContentHandler(transformerHandler);
           log.debug("Parse to result throw empty transformer");
         }
-        xmlReader.setFeature("http://apache.org/xml/features/allow-java-encodings",true);
         xmlReader.parse(new InputSource(input));
         log.debug("Parse complete");
       } catch (SAXException ex) {
