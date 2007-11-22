@@ -5,13 +5,13 @@
 package org.exoplatform.services.xml.resolving.impl.simple;
 
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.xml.BaseTest;
 import org.exoplatform.services.xml.resolving.SimpleResolvingService;
-import junit.framework.TestCase;
 
 /**
  * Created by the Exo Development team.
  */
-public class TestSimpleResolver extends TestCase {
+public class TestSimpleResolver extends BaseTest {
 
   private SimpleResolvingService service;
 
@@ -32,8 +32,8 @@ public class TestSimpleResolver extends TestCase {
 
       reader.setEntityResolver(service.getEntityResolver());
       try {
-        reader.parse(getClass().getClassLoader().getResource("tmp/dtd-not-found.xml")
-            .toString());
+        reader.parse(resourceURL("tmp/dtd-not-found.xml").getPath());
+//            .toString());
 
       } catch (Throwable e) {
         return;
@@ -51,8 +51,7 @@ public class TestSimpleResolver extends TestCase {
       org.xml.sax.XMLReader reader = jaxpParser.getXMLReader();
 
       reader.setEntityResolver(service.getEntityResolver());
-      reader.parse(getClass().getClassLoader().getResource("web.xml")
-          .toString());
+      reader.parse(resourceURL("web.xml").toString());
 
     } catch (Exception e) {
 

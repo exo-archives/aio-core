@@ -1,3 +1,0 @@
-<query  source="tmp/test-bean.xml" destination="tmp/test.out">
-   <select xpath="/beans/*"/>
-</query>

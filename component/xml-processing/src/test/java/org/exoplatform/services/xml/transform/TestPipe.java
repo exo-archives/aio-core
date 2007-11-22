@@ -15,11 +15,13 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.xml.BaseTest;
 import org.exoplatform.services.xml.transform.html.HTMLTransformer;
 import org.exoplatform.services.xml.transform.html.HTMLTransformerService;
 import org.exoplatform.services.xml.transform.trax.TRAXTemplates;
 import org.exoplatform.services.xml.transform.trax.TRAXTransformer;
 import org.exoplatform.services.xml.transform.trax.TRAXTransformerService;
+
 
 /**
  * Created by the Exo Development team.
@@ -47,8 +49,9 @@ public class TestPipe extends BaseTest {
 
     // get xsl
     // String XSL_URL = Constants.XSLT_DIR + "/html-url-rewite.xsl";
-    InputStream xslInputStream = Thread.currentThread().getContextClassLoader()
-        .getResourceAsStream("html-url-rewite.xsl");
+    InputStream xslInputStream = resourceStream("html-url-rewite.xsl");
+//    Thread.currentThread().getContextClassLoader()
+//        .getResourceAsStream();
     assertNotNull("empty xsl", xslInputStream);
     Source xslSource = new StreamSource(xslInputStream);
     assertNotNull("get xsl source", xslSource);
@@ -59,16 +62,20 @@ public class TestPipe extends BaseTest {
 
   public void testTidyAndXsl() throws Exception {
     // input
-    InputStream res = getClass().getClassLoader().getResourceAsStream(
-        "rss-out.xhtml");
+    InputStream res = resourceStream("rss-in.xhtml");
 
     // FileInputStream inputFileInputStream =
     // new FileInputStream("rss-out.html");
     assertTrue("Empty input file", res.available() > 0);
 
     // output
-    String OUTPUT_FILENAME = "target/rss-out_" + getTimeStamp()
-        + "_tydy_xsl.xml";
+    //getClass().getClassLoader().getResource("").getPath()
+    String OUTPUT_FILENAME = resourceURL("rss-out.xml").getPath();
+//    + getTimeStamp()
+//        + "_tydy_xsl.xml");
+    
+//    System.out.println("-------------------> "+OUTPUT_FILENAME);
+//    System.out.println("-------------------> "+System.getProperty("file.encoding"));
     OutputStream outputFileOutputStream = new FileOutputStream(OUTPUT_FILENAME);
     TRAXTransformer traxTransformer = traxTemplates.newTransformer();
 
@@ -88,14 +95,14 @@ public class TestPipe extends BaseTest {
 
   public void testXslAndXsl() throws Exception {
     // input
-    InputStream res = getClass().getClassLoader().getResourceAsStream(
-        "rss-out.xhtml");
+    InputStream res = resourceStream("rss-in.xhtml");
 
     assertTrue("Empty input file", res.available() > 0);
 
     // output
-    String OUTPUT_FILENAME = "target/rss-out_" + getTimeStamp()
-        + "_xsl_xsl.xml";
+//    String OUTPUT_FILENAME = "target/rss-out_" + getTimeStamp()
+//        + "_xsl_xsl.xml";
+    String OUTPUT_FILENAME = resourceURL("rss-out.xml").getPath();
     OutputStream outputFileOutputStream = new FileOutputStream(OUTPUT_FILENAME);
 
     TRAXTransformer traxTransformer1 = traxTemplates.newTransformer();

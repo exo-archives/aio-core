@@ -16,6 +16,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.xml.BaseTest;
 import org.exoplatform.services.xml.transform.trax.TRAXTemplates;
 import org.exoplatform.services.xml.transform.trax.TRAXTransformer;
 import org.exoplatform.services.xml.transform.trax.TRAXTransformerService;
@@ -37,11 +38,10 @@ public class TestXsl extends BaseTest {
   }
 
   public void testSimpleXslt() throws Exception {
+    
+    InputStream res = resourceStream("rss-in.xhtml");
+    String OUTPUT_FILENAME = resourceURL("rss-out.xml").getPath();
 
-    String OUTPUT_FILENAME = "target/rss-out_" + getTimeStamp() + "_xsl.xml";
-
-    InputStream res = getClass().getClassLoader().getResourceAsStream(
-        "rss-out.xhtml");
 
     // FileInputStream inputFileInputStream =
     // new FileInputStream("tmp/rss-out.xhtml");
@@ -53,8 +53,7 @@ public class TestXsl extends BaseTest {
 
     // get xsl
     //String XSL_URL = Constants.XSLT_DIR + "/html-url-rewite.xsl";
-    InputStream xslInputStream = Thread.currentThread().getContextClassLoader()
-        .getResourceAsStream("html-url-rewite.xsl");
+    InputStream xslInputStream = resourceStream("html-url-rewite.xsl");
     assertNotNull("empty xsl", xslInputStream);
     Source xslSource = new StreamSource(xslInputStream);
     assertNotNull("get xsl source", xslSource);
@@ -78,9 +77,8 @@ public class TestXsl extends BaseTest {
   }
 
   public void testXsltUseTemplates() throws Exception {
-    // input
-    InputStream res = getClass().getClassLoader().getResourceAsStream(
-    "rss-out.xhtml");
+//    String OUTPUT_FILENAME = resourceURL("rss-in.xml").getPath();
+    InputStream res = resourceStream("rss-in.xhtml");
 
     assertTrue("Empty input file", res.available() > 0);
 
@@ -89,8 +87,7 @@ public class TestXsl extends BaseTest {
 
     // get xsl
     //String XSL_URL = Constants.XSLT_DIR + "/html-url-rewite.xsl";
-    InputStream xslInputStream = Thread.currentThread().getContextClassLoader()
-        .getResourceAsStream("html-url-rewite.xsl");
+    InputStream xslInputStream = resourceStream("html-url-rewite.xsl");
     assertNotNull("empty xsl", xslInputStream);
     Source xslSource = new StreamSource(xslInputStream);
     assertNotNull("get xsl source", xslSource);
@@ -115,8 +112,7 @@ public class TestXsl extends BaseTest {
     TRAXTransformer traxOtherTransformer = traxTemplates.newTransformer();
     assertNotNull("get Other transformer", traxOtherTransformer);
 
-    res = getClass().getClassLoader().getResourceAsStream(
-    "rss-out.xhtml");
+    res = resourceStream("rss-in.xhtml");
 
     assertTrue("Empty input other file",
         res.available() > 0);
