@@ -3,15 +3,15 @@
     <groupId>org.exoplatform.core</groupId>
     <artifactId>config</artifactId>
     <version>2.0.3</version>
-  </parent> 
+  </parent>
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.core.component.organization.api</artifactId>
   <packaging>jar</packaging>
   <version>${org.exoplatform.core.version}</version>
-  <name>eXo Organization Service</name>
-  <description>eXo Organization Service</description>
-  
+  <name>eXo Organization Service API</name>
+  <description>eXo Organization Service API</description>
+
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
@@ -35,14 +35,14 @@
       <groupId>org.exoplatform.core</groupId>
       <artifactId>exo.core.component.ldap</artifactId>
       <version>${org.exoplatform.core.version}</version>
-    </dependency>    
+    </dependency>
 
     <dependency>
       <groupId>org.exoplatform.core</groupId>
       <artifactId>exo.core.component.database</artifactId>
       <version>${org.exoplatform.core.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>javax.ejb</groupId>
       <artifactId>ejb</artifactId>
@@ -68,7 +68,7 @@
             <phase>compile<!--process-classes--></phase>
             <configuration>
               <tasks>
-                <taskdef name="hibernatedoclet" classname="xdoclet.modules.hibernate.HibernateDocletTask" 
+                <taskdef name="hibernatedoclet" classname="xdoclet.modules.hibernate.HibernateDocletTask"
                          classpathref="maven.dependency.classpath"/>
                 <hibernatedoclet destdir="${basedir}/target/classes"
                                  excludedtags="@version,@author,@todo"
