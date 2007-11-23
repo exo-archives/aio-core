@@ -59,7 +59,7 @@
             <exclude>**/DBCreatorTest.java</exclude>
 		    <exclude>**/TestOrganizationService.java</exclude>
 		    <exclude>**/CurrentSubjectTest.java</exclude>
-		    <exclude>**/TestDatabaseService.java</exclude>
+		    <!--<exclude>**/TestDatabaseService.java</exclude>-->
 		    <exclude>**/*$*</exclude>
           </excludes>
         </configuration>
