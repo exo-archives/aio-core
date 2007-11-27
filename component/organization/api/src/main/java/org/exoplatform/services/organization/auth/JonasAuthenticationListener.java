@@ -11,6 +11,8 @@ import java.util.Iterator;
 import javax.security.auth.Subject;
 
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
 import org.exoplatform.services.organization.OrganizationService;
@@ -21,6 +23,16 @@ import org.exoplatform.services.organization.OrganizationService;
  * May 17, 2007  
  */
 public class JonasAuthenticationListener extends Listener<AuthenticationService, Identity> {
+
+  private String userRoleParentGroup = null ;
+
+  public JonasAuthenticationListener(InitParams params) {
+    ValueParam param = params.getValueParam("user.role.parent.group");
+    if(param!= null && param.getValue().length()>0) {
+      userRoleParentGroup = param.getValue();
+    }      
+  }
+
   public void onEvent(Event<AuthenticationService, Identity> event)  throws Exception {
     OrganizationService service = event.getSource().getOrganizationService() ;
     Identity identity = event.getData() ;
@@ -34,7 +46,12 @@ public class JonasAuthenticationListener extends Listener<AuthenticationService,
         (org.exoplatform.services.organization.Group) iter.next();
       String groupId = group.getId();
       String[] splittedGroupName = StringUtils.split(groupId, "/");
-      roleGroup.addMember(new RolePrincipal(splittedGroupName[0]));
+      if(userRoleParentGroup != null &&splittedGroupName[0].equals(userRoleParentGroup) &&
+          splittedGroupName.length>1) {
+        roleGroup.addMember(new RolePrincipal(splittedGroupName[splittedGroupName.length-1]));
+      }else {
+        roleGroup.addMember(new RolePrincipal(splittedGroupName[0])); 
+      }     
     }
     subject.getPrincipals().add(roleGroup);
   }
