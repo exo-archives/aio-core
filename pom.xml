@@ -58,6 +58,7 @@
             <exclude>**/DBCreatorTest.java</exclude>
 		    <exclude>**/TestOrganizationService.java</exclude>
 		    <exclude>**/TestDatabaseService.java</exclude>
+		    <exclude>**/TestCurrentSubject.java</exclude>
 		    <exclude>**/*$*</exclude>
           </excludes>
         </configuration>
