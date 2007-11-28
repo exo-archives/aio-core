@@ -27,10 +27,12 @@ public class TomcatAuthenticationListener extends Listener<AuthenticationService
 
   private String userRoleParentGroup = null ;
   public TomcatAuthenticationListener(InitParams params) {
-    ValueParam param = params.getValueParam("user.role.parent.group");
-    if(param!= null && param.getValue().length()>0) {
-      userRoleParentGroup = param.getValue();
-    }      
+    if(params != null) {
+      ValueParam param = params.getValueParam("user.role.parent.group");
+      if(param!= null && param.getValue().length()>0) {
+        userRoleParentGroup = param.getValue();
+      } 
+    }         
   }
   public void onEvent(Event<AuthenticationService, Identity> event)  throws Exception {
     Identity identity = event.getData() ;

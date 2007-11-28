@@ -3,7 +3,7 @@
  * Please look at license.txt in info directory for more license detail.   *
  **************************************************************************/
 package org.exoplatform.services.organization.auth;
-  
+
 import java.security.acl.Group;
 import java.util.Collection;
 import java.util.Iterator;
@@ -23,16 +23,18 @@ import org.exoplatform.services.organization.OrganizationService;
  * May 17, 2007  
  */
 public class JbossAuthenticationListener extends Listener<AuthenticationService, Identity> {
-  
+
   private String userRoleParentGroup = null ;
-  
+
   public JbossAuthenticationListener(InitParams params) {
-    ValueParam param = params.getValueParam("user.role.parent.group");
-    if(param!= null && param.getValue().length()>0) {
-      userRoleParentGroup = param.getValue();
-    }      
+    if(params != null) {
+      ValueParam param = params.getValueParam("user.role.parent.group");
+      if(param!= null && param.getValue().length()>0) {
+        userRoleParentGroup = param.getValue();
+      } 
+    }         
   }
-  
+
   public void onEvent(Event<AuthenticationService, Identity> event)  throws Exception {
     OrganizationService service = event.getSource().getOrganizationService() ;
     Identity identity = event.getData() ;
