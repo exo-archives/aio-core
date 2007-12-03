@@ -101,12 +101,12 @@ public class TestLDAPService extends TestCase {
     attrs.put(objclass);
     ctx.createSubcontext("ou=users,o=ibm.com,ou=clients,"+BASE, attrs);
 
-
     attrs = new BasicAttributes(true); // case-ignore
-    objclass.add("top");
-    objclass.add("person");
-    objclass.add("organizationalPerson");
+    objclass = new BasicAttribute("objectClass");
     objclass.add("inetOrgPerson");
+    objclass.add("organizationalPerson");
+    objclass.add("person");
+    objclass.add("top");
     attrs.put(objclass);
     attrs.put("cn", "g");
     attrs.put("sn", "a");
