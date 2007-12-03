@@ -10,7 +10,7 @@ import org.exoplatform.services.database.jdbc.CreateDBSchemaPlugin;
 import org.exoplatform.services.database.jdbc.DBSchemaCreator;
 
 /**
- * Created by The eXo Platform SARL .
+ * Created by The eXo Platform SAS .
  * 
  * @author <a href="mailto:geaz@users.sourceforge.net">Gennady Azarenkov </a>
  * @version $Id: DBCreatorTest.java 5569 2006-05-17 12:48:47Z lautarul $

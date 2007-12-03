@@ -1,17 +1,20 @@
-/***************************************************************************
- * Copyright 2001-2004 The eXo Platform SARL         All rights reserved.  *
- * Please look at license.txt in info directory for more license detail.   *
- **************************************************************************/
-/**
- * Created by The eXo Platform SARL        .
- * Author : James Chamberlain
- *          james@echamberlains.com
- * Date: 11/2/2005
- * 
+/*
+ * Copyright (C) 2003-2007 eXo Platform SAS.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-
 package org.exoplatform.services.ldap.impl;
-
 
 import java.io.File;
 import java.util.HashMap;
@@ -33,6 +36,13 @@ import org.exoplatform.services.ldap.CreateObjectCommand;
 import org.exoplatform.services.ldap.DeleteObjectCommand;
 import org.exoplatform.services.ldap.LDAPService;
 
+/**
+ * Created by The eXo Platform SAS        .
+ * Author : James Chamberlain
+ *          james@echamberlains.com
+ * Date: 11/2/2005
+ * 
+ */
 public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
 
   private ThreadLocal<LdapContext> tlocal_ = new ThreadLocal<LdapContext >() ;
