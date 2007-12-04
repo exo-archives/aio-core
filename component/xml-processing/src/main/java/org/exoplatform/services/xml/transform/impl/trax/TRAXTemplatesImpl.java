@@ -1,16 +1,16 @@
-/*
+/**
  * Copyright (C) 2003-2007 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; either version 3
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
@@ -29,7 +29,7 @@ import org.exoplatform.services.xml.transform.trax.TRAXTransformer;
 /**
  * Created by The eXo Platform SAS .
  * 
- * Wrapper for Trax Transformer
+ * Wrapper for Trax Transformer.
  * 
  * @author <a href="mailto:alex.kravchuk@gmail.com">Alexander Kravchuk</a>
  * @version $Id: TRAXTemplatesImpl.java 5799 2006-05-28 17:55:42Z geaz $
@@ -38,7 +38,7 @@ import org.exoplatform.services.xml.transform.trax.TRAXTransformer;
 
 public class TRAXTemplatesImpl implements TRAXTemplates {
   private Templates templates;
-  XMLResolvingService resolvingService;
+  private XMLResolvingService resolvingService;
 
   public TRAXTemplatesImpl(Templates templates) {
     this.templates = templates;
@@ -51,7 +51,11 @@ public class TRAXTemplatesImpl implements TRAXTemplates {
   public TRAXTransformer newTransformer()
       throws TransformerConfigurationException {
     TRAXTransformerImpl transf = new TRAXTransformerImpl(this.templates);
-    transf.resolvingService = resolvingService;
+    transf.setResolvingService(resolvingService);
     return transf;
+  }
+  
+  public void setResolvingService(XMLResolvingService r) {
+    resolvingService = r;
   }
 }

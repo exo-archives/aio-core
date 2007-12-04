@@ -19,34 +19,12 @@
       <version>${org.exoplatform.kernel.version}</version>
     </dependency>
 
-    <!-- dependency>
-      <groupId>xmldb</groupId>
-      <artifactId>xmldb-api</artifactId>
-      <version>20021118</version>
-      <scope>compile</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>xerces</groupId>
-      <artifactId>xercesImpl</artifactId>
-      <version>2.6.2</version>
-      <scope>compile</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>castor</groupId>
-      <artifactId>castor</artifactId>
-      <version>0.9.7</version>
-      <scope>compile</scope>
-    </dependency -->
-    
     <dependency>
       <groupId>jtidy</groupId>
       <artifactId>jtidy</artifactId>
       <version>4aug2000r7-dev</version>
       <scope>compile</scope>
     </dependency>
-    
     
     <dependency>
       <groupId>xml-resolver</groupId>
@@ -57,6 +35,11 @@
   </dependencies>
   
   <build>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <outputDirectory>target/classes</outputDirectory>
+    <testSourceDirectory>src/test/java</testSourceDirectory>
+    <testOutputDirectory>target/test-classes</testOutputDirectory>
+		  
     <resources>
       <resource>
         <directory>src/main/java</directory>
@@ -94,6 +77,16 @@
           <include>**/*.xsl</include>
        </includes>
      </testResource>
+     <testResource>
+       <directory>src/test/java</directory>
+       <includes>
+          <include>**/*.properties</include>
+          <include>**/*.xml</include>
+          <include>**/*.xhtml</include>
+          <include>**/*.html</include>
+          <include>**/*.xsl</include>
+       </includes>
+     </testResource>
     </testResources>
 
 
@@ -107,8 +100,11 @@
           <forkMode>never</forkMode><!--once , pertest -->
           <testFailureIgnore>false</testFailureIgnore>
           <includes>
-            <include implementation="java.lang.String">**/Test*.java</include>
+            <include>**/Test*.java</include>
           </includes>
+          <!-- excludes>
+            <exclude implementation="java.lang.String">**/*Test.java</exclude>
+          </excludes-->
         </configuration>
       </plugin>
     </plugins>

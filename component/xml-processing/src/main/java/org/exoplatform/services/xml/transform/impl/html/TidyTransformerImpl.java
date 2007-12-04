@@ -1,19 +1,20 @@
-/*
+/**
  * Copyright (C) 2003-2007 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; either version 3
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
+
 package org.exoplatform.services.xml.transform.impl.html;
 
 import java.io.InputStream;
@@ -32,6 +33,7 @@ import org.exoplatform.services.xml.transform.impl.TransformerBase;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Created by The eXo Platform SAS .
@@ -62,7 +64,6 @@ public class TidyTransformerImpl extends TransformerBase implements
    */
   public void setOutputProperties(Properties props) {
     this.props = props;
-    // tidy.setConfigurationFromProps(props);
   }
 
   private void initProps() {
@@ -105,13 +106,6 @@ public class TidyTransformerImpl extends TransformerBase implements
       new TransformerException("Error on read source", ex);
     }
 
-    // to del begin
-    // ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-    // transformInputStream2Result(input,new StreamResult(byteOutput));
-    // input = new ByteArrayInputStream(byteOutput.toByteArray());
-    // writeTofile(byteOutput.toByteArray(),"tidy_input");
-    // to del end
-
     // OutputStream output = null;
     tidy.setConfigurationFromProps(props);
 
@@ -127,10 +121,10 @@ public class TidyTransformerImpl extends TransformerBase implements
       log.debug("Tidy parse is complete");
       // sex with coding
       String outputString = output.toString();
-      outputString = outputString.replaceFirst("<\\?xml version=\"1.0\"\\?>",
-          "<?xml version=\"1.0\" encoding=\"" + getCurrentIANAEncoding()
-              + "\"?>");
       try {
+        outputString = outputString.replaceFirst("<\\?xml version=\"1.0\"\\?>",
+            "<?xml version=\"1.0\" encoding=\"" + getCurrentIANAEncoding()
+                + "\"?>");
         output.flush();
       } catch (IOException ex) {
         throw new TransformerException(ex);
@@ -140,8 +134,13 @@ public class TidyTransformerImpl extends TransformerBase implements
 
   }
 
-  protected String getCurrentIANAEncoding() {
+  protected String getCurrentIANAEncoding() throws UnsupportedEncodingException {
     EncodingMap encodingMap = new EncodingMapImpl();
-    return encodingMap.convertJava2IANA(System.getProperty("file.encoding"));
+    String ianaEncoding = encodingMap.convertJava2IANA(System.getProperty("file.encoding"));
+    if (ianaEncoding == null) {
+      throw new UnsupportedEncodingException("Can't find corresponding type of encoding for : "
+          + System.getProperty("file.encoding"));
+    }
+    return encodingMap.convertJava2IANA(ianaEncoding);
   }
 }

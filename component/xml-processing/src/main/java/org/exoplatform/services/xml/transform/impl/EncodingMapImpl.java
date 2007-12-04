@@ -1,19 +1,20 @@
-/*
+/**
  * Copyright (C) 2003-2007 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; either version 3
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
+
 package org.exoplatform.services.xml.transform.impl;
 
 import java.util.Hashtable;
@@ -33,8 +34,10 @@ import org.exoplatform.services.xml.transform.EncodingMap;
 public class EncodingMapImpl implements EncodingMap {
   private static Log log = LogFactory.getLog(EncodingMapImpl.class);
 
-  protected final static Hashtable IANA2JavaMap = new Hashtable();
-  protected final static Hashtable Java2IANAMap = new Hashtable();
+  protected final static Hashtable <String, String> IANA2JavaMap =
+    new Hashtable<String, String>();
+  protected final static Hashtable <String, String> Java2IANAMap =
+    new Hashtable<String, String>();
 
   public static void addIANA2JavaMapping(String iana, String java) {
     IANA2JavaMap.put(iana, java);
@@ -54,13 +57,13 @@ public class EncodingMapImpl implements EncodingMap {
   }
 
   public String convertIANA2Java(String iana) {
-    return (String) IANA2JavaMap.get(iana);
+    return IANA2JavaMap.get(iana);
   }
 
   public String convertJava2IANA(String java) {
     log.debug("convert [" + java + "] to iana coding ["
         + Java2IANAMap.get(java) + "]");
-    return (String) Java2IANAMap.get(java);
+    return Java2IANAMap.get(java);
   }
 
   static {

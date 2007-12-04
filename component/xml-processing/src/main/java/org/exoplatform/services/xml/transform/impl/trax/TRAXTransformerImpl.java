@@ -1,22 +1,24 @@
-/*
+/**
  * Copyright (C) 2003-2007 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; either version 3
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
 package org.exoplatform.services.xml.transform.impl.trax;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -27,11 +29,14 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
 
 import org.exoplatform.services.xml.transform.NotSupportedIOTypeException;
 import org.exoplatform.services.xml.transform.impl.TransformerBase;
@@ -40,7 +45,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-// import org.exoplatform.services.xml.transform.TransformRules;
 
 /**
  * Created by The eXo Platform SAS .
@@ -55,7 +59,6 @@ import org.xml.sax.XMLReader;
 public class TRAXTransformerImpl extends TransformerBase implements
     TRAXTransformer {
 
-  // private SAXTransformerFactory saxTFactory;
   protected TransformerHandler tHandler;
 
   protected Transformer getTransformer() {
@@ -82,7 +85,7 @@ public class TRAXTransformerImpl extends TransformerBase implements
     tHandler = saxTFactory.newTransformerHandler(templates);
   }
 
-  protected void internalTransform(Source src) throws TransformerException,
+  protected void internalTransform(Source source) throws TransformerException,
       NotSupportedIOTypeException, IllegalStateException {
 
     XMLReader xmlReader = null;
@@ -103,20 +106,20 @@ public class TRAXTransformerImpl extends TransformerBase implements
     xmlReader.setContentHandler(tHandler);
     // tHandler.setResult(getResult());
 
+    InputSource inputSource = null;
     // todo simplify
-    InputSource inputSource = SAXSource.sourceToInputSource(src);
-    // InputSource inputSource = null;
-    // if (src instanceof StreamSource) {
-    // inputSource = new InputSource(((StreamSource) src).getInputStream());
-    // }
-    // else {
-    // inputSource = SAXSource.sourceToInputSource(src);
-    // }
-    //
-    // if (inputSource == null) {
-    // throw new NotSupportedIOTypeException(src);
-    // }
-
+    // SAXSource.sourceToInputSource(Source source) from JSDK does not supported DOMSource
+    if (source instanceof DOMSource) {
+      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+      SAXTransformerFactory.newInstance().newTransformer()
+          .transform(source, new StreamResult(outputStream));
+      inputSource = new InputSource(new ByteArrayInputStream(outputStream.toByteArray()));
+    } else {
+      inputSource = SAXSource.sourceToInputSource(source);
+    }
+    if (inputSource == null) {
+      throw new NotSupportedIOTypeException(source);
+    }
     try {
       xmlReader.parse(inputSource);
     } catch (SAXException ex) {

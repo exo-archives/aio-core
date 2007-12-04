@@ -1,19 +1,20 @@
-/*
+/**
  * Copyright (C) 2003-2007 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; either version 3
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
+
 package org.exoplatform.services.xml.transform;
 
 import java.io.FileInputStream;
@@ -28,8 +29,7 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.logging.Log;
-import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.services.xml.BaseTest;
 import org.exoplatform.services.xml.transform.html.HTMLTransformer;
 import org.exoplatform.services.xml.transform.html.HTMLTransformerService;
@@ -40,12 +40,12 @@ import org.exoplatform.services.xml.transform.html.HTMLTransformerService;
 public class TestTidy extends BaseTest {
   private HTMLTransformer htmlTransformer;
 
-  private Log log;
-
   public void setUp() throws Exception {
-    log = getLog();
-    HTMLTransformerService htmlService = (HTMLTransformerService) PortalContainer
-        .getInstance().getComponentInstanceOfType(HTMLTransformerService.class);
+    StandaloneContainer.setConfigurationPath(Thread.currentThread().getContextClassLoader()
+        .getResource("conf/standalone/test-configuration.xml").getPath());
+    StandaloneContainer container = StandaloneContainer.getInstance();
+    HTMLTransformerService htmlService = (HTMLTransformerService) container
+        .getComponentInstanceOfType(HTMLTransformerService.class);
     assertNotNull("htmlService", htmlService);
     htmlTransformer = htmlService.getTransformer();
 
@@ -68,7 +68,6 @@ public class TestTidy extends BaseTest {
       // read the output file
       FileInputStream outputFileInputStream = new FileInputStream(
           OUTPUT_FILENAME);
-
       assertTrue("Output is empty", outputFileInputStream.available() > 0);
 
       // validate output xml
