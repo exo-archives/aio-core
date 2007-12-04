@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
+import javax.naming.OperationNotSupportedException;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.Control;
@@ -57,7 +58,9 @@ public class LDAPUserPageList extends PageList {
     try{
       int size = this.getResultSize();   
       setAvailablePage(size);
-    }catch(NameNotFoundException exp){
+    } catch(NameNotFoundException exp) {
+      setAvailablePage(0);
+    } catch(OperationNotSupportedException exp) {
       setAvailablePage(0);
     }
   }
