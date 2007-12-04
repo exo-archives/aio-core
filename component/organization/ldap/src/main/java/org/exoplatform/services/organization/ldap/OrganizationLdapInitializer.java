@@ -37,6 +37,8 @@ import org.exoplatform.services.organization.OrganizationServiceInitializer;
 public class OrganizationLdapInitializer 
   extends BaseComponentPlugin implements OrganizationServiceInitializer, ComponentPlugin {
   
+  protected static Pattern COMPACT_DN = Pattern.compile("\\b\\p{Space}*=\\p{Space}*", Pattern.CASE_INSENSITIVE);
+  
   private BaseDAO baseHandler;
   
   public void init(OrganizationService service) throws Exception {   
@@ -96,12 +98,10 @@ public class OrganizationLdapInitializer
   }  
 
   public void createSubContextNew(String basedn, String dn) throws Exception {
-    Pattern pattern = Pattern.compile("\\b\\p{Space}*=\\p{Space}*", Pattern.CASE_INSENSITIVE);
-    
-    Matcher matcher = pattern.matcher(dn);
+    Matcher matcher = COMPACT_DN.matcher(dn);
     dn = matcher.replaceAll("=");
     
-    matcher = pattern.matcher(basedn);
+    matcher = COMPACT_DN.matcher(basedn);
     basedn = matcher.replaceAll("=");
     
     LdapContext context = baseHandler.ldapService_.getLdapContext();
@@ -127,37 +127,8 @@ public class OrganizationLdapInitializer
       } else {
         // create RDN elem
         rdn = n + "," + rdn;
-        createDNNew(rdn, context);
+        createDN(rdn, context);
       }
     }  
   } 
-  
-  private void createDNNew(String dn, LdapContext context) throws Exception {   
-    try{
-      Object obj = context.lookupLink(dn);      
-      if(obj != null) return;
-    } catch (Exception exp){}    
-    
-    String nameValue = dn.substring(dn.indexOf("=")+1, dn.indexOf(","));
-    BasicAttributes attrs = new BasicAttributes();
-    if(dn.toLowerCase().startsWith("ou=")){
-      attrs.put( new ObjectClassAttribute(new String[]{"top", "organizationalUnit"}));  
-      attrs.put("ou", nameValue);   
-    } else if(dn.toLowerCase().startsWith("cn=")) {
-      attrs.put( new ObjectClassAttribute(new String[]{"top", "organizationalRole"}));  
-      attrs.put("cn", nameValue);  
-    } else if(dn.toLowerCase().startsWith("c=")) {      
-      attrs.put( new ObjectClassAttribute(new String[]{"country"}));  
-      attrs.put("c", nameValue);      
-    } else if(dn.toLowerCase().startsWith("o=")) {      
-      attrs.put( new ObjectClassAttribute(new String[]{"organization"}));  
-      attrs.put("o", nameValue);      
-    } else if(dn.toLowerCase().startsWith("dc=")) {      
-      attrs.put( new ObjectClassAttribute(new String[]{"top","dcObject","organization"}));  
-      attrs.put("dc", nameValue);      
-      attrs.put("o", nameValue);      
-    }
-    attrs.put("description", nameValue);
-    context.createSubcontext(dn, attrs);    
-  }  
 }
