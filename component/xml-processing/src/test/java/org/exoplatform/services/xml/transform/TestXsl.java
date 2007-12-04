@@ -1,19 +1,20 @@
-/*
+/**
  * Copyright (C) 2003-2007 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; either version 3
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
+
 package org.exoplatform.services.xml.transform;
 
 import java.io.ByteArrayOutputStream;
@@ -26,8 +27,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.logging.Log;
-import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.services.xml.BaseTest;
 import org.exoplatform.services.xml.transform.trax.TRAXTemplates;
 import org.exoplatform.services.xml.transform.trax.TRAXTransformer;
@@ -38,15 +38,14 @@ import org.exoplatform.services.xml.transform.trax.TRAXTransformerService;
  */
 public class TestXsl extends BaseTest {
   private TRAXTransformerService traxService;
-  private Log log;
 
   public void setUp() throws Exception {
-    log = getLog();
-    traxService = (TRAXTransformerService) PortalContainer.getInstance()
+    StandaloneContainer.setConfigurationPath(Thread.currentThread().getContextClassLoader()
+        .getResource("conf/standalone/test-configuration.xml").getPath());
+    StandaloneContainer container = StandaloneContainer.getInstance();
+    traxService = (TRAXTransformerService) container
         .getComponentInstanceOfType(TRAXTransformerService.class);
     assertNotNull("traxService", traxService);
-    // dateFormat = new SimpleDateFormat(DATE_PATTERN);
-
   }
 
   public void testSimpleXslt() throws Exception {
@@ -54,17 +53,12 @@ public class TestXsl extends BaseTest {
     InputStream res = resourceStream("rss-in.xhtml");
     String OUTPUT_FILENAME = resourceURL("rss-out.xml").getPath();
 
-
-    // FileInputStream inputFileInputStream =
-    // new FileInputStream("tmp/rss-out.xhtml");
-
     assertTrue("Empty input file", res.available() > 0);
 
     // output file
     OutputStream outputFileOutputStream = new FileOutputStream(OUTPUT_FILENAME);
 
     // get xsl
-    //String XSL_URL = Constants.XSLT_DIR + "/html-url-rewite.xsl";
     InputStream xslInputStream = resourceStream("html-url-rewite.xsl");
     assertNotNull("empty xsl", xslInputStream);
     Source xslSource = new StreamSource(xslInputStream);
@@ -89,7 +83,6 @@ public class TestXsl extends BaseTest {
   }
 
   public void testXsltUseTemplates() throws Exception {
-//    String OUTPUT_FILENAME = resourceURL("rss-in.xml").getPath();
     InputStream res = resourceStream("rss-in.xhtml");
 
     assertTrue("Empty input file", res.available() > 0);
@@ -98,7 +91,6 @@ public class TestXsl extends BaseTest {
     ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
 
     // get xsl
-    //String XSL_URL = Constants.XSLT_DIR + "/html-url-rewite.xsl";
     InputStream xslInputStream = resourceStream("html-url-rewite.xsl");
     assertNotNull("empty xsl", xslInputStream);
     Source xslSource = new StreamSource(xslInputStream);
