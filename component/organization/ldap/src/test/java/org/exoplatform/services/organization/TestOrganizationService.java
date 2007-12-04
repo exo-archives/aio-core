@@ -19,11 +19,12 @@ package org.exoplatform.services.organization;
 import java.util.Collection;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.LogService;
 import org.exoplatform.services.log.LogUtil;
-import org.exoplatform.test.BasicTestCase;
 
 /**
  * Created by The eXo Platform SAS
@@ -32,7 +33,7 @@ import org.exoplatform.test.BasicTestCase;
  * Oct 27, 2005
  */
 
-public class TestOrganizationService extends BasicTestCase {
+public class TestOrganizationService extends TestCase {
   
   static String Group1 = "Group1" ;
   static String Group2 = "Group2" ;
@@ -76,7 +77,6 @@ public class TestOrganizationService extends BasicTestCase {
   }
   
   public void testUserPageSize() throws Exception{    
-    runtest = false;
     if(!runtest)  return ;
     /* Create an user with UserName: test*/
     String USER = "test" ;

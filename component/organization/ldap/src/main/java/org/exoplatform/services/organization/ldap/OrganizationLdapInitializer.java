@@ -41,10 +41,10 @@ public class OrganizationLdapInitializer
   
   public void init(OrganizationService service) throws Exception {   
     baseHandler = (BaseDAO)service.getUserHandler();
-    createSubContext(baseHandler.ldapAttrMapping_.groupsURL);
-    createSubContext(baseHandler.ldapAttrMapping_.userURL);
-    createSubContext(baseHandler.ldapAttrMapping_.membershipTypeURL);
-    createSubContext(baseHandler.ldapAttrMapping_.profileURL);
+    createSubContextNew(baseHandler.ldapAttrMapping_.baseURL, baseHandler.ldapAttrMapping_.groupsURL);
+    createSubContextNew(baseHandler.ldapAttrMapping_.baseURL, baseHandler.ldapAttrMapping_.userURL);
+    createSubContextNew(baseHandler.ldapAttrMapping_.baseURL, baseHandler.ldapAttrMapping_.membershipTypeURL);
+    createSubContextNew(baseHandler.ldapAttrMapping_.baseURL, baseHandler.ldapAttrMapping_.profileURL);
   }
   
   public void createSubContext(String dn) throws Exception {
@@ -71,22 +71,22 @@ public class OrganizationLdapInitializer
     try{
       Object obj = context.lookupLink(dn);      
       if(obj != null) return;
-    }catch(Exception exp){}    
+    } catch (Exception exp){}    
     String nameValue = dn.substring(dn.indexOf("=")+1, dn.indexOf(","));
     BasicAttributes attrs = new BasicAttributes();
     if(dn.toLowerCase().startsWith("ou=")){
       attrs.put( new ObjectClassAttribute(new String[]{"top", "organizationalUnit"}));  
       attrs.put("ou", nameValue);   
-    }else if(dn.toLowerCase().startsWith("cn=")){
+    } else if(dn.toLowerCase().startsWith("cn=")) {
       attrs.put( new ObjectClassAttribute(new String[]{"top", "organizationalRole"}));  
       attrs.put("cn", nameValue);  
-    }else if(dn.toLowerCase().startsWith("c=")){      
+    } else if(dn.toLowerCase().startsWith("c=")) {      
       attrs.put( new ObjectClassAttribute(new String[]{"country"}));  
       attrs.put("c", nameValue);      
-    }else if(dn.toLowerCase().startsWith("o=")){      
+    } else if(dn.toLowerCase().startsWith("o=")) {      
       attrs.put( new ObjectClassAttribute(new String[]{"organization"}));  
       attrs.put("o", nameValue);      
-    }else if(dn.toLowerCase().startsWith("dc=")){      
+    } else if(dn.toLowerCase().startsWith("dc=")) {      
       attrs.put( new ObjectClassAttribute(new String[]{"top","dcObject","organization"}));  
       attrs.put("dc", nameValue);      
       attrs.put("o", nameValue);      
@@ -95,4 +95,69 @@ public class OrganizationLdapInitializer
     context.createSubcontext(dn, attrs);    
   }  
 
+  public void createSubContextNew(String basedn, String dn) throws Exception {
+    Pattern pattern = Pattern.compile("\\b\\p{Space}*=\\p{Space}*", Pattern.CASE_INSENSITIVE);
+    
+    Matcher matcher = pattern.matcher(dn);
+    dn = matcher.replaceAll("=");
+    
+    matcher = pattern.matcher(basedn);
+    basedn = matcher.replaceAll("=");
+    
+    LdapContext context = baseHandler.ldapService_.getLdapContext();
+    
+    String[] edn = baseHandler.explodeDN(dn, false);
+    String[] ebasedn = baseHandler.explodeDN(basedn, false);
+    
+    if(edn.length < 1) 
+      throw new IllegalArgumentException("Zerro DN length, [" + dn + "]");
+    if(ebasedn.length < 1) 
+      throw new IllegalArgumentException("Zerro Base DN length, [" + basedn + "]");
+    if(edn.length < ebasedn.length) 
+      throw new IllegalArgumentException("DN length smaller Base DN [" + dn + " >= " + basedn + "]");
+    
+    String rdn = basedn;
+    for (int i=1; i <= edn.length; i++) {
+    //for (int i=edn.length - 1; i>=0; i--) {
+      String n = edn[edn.length - i];
+      if (i <= ebasedn.length) {
+        String bn = ebasedn[ebasedn.length - i];
+        if (!n.equals(bn))
+          throw new IllegalArgumentException("DN does not starts with Base DN [" + dn + " != " + basedn + "]");
+      } else {
+        // create RDN elem
+        rdn = n + "," + rdn;
+        createDNNew(rdn, context);
+      }
+    }  
+  } 
+  
+  private void createDNNew(String dn, LdapContext context) throws Exception {   
+    try{
+      Object obj = context.lookupLink(dn);      
+      if(obj != null) return;
+    } catch (Exception exp){}    
+    
+    String nameValue = dn.substring(dn.indexOf("=")+1, dn.indexOf(","));
+    BasicAttributes attrs = new BasicAttributes();
+    if(dn.toLowerCase().startsWith("ou=")){
+      attrs.put( new ObjectClassAttribute(new String[]{"top", "organizationalUnit"}));  
+      attrs.put("ou", nameValue);   
+    } else if(dn.toLowerCase().startsWith("cn=")) {
+      attrs.put( new ObjectClassAttribute(new String[]{"top", "organizationalRole"}));  
+      attrs.put("cn", nameValue);  
+    } else if(dn.toLowerCase().startsWith("c=")) {      
+      attrs.put( new ObjectClassAttribute(new String[]{"country"}));  
+      attrs.put("c", nameValue);      
+    } else if(dn.toLowerCase().startsWith("o=")) {      
+      attrs.put( new ObjectClassAttribute(new String[]{"organization"}));  
+      attrs.put("o", nameValue);      
+    } else if(dn.toLowerCase().startsWith("dc=")) {      
+      attrs.put( new ObjectClassAttribute(new String[]{"top","dcObject","organization"}));  
+      attrs.put("dc", nameValue);      
+      attrs.put("o", nameValue);      
+    }
+    attrs.put("description", nameValue);
+    context.createSubcontext(dn, attrs);    
+  }  
 }
