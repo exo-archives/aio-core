@@ -3,7 +3,7 @@
   <groupId>org.exoplatform.core</groupId>
   <artifactId>config</artifactId>
   <name>eXo Core Config</name>
-  <version>2.0.3</version>
+  <version>trunk</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -74,10 +74,10 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <exo.platform.version>2.0.3</exo.platform.version>
+        <exo.platform.version>trunk</exo.platform.version>
 
-        <org.exoplatform.kernel.version>2.0.3</org.exoplatform.kernel.version>
-        <org.exoplatform.core.version>2.0.3</org.exoplatform.core.version>
+        <org.exoplatform.kernel.version>trunk</org.exoplatform.kernel.version>
+        <org.exoplatform.core.version>trunk</org.exoplatform.core.version>
         <test.classes>Test*</test.classes>
         <test.skip>false</test.skip>
       </properties>
