@@ -32,12 +32,13 @@ import org.exoplatform.services.xml.transform.NotSupportedIOTypeException;
 import org.exoplatform.services.xml.transform.trax.TRAXTemplates;
 import org.exoplatform.services.xml.transform.trax.TRAXTemplatesService;
 import org.exoplatform.services.xml.transform.trax.TRAXTransformerService;
+import org.picocontainer.Startable;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
-public class TRAXTemplatesServiceImpl implements TRAXTemplatesService {
+public class TRAXTemplatesServiceImpl implements TRAXTemplatesService, Startable {
   
   private static final Log LOGGER = ExoLogger.getLogger("TRAXTemplatesServiceImpl");
   private Map<String, TRAXTemplates> templates_;
@@ -103,6 +104,19 @@ public class TRAXTemplatesServiceImpl implements TRAXTemplatesService {
          }
       }
     }
+  }
+  // ------ Startable -------
+  
+  /* (non-Javadoc)
+   * @see org.picocontainer.Startable#start()
+   */
+  public void start(){
+  }
+  
+  /* (non-Javadoc)
+   * @see org.picocontainer.Startable#stop()
+   */
+  public void stop() {
   }
 
 }
