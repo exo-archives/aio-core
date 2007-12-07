@@ -17,7 +17,7 @@
           <value>org/exoplatform/services/organization/impl/MembershipImpl.hbm.xml</value>
           <value>org/exoplatform/services/organization/impl/GroupImpl.hbm.xml</value>
           <value>org/exoplatform/services/organization/impl/MembershipTypeImpl.hbm.xml</value>
-          <value>org/exoplatform/services/organization/impl/UserProfileData.hbm.xml</value>
+          <value>org/exoplatform/services/organization/impl/UserProfileData.hbm.xml</value>          
         </values-param>
       </init-params>
     </component-plugin>
