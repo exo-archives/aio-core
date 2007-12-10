@@ -33,7 +33,9 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 
+import org.apache.commons.logging.Log;
 import org.exoplatform.services.ldap.LDAPService;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.MembershipEventListener;
@@ -48,6 +50,8 @@ import org.exoplatform.services.organization.impl.MembershipImpl;
  * Oct 14, 2005
  */
 public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
+  
+  private static Log log = ExoLogger.getLogger("core.MembershipDAOImpl");
   
   protected List<MembershipEventListener> listeners_;
   
@@ -192,10 +196,12 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
     try {
       LdapContext ctx = ldapService_.getLdapContext();      
       Attributes attrs = ctx.getAttributes( membershipDN);      
-      if (attrs == null) return null; 
-      if(!haveUser( attrs, getDNFromUsername( userName).trim())) return null; 
-      return createObject( userName, groupId, type);
+      if (attrs == null) return null;
+      String userDN = getDNFromUsername(userName);
+      if (userDN != null && haveUser(attrs, userDN.trim())) 
+        return createObject(userName, groupId, type);
     } catch (NameNotFoundException e){        
+      log.warn("Find membership by user group and type error " + e, e);
     }    
     return null;   
   }
