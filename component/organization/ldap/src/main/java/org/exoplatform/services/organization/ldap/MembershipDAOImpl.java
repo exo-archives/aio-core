@@ -201,7 +201,7 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
       if (userDN != null && haveUser(attrs, userDN.trim())) 
         return createObject(userName, groupId, type);
     } catch (NameNotFoundException e){        
-      log.warn("Find membership by user group and type error " + e, e);
+      //log.warn("Find membership by user group and type error " + e, e);
     }    
     return null;   
   }
