@@ -40,7 +40,7 @@ public class DBObjectPageList extends PageList {
     countQuery_ = "select count(o) from " + objectType.getName()  + " o" ;
     Session session = service_.openSession() ;
     List l  = session.createQuery(countQuery_).list() ;
-    Integer count = (Integer) l.get(0) ;
+    Number count = (Number) l.get(0) ;
     setAvailablePage(count.intValue()) ;    
   }
   
@@ -51,7 +51,7 @@ public class DBObjectPageList extends PageList {
     countQuery_ = oq.getHibernateCountQuery() ;
     Session session = service_.openSession() ;
     List l  = session.createQuery(countQuery_).list() ;
-    Integer count = (Integer) l.get(0) ;
+    Number count = (Number) l.get(0) ;
     setAvailablePage(count.intValue()) ;
   }
   
@@ -63,7 +63,7 @@ public class DBObjectPageList extends PageList {
     countQuery_ =  countQuery ;
     Session session = service_.openSession() ;
     List l  = session.createQuery(countQuery_).list() ;
-    Integer count = (Integer) l.get(0) ;
+    Number count = (Number) l.get(0) ;
     setAvailablePage(count.intValue()) ;
   }
   
