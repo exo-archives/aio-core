@@ -215,9 +215,17 @@ public class MembershipDAOImpl implements MembershipHandler {
 
   public Membership findMembership(String id) throws Exception {
   	Session session = service_.openSession();
-  	Membership  membership = 
-      (Membership) session.createQuery(queryFindMembership).setString(0, id).list() ;
-  	return membership;
+  	List memberships = session.createQuery(queryFindMembership).setString(0, id).list() ;
+    if(memberships.size() == 0) {
+      return null  ;
+    } else if(memberships.size() == 1) {
+      return (Membership) memberships.get(0) ;
+    } else {
+      throw new Exception("Expect 0 or 1 membership but found" + memberships.size()) ; 
+    }
+//  	Membership  membership = 
+//      (Membership) session.createQuery(queryFindMembership).setString(0, id).list() ;
+//  	return membership;
   }
 
   private void preSave(Membership membership , boolean isNew) throws Exception {
