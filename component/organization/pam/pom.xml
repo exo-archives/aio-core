@@ -9,7 +9,7 @@
   <version>${org.exoplatform.core.version}</version>
   <name>JPam Login Module</name>
   <description></description>
-  
+
   <dependencies>
   	<dependency>
   		<groupId>commons-logging</groupId>
@@ -22,12 +22,13 @@
   		<version>${org.exoplatform.core.version}</version>
   	</dependency>
   </dependencies>
-  
+
   <build>
   	<plugins>
   		<plugin>
   			<groupId>org.apache.maven.plugins</groupId>
   			<artifactId>maven-antrun-plugin</artifactId>
+  			<version>1.2-SNAPSHOT</version>
   			<configuration>
   				<tasks>
 						<exec executable="javah">
