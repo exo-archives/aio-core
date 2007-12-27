@@ -21,7 +21,7 @@ public class LDAPConnectionConfig {
   
   private String  providerURL = "ldap://127.0.0.1:389" ;
   
-  private  String rootdn ;//= "cn=admin,dc=exoplatform,dc=com";
+  private  String rootdn ;
   
   private  String password ;//= "exo";
   

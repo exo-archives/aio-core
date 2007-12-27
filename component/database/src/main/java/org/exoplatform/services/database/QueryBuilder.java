@@ -22,7 +22,6 @@ import java.util.List;
 import org.exoplatform.services.database.annotation.Query;
 import org.exoplatform.services.database.annotation.Table;
 import org.exoplatform.services.database.annotation.TableField;
-import org.jgroups.util.ExposedDataOutputStream;
 
 /**
  * Created by The eXo Platform SAS
