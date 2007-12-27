@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app
+ PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+  "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+
+	<!--If define the Portlet Application name MUST end with .par-->
+	<display-name>HelloWorld</display-name>
+	<description>
+        This application is a portlet. It can not be used outside a portal.
+        This web.xml file is mandatory in each .par archive file.
+	</description>
+
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+
+	<taglib>
+		<taglib-uri>portlet</taglib-uri>
+		<taglib-location>/WEB-INF/tlds/portlet.tld</taglib-location>
+	</taglib>
+</web-app>
