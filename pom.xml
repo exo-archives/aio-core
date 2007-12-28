@@ -3,7 +3,7 @@
   <groupId>org.exoplatform.core</groupId>
   <artifactId>config</artifactId>
   <name>eXo Core Config</name>
-  <version>trunk</version>
+  <version>2.0</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -128,8 +128,8 @@
                 <taskdef resource="emma_ant.properties" classpathref="maven.dependency.classpath" />
                 <emma enabled="true">
                   <!-- merged file will be rewritted by last project -->
-                  <merge outfile="${exo.projects.directory.src}/core/trunk/target/coverage.es">
-                    <fileset dir="${exo.projects.directory.src}/core/trunk/">
+                  <merge outfile="${exo.projects.directory.src}/core/${org.exoplatform.core.version}/target/coverage.es">
+                    <fileset dir="${exo.projects.directory.src}/core/${org.exoplatform.core.version}/">
                       <include name="**/target/emma/*.e*" />
                       <include name="**/target/emma/*.e*" />
                     </fileset>
@@ -138,15 +138,15 @@
                   </merge>
                   <report>
                     <sourcepath>
-                      <dirset dir="${exo.projects.directory.src}/core/trunk/">
+                      <dirset dir="${exo.projects.directory.src}/core/${org.exoplatform.core.version}/">
                         <include name="**/src/**/java" />
                       </dirset>
                     </sourcepath>
-                    <fileset dir="${exo.projects.directory.src}/core/trunk/target/">
+                    <fileset dir="${exo.projects.directory.src}/core/${org.exoplatform.core.version}/target/">
                       <include name="*.es" />
                     </fileset>
-                    <html outfile="${exo.projects.directory.src}/core/trunk/target/coverage.html" />
-                    <xml outfile="${exo.projects.directory.src}/core/trunk/target/coverage.xml" />
+                    <html outfile="${exo.projects.directory.src}/core/${org.exoplatform.core.version}/target/coverage.html" />
+                    <xml outfile="${exo.projects.directory.src}/core/${org.exoplatform.core.version}/target/coverage.xml" />
                   </report>
                 </emma>
               </tasks>
@@ -185,6 +185,7 @@
       </plugin>
     </plugins>
   </reporting>
+
   <profiles>
     <profile>
       <id>default</id>
@@ -195,9 +196,9 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <exo.platform.version>trunk</exo.platform.version>
-        <org.exoplatform.kernel.version>trunk</org.exoplatform.kernel.version>
-        <org.exoplatform.core.version>trunk</org.exoplatform.core.version>
+        <exo.platform.version>2.0</exo.platform.version>
+        <org.exoplatform.kernel.version>2.0</org.exoplatform.kernel.version>
+        <org.exoplatform.core.version>2.0</org.exoplatform.core.version>
       </properties>
     </profile>
   </profiles>
