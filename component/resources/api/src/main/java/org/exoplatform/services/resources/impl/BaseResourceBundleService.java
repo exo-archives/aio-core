@@ -38,8 +38,6 @@ import org.exoplatform.services.resources.ResourceBundleService;
 
 /**
  * Created by The eXo Platform SAS
- * Author : Nhu Dinh Thuan
- *          nhudinhthuan@exoplatform.com
  * Mar 9, 2007  
  */
 abstract public class BaseResourceBundleService implements ResourceBundleService  {
