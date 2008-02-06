@@ -17,7 +17,6 @@
 package org.exoplatform.services.organization.auth;
 
 import java.io.IOException;
-import java.security.acl.Group;
 import java.util.Map;
 
 import javax.naming.InitialContext;
