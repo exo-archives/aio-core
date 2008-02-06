@@ -54,6 +54,8 @@ public class ExoEJBLoginBean implements SessionBean {
    */
   public Subject authenticate(String user, char[] pass) {
     try {
+      // =============== temporary ================
+      // TODO: change to get actual container
       container = ExoContainerContext.getContainerByName("portal");
       orgService = (OrganizationService) container
           .getComponentInstanceOfType(OrganizationService.class);
@@ -70,7 +72,7 @@ public class ExoEJBLoginBean implements SessionBean {
         subj.getPrincipals().add(jaasGroup);
         return subj;
       }
-      throw new LoginException("Can't login with principal : '" + user + "'");
+      throw new LoginException("Can't login with principal : '" + user + "'.");
 
     } catch (Exception e) {
       throw new EJBException("Exception in Remote Bean: " + e);
