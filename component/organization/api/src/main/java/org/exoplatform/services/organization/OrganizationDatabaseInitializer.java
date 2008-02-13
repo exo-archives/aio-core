@@ -92,7 +92,7 @@ public class OrganizationDatabaseInitializer
         }
         printInfo("    Create Group " + groupId ) ;
       } else {
-        printInfo("    Group " + groupId + " is existed, ignore the entry") ; 
+        printInfo("    Group " + groupId + " already exists, ignoring the entry") ; 
       }
     }
   }
@@ -109,7 +109,7 @@ public class OrganizationDatabaseInitializer
         service.getMembershipTypeHandler().createMembershipType(type, true) ;
         printInfo("    Created Membership Type " + data.getType()) ;
       } else {
-        printInfo("    Membership Type " + data.getType() + " is existed, ignore the entry") ;
+        printInfo("    Membership Type " + data.getType() + " already exists, ignoring the entry") ;
       }
     }
   }
@@ -130,7 +130,7 @@ public class OrganizationDatabaseInitializer
         service.getUserHandler().createUser(user, true);
         printInfo("    Created user " + data.getUserName()) ;
       }  else {
-        printInfo("    User " + data.getUserName() + " is existed, ignore the entry") ;
+        printInfo("    User " + data.getUserName() + " already exists, ignoring the entry") ;
       }
       
       String groups = data.getGroups();
@@ -146,7 +146,7 @@ public class OrganizationDatabaseInitializer
           mhandler.linkMembership(user,group,mt, true) ;
           printInfo("    Created membership " + data.getUserName() + ", " + groupId + ", " + membership) ;
         } else {
-          printInfo("    Ignore membership " + data.getUserName() + ", " + groupId + ", " + membership) ;
+          printInfo("    Ignored membership " + data.getUserName() + ", " + groupId + ", " + membership) ;
         }
       }            
       
