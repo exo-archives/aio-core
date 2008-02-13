@@ -21,6 +21,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 import javax.naming.Name;
+import javax.naming.NameNotFoundException;
 import javax.naming.NameParser;
 import javax.naming.NamingEnumeration;
 import javax.naming.directory.Attribute;
@@ -29,7 +30,9 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 
+import org.apache.commons.logging.Log;
 import org.exoplatform.services.ldap.LDAPService;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.impl.GroupImpl;
@@ -41,6 +44,8 @@ import org.exoplatform.services.organization.impl.GroupImpl;
  * Oct 14, 2005
  */
 public class BaseDAO {
+  
+  private static Log log = ExoLogger.getLogger("core.BaseAO");
   
   protected LDAPAttributeMapping ldapAttrMapping_ ; 
   
@@ -56,6 +61,7 @@ public class BaseDAO {
   protected String getGroupDNFromGroupId(String groupId) {   
     StringBuilder buffer = new StringBuilder();
     String groupParts[] = groupId.split("/");
+    // TODO : http://jira.exoplatform.org/browse/COR-49
     for (int x = (groupParts.length - 1); x > 0; x--) {
       buffer.append("ou=" + groupParts[x] + ", ");
     }   
@@ -89,6 +95,7 @@ public class BaseDAO {
   }
   
   protected Group getGroupByDN(String groupDN) throws Exception {
+	  if (log.isDebugEnabled()) log.debug("Getting group for DN: " + groupDN);  
     LdapContext ctx = ldapService_.getLdapContext();  
     StringBuffer idBuffer = new StringBuffer();
     String parentId = null;
@@ -103,6 +110,8 @@ public class BaseDAO {
     GroupImpl group = new GroupImpl();
     group.setGroupName( membershipParts[0]);
     group.setId(idBuffer.toString());
+    
+    // TODO needs to use mapping there : http://jira.exoplatform.org/browse/COR-49
     group.setDescription( ldapAttrMapping_.getAttributeValueAsString(attrs, "description"));
     group.setLabel(ldapAttrMapping_.getAttributeValueAsString(attrs, "l"));  
     group.setParentId(parentId);
@@ -139,14 +148,13 @@ public class BaseDAO {
   }
   
   protected String getDNFromUsername(String username) throws Exception { 
-    try{
-//        String userDN = "CN="+username+","+ldapAttrMapping_.userURL;
-        String userDN = ldapAttrMapping_.userDNKey + "="+username+","+ldapAttrMapping_.userURL;
-      Object obj =ldapService_.getLdapContext().lookup(userDN);
-      if(obj != null) return userDN;      
-    }catch(Exception exp){}
+//    try{
+//      String userDN = ldapAttrMapping_.userDNKey + "="+username+","+ldapAttrMapping_.userURL;
+//      Object obj =ldapService_.getLdapContext().lookup(userDN);
+//      if(obj != null) return userDN;      
+//    }catch(Exception exp){}
     NamingEnumeration<SearchResult> answer =  findUser(username, false);    
-    while (answer.hasMoreElements()) return answer.next().getNameInNamespace();   
+    if (answer.hasMoreElements()) return answer.next().getNameInNamespace();   
     return null;
   }
   
@@ -159,7 +167,7 @@ public class BaseDAO {
     }
     String filter = "(&("+ldapAttrMapping_.userUsernameAttr + "=" + username+")" ;
     filter += "("+ldapAttrMapping_.userObjectClassFilter+"))";        
-    return ldapService_.getLdapContext().search(ldapAttrMapping_.baseURL, filter, constraints); 
+    return ldapService_.getLdapContext().search(ldapAttrMapping_.userURL, filter, constraints); 
   }
   
   
@@ -202,5 +210,27 @@ public class BaseDAO {
     }
     return buf.toString();
   }
+  
+  protected User findUserByDN (String userDN, LdapContext ctx) throws Exception {   
+	    if (userDN == null) return null;
+	    try {      
+	      Attributes attrs = ctx.getAttributes(userDN);
+	      if (attrs == null) return null;
+	      User user = ldapAttrMapping_.attributesToUser(attrs);         
+	      user.setFullName(user.getFirstName()+" "+user.getLastName());  
+	      return user;
+	    } catch (NameNotFoundException e){     
+	      return null;
+	    }
+	  }
+  
+  protected boolean haveUser( Attributes attrs, String userDN) throws Exception {
+    if (attrs == null) return false;    
+    List<Object> members = this.getAttributes(attrs, ldapAttrMapping_.membershipTypeMemberValue);
+    for( int i=0; i<members.size(); i++){        
+      if( String.valueOf( members.get( i)).trim().equalsIgnoreCase( userDN)) return true;      
+    }      
+    return false;
+  }  
   
 }
