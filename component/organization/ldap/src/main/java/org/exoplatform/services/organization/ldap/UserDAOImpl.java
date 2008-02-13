@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
-import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
@@ -61,13 +60,29 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
   
   public User createUserInstance(String username) {  return new UserImpl(username) ;  }
   
-  public void createUser(User user, boolean broadcast) throws Exception {  
-//    String userDN = "cn=" + user.getUserName()+ "," + ldapAttrMapping_.userURL;  
-    String userDN = ldapAttrMapping_.userDNKey + "=" + user.getUserName()+ "," + ldapAttrMapping_.userURL;  
+  public void createUser(User user, boolean broadcast) throws Exception {
+    String dnKeyValue = getDNKeyValue(user);
+    String userDN = ldapAttrMapping_.userDNKey + "=" + dnKeyValue + "," + ldapAttrMapping_.userURL;
     Attributes attrs = ldapAttrMapping_.userToAttributes(user);
-    if(broadcast) preSave(user, true) ; 
+    if (broadcast)
+      preSave(user, true);
     ldapService_.getLdapContext().createSubcontext(userDN, attrs);
-    if(broadcast) postSave(user, true) ;   
+    if (broadcast)
+      postSave(user, true);
+  }
+
+  private String getDNKeyValue(User user) {
+    String dnKeyValue = user.getUserName();
+    if (!ldapAttrMapping_.userDNKey.equals(ldapAttrMapping_.userUsernameAttr)) {
+      if (ldapAttrMapping_.userDNKey.equals(ldapAttrMapping_.userLastNameAttr)) {
+        dnKeyValue = user.getLastName();
+      } else if (ldapAttrMapping_.userDNKey.equals(ldapAttrMapping_.userFirstNameAttr)) {
+        dnKeyValue = user.getFirstName();
+      } else if (ldapAttrMapping_.userDNKey.equals(ldapAttrMapping_.userMailAttr)) {
+        dnKeyValue = user.getEmail();
+      }
+    }
+    return dnKeyValue;
   }
   
   public void saveUser(User user, boolean broadcast) throws Exception {    
@@ -164,18 +179,6 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
     return new ObjectPageList(users, 20);
   }
   
-  protected User findUserByDN (String userDN, LdapContext ctx) throws Exception {   
-    if (userDN == null) return null;
-    try {      
-      Attributes attrs = ctx.getAttributes(userDN);
-      if (attrs == null) return null;
-      User user = ldapAttrMapping_.attributesToUser(attrs);         
-      user.setFullName(user.getFirstName()+" "+user.getLastName());  
-      return user;
-    } catch (NameNotFoundException e){     
-      return null;
-    }
-  }
   
   public PageList getUserPageList(int pageSize) throws Exception {      
     String searchBase = ldapAttrMapping_.userURL;
