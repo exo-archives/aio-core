@@ -33,10 +33,13 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 
+import org.apache.commons.logging.Log;
 import org.exoplatform.services.ldap.LDAPService;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.GroupEventListener;
 import org.exoplatform.services.organization.GroupHandler;
+import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.impl.GroupImpl;
 
 /**
@@ -46,6 +49,8 @@ import org.exoplatform.services.organization.impl.GroupImpl;
  * Oct 14, 2005
  */
 public class GroupDAOImpl extends BaseDAO implements  GroupHandler {
+  
+  private static Log log = ExoLogger.getLogger("core.GroupDAOImpl");
   
   protected List<GroupEventListener> listeners_ ;
   
@@ -239,26 +244,42 @@ public class GroupDAOImpl extends BaseDAO implements  GroupHandler {
     return groups;
   }
   
-  public Collection findGroupsOfUser(String user) throws Exception {  
+  public Collection findGroupsOfUser(String userName) throws Exception {
     List<Group> groups = new ArrayList<Group>();
+
+    // check if user exists
+    String userDN = getDNFromUsername(userName);
+    if (userDN == null)
+      return groups;
+    userDN = userDN.trim();
+
+    NamingEnumeration<SearchResult> results = null;
     LdapContext ctx = ldapService_.getLdapContext();
-    String userDN = getDNFromUsername(user);    
-    
-    String searchBase = ldapAttrMapping_.groupsURL;
-    String filter = ldapAttrMapping_.membershipTypeMemberValue + "=" + escapeDN(userDN);
-    SearchControls constraints = new SearchControls();
-    constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    NamingEnumeration<SearchResult> results = ctx.search(searchBase, filter, constraints);
-    
+    try {
+      SearchControls constraints = new SearchControls();
+      constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+      // TODO : Need to optimize! Retrieving ALL memberships!
+      String filter = ldapAttrMapping_.membershipObjectClassFilter;
+      results = ctx.search(ldapAttrMapping_.groupsURL, filter, constraints);
+    } catch (Exception exp) {
+      if (log.isWarnEnabled())
+        log.warn("Failed to retrieve memberships for user " + userName + ": " + exp.getMessage());
+    }
+
+    // add groups for memberships matching user
     while (results.hasMore()) {
       SearchResult sr = results.next();
-      NameParser parser = ctx.getNameParser("");
-      CompositeName name = new CompositeName(sr.getName());
-      if (name.size() < 1) break;
-      Name entryName = parser.parse( name.get(0));
-      String groupDN = entryName + "," + searchBase;
-      Group group = this.getGroupFromMembershipDN(groupDN);      
-      if (group != null) addGroup(groups, group);      
+      if (haveUser(sr.getAttributes(), userDN)) {
+        NameParser parser = ctx.getNameParser("");
+        CompositeName name = new CompositeName(sr.getName());
+        if (name.size() < 1)
+          break;
+        Name entryName = parser.parse(name.get(0));
+        String membershipDN = entryName + "," + ldapAttrMapping_.groupsURL;
+        Group group = this.getGroupFromMembershipDN(membershipDN);
+        if (group != null)
+          addGroup(groups, group);
+      }
     }
     return groups;
   }
