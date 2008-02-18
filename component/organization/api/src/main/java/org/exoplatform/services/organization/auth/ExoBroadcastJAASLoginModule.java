@@ -16,6 +16,8 @@
  */
 package org.exoplatform.services.organization.auth;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +32,9 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.organization.Membership;
+import org.exoplatform.services.organization.OrganizationService;
 
 /**
  * Created y the eXo platform team
@@ -96,13 +101,21 @@ public class ExoBroadcastJAASLoginModule implements LoginModule {
         AuthenticationService authService =
           (AuthenticationService) container.getComponentInstanceOfType(AuthenticationService.class) ;
         Identity identity = new Identity(username, username, subject_);
+        
+        // populate user memberships into identity object
+        OrganizationService orgService =
+          (OrganizationService) container.getComponentInstanceOfType(OrganizationService.class) ;                                
+        Collection<Membership> memberships = orgService.getMembershipHandler().findMembershipsByUser(username);
+        identity.setMemberships(memberships);        
+        
+        // broadcast identity to other services
         authService.broadcastAuthentication(identity);
         return true;
       } finally {
         postProcessOperations();
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      //e.printStackTrace();
       throw new LoginException("Authentication failed. Exception " + e);
     }
   }
