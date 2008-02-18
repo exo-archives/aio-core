@@ -31,7 +31,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
 
 import org.exoplatform.services.organization.auth.JAASGroup;
-import org.exoplatform.services.organization.auth.pam.jaas.GroupPrincipal;
+import org.exoplatform.services.organization.auth.GroupPrincipal;
 
 import static java.lang.System.out;
 

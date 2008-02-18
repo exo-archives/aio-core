@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.auth.JAASGroup;
 import org.exoplatform.services.organization.auth.UserPrincipal;
+import org.exoplatform.services.organization.auth.GroupPrincipal;
 import org.exoplatform.services.organization.auth.pam.Pam;
 import org.exoplatform.services.organization.auth.pam.PamReturnValue;
 
