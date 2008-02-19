@@ -120,7 +120,7 @@ public class Identity {
   public boolean hasMembership_(String membershipType, String groupId) {
     
     for (Membership membership : memberships) {
-      if (groupId.equals(membership.getGroupId()) && membershipType.equals(membership.getMembershipType()) {
+      if (groupId.equals(membership.getGroupId()) && membershipType.equals(membership.getMembershipType())) {
         return true;
       }
     }
