@@ -106,26 +106,16 @@ public class Identity {
     groupsByMembershipMap_ = new HashMap<String, Set<String>>();
     for (Membership membership : memberships) {
       String membershipType = membership.getMembershipType();
-      Collection<String> groupsForMembership = groupsByMembershipMap_.get(membershipType);
+      Set<String> groupsForMembership = groupsByMembershipMap_.get(membershipType);
       if (groupsForMembership == null) {
         groupsForMembership = new HashSet<String>();
+        groupsByMembershipMap_.put(membershipType, groupsForMembership);
       }
       groupsForMembership.add(membership.getGroupId());
 
     }
   }
 
-  Collection<Membership> memberships;
 
-  public boolean hasMembership_(String membershipType, String groupId) {
-    
-    for (Membership membership : memberships) {
-      if (groupId.equals(membership.getGroupId()) && membershipType.equals(membership.getMembershipType())) {
-        return true;
-      }
-    }
-    return false;
-      
-  }
 
 }
