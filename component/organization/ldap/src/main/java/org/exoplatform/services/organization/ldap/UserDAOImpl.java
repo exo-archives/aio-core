@@ -80,6 +80,9 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
         dnKeyValue = user.getFirstName();
       } else if (ldapAttrMapping_.userDNKey.equals(ldapAttrMapping_.userMailAttr)) {
         dnKeyValue = user.getEmail();
+      } else if (ldapAttrMapping_.userDNKey.equals(ldapAttrMapping_.userDisplayNameAttr)) {
+        dnKeyValue = user.getFullName();
+
       }
     }
     return dnKeyValue;
