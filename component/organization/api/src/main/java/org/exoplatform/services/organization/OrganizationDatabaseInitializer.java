@@ -116,12 +116,11 @@ public class OrganizationDatabaseInitializer
   
   private void createUsers(OrganizationService service) throws Exception {
     printInfo("  Init  User  Data") ;
-    List users = config_.getUser() ;
+    List<OrganizationConfig.User> users = config_.getUser() ;
     MembershipHandler mhandler = service.getMembershipHandler() ;
     for(int i = 0 ; i < users.size() ; i++) {
       OrganizationConfig.User data = (OrganizationConfig.User) users.get(i);      
-      User user = service.getUserHandler().createUserInstance() ;
-      user.setUserName(data.getUserName()) ;
+      User user = service.getUserHandler().createUserInstance(data.getUserName()) ;
       user.setPassword(data.getPassword()) ;
       user.setFirstName(data.getFirstName()) ;
       user.setLastName(data.getLastName()) ;
