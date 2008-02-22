@@ -14,10 +14,15 @@ import org.exoplatform.services.organization.BaseOrganizationService;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.GroupEventListener;
 import org.exoplatform.services.organization.GroupHandler;
+import org.exoplatform.services.organization.Membership;
+import org.exoplatform.services.organization.MembershipEventListener;
+import org.exoplatform.services.organization.MembershipHandler;
+import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.Query;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserEventListener;
 import org.exoplatform.services.organization.UserHandler;
+import org.exoplatform.services.organization.impl.MembershipImpl;
 import org.exoplatform.services.organization.impl.UserImpl;
 
 /**
@@ -27,6 +32,81 @@ public class DummyOrganizationService extends BaseOrganizationService {
   public DummyOrganizationService() {
     this.userDAO_ = new UserHandlerImpl();
     this.groupDAO_ = new GroupHandlerImpl();
+    this.membershipDAO_ = new MembershipHandlerImpl();
+  }
+  
+  static public class MembershipHandlerImpl implements MembershipHandler {
+
+    public void addMembershipEventListener(MembershipEventListener listener) {
+    }
+
+    public void createMembership(Membership m, boolean broadcast) throws Exception {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public Membership createMembershipInstance() {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public Membership findMembership(String id) throws Exception {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public Membership findMembershipByUserGroupAndType(String userName, String groupId, String type)
+        throws Exception {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public Collection findMembershipsByGroup(Group group) throws Exception {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public Collection findMembershipsByUser(String userName) throws Exception {
+      Collection memberships = new ArrayList();
+      if ("admin".equals(userName)) {
+        MembershipImpl admin = new MembershipImpl();
+        admin.setMembershipType("*");
+        admin.setUserName(userName);
+        admin.setGroupId("admin");    
+        memberships.add(admin);
+      } 
+      
+      MembershipImpl membership = new MembershipImpl();
+      membership.setMembershipType("*");
+      membership.setUserName(userName);
+      membership.setGroupId("exo");
+      memberships.add(membership);
+      
+      return memberships;
+    }
+
+    public Collection findMembershipsByUserAndGroup(String userName, String groupId)
+        throws Exception {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public void linkMembership(User user, Group group, MembershipType m, boolean broadcast)
+        throws Exception {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public Membership removeMembership(String id, boolean broadcast) throws Exception {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public Collection removeMembershipByUser(String username, boolean broadcast) throws Exception {
+      // TODO Auto-generated method stub
+      return null;
+    }
+    
   }
 
 // synchronized public void addListener(ComponentPlugin listener) {
