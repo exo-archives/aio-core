@@ -14,10 +14,15 @@ import org.exoplatform.services.organization.BaseOrganizationService;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.GroupEventListener;
 import org.exoplatform.services.organization.GroupHandler;
+import org.exoplatform.services.organization.Membership;
+import org.exoplatform.services.organization.MembershipEventListener;
+import org.exoplatform.services.organization.MembershipHandler;
+import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.Query;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserEventListener;
 import org.exoplatform.services.organization.UserHandler;
+import org.exoplatform.services.organization.impl.MembershipImpl;
 import org.exoplatform.services.organization.impl.UserImpl;
 
 /**
@@ -27,7 +32,90 @@ public class DummyOrganizationService extends BaseOrganizationService {
   public DummyOrganizationService() {
     this.userDAO_ = new UserHandlerImpl();
     this.groupDAO_ = new GroupHandlerImpl();
+    this.membershipDAO_ = new MembershipHandlerImpl();
   }
+  
+  static public class MembershipHandlerImpl implements MembershipHandler {
+
+    public void addMembershipEventListener(MembershipEventListener listener) {
+    }
+
+    public void createMembership(Membership m, boolean broadcast) throws Exception {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public Membership createMembershipInstance() {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public Membership findMembership(String id) throws Exception {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public Membership findMembershipByUserGroupAndType(String userName, String groupId, String type)
+        throws Exception {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public Collection findMembershipsByGroup(Group group) throws Exception {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public Collection findMembershipsByUser(String userName) throws Exception {
+      Collection memberships = new ArrayList();
+      if ("admin".equals(userName)) {
+        MembershipImpl admin = new MembershipImpl();
+        admin.setMembershipType("*");
+        admin.setUserName(userName);
+        admin.setGroupId("admin");    
+        memberships.add(admin);
+      } 
+      
+      MembershipImpl membership = new MembershipImpl();
+      membership.setMembershipType("*");
+      membership.setUserName(userName);
+      membership.setGroupId("exo");
+      memberships.add(membership);
+      
+      return memberships;
+    }
+
+    public Collection findMembershipsByUserAndGroup(String userName, String groupId)
+        throws Exception {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public void linkMembership(User user, Group group, MembershipType m, boolean broadcast)
+        throws Exception {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public Membership removeMembership(String id, boolean broadcast) throws Exception {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public Collection removeMembershipByUser(String username, boolean broadcast) throws Exception {
+      // TODO Auto-generated method stub
+      return null;
+    }
+    
+  }
+
+// synchronized public void addListener(ComponentPlugin listener) {
+// }
+
+// public void addListener(OrganizationDatabaseInitializer listener) {}
+
+// public void removeListener(OrganizationDatabaseInitializer listener) {
+// }
 
   static public class UserHandlerImpl implements UserHandler {
 
@@ -61,28 +149,7 @@ public class DummyOrganizationService extends BaseOrganizationService {
 
       usr = new UserImpl("__anonim");
       users.add(usr);
-      
-      // webos users
-      usr = new UserImpl("root");
-      usr.setPassword("exo");
-      users.add(usr);
 
-      usr = new UserImpl("john");
-      usr.setPassword("exo");
-      users.add(usr);
-      
-      usr = new UserImpl("james");
-      usr.setPassword("exo");
-      users.add(usr);
-      
-      usr = new UserImpl("mary");
-      usr.setPassword("exo");
-      users.add(usr);
-      
-      usr = new UserImpl("demo");
-      usr.setPassword("exo");
-      users.add(usr);
-      
     }
 
     public User createUserInstance() {
@@ -130,15 +197,9 @@ public class DummyOrganizationService extends BaseOrganizationService {
         users.add(new UserImpl("exo"));
         users.add(new UserImpl("exo1"));
         users.add(new UserImpl("exo2"));
-        users.add(new UserImpl("mary"));
-        users.add(new UserImpl("james"));
-        users.add(new UserImpl("demo"));
       }
-      if (groupId.startsWith("admin")) {
+      if (groupId.startsWith("admin"))
         users.add(new UserImpl("admin"));
-        users.add(new UserImpl("root"));
-        users.add(new UserImpl("john"));
-      }
       return new ObjectPageList(users, 10);
     }
 
@@ -174,6 +235,16 @@ public class DummyOrganizationService extends BaseOrganizationService {
         if (usr.getPassword().equals(password))
           return true;
       }
+
+      // System.out.println("authenticate: " + username + " " + password);
+      /*
+       * if ("exo".equals(username) && "exo".equals(password) ||
+       * "exo1".equals(username) && "exo1".equals(password) ||
+       * "exo2".equals(username) && "exo2".equals(password) ||
+       * "admin".equals(username) && "admin".equals(password) ||
+       * "weblogic".equals(username) && "11111111".equals(password) ||
+       * "__anonim".equals(username)) return true;
+       */
       return false;
     }
   }
@@ -223,9 +294,9 @@ public class DummyOrganizationService extends BaseOrganizationService {
 
     public Collection findGroupsOfUser(String user) throws Exception {
       List<Group> groups = new ArrayList<Group>(1);
-      if (user.startsWith("exo") || user.equals("demo") || user.equals("mary") ||  user.equals("james"))
+      if (user.startsWith("exo"))
         groups.add(new DummyGroup("/exo", "exo"));
-      else if (user.startsWith("admin") || user.equals("root") || user.equals("john"))
+      if (user.startsWith("admin"))
         groups.add(new DummyGroup("/admin", "admin"));
       return groups;
     }
