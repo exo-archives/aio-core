@@ -72,14 +72,14 @@ public class DummyOrganizationService extends BaseOrganizationService {
         MembershipImpl admin = new MembershipImpl();
         admin.setMembershipType("*");
         admin.setUserName(userName);
-        admin.setGroupId("admin");    
+        admin.setGroupId("/admin");    
         memberships.add(admin);
       } 
       
       MembershipImpl membership = new MembershipImpl();
       membership.setMembershipType("*");
       membership.setUserName(userName);
-      membership.setGroupId("exo");
+      membership.setGroupId("/exo");
       memberships.add(membership);
       
       return memberships;
