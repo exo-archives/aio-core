@@ -95,14 +95,16 @@ public class ExoBroadcastJAASLoginModule implements LoginModule {
         preProcessOperations();
         AuthenticationService authService =
           (AuthenticationService) container.getComponentInstanceOfType(AuthenticationService.class) ;
-        Identity identity = new Identity(username, username, subject_);
+        Identity identity = new Identity(username, username, subject_);    
+        
+        // broadcast identity to other services
         authService.broadcastAuthentication(identity);
         return true;
       } finally {
         postProcessOperations();
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      //e.printStackTrace();
       throw new LoginException("Authentication failed. Exception " + e);
     }
   }
