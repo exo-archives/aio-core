@@ -92,7 +92,7 @@ public class OrganizationDatabaseInitializer
         }
         printInfo("    Create Group " + groupId ) ;
       } else {
-        printInfo("    Group " + groupId + " is existed, ignore the entry") ; 
+        printInfo("    Group " + groupId + " already exists, ignoring the entry") ; 
       }
     }
   }
@@ -109,19 +109,18 @@ public class OrganizationDatabaseInitializer
         service.getMembershipTypeHandler().createMembershipType(type, true) ;
         printInfo("    Created Membership Type " + data.getType()) ;
       } else {
-        printInfo("    Membership Type " + data.getType() + " is existed, ignore the entry") ;
+        printInfo("    Membership Type " + data.getType() + " already exists, ignoring the entry") ;
       }
     }
   }
   
   private void createUsers(OrganizationService service) throws Exception {
     printInfo("  Init  User  Data") ;
-    List users = config_.getUser() ;
+    List<OrganizationConfig.User> users = config_.getUser() ;
     MembershipHandler mhandler = service.getMembershipHandler() ;
     for(int i = 0 ; i < users.size() ; i++) {
       OrganizationConfig.User data = (OrganizationConfig.User) users.get(i);      
-      User user = service.getUserHandler().createUserInstance() ;
-      user.setUserName(data.getUserName()) ;
+      User user = service.getUserHandler().createUserInstance(data.getUserName()) ;
       user.setPassword(data.getPassword()) ;
       user.setFirstName(data.getFirstName()) ;
       user.setLastName(data.getLastName()) ;
@@ -130,7 +129,7 @@ public class OrganizationDatabaseInitializer
         service.getUserHandler().createUser(user, true);
         printInfo("    Created user " + data.getUserName()) ;
       }  else {
-        printInfo("    User " + data.getUserName() + " is existed, ignore the entry") ;
+        printInfo("    User " + data.getUserName() + " already exists, ignoring the entry") ;
       }
       
       String groups = data.getGroups();
@@ -146,7 +145,7 @@ public class OrganizationDatabaseInitializer
           mhandler.linkMembership(user,group,mt, true) ;
           printInfo("    Created membership " + data.getUserName() + ", " + groupId + ", " + membership) ;
         } else {
-          printInfo("    Ignore membership " + data.getUserName() + ", " + groupId + ", " + membership) ;
+          printInfo("    Ignored membership " + data.getUserName() + ", " + groupId + ", " + membership) ;
         }
       }            
       
