@@ -67,7 +67,7 @@ public class Identity {
   }
 
   /**
-   * Check if user has a membership for given group.
+   * Check if user has any membership in a given group.
    * 
    * @param groupId id of the group to check
    * @return true if
@@ -83,7 +83,7 @@ public class Identity {
   }
 
   /**
-   * Check if user has a given membership
+   * Check if user has a given membership in a group.
    * 
    * @param membershipType type of the membership.
    * @param groupId id of the group of the membership.
@@ -103,6 +103,7 @@ public class Identity {
    * @param memberships
    */
   public void setMemberships(Collection<Membership> memberships) {
+    if (memberships == null) return;
     groupsByMembershipMap_ = new HashMap<String, Set<String>>();
     for (Membership membership : memberships) {
       String membershipType = membership.getMembershipType();
