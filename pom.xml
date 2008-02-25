@@ -18,7 +18,6 @@
     <module>component/security</module>
     <module>component/xml-processing</module>
     <module>component/resources/api</module>
-    <module>ejb/organization</module>
   </modules>
 
   <dependencies>
