@@ -190,72 +190,121 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
     return membership;
   }
   
-  public Membership findMembershipByUserGroupAndType(String userName, String groupId, String type) throws Exception {    
-    String membershipDN = 
-      ldapAttrMapping_.membershipTypeNameAttr + "=" + type + "," + getGroupDNFromGroupId(groupId);     
-    try {
-      LdapContext ctx = ldapService_.getLdapContext();      
-      Attributes attrs = ctx.getAttributes( membershipDN);      
-      if (attrs == null) return null;
-      String userDN = getDNFromUsername(userName);
-      if (userDN != null && haveUser(attrs, userDN.trim())) 
-        return createObject(userName, groupId, type);
-    } catch (NameNotFoundException e){        
-      //log.warn("Find membership by user group and type error " + e, e);
-    }    
-    return null;   
+  public Membership findMembershipByUserGroupAndType(String userName, String groupId, String type)
+      throws Exception {
+    Membership membership = null;
+
+    // check if user exists
+    String userDN = getDNFromUsername(userName);
+    if (userDN == null)
+      return null;
+    userDN = userDN.trim();
+
+    String filter = "(&" + ldapAttrMapping_.membershipObjectClassFilter + "("
+        + ldapAttrMapping_.membershipTypeNameAttr + "=" + type + "))";
+
+    // retrieve memberships
+    NamingEnumeration<SearchResult> results = findMembershipsInGroup(groupId, filter);
+    if (results == null)
+      return null;
+
+    // add memberships matching user
+    if (results.hasMore()) {
+      SearchResult sr = results.next();
+      if (haveUser(sr.getAttributes(), userDN)) {
+        //String type = explodeDN(sr.getNameInNamespace(), true)[0];
+        membership = createObject(userName, groupId, type);
+      }
+    }
+
+    return membership;
   }
   
   public Collection findMembershipsByUserAndGroup(String userName, String groupId) throws Exception {
-    ArrayList<Membership> memberships = new ArrayList<Membership>();  
-    String userDN = getDNFromUsername(userName);    
-    if(userDN == null ) return memberships;
+    ArrayList<Membership> memberships = new ArrayList<Membership>();
+
+    // check if user exists
+    String userDN = getDNFromUsername(userName);
+    if (userDN == null)
+      return memberships;
     userDN = userDN.trim();
-    NamingEnumeration<SearchResult>  results = null;       
-    LdapContext ctx = ldapService_.getLdapContext();   
-    try{  
-      SearchControls constraints = new SearchControls();
-      constraints.setSearchScope( SearchControls.ONELEVEL_SCOPE);
-      results = ctx.search( getGroupDNFromGroupId( groupId), "objectClass=groupOfNames",constraints);
-    }catch( Exception exp){        
-    }
-    
-    if( results == null) return memberships;  
-    while( results.hasMore()) {
+
+    // retrieve memberships
+    NamingEnumeration<SearchResult> results = findMembershipsInGroup(groupId,
+        ldapAttrMapping_.membershipObjectClassFilter);
+    if (results == null)
+      return memberships;
+
+    // add memberships matching user
+    while (results.hasMore()) {
       SearchResult sr = results.next();
-      if(haveUser(sr.getAttributes(), userDN)){        
-        memberships.add(createObject(userName, groupId, explodeDN(sr.getNameInNamespace(), true)[0]));
+      if (haveUser(sr.getAttributes(), userDN)) {
+        String type = explodeDN(sr.getNameInNamespace(), true)[0];
+        Membership membership = createObject(userName, groupId, type);
+        memberships.add(membership);
       }
     }
     return memberships;
   }
-  
-  public Collection findMembershipsByUser( String userName) throws Exception {   
-    Collection<Membership> memberships = new ArrayList<Membership>();
-    
-    String userDN = this.getDNFromUsername(userName);
-    if( userDN == null) return memberships;    
-    String filter = ldapAttrMapping_.membershipTypeMemberValue + "=" + escapeDN( userDN);  
-    
-    SearchControls constraints = new SearchControls();
-    constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    LdapContext ctx = ldapService_.getLdapContext();  
+
+  /**
+   * List memberships of a group by applying the membershipObjectFilter
+   * 
+   * @param groupId id of the group to retrieve
+   * @param filter filter to apply to search
+   * @return search results or null if failed
+   * @throws Exception
+   */
+  private NamingEnumeration<SearchResult> findMembershipsInGroup(String groupId, String filter) throws Exception {
     NamingEnumeration<SearchResult> results = null;
-    try{
-      results = ctx.search( ldapAttrMapping_.groupsURL, filter, constraints);
-    }catch( Exception exp){
-      return memberships;
+    LdapContext ctx = ldapService_.getLdapContext();
+    try {
+      SearchControls constraints = new SearchControls();
+      constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
+      String groupDN = getGroupDNFromGroupId(groupId);
+      results = ctx.search(groupDN, filter, constraints);
+    } catch (Exception exp) {
+      if (log.isWarnEnabled())
+        log.warn("Failed to retrieve memberships for " + groupId + ": " + exp.getMessage());
     }
-    
-    if( results == null) return memberships;
-    while(results.hasMore()) {
+    return results;
+  }
+  
+  public Collection findMembershipsByUser( String userName) throws Exception {
+    ArrayList<Membership> memberships = new ArrayList<Membership>();
+
+    // check if user exists
+    String userDN = getDNFromUsername(userName);
+    if (userDN == null)
+      return memberships;
+    userDN = userDN.trim();
+
+    NamingEnumeration<SearchResult> results = null;
+    LdapContext ctx = ldapService_.getLdapContext();
+    try {
+      SearchControls constraints = new SearchControls();
+      constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+      // TODO : Need to optimize! Retrieving ALL memberships!
+      String filter = ldapAttrMapping_.membershipObjectClassFilter;
+      results = ctx.search(ldapAttrMapping_.groupsURL, filter, constraints);
+    } catch (Exception exp) {
+      if (log.isWarnEnabled())
+        log.warn("Failed to retrieve memberships for user " + userName + ": " + exp.getMessage());
+    }
+
+    // add memberships matching user
+    while (results.hasMore()) {
       SearchResult sr = results.next();
-      String membershipDN = sr.getNameInNamespace();
-      Group group = getGroupFromMembershipDN(membershipDN);
-      String type = explodeDN(membershipDN, true)[0];
-      memberships.add( this.createObject( userName, group.getId(), type));
+      if (haveUser(sr.getAttributes(), userDN)) {
+        String membershipDN = sr.getNameInNamespace();
+        Group group = getGroupFromMembershipDN(membershipDN);
+        String type = explodeDN(membershipDN, true)[0];        
+        Membership membership = createObject(userName, group.getId(), type);
+        memberships.add(membership);
+      }
     }
     return memberships;
+    
   }
   
   public Collection findMembershipsByGroup(Group group) throws Exception {
@@ -266,37 +315,38 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope( SearchControls.ONELEVEL_SCOPE);
     NamingEnumeration<SearchResult>  results = null;  
-    
+    if (log.isDebugEnabled()) log.debug("Searching memberships of group " + group.getId() + ": ");
     try{       
       results = ctx.search(groupDN, ldapAttrMapping_.membershipObjectClassFilter, constraints);
     }catch( Exception exp){ 
       return memberships;    
     }    
-    if( results == null || !results.hasMoreElements()) return memberships;    
+    
+    if( results == null || !results.hasMoreElements()) return memberships;
+    
     while( results.hasMoreElements()) {
       SearchResult sr = results.next();
-      NameParser parser = ctx.getNameParser("");
-      String type = explodeDN(sr.getNameInNamespace(), true)[0];      
+      String membershipType = explodeDN(sr.getNameInNamespace(), true)[0];      
       Attributes attrs =  sr.getAttributes();
-//      Attribute attr = attrs.get("member");
       Attribute attr = attrs.get(ldapAttrMapping_.membershipTypeMemberValue);
       String userName;
       for( int i=0; i<attr.size(); i++){
-        userName = explodeDN(String.valueOf( attr.get(i)), true)[0];       
-        memberships.add(createObject( userName, group.getId(), type));
+    	String userDN = String.valueOf( attr.get(i));
+        
+        if (ldapAttrMapping_.userDNKey.equals(ldapAttrMapping_.userUsernameAttr)) {
+        	userName = explodeDN(userDN, true)[0];
+        }         
+        else {
+        	userName = findUserByDN(userDN, ctx).getUserName();        	
+        }
+        Membership membership = createObject( userName, group.getId(), membershipType);
+        if (log.isDebugEnabled()) log.debug("  found " + membership.toString());
+        memberships.add(membership);
       }
     }
     return memberships;
   }
   
-  private boolean haveUser( Attributes attrs, String userDN) throws Exception {
-    if (attrs == null) return false;    
-    List<Object> members = this.getAttributes(attrs, ldapAttrMapping_.membershipTypeMemberValue);
-    for( int i=0; i<members.size(); i++){        
-      if( String.valueOf( members.get( i)).trim().equalsIgnoreCase( userDN)) return true;      
-    }      
-    return false;
-  }
   
   private MembershipImpl createObject(String userName, String groupId, String type) throws Exception{
     MembershipImpl membership = new MembershipImpl();

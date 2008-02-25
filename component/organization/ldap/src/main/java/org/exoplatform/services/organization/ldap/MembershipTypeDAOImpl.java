@@ -73,6 +73,7 @@ public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHand
     if (attrs == null) return mt;
     ModificationItem[] mods = new ModificationItem[1];
     String desc = mt.getDescription();
+    // TODO: http://jira.exoplatform.org/browse/COR-49
     if (desc != null && desc.length() > 0){
       mods[0] = new ModificationItem(
           DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("description" , mt.getDescription()));

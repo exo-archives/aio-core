@@ -58,7 +58,7 @@ public class LDAPAttributeMapping {
   
    String userDNKey;
    
-   String userAuthenticationAttr;
+   //String userAuthenticationAttr;
    String userUsernameAttr;
    String userPassword;
    String userFirstNameAttr;
@@ -83,6 +83,7 @@ public class LDAPAttributeMapping {
     BasicAttributes attrs = new BasicAttributes();
     if(USER_LDAP_CLASSES == null)  USER_LDAP_CLASSES = userLDAPClasses.split(","); 
     attrs.put(new ObjectClassAttribute(USER_LDAP_CLASSES));
+    // TODO : user ldn.dn.key instead of hardcoded cn
     attrs.put("cn", user.getUserName());
     attrs.put(userDisplayNameAttr, user.getFullName());
     attrs.put(userUsernameAttr, user.getUserName());    
@@ -114,6 +115,7 @@ public class LDAPAttributeMapping {
     attrs.put(new ObjectClassAttribute(GROUP_LDAP_CLASSES));
     attrs.put("ou", group.getGroupName());
     String desc = group.getDescription();
+    // TODO : http://jira.exoplatform.org/browse/COR-49
     if (desc != null && desc.length() > 0) attrs.put("description", desc);
     String lbl = group.getLabel();
     if( lbl != null && lbl.length() > 0)  attrs.put("l", lbl);
@@ -123,6 +125,7 @@ public class LDAPAttributeMapping {
   final public Group attributesToGroup(Attributes attrs) throws Exception {
     if(attrs == null ||  attrs.size() == 0)  return null ;
     Group group = new GroupImpl();    
+    // TODO : http://jira.exoplatform.org/browse/COR-49
     group.setGroupName(getAttributeValueAsString(attrs, "ou"));
     group.setDescription(getAttributeValueAsString(attrs, "description"));    
     group.setLabel(getAttributeValueAsString(attrs, "l"));    
@@ -136,6 +139,7 @@ public class LDAPAttributeMapping {
     attrs.put(new ObjectClassAttribute(MEMBERSHIPTYPE_LDAP_CLASSES));  
     attrs.put(membershipTypeNameAttr, mt.getName());    
     String desc = mt.getDescription();
+    // TODO: http://jira.exoplatform.org/browse/COR-49
     if (desc != null && desc.length() > 0) attrs.put( "description", desc);        
     return attrs;
   }
@@ -143,6 +147,7 @@ public class LDAPAttributeMapping {
   final public MembershipType attributesToMembershipType(Attributes attrs){
     if(attrs == null ||  attrs.size() == 0)  return null ;
     MembershipType m = new MembershipTypeImpl();
+    // TODO : http://jira.exoplatform.org/browse/COR-49
     m.setName(getAttributeValueAsString(attrs, membershipTypeNameAttr));
     m.setDescription(getAttributeValueAsString(attrs, "description"));
     m.setCreatedDate(new Date());
@@ -163,6 +168,7 @@ public class LDAPAttributeMapping {
     BasicAttributes attrs = new BasicAttributes();
     if(PROFILE_LDAP_CLASSES == null) PROFILE_LDAP_CLASSES = profileLDAPClasses.split(","); 
     attrs.put(new ObjectClassAttribute(PROFILE_LDAP_CLASSES));
+    // TODO: http://jira.exoplatform.org/browse/COR-49
     attrs.put("sn", profile.getUserName());
     UserProfileData upd = new UserProfileData() ;  
     upd.setUserProfile( profile) ;    
