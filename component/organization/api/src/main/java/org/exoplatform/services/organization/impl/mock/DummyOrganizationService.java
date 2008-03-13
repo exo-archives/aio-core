@@ -277,8 +277,9 @@ public class DummyOrganizationService extends BaseOrganizationService {
     }
 
     public Group findGroupById(String groupId) throws Exception {
-      Group group = new DummyGroup("/" + groupId, groupId);
-      return group;
+      if(groupId.startsWith("/"))
+        return new DummyGroup(groupId, groupId.substring(1) );
+      else return new DummyGroup("/" + groupId, groupId);
     }
 
     public Collection findGroups(Group parent) throws Exception {
