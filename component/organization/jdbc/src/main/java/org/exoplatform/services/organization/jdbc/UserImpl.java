@@ -6,6 +6,7 @@ import org.exoplatform.services.database.DBObject;
 import org.exoplatform.services.database.annotation.Table;
 import org.exoplatform.services.database.annotation.TableField;
 import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.auth.PasswordEncrypter;
 
 @Table(
     name = "EXO_USER" ,
@@ -30,19 +31,27 @@ public class UserImpl extends DBObject implements User {
   private Date   createdDate ;
   private Date  lastLoginTime ;
   private String organizationId = null;
+  private PasswordEncrypter passwordEncrypter = null;
   
   public UserImpl() {
   }
   
-  public UserImpl(String username) {
-    this.userName = username;
+  public UserImpl(String username) { this.userName = username; }
+  
+  public void setPasswordEncrypter(PasswordEncrypter passwordEncrypter) {
+    this.passwordEncrypter = passwordEncrypter;
   }
 
   public String getUserName() { return userName; }
   public void setUserName(String name) { this.userName = name; }
 
   public String getPassword() { return password; }
-  public void setPassword(String password) { this.password = password; }
+  public void setPassword(String password) { 
+    if(this.passwordEncrypter == null)
+      this.password = password; 
+    else
+      this.password = new String(passwordEncrypter.encrypt(password.getBytes()));
+  }
   
   public String getFirstName() { return firstName; }
   public void setFirstName(String firstName) { this.firstName = firstName; }

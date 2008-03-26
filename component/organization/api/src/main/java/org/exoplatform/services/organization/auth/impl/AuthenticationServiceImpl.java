@@ -25,6 +25,7 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.auth.AuthenticationService;
 import org.exoplatform.services.organization.auth.Identity;
+import org.exoplatform.services.organization.auth.PasswordEncrypter;
 
 /**
  * Created by The eXo Platform SAS
@@ -38,16 +39,26 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private Map<String, Identity>  identities_ = new HashMap<String, Identity>() ;;
   private ListenerService listenerService_ ;
   private OrganizationService orgService_ ;
+  private PasswordEncrypter encrypter ;
   
-  public AuthenticationServiceImpl(ListenerService listenerService, OrganizationService orgService)  {
+  public AuthenticationServiceImpl(ListenerService listenerService, OrganizationService orgService, PasswordEncrypter encrypter)  {
     log.info("Start AuthenticationService init ...................... ");
     listenerService_ = listenerService ;
     orgService_ =  orgService ;
+    this.encrypter = encrypter;
     log.info("End AuthenticationService init ...................... ");
   }
   
+  public AuthenticationServiceImpl(ListenerService listenerService, OrganizationService orgService)  {
+
+    this(listenerService, orgService, null);
+  }
+  
   public boolean login(String userName, String password) throws Exception {
-    if(orgService_.getUserHandler().authenticate(userName, password)) {
+    String psw = password;
+    if(this.encrypter != null)
+      psw = new String(encrypter.encrypt(password.getBytes()));
+    if(orgService_.getUserHandler().authenticate(userName, psw)) {
       return true ;
     } else {
       return false ;

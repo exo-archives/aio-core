@@ -27,6 +27,7 @@ import org.exoplatform.services.database.DatabaseService;
 import org.exoplatform.services.database.ExoDatasource;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.organization.BaseOrganizationService;
+import org.exoplatform.services.organization.auth.PasswordEncrypter;
 /**
  * Created by The eXo Platform SAS
  * Author : Mestrallet Benjamin
@@ -37,11 +38,16 @@ import org.exoplatform.services.organization.BaseOrganizationService;
  * Time: 4:51:21 PM
  */
 public class OrganizationServiceImpl extends  BaseOrganizationService {
+  
+  public OrganizationServiceImpl(ListenerService listenerService,  
+      DatabaseService dbService) throws Exception {
+    this(listenerService, dbService, null);
+  }
 
   public OrganizationServiceImpl(ListenerService listenerService,  
-                                 DatabaseService dbService) throws Exception {
+                                 DatabaseService dbService, PasswordEncrypter encrypter) throws Exception {
     ExoDatasource datasource = dbService.getDatasource();  
-    userDAO_ = new UserDAOImpl(listenerService, datasource, new UserMapper()) ;   
+    userDAO_ = new UserDAOImpl(listenerService, datasource, new UserMapper(), encrypter) ;   
     groupDAO_ =  new GroupDAOImpl(listenerService, datasource, new GroupMapper()) ;
     membershipTypeDAO_ = new MembershipTypeDAOImpl(listenerService, datasource, new MembershipTypeMapper()) ;
 

@@ -39,6 +39,7 @@ import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserEventListener;
 import org.exoplatform.services.organization.UserHandler;
+import org.exoplatform.services.organization.auth.PasswordEncrypter;
 
 /**
  * Created by The eXo Platform SAS
@@ -49,15 +50,26 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements  UserHandle
   protected static Log log = ExoLogger.getLogger("organization:UserDAOImpl");
   
   protected ListenerService listenerService_;
+  protected PasswordEncrypter passwordEncrypter;
   
-  public UserDAOImpl(ListenerService lService, ExoDatasource datasource, DBObjectMapper<UserImpl> mapper) {
+  public UserDAOImpl(ListenerService lService, ExoDatasource datasource, DBObjectMapper<UserImpl> mapper,
+      PasswordEncrypter passwordEncrypter) {
     super(datasource, mapper, UserImpl.class);
     listenerService_ = lService;
+    this.passwordEncrypter = passwordEncrypter;
   }
   
-  public User createUserInstance() { return new UserImpl(); }
+  public User createUserInstance() { 
+    UserImpl user = new UserImpl(); 
+    user.setPasswordEncrypter(passwordEncrypter);
+    return user;
+  }
 
-  public User createUserInstance(String username) { return new UserImpl(username); }
+  public User createUserInstance(String username) { 
+    UserImpl user = new UserImpl(username); 
+    user.setPasswordEncrypter(passwordEncrypter);
+    return user;
+  }
   
   public void createUser(User user, boolean broadcast) throws Exception {
 	if(log.isDebugEnabled())
