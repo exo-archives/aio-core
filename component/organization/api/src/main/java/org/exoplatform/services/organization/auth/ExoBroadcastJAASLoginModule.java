@@ -26,6 +26,7 @@ import javax.security.auth.spi.LoginModule;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
@@ -39,64 +40,71 @@ import org.exoplatform.services.log.ExoLogger;
  * @version $Id$
  */
 public class ExoBroadcastJAASLoginModule implements LoginModule {
-  
-  private Log      log = ExoLogger.getLogger("kernel.ExoBroadcastJAASLoginModule");
-  
-  private Subject subject_;
-  private Map sharedState_;
+
+  private Log             log              = ExoLogger.getLogger("core.ExoBroadcastJAASLoginModule");
+
+  private Subject         subject_;
+  private Map             sharedState_;
   private PortalContainer cachedContainer_ = null;
-  
-  public ExoBroadcastJAASLoginModule() { }
-  
-  public ExoContainer getContainer() throws Exception {
-    return RootContainer.getInstance().getPortalContainer("portal");	  
+
+  public ExoBroadcastJAASLoginModule() {
   }
-  
+
+  private ExoContainer getContainer() throws Exception {                                                                                                 
+    ExoContainer container = ExoContainerContext.getCurrentContainer();                                                                                  
+    if (container instanceof RootContainer) {                                                                                                            
+      container = RootContainer.getInstance().getPortalContainer("portal");                                                                              
+    }                                                                                                                                                    
+    return container;                                                                                                                                    
+  }
+
   public void preProcessOperations() throws Exception {
     cachedContainer_ = PortalContainer.getInstance();
     PortalContainer container = cachedContainer_;
-    if(container == null) {
+    if (container == null) {
       container = (PortalContainer) getContainer();
-      PortalContainer.setInstance(container) ;
-    }    
+      PortalContainer.setInstance(container);
+    }
     List<ComponentRequestLifecycle> components = container.getComponentInstancesOfType(ComponentRequestLifecycle.class);
-    for(ComponentRequestLifecycle component : components) { 
-      component.startRequest(container) ;
-    }        
+    for (ComponentRequestLifecycle component : components) {
+      component.startRequest(container);
+    }
   }
 
   public void postProcessOperations() throws Exception {
     PortalContainer container = (PortalContainer) getContainer();
     List<ComponentRequestLifecycle> components = container.getComponentInstancesOfType(ComponentRequestLifecycle.class);
-    if(components != null) {
-      for(ComponentRequestLifecycle component : components) {
-        component.endRequest(container) ;
+    if (components != null) {
+      for (ComponentRequestLifecycle component : components) {
+        component.endRequest(container);
       }
     }
     // Previously, the Portal Container was set to null.
     // It is mandatory to restore a previous instance if existing.
-    PortalContainer.setInstance(cachedContainer_) ;
-  }  
-  
-  final public void initialize(Subject subject, CallbackHandler callbackHandler, Map sharedState, Map options) {
+    PortalContainer.setInstance(cachedContainer_);
+  }
+
+  final public void initialize(Subject subject,
+                               CallbackHandler callbackHandler,
+                               Map sharedState,
+                               Map options) {
     this.subject_ = subject;
     this.sharedState_ = sharedState;
   }
-  
+
   final public boolean login() throws LoginException {
     return true;
   }
-  
+
   final public boolean commit() throws LoginException {
     try {
       try {
-        String username = (String) sharedState_.get("javax.security.auth.login.name"); 	
+        String username = (String) sharedState_.get("javax.security.auth.login.name");
         ExoContainer container = getContainer();
         preProcessOperations();
-        AuthenticationService authService =
-          (AuthenticationService) container.getComponentInstanceOfType(AuthenticationService.class) ;
-        Identity identity = new Identity(username, username, subject_);    
-        
+        AuthenticationService authService = (AuthenticationService) container.getComponentInstanceOfType(AuthenticationService.class);
+        Identity identity = new Identity(username, username, subject_);
+
         // broadcast identity to other services
         authService.broadcastAuthentication(identity);
         return true;
@@ -108,18 +116,17 @@ public class ExoBroadcastJAASLoginModule implements LoginModule {
       throw new LoginException("Authentication failed. Exception " + e);
     }
   }
-  
+
   final public boolean abort() throws LoginException {
     if (log.isDebugEnabled())
-      log.debug("In abort of TomcatLoginModule") ;
-    return true  ;
-  }
-  
-  final public boolean logout() throws LoginException {
-    if (log.isDebugEnabled())
-      log.debug("In logout of TomcatLoginModule, It seems this method is never called in tomcat") ;
-    return  true ;
+      log.debug("In abort of ExoBroadcastJAASLoginModule");
+    return true;
   }
 
+  final public boolean logout() throws LoginException {
+    if (log.isDebugEnabled())
+      log.debug("In logout of ExoBroadcastJAASLoginModule");
+    return true;
+  }
 
 }

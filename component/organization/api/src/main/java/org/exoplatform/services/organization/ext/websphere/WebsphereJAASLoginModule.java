@@ -14,19 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.services.organization.auth;
+package org.exoplatform.services.organization.ext.websphere;
 
+import java.security.Principal;
+import java.security.acl.Group;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
@@ -34,17 +38,22 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.auth.Identity;
+import org.exoplatform.services.organization.auth.JAASGroup;
+import org.exoplatform.services.organization.auth.RolePrincipal;
+import org.exoplatform.services.organization.auth.UserPrincipal;
 
 /**
  * Created y the eXo platform team
  * User:  Tuan Nguyen
  * Date: May 6th, 2007
  * 
- * @version $Id$
+ * @version $Id: ExoLoginJAASLoginModule.java 8478 2007-12-03 10:45:34Z rainf0x $
  */
-public class ExoLoginJAASLoginModule implements LoginModule {
+public class WebsphereJAASLoginModule implements LoginModule {
 
-  private Log             log              = ExoLogger.getLogger("core.ExoLoginJAASLoginModule");
+  private Log             log              = ExoLogger.getLogger("core.ExoWebsphereJAASLoginModule");
 
   private Subject         subject_;
   private CallbackHandler callbackHandler_;
@@ -52,7 +61,7 @@ public class ExoLoginJAASLoginModule implements LoginModule {
   private Map             sharedState_;
   private PortalContainer cachedContainer_ = null;
 
-  public ExoLoginJAASLoginModule() {
+  public WebsphereJAASLoginModule() {
   }
 
   private ExoContainer getContainer() throws Exception {                                                                                                 
@@ -100,44 +109,20 @@ public class ExoLoginJAASLoginModule implements LoginModule {
 
   final public boolean login() throws LoginException {
     if (log.isDebugEnabled())
-      log.debug("In login of ExoLoginJAASLoginModule");
-
-    Callback[] callbacks = new Callback[2];
-    callbacks[0] = new NameCallback("Username");
-    callbacks[1] = new PasswordCallback("Password", false);
-    ExoContainer container = null;
+      log.debug("In login of WebsphereJAASLoginModule");
     try {
       try {
-        callbackHandler_.handle(callbacks);
-        String username = ((NameCallback) callbacks[0]).getName();
-        String password = new String(((PasswordCallback) callbacks[1]).getPassword());
-        ((PasswordCallback) callbacks[1]).clearPassword();
-        if (username == null || password == null)
-          return false;
-        sharedState_.put("javax.security.auth.login.name", username);
-        subject_.getPrivateCredentials().add(password);
-        container = getContainer();
+        username_ = (String) sharedState_.get("javax.security.auth.login.name");
+        ExoContainer container = getContainer();
         preProcessOperations();
-        AuthenticationService authService = (AuthenticationService) container.getComponentInstanceOfType(AuthenticationService.class);
-
-        if (authService.login(username, password)) {
-          return true;
-        } else {
-          throw new LoginException("Authentication failed");
-        }
+        OrganizationService orgService = (OrganizationService) container.getComponentInstanceOfType(OrganizationService.class);
+        onEvent(orgService);
+        return true;
       } finally {
         postProcessOperations();
       }
-    } catch (final Throwable e) {
-      throw new LoginException(e.toString()) {
-
-        private static final long serialVersionUID = 5843336633846631565L; // autogen by eclipse
-
-        @Override
-        public Throwable getCause() {
-          return e;
-        }
-      };
+    } catch (Exception e) {
+      throw new LoginException("Authentication failed. Exception " + e);
     }
   }
 
@@ -147,13 +132,62 @@ public class ExoLoginJAASLoginModule implements LoginModule {
 
   final public boolean abort() throws LoginException {
     if (log.isDebugEnabled())
-      log.debug("In abort of TomcatLoginModule");
+      log.debug("In abort of WebsphereJAASLoginModule");
     return true;
   }
 
   final public boolean logout() throws LoginException {
     if (log.isDebugEnabled())
-      log.debug("In logout of TomcatLoginModule, It seems this method is never called in tomcat");
+      log.debug("In logout of WebsphereJAASLoginModule");
+    getSubject().getPrincipals().remove(usernamePrincipal);
     return true;
+  }
+
+  protected Subject getSubject() {
+    return subject_;
+  }
+
+  private String             username_;
+  private Principal          usernamePrincipal;
+  private String             userRoleParentGroup         = "platform";
+
+  final public static String WSCREDENTIAL_PROPERTIES_KEY = "com.ibm.wsspi.security.cred.propertiesObject";
+  final public static String WSCREDENTIAL_UNIQUEID       = "com.ibm.wsspi.security.cred.uniqueId";
+  final public static String WSCREDENTIAL_SECURITYNAME   = "com.ibm.wsspi.security.cred.securityName";
+  final public static String WSCREDENTIAL_GROUPS         = "com.ibm.wsspi.security.cred.groups";
+  final public static String WSCREDENTIAL_CACHE_KEY      = "com.ibm.wsspi.security.cred.cacheKey";
+
+  public void onEvent(OrganizationService service) throws Exception {
+    usernamePrincipal = new UserPrincipal(username_);
+    subject_.getPrincipals().add(usernamePrincipal);
+    Collection groups = service.getGroupHandler().findGroupsOfUser(username_);
+    Group roleGroup = new JAASGroup(JAASGroup.ROLES);
+    ArrayList<String> roleGroupList = new ArrayList<String>();
+    for (Iterator iter = groups.iterator(); iter.hasNext();) {
+      org.exoplatform.services.organization.Group group = (org.exoplatform.services.organization.Group) iter.next();
+      String groupId = group.getId();
+      String groupName = null;
+      String[] splittedGroupName = StringUtils.split(groupId, "/");
+      if (userRoleParentGroup != null && splittedGroupName[0].equals(userRoleParentGroup) && splittedGroupName.length > 1) {
+        groupName = splittedGroupName[splittedGroupName.length - 1];
+      } else {
+        groupName = splittedGroupName[0];
+      }
+      roleGroup.addMember(new RolePrincipal(groupName));
+      roleGroupList.add(groupName);
+    }
+    subject_.getPrincipals().add(roleGroup);
+    websphereLogin(roleGroupList);
+  }
+
+  private void websphereLogin(ArrayList<String> roleGroupList) {
+    Hashtable hashtable = new Hashtable();
+    String uniqueid = username_;
+    hashtable.put(WSCREDENTIAL_UNIQUEID, uniqueid);
+    hashtable.put(WSCREDENTIAL_SECURITYNAME, username_);
+    hashtable.put(WSCREDENTIAL_GROUPS, roleGroupList);
+    hashtable.put(WSCREDENTIAL_CACHE_KEY, uniqueid + "WebsphereJAASLoginModule");
+    //sharedState.put(WSCREDENTIAL_PROPERTIES_KEY, hashtable);
+    subject_.getPublicCredentials().add(hashtable);
   }
 }
