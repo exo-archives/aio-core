@@ -50,7 +50,7 @@ public class ExoBroadcastJAASLoginModule implements LoginModule {
   public ExoBroadcastJAASLoginModule() {
   }
 
-  private ExoContainer getContainer() throws Exception {                                                                                                 
+  public ExoContainer getContainer() throws Exception {                                                                                                 
     ExoContainer container = ExoContainerContext.getCurrentContainer();                                                                                  
     if (container instanceof RootContainer) {                                                                                                            
       container = RootContainer.getInstance().getPortalContainer("portal");                                                                              
