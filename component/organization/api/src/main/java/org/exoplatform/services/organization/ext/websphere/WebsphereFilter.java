@@ -48,8 +48,8 @@ import org.exoplatform.services.organization.auth.Identity;
 public class WebsphereFilter implements Filter {
 
   private static Log log = ExoLogger.getLogger("org.exoplatform.frameworks.jcr.web.WebsphereFilter");
-  private static String cookieName = "LtpaToken";
-  private static String cookieName2 = "LtpaToken2";
+  private static final String cookieName = "LtpaToken";
+  private static final String cookieName2 = "LtpaToken2";
 
   public void destroy() {
   }
@@ -62,6 +62,8 @@ public class WebsphereFilter implements Filter {
     HttpServletResponse httpResponse = (HttpServletResponse) response;
     if (httpRequest.getQueryString() == null && httpRequest.getRequestURI() != null && httpRequest.getRequestURI().contains("/public")) {
       removeLtpaTokenCookie(httpRequest, httpResponse);
+    } else if (httpRequest.getQueryString() != null && httpRequest.getQueryString().contains("UIPortalComponentLogin") && httpRequest.getRequestURI() != null && httpRequest.getRequestURI().contains("/public")) {
+      removeLtpaTokenCookie(httpRequest, httpResponse);
     }
     chain.doFilter(request, response);
   }
@@ -72,14 +74,15 @@ public class WebsphereFilter implements Filter {
   private void removeLtpaTokenCookie(HttpServletRequest req,
                                      HttpServletResponse res) {
     Cookie[] cooks = req.getCookies();
+    if (log.isDebugEnabled()) log.debug("message");
     if (cooks != null) {
       for (Cookie cook : cooks) {
-//        System.out.println(">>> EXOMAN WebsphereFilter.removeLtpaTokenCookie() cook.getName() = " + cook.getName());
+        if (log.isDebugEnabled()) log.debug("WebsphereFilter.removeLtpaTokenCookie() cook.getName() = " + cook.getName());
         if (cook != null && (cookieName.equalsIgnoreCase(cook.getName()) || cookieName2.equalsIgnoreCase(cook.getName()))) {
           cook.setMaxAge(0);
           cook.setPath("/");
           res.addCookie(cook);
-//          System.out.println(">>> EXOMAN WebsphereFilter.removeLtpaTokenCookie() REMOVED LtpaToken = ");
+          if (log.isDebugEnabled()) log.debug("WebsphereFilter.removeLtpaTokenCookie() REMOVED LtpaToken = ");
         }
       }
     }
@@ -93,28 +96,28 @@ public class WebsphereFilter implements Filter {
       PortalContainer portalContainer = rootContainer.getPortalContainer(portalContainerName);
       PortalContainer.setInstance(portalContainer);
       AuthenticationService authenticationService = (AuthenticationService) portalContainer.getComponentInstanceOfType(AuthenticationService.class);
-//      System.out.println(">>> EXOMAN WebsphereFilter.logout() authenticationService = " + authenticationService);
+      if (log.isDebugEnabled()) log.debug("WebsphereFilter.logout() authenticationService = " + authenticationService);
       Identity identity = authenticationService.getCurrentIdentity();
-//      System.out.println(">>> EXOMAN WebsphereFilter.logout() identity = " + identity);
+      if (log.isDebugEnabled()) log.debug("WebsphereFilter.logout() identity = " + identity);
       String username = null;
       Subject subject = null;
       if (identity != null) {
         username = identity.getUsername();
-//        System.out.println(">>> EXOMAN WebsphereFilter.logout() username = " + username);
+        if (log.isDebugEnabled()) log.debug("WebsphereFilter.logout() username = " + username);
         subject = identity.getSubject();
-//        System.out.println(">>> EXOMAN WebsphereFilter.logout() subject = " + subject);
+        if (log.isDebugEnabled()) log.debug("WebsphereFilter.logout() subject = " + subject);
       }
       if (subject != null) {
         LoginContext lc = null;
-//        System.out.println(">>> EXOMAN WebsphereFilter.logout() BEFORE CREATE LoginContext = ");
+        if (log.isDebugEnabled()) log.debug("WebsphereFilter.logout() BEFORE CREATE LoginContext = for " + "exo-domain");
         lc = new LoginContext("exo-domain", subject);
-//        System.out.println(">>> EXOMAN WebsphereFilter.logout() lc = " + lc);
-//        System.out.println(">>> EXOMAN WebsphereFilter.logout() AFTER CREATE LoginContext = ");
+        if (log.isDebugEnabled()) log.debug("WebsphereFilter.logout() lc = " + lc);
+        if (log.isDebugEnabled()) log.debug("WebsphereFilter.logout() AFTER CREATE LoginContext = ");
 
-//        System.out.println(">>> EXOMAN WebsphereFilter.logout() BEFORE LOGOUT = ");
+        if (log.isDebugEnabled()) log.debug("WebsphereFilter.logout() BEFORE LOGOUT = ");
         log.warn("LOGOUT with user '" + username + "'");
         lc.logout();
-//        System.out.println(">>> EXOMAN WebsphereFilter.logout() AFTER LOGOUT = ");
+        if (log.isDebugEnabled()) log.debug("WebsphereFilter.logout() AFTER LOGOUT = ");
       }
     } catch (Exception ex) {
       log.error("Error while logout a portal", ex);
