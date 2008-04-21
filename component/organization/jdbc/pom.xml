@@ -9,8 +9,8 @@
   <artifactId>exo.core.component.organization.jdbc</artifactId>
   <packaging>jar</packaging>
   <version>${org.exoplatform.core.version}</version>
-  <name>eXo Organization Service JDBC</name>
-  <description>eXo Organization Service JDBC</description>
+  <name>eXo Core Organization Service JDBC</name>
+  <description>eXo Core Organization Service JDBC</description>
 
   <dependencies>
     <dependency>

@@ -9,8 +9,8 @@
   <artifactId>exo.core.component.xml-processing</artifactId>
   <packaging>jar</packaging>
   <version>${org.exoplatform.core.version}</version>
-  <name>eXo XML Processing Services</name>
-  <description>eXo XML Processing Services</description>
+  <name>eXo Core XML Processing Services</name>
+  <description>eXo Core XML Processing Services</description>
 
   <dependencies>
     <dependency>

@@ -9,7 +9,7 @@
   <artifactId>exo.core.component.common</artifactId>
   <packaging>jar</packaging>
   <version>${org.exoplatform.core.version}</version>
-  <name>Common service impl</name>
+  <name>eXo Core Common service impl</name>
   <description>exoplatform common services implementation</description>
 
   <dependencies>

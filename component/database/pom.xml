@@ -9,7 +9,7 @@
   <artifactId>exo.core.component.database</artifactId>
   <packaging>jar</packaging>
   <version>${org.exoplatform.core.version}</version>
-  <name>Database service impl</name>
+  <name>eXo Core Database service impl</name>
   <description>exoplatform database services implementation</description>
 
   <dependencies>

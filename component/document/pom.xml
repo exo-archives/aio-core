@@ -9,7 +9,7 @@
   <artifactId>exo.core.component.document</artifactId>
   <packaging>jar</packaging>
   <version>${org.exoplatform.core.version}</version>
-  <name>eXo demo service Impl</name>
+  <name>eXo Core demo service Impl</name>
   <description>eXo demo service Impl</description>
 
   <dependencies>

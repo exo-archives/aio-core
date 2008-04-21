@@ -9,8 +9,8 @@
   <artifactId>exo.core.component.organization.ldap</artifactId>
   <packaging>jar</packaging>
   <version>${org.exoplatform.core.version}</version>
-  <name>eXo Organization Service LDAP</name>
-  <description>eXo Organization Service LDAP</description>
+  <name>eXo Core Organization Service LDAP</name>
+  <description>eXo Core Organization Service LDAP</description>
 
   <dependencies>
     <dependency>

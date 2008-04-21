@@ -9,8 +9,8 @@
   <artifactId>exo.core.component.security</artifactId>
   <packaging>jar</packaging>
   <version>${org.exoplatform.core.version}</version>
-  <name>eXo Security Service</name>
-  <description>eXo Security</description>
+  <name>eXo Core Security Service</name>
+  <description>eXo Core Security</description>
 
   <dependencies>
     <dependency>

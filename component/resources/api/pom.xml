@@ -9,8 +9,8 @@
   <artifactId>exo.core.component.resources.api</artifactId>
   <packaging>jar</packaging>
   <version>${org.exoplatform.core.version}</version>
-  <name>eXo Resources Service</name>
-  <description>eXo Resources Service</description>
+  <name>eXo Core Resources Service</name>
+  <description>eXo Core Resources Service</description>
   
   <dependencies>
     <dependency>

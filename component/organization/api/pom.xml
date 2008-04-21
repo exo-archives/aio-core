@@ -9,8 +9,8 @@
   <artifactId>exo.core.component.organization.api</artifactId>
   <packaging>jar</packaging>
   <version>${org.exoplatform.core.version}</version>
-  <name>eXo Organization Service API</name>
-  <description>eXo Organization Service API</description>
+  <name>eXo Core Organization Service API</name>
+  <description>eXo Core Organization Service API</description>
 
   <dependencies>
     <dependency>
