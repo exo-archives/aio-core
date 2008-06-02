@@ -173,10 +173,8 @@ public class WebsphereJAASLoginModule implements LoginModule {
       } else {
         groupName = splittedGroupName[0];
       }
-      roleGroup.addMember(new RolePrincipal(groupName));
       roleGroupList.add(groupName);
     }
-    subject_.getPrincipals().add(roleGroup);
     websphereLogin(roleGroupList);
   }
 

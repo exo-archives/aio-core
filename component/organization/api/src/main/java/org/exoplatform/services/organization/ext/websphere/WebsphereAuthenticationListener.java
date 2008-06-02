@@ -47,21 +47,16 @@ import org.exoplatform.services.organization.auth.UserPrincipal;
 */
 public class WebsphereAuthenticationListener extends Listener<AuthenticationService, Identity> {
 
-  private static Log         log                         = ExoLogger.getLogger("org.exoplatform.services.organization.auth.WebsphereAuthenticationListener");
+  private static Log log                 = ExoLogger.getLogger("core.WebsphereAuthenticationListener");
 
-  private String             userRoleParentGroup         = null;
+  private String     userRoleParentGroup = null;
 
-  private Subject            subject;
-  private String             username;
+  private Subject    subject;
 
-  final public static String WSCREDENTIAL_PROPERTIES_KEY = "com.ibm.wsspi.security.cred.propertiesObject";
-  final public static String WSCREDENTIAL_UNIQUEID       = "com.ibm.wsspi.security.cred.uniqueId";
-  final public static String WSCREDENTIAL_SECURITYNAME   = "com.ibm.wsspi.security.cred.securityName";
-  final public static String WSCREDENTIAL_GROUPS         = "com.ibm.wsspi.security.cred.groups";
-  final public static String WSCREDENTIAL_CACHE_KEY      = "com.ibm.wsspi.security.cred.cacheKey";
+  private String     username;
 
   public WebsphereAuthenticationListener(InitParams params) {
-    System.out.println(">>> EXOMAN WebsphereAuthenticationListener.WebsphereAuthenticationListaner() 1 = " + 1);
+    if (log.isDebugEnabled()) log.debug("WebsphereAuthenticationListener.WebsphereAuthenticationListaner() 1 = " + 1);
     if (params != null) {
       ValueParam param = params.getValueParam("user.role.parent.group");
       if (param != null && param.getValue().length() > 0) {
@@ -71,7 +66,7 @@ public class WebsphereAuthenticationListener extends Listener<AuthenticationServ
   }
 
   public void onEvent(Event<AuthenticationService, Identity> event) throws Exception {
-    System.out.println(">>> EXOMAN WebsphereAuthenticationListener.onEvent() 1 = " + 1);
+    if (log.isDebugEnabled()) log.debug("WebsphereAuthenticationListener.onEvent() 1 = " + 1);
     OrganizationService service = event.getSource().getOrganizationService();
     Identity identity = event.getData();
     subject = identity.getSubject();
@@ -94,19 +89,6 @@ public class WebsphereAuthenticationListener extends Listener<AuthenticationServ
       roleGroupList.add(groupName);
     }
     subject.getPrincipals().add(roleGroup);
-//    websphereLogin(roleGroupList);
   }
-
-//  private void websphereLogin(ArrayList<String> roleGroupList) {
-//    System.out.println(">>> EXOMAN WebsphereAuthenticationListener.websphereLogin() 1 = " + 1);
-//    Hashtable hashtable = new Hashtable();
-//    String uniqueid = username;
-//    hashtable.put(WSCREDENTIAL_UNIQUEID, uniqueid);
-//    hashtable.put(WSCREDENTIAL_SECURITYNAME, username);
-//    hashtable.put(WSCREDENTIAL_GROUPS, roleGroupList);
-//    hashtable.put(WSCREDENTIAL_CACHE_KEY, uniqueid + "WebsphereJAASLoginModule");
-//    //sharedState.put(WSCREDENTIAL_PROPERTIES_KEY, hashtable);
-//    subject.getPublicCredentials().add(hashtable);
-//  }
 
 }

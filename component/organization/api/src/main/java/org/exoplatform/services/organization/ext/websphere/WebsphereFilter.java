@@ -47,7 +47,7 @@ import org.exoplatform.services.organization.auth.Identity;
 */
 public class WebsphereFilter implements Filter {
 
-  private static Log log = ExoLogger.getLogger("org.exoplatform.frameworks.jcr.web.WebsphereFilter");
+  private static Log log = ExoLogger.getLogger("core.WebsphereFilter");
   private static final String cookieName = "LtpaToken";
   private static final String cookieName2 = "LtpaToken2";
 
