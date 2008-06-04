@@ -42,8 +42,6 @@ public class TestPPTDocumentReader  extends BasicTestCase  {
   public void testGetContentAsString() throws Exception {
     InputStream is = TestPPTDocumentReader.class.getResourceAsStream("/test.ppt");
     String text = service_.getDocumentReader("application/powerpoint").getContentAsText(is);
-    System.out.println(" text ["+text+"]");
-    
     String etalon = "TEST POWERPOINT\n"
       +"Manchester United \n"
       +"AC Milan\n"
@@ -52,7 +50,6 @@ public class TestPPTDocumentReader  extends BasicTestCase  {
       +"Kaka\n"
       +"Ronaldo\n"
       +"The natural scients universitys\n\n";
-    System.out.println(" etalon ["+etalon+"]");
     assertEquals("Wrong string returned",etalon,text );
   }
 }

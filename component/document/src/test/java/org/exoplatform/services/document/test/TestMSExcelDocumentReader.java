@@ -55,6 +55,7 @@ public class TestMSExcelDocumentReader extends BasicTestCase {
       +"XNNL XNNL XNNL_SUGAR_RACE NamPH 2005-05-09 00:00:00.000+0300 2005-06-10 00:00:00.000+0300 No "
       +"XNNL XNNL F_XNNL_DISTRI NamPH 2005-05-09 00:00:00.000+0300 2005-06-10 00:00:00.000+0300 Tested "
       +"XNNL XNNL XNNL_LASUCO_USER NamPH 2005-09-09 00:00:00.000+0300 2005-06-10 00:00:00.000+0300 No ";
+    assertEquals("String length is incorect",etalon.length(),text.length());
     assertEquals("Wrong string returned",etalon ,text );
     
   }
