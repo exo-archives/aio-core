@@ -24,11 +24,13 @@ import javax.security.auth.login.LoginException;
 import org.exoplatform.services.security.jaas.DefaultLoginModule;
 import org.exoplatform.services.security.jaas.JAASGroup;
 import org.exoplatform.services.security.jaas.RolePrincipal;
+import org.exoplatform.services.security.jaas.UserPrincipal;
 
 /**
- * Created by The eXo Platform SAS        .
+ * Created by The eXo Platform SAS .
+ * 
  * @author Gennady Azarenkov
- * @version $Id: $
+ * @version $Id$
  */
 
 public class JbossLoginModule extends DefaultLoginModule {
@@ -36,20 +38,22 @@ public class JbossLoginModule extends DefaultLoginModule {
   @Override
   public boolean commit() throws LoginException {
 
-    if(super.commit()) {
-     // subject_.getPrincipals().add(new UserPrincipal(this.identity_.getUserId()));
+    if (super.commit()) {
+
       Group roleGroup = new JAASGroup(JAASGroup.ROLES);
-      for(String role : identity_.getRoles()) 
-        roleGroup.addMember(new RolePrincipal(role));      
-     
-      subject_.getPrincipals().add(roleGroup); 
+      for (String role : identity_.getRoles())
+        roleGroup.addMember(new RolePrincipal(role));
+
+      // group principal
+      subject_.getPrincipals().add(roleGroup);
+
+      // username principal
+      subject_.getPrincipals().add(new UserPrincipal(identity_.getUserId()));
       return true;
     } else {
       return false;
     }
-      
-    
+
   }
 
 }
-

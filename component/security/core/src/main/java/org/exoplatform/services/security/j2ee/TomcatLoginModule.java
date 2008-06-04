@@ -24,23 +24,30 @@ import javax.security.auth.login.LoginException;
 
 import org.exoplatform.services.security.jaas.DefaultLoginModule;
 import org.exoplatform.services.security.jaas.RolePrincipal;
+import org.exoplatform.services.security.jaas.UserPrincipal;
 
 /**
  * Created by The eXo Platform SAS .
  * 
  * @author Gennady Azarenkov
- * @version $Id: $
+ * @version $Id$
  */
 
 public class TomcatLoginModule extends DefaultLoginModule {
 
   @Override
   public boolean commit() throws LoginException {
+    
     if (super.commit()) {
+
       Set<Principal> principals = subject_.getPrincipals();
       for (String role : identity_.getRoles()) {
         principals.add(new RolePrincipal(role));
       }
+
+      // username principal
+      subject_.getPrincipals().add(new UserPrincipal(identity_.getUserId()));
+
       return true;
     } else {
       return false;
