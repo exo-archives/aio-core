@@ -39,7 +39,7 @@ public class TestMSExcelDocumentReader extends BasicTestCase {
   }
 
   public void testGetContentAsString() throws Exception {
-    InputStream is = TestDocumentReaderServices.class.getResourceAsStream("/test.xls");
+    InputStream is = TestMSExcelDocumentReader.class.getResourceAsStream("/test.xls");
     String text = service_.getDocumentReader("application/excel").getContentAsText(is);
     String etalon = 
       "Ronaldo Eric Cantona Kaka Ronaldonho ID Group Functionality Executor Begin End Tested "

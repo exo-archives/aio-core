@@ -40,7 +40,7 @@ public class TestXMLDocumentReader extends BasicTestCase {
   }
 
   public void testGetContentAsString() throws Exception {
-    InputStream is = TestDocumentReaderServices.class.getResourceAsStream("/test.xml");
+    InputStream is = TestXMLDocumentReader.class.getResourceAsStream("/test.xml");
     String text = service_.getDocumentReader("text/xml").getContentAsText(is);
     String etalon = 
       "\n\n  John\n"

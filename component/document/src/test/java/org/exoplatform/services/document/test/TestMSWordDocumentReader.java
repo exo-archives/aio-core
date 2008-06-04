@@ -41,25 +41,27 @@ public class TestMSWordDocumentReader extends BasicTestCase {
   }
 
   public void testGetContentAsStringTemplate() throws Exception {
-    InputStream is = TestDocumentReaderServices.class.getResourceAsStream("/test.dot");
+    InputStream is = TestMSWordDocumentReader.class.getResourceAsStream("/test.dot");
     String text = service_.getDocumentReader("application/msworddot").getContentAsText(is);
-    System.out.println(text);
-    //unknown whitespace character
-    /*
+    System.out.println("text ["+text+"]");
     String etalon = "exotest";
-    System.out.println(etalon);
+    System.out.println("etalon ["+etalon+"]");
     
     System.out.println("["+text.length()+"] ["+etalon.length()+"]");
-    assertEquals("Wrong string returned",etalon ,text );*/
+    assertEquals("Wrong string returned",etalon ,text );
   }
   
   public void testGetContentAsStringDoc() throws Exception {
-    InputStream is = TestDocumentReaderServices.class.getResourceAsStream("/test.doc");
+    InputStream is = TestMSWordDocumentReader.class.getResourceAsStream("/test.doc");
     String text = service_.getDocumentReader("application/msword").getContentAsText(is);
-    System.out.println(text);
-/*
-    String etalon = "exotest";
-    System.out.println(etalon);
+    System.out.println("text ["+text+"]");
+
+  /*  String etalon = "Hello.\n"
+      +"This is the test document 12345\n"
+      +"Table\n"
+      +"Title One Two\n"
+      +"Hello_Title Hello_One Hello_Two\n";
+    System.out.println("etalon ["+etalon+"]");
     
     System.out.println("["+text.length()+"] ["+etalon.length()+"]");
     assertEquals("Wrong string returned",etalon ,text );*/

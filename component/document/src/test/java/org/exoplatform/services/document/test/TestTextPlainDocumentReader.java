@@ -40,13 +40,13 @@ public class TestTextPlainDocumentReader  extends BasicTestCase  {
   }
 
   public void testGetContentAsString() throws Exception {
-    InputStream is = TestDocumentReaderServices.class.getResourceAsStream("/test.txt");
+    InputStream is = TestTextPlainDocumentReader.class.getResourceAsStream("/test.txt");
     String text = service_.getDocumentReader("text/plain").getContentAsText(is);
     assertEquals("Wrong string returned","This is a test text\n" ,text );
   }
   
   public void testGetContentAsStringWithEncoding() throws Exception {
-    InputStream is = TestDocumentReaderServices.class.getResourceAsStream("/testUTF8.txt");
+    InputStream is = TestTextPlainDocumentReader.class.getResourceAsStream("/testUTF8.txt");
     String text = service_.getDocumentReader("text/plain").getContentAsText(is,"UTF-8");
     String etalon = "\ufeff\u0426\u0435 \u0442\u0435\u0441\u0442\u043e\u0432\u0438\u0439 \u0442\u0435\u043a\u0441\u0442. \u042d\u0442\u043e \u0442\u0435\u0441\u0442\u043e\u0432\u044b\u0439 \u0442\u0435\u043a\u0441\u0442.";
     assertEquals("Wrong string returned",etalon ,text );

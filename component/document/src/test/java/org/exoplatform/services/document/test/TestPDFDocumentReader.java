@@ -39,7 +39,7 @@ public class TestPDFDocumentReader  extends BasicTestCase {
   }
 
   public void testGetContentAsString() throws Exception {
-    InputStream is = TestDocumentReaderServices.class.getResourceAsStream("/test.pdf");
+    InputStream is = TestPDFDocumentReader.class.getResourceAsStream("/test.pdf");
     String text = service_.getDocumentReader("application/pdf").getContentAsText(is);
     String etalon = "Hello This is my first Cocoon page! page 1 ";
     assertEquals("Wrong string returned",etalon ,text );

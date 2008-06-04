@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.poi.hwpf.usermodel.Range;
 
 /**
@@ -59,11 +60,13 @@ public class MSWordDocumentReader extends BaseDocumentReader {
     String text = "";
     try {
       HWPFDocument doc = new HWPFDocument(is);
+      //WordExtractor extr = new WordExtractor(doc); 
+      
       Range range = doc.getRange();
       text = range.text();
     }catch (IOException e) {
     }
-    return text;
+    return text.trim();
   }
 
   public String getContentAsText(InputStream is, String encoding) throws Exception {

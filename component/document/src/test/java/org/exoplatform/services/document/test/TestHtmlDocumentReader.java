@@ -41,12 +41,12 @@ public class TestHtmlDocumentReader extends BasicTestCase {
   }
 
   public void testGetContentAsString() throws Exception {
-    InputStream is = TestDocumentReaderServices.class.getResourceAsStream("/test.html");
+    InputStream is = TestHtmlDocumentReader.class.getResourceAsStream("/test.html");
     MimeTypeResolver mimetypeResolver = new MimeTypeResolver();
     String mimeType = mimetypeResolver.getMimeType("test.html");
     
     DocumentReader dr = service_.getDocumentReader(mimeType); 
     String text = dr.getContentAsText(is);
-    // text to huge, need smaler test file
+    //TODO text is too huge, need small test file
   }
 }

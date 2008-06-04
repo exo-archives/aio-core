@@ -41,7 +41,7 @@ public class TestOpenOfficeDocumentReader extends BasicTestCase {
   }
 
   public void testGetContentAsString() throws Exception {
-    InputStream is = TestDocumentReaderServices.class.getResourceAsStream("/test.odt");
+    InputStream is = TestOpenOfficeDocumentReader.class.getResourceAsStream("/test.odt");
     String text = service_.getDocumentReader("application/vnd.oasis.opendocument.text")
         .getContentAsText(is);
     System.out.println("["+text+"]");
