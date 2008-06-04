@@ -41,6 +41,7 @@ public class TestMSExcelDocumentReader extends BasicTestCase {
   public void testGetContentAsString() throws Exception {
     InputStream is = TestMSExcelDocumentReader.class.getResourceAsStream("/test.xls");
     String text = service_.getDocumentReader("application/excel").getContentAsText(is);
+    System.out.println(" text ["+text+"]");
     String etalon = 
       "Ronaldo Eric Cantona Kaka Ronaldonho ID Group Functionality Executor Begin End Tested "
       +"XNNL XNNL Xay dung vung quan li nguyen lieu NamPH 2005-02-02 00:00:00.000+0200 2005-10-02 00:00:00.000+0300 Tested "
@@ -55,6 +56,7 @@ public class TestMSExcelDocumentReader extends BasicTestCase {
       +"XNNL XNNL XNNL_SUGAR_RACE NamPH 2005-05-09 00:00:00.000+0300 2005-06-10 00:00:00.000+0300 No "
       +"XNNL XNNL F_XNNL_DISTRI NamPH 2005-05-09 00:00:00.000+0300 2005-06-10 00:00:00.000+0300 Tested "
       +"XNNL XNNL XNNL_LASUCO_USER NamPH 2005-09-09 00:00:00.000+0300 2005-06-10 00:00:00.000+0300 No ";
+    System.out.println(" etalon ["+etalon+"]");
     assertEquals("String length is incorect",etalon.length(),text.length());
     assertEquals("Wrong string returned",etalon ,text );
     
