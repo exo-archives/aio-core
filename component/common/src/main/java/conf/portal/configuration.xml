@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <configuration>
+<!--
   <component>
     <key>org.exoplatform.services.naming.NamingService</key>
     <type>org.exoplatform.services.naming.NamingService</type>
@@ -30,4 +31,5 @@
       </component-plugin>
     </component-plugins>
   </component>
+-->
 </configuration>
