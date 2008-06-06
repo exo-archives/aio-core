@@ -19,6 +19,7 @@ package org.exoplatform.services.organization.auth;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 
@@ -32,6 +33,7 @@ import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.MembershipEntry;
 import org.exoplatform.services.security.PasswordCredential;
 import org.exoplatform.services.security.PasswordEncrypter;
+import org.exoplatform.services.security.RolesExtractor;
 import org.exoplatform.services.security.UsernameCredential;
 
 /**
@@ -49,16 +51,19 @@ public class OrganizationAuthenticatorImpl implements Authenticator {
 
   private final OrganizationService orgService;
   private final PasswordEncrypter   encrypter;
+  private final RolesExtractor rolesExtractor;
 
   public OrganizationAuthenticatorImpl(OrganizationService orgService,
-                                       PasswordEncrypter encrypter) {
+                                       PasswordEncrypter encrypter,
+                                       RolesExtractor rolesExtractor) {
     this.orgService = orgService;
     this.encrypter = encrypter;
+    this.rolesExtractor = rolesExtractor;
   }
 
-  public OrganizationAuthenticatorImpl(OrganizationService orgService) {
+  public OrganizationAuthenticatorImpl(OrganizationService orgService, RolesExtractor rolesExtractor) {
 
-    this(orgService, null);
+    this(orgService, null, rolesExtractor);
   }
   
   
@@ -85,14 +90,14 @@ public class OrganizationAuthenticatorImpl implements Authenticator {
     if (!orgService.getUserHandler().authenticate(user, password))
       throw new LoginException("Login failed for " + user);
 
-    Collection<MembershipEntry> entries = new HashSet<MembershipEntry>();
+    Set<MembershipEntry> entries = new HashSet<MembershipEntry>();
     Collection<Membership> memberships = orgService.getMembershipHandler().findMembershipsByUser(user);
     if (memberships != null) {
       for (Membership membership : memberships)
         entries.add(new MembershipEntry(membership.getGroupId(), membership.getMembershipType()));
     }
     //identity.setMemberships(entries); // TODO
-    return new Identity(user, entries);
+    return new Identity(user, entries, rolesExtractor.extractRoles(user, entries));
   }
   
   public OrganizationService getOrganizationService() {
