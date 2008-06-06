@@ -17,24 +17,37 @@
 
 package org.exoplatform.services.security;
 
-import java.util.Set;
+import java.util.HashMap;
 
 /**
- * Created by The eXo Platform SAS        .<br/>
- * Strategy of extraction J2EE roles from given group names  
+ * Created by The eXo Platform SAS        .
  * @author Gennady Azarenkov
- * @version $Id:$
+ * @version $Id: $
  */
 
-public interface RolesExtractor {
+public class IdentityRegistry {
+  
+  private HashMap<String, Identity>  identities   = new HashMap<String, Identity>();
 
-  /**
-   * Extracts J2EE roles from userId and|or groups the user belongs to
-   * both parameters may be null
-   * @param userId
-   * @param groups
-   * @return
-   */
-  Set <String> extractRoles(String userId, Set<MembershipEntry> memberships);
+  public IdentityRegistry() {
+
+  }
+
+  public Identity getIdentity(String userId) {
+    return identities.get(userId);
+  }
+  
+
+  public void register(Identity identity) {
+    this.identities.put(identity.getUserId(), identity);
+  }
+
+  public void unregister(String userId) {
+    this.identities.remove(userId);
+  }
+  
+  void clear() {
+    identities.clear();
+  }
 }
 

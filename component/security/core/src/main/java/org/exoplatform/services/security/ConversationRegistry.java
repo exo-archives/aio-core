@@ -30,54 +30,22 @@ import java.util.Map;
  */
 
 public final class ConversationRegistry {
-
-  //public static final String         ADD_SESSION_EVENT    = "exo.service.security.login";
-  //public static final String         REMOVE_SESSION_EVENT = "exo.service.security.logout";
-  //public static final String SET_ATTRIBUTE_EVENT = "exo.service.security.setattribute";
-
-  //private ListenerService            listenerService;
-
-//  private static ThreadLocal<String> currentSessionHolder = new ThreadLocal<String>();
   
-  private HashMap<String, Identity>  identities             = new HashMap<String, Identity>();
+//  private HashMap<String, Identity>  identities             = new HashMap<String, Identity>();
 
   private HashMap<Object, ConversationState>    states              = new HashMap<Object, ConversationState>();
-  
 
-  public ConversationRegistry() {
+  private IdentityRegistry identityRegistry;
+
+  public ConversationRegistry(IdentityRegistry identityRegistry) {
+    this.identityRegistry = identityRegistry;
 //    this.listenerService = listenerService;
   }
   
-//  public void setCurrentIdentity(Identity toCurrentIdentity) {
-//    currentSessionHolder.set(toCurrentIdentity.getUserId());
-//  }
-  
-//  /**
-//   * @return current session
-//   */
-//  public Identity getIdentity() {
-//    return Identity.getCurrent();
-//  }
 
-//  /**
-//   * @param key
-//   * @return session
-//   */
-//  public Identity getIdentity(String key) {
-//    return sessions.get(userId);
-//  }
-
-//  public Identity getIdentity(String userId) {
-//    return identities.get(userId);
-//  }
-  
   public ConversationState getState(Object key) {
     return states.get(key);
   }
-  
-//  public void putIdentity(Identity identity) {
-//    this.identities.put(identity.getUserId(), identity);
-//  }
   
 
   /**
@@ -107,45 +75,23 @@ public final class ConversationRegistry {
     // login and possible use - first state will be just missed
     states.put(key, state);
     
-//    if(!identities.containsKey(state.getIdentity().getUserId()))
-    identities.put(state.getIdentity().getUserId(), state.getIdentity());
+    identityRegistry.register(state.getIdentity());
+    
+    //identities.put(state.getIdentity().getUserId(), state.getIdentity());
     
   }
   
   public ConversationState unregister(Object key) {
     ConversationState s = states.remove(key);
     if(!states.containsKey(key))
-      identities.remove(s.getIdentity().getUserId());
+      identityRegistry.unregister(s.getIdentity().getUserId());
+      //identities.remove(s.getIdentity().getUserId());
     return s;
   }
 
-//  /**
-//   * Removes session by key and broadcasts REMOVE_SESSION_EVENT to interested
-//   * listeners
-//   * 
-//   * @param key
-//   * @throws Exception
-//   */
-//  public void invalidateUser(String userId) throws Exception {
-//    
-//    identities.remove(userId);
-//
-//    // remove from aliases if any
-//    for (Object key : getStates(userId))
-//      states.remove(key);
-//
-//
-//  }
-
-//  void addAlias(String alias,
-//                String userId) {
-//    states.put(alias, userId);
-//  }
-
   void clear() {
-    identities.clear();
+    //identities.clear();
     states.clear();
-//    currentSessionHolder.set(null);
   }
   
   public List <Object> getStateKeys(String userId) {

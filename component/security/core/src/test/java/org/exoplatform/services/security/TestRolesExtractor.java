@@ -57,9 +57,9 @@ public class TestRolesExtractor extends TestCase {
 
   public void testExtractRoles1() throws Exception {
 
-    Set<String> groups = getGroups1();
+    Set<MembershipEntry> groups = getGroups1();
 
-    Set<String> extractRoles = rolesExtractor.extractRoles(groups);
+    Set<String> extractRoles = rolesExtractor.extractRoles("exo",groups);
     assertNotNull(extractRoles);
     assertFalse(extractRoles.isEmpty());
     assertEquals(2, extractRoles.size());
@@ -71,10 +71,10 @@ public class TestRolesExtractor extends TestCase {
 
   public void testExtractRoles2() throws Exception {
 
-    Set<String> groups = getGroups2();
+    Set<MembershipEntry> groups = getGroups2();
 
     ((DefaultRolesExtractorImpl) rolesExtractor).setUserRoleParentGroup("platform");
-    Set<String> extractRoles = rolesExtractor.extractRoles(groups);
+    Set<String> extractRoles = rolesExtractor.extractRoles("exo", groups);
     assertNotNull(extractRoles);
     assertFalse(extractRoles.isEmpty());
     assertEquals(5, extractRoles.size());
@@ -87,23 +87,23 @@ public class TestRolesExtractor extends TestCase {
   /**
    * @return set of groups to which this user belongs to
    */
-  private Set<String> getGroups1() {
-    Set<String> groups = new HashSet<String>();
-    groups.add("/admin");
-    groups.add("/exo");
+  private Set<MembershipEntry> getGroups1() {
+    Set<MembershipEntry> groups = new HashSet<MembershipEntry>();
+    groups.add(new MembershipEntry("/admin"));
+    groups.add(new MembershipEntry("/exo"));
     return groups;
   }
 
   /**
    * @return set of groups to which this user belongs to
    */
-  private Set<String> getGroups2() {
-    Set<String> groups = new HashSet<String>();
-    groups.add("/admin");
-    groups.add("/exo");
-    groups.add("/organization/management/executive-board");
-    groups.add("/platform/administrators");
-    groups.add("/platform/users");
+  private Set<MembershipEntry> getGroups2() {
+    Set<MembershipEntry> groups = new HashSet<MembershipEntry>();
+    groups.add(new MembershipEntry("/admin"));
+    groups.add(new MembershipEntry("/exo"));
+    groups.add(new MembershipEntry("/organization/management/executive-board"));
+    groups.add(new MembershipEntry("/platform/administrators"));
+    groups.add(new MembershipEntry("/platform/users"));
     return groups;
   }
 

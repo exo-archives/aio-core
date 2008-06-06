@@ -17,8 +17,8 @@
 
 package org.exoplatform.services.security;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 
@@ -31,8 +31,10 @@ import javax.security.auth.login.LoginException;
 public class DummyAuthenticatorImpl implements Authenticator {
 
   private String[] acceptableUIDs = { "exo" };
+  private RolesExtractor rolesExtractor;
 
-  public DummyAuthenticatorImpl() {
+  public DummyAuthenticatorImpl(RolesExtractor rolesExtractor) {
+    this.rolesExtractor = rolesExtractor;
 
   }
 
@@ -40,7 +42,7 @@ public class DummyAuthenticatorImpl implements Authenticator {
       Exception {
 
       String myID = ((UsernameCredential) credentials[0]).getUsername();
-      Collection<MembershipEntry> entries = new HashSet<MembershipEntry>();
+      Set<MembershipEntry> entries = new HashSet<MembershipEntry>();
       for (String id : this.acceptableUIDs)
         if (id.equals(myID)) {
           entries.add(new MembershipEntry("exo"));
@@ -48,7 +50,7 @@ public class DummyAuthenticatorImpl implements Authenticator {
         } else {
           throw new LoginException();
         }
-      return new Identity(myID, entries);
+      return new Identity(myID, entries, rolesExtractor.extractRoles(myID, entries));
   }
 
 

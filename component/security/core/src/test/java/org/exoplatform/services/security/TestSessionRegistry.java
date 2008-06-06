@@ -17,6 +17,7 @@
 
 package org.exoplatform.services.security;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,8 +26,6 @@ import javax.security.auth.login.LoginException;
 import junit.framework.TestCase;
 
 import org.exoplatform.container.StandaloneContainer;
-import org.exoplatform.services.listener.Event;
-import org.exoplatform.services.listener.Listener;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.security.impl.DefaultRolesExtractorImpl;
 
@@ -124,14 +123,18 @@ public class TestSessionRegistry extends TestCase {
     memberships.add(new MembershipEntry("exogroup"));
     memberships.add(new MembershipEntry("exogroup/exogroup1/exogroup2",
         "member"));
-    Identity session = new Identity("exo", memberships);
     DefaultRolesExtractorImpl extractor = new DefaultRolesExtractorImpl();
     extractor.setUserRoleParentGroup("exogroup");
-    session.setRolesExtractor(extractor);
-    Set<String> roles = session.getRoles();
+    Set<String> roles = extractor.extractRoles("exo", memberships);
     assertEquals(2, roles.size());
     assertTrue(roles.contains("exogroup"));
     assertTrue(roles.contains("exogroup2"));
+    Identity session = new Identity("exo", memberships, roles);
+    Collection<String> roles2 = session.getRoles();
+    assertEquals(2, roles2.size());
+    
+    //session.setRolesExtractor(extractor);
+    
   }
 
   

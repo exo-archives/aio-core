@@ -23,6 +23,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
+import org.exoplatform.services.security.MembershipEntry;
 import org.exoplatform.services.security.RolesExtractor;
 
 /**
@@ -56,11 +57,11 @@ public class DefaultRolesExtractorImpl implements RolesExtractor {
   /* (non-Javadoc)
    * @see org.exoplatform.services.security.RolesExtractor#extractRoles(java.util.Set)
    */
-  public Set<String> extractRoles(Set<String> groups) {
+  public Set<String> extractRoles(String userId, Set<MembershipEntry> memberships) {
     
     Set<String> roles = new HashSet<String>();
-    for (String groupId : groups) {
-      String[] splittedGroupName = StringUtils.split(groupId, "/");
+    for (MembershipEntry membership : memberships) {
+      String[] splittedGroupName = StringUtils.split(membership.getGroup(), "/");
       
       if (userRoleParentGroup != null
           && splittedGroupName[0].equals(userRoleParentGroup)

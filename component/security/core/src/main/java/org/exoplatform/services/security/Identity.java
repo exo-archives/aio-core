@@ -24,10 +24,9 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 /**
- * Created by The eXo Platform SAS .<br/>
- * User Session encapsulates user's principals such as name, groups along
- * with JAAS subject (useful in J2EE environment) as well as other optional 
- * attributes
+ * Created by The eXo Platform SAS .<br/> User Session encapsulates user's
+ * principals such as name, groups along with JAAS subject (useful in J2EE
+ * environment) as well as other optional attributes
  * 
  * @author Gennady Azarenkov
  * @version $Id: $
@@ -35,21 +34,27 @@ import javax.security.auth.Subject;
 
 public class Identity {
 
-  private String                      userId;
+  private String userId;
   private Collection<MembershipEntry> memberships;
-  private Subject                     subject;
-  private RolesExtractor              rolesExtractor;
+  private Subject subject;
+  private Collection<String> roles;
 
-  public Identity(String userId) {  
-    this(userId, new HashSet<MembershipEntry>());
+  // private RolesExtractor rolesExtractor;
+
+  public Identity(String userId) {
+    this(userId, new HashSet<MembershipEntry>(), new HashSet<String>());
   }
 
-  public Identity(String userId,
-                  Collection<MembershipEntry> memberships) {
+  public Identity(String userId, Collection<MembershipEntry> memberships) {
+    this(userId, memberships, new HashSet<String>());
+  }
+
+  public Identity(String userId, Collection<MembershipEntry> memberships, Collection<String> roles) {
     this.userId = userId;
     this.memberships = memberships;
+    this.roles = roles;
   }
-  
+
   /**
    * @return user name
    */
@@ -60,10 +65,10 @@ public class Identity {
   /**
    * @param group
    * @param membershipType
-   * @return true if user has given membershipType for given group, false otherwise
+   * @return true if user has given membershipType for given group, false
+   *         otherwise
    */
-  public boolean isMemberOf(String group,
-                            String membershipType) {
+  public boolean isMemberOf(String group, String membershipType) {
     return containsMembership(new MembershipEntry(group, membershipType));
   }
 
@@ -73,7 +78,8 @@ public class Identity {
 
   /**
    * @param group
-   * @return true if user has any membershipType for given group, false otherwise
+   * @return true if user has any membershipType for given group, false
+   *         otherwise
    */
   public boolean isMemberOf(String group) {
     return containsMembership(new MembershipEntry(group));
@@ -100,28 +106,28 @@ public class Identity {
   public Collection<MembershipEntry> getMemberships() {
     return memberships;
   }
-  
 
-
-  /**
-   * Sets the roles extractor component for J2EE environment using
-   * @param rolesExtractor
-   */
-  public void setRolesExtractor(RolesExtractor rolesExtractor) {
-    this.rolesExtractor = rolesExtractor;
-  }
+//  /**
+//   * Sets the roles extractor component for J2EE environment using
+//   * 
+//   * @param rolesExtractor
+//   */
+//  public void setRolesExtractor(RolesExtractor rolesExtractor) {
+//    this.rolesExtractor = rolesExtractor;
+//  }
 
   /**
    * 
    * @param rolesExtractor
-   * @return set of J2EE roles extracted from this user's groups using giving extraction algorithm
+   * @return set of J2EE roles extracted from this user's groups using giving
+   *         extraction algorithm
    */
-  public Set<String> getRoles() {
-    if (this.rolesExtractor == null)
-      return new HashSet<String>();
-    return rolesExtractor.extractRoles(getGroups());
+  public Collection<String> getRoles() {
+//    if (this.rolesExtractor == null)
+//      return new HashSet<String>();
+//    return rolesExtractor.extractRoles(getGroups());
+    return roles;
   }
-  
 
   /**
    * @deprecated
@@ -141,8 +147,9 @@ public class Identity {
     for (MembershipEntry membership : memberships) {
       if (checkMe.equals(membership))
         return true;
-//      else if(membership.getMembershipType().equals(MembershipEntry.ANY_TYPE))
-//        return membership.getGroup().equals(checkMe.getGroup());
+      // else
+      // if(membership.getMembershipType().equals(MembershipEntry.ANY_TYPE))
+      // return membership.getGroup().equals(checkMe.getGroup());
     }
     return false;
   }

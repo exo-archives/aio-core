@@ -101,7 +101,8 @@ public class DefaultLoginModule {
       Credential[] credentials = new Credential[] { new UsernameCredential(username), new PasswordCredential(password) };
       
       identity_ = authenticator.authenticate(credentials);
-      identity_.setRolesExtractor(rolesExtractor);
+      
+      //identity_.setRolesExtractor(rolesExtractor);
 
       return true;
 
