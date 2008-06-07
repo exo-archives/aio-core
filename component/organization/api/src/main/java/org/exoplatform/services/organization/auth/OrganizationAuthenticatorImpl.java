@@ -24,6 +24,7 @@ import java.util.Set;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.logging.Log;
+import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.OrganizationService;
@@ -52,10 +53,22 @@ public class OrganizationAuthenticatorImpl implements Authenticator {
   private final OrganizationService orgService;
   private final PasswordEncrypter   encrypter;
   private final RolesExtractor rolesExtractor;
+  private boolean  shouldAuthenticate = true;
 
-  public OrganizationAuthenticatorImpl(OrganizationService orgService,
-                                       PasswordEncrypter encrypter,
-                                       RolesExtractor rolesExtractor) {
+  public OrganizationAuthenticatorImpl(InitParams params, 
+  																		 OrganizationService orgService,
+      																 PasswordEncrypter encrypter,
+      																 RolesExtractor rolesExtractor) {
+
+    if (params != null) {
+      try {
+        this.shouldAuthenticate = Boolean.valueOf(params.getValueParam("shouldAuthenticate")
+            .getValue());
+      } catch (Exception e) {
+        log.equals("Boolean value expected for init param shouldAuthenticate, got: "
+            + params.getValueParam("shouldAuthenticate"));
+      }
+    }
     this.orgService = orgService;
     this.encrypter = encrypter;
     this.rolesExtractor = rolesExtractor;
@@ -63,7 +76,7 @@ public class OrganizationAuthenticatorImpl implements Authenticator {
 
   public OrganizationAuthenticatorImpl(OrganizationService orgService, RolesExtractor rolesExtractor) {
 
-    this(orgService, null, rolesExtractor);
+    this(null, orgService, null, rolesExtractor);
   }
   
   
@@ -81,22 +94,25 @@ public class OrganizationAuthenticatorImpl implements Authenticator {
       if (cred instanceof PasswordCredential)
         password = ((PasswordCredential) cred).getPassword();
     }
-    if (user == null || password == null)
-      throw new LoginException("Username or Password is not defined");
 
-    if (this.encrypter != null)
-      password = new String(encrypter.encrypt(password.getBytes()));
+    if (shouldAuthenticate) {
 
-    if (!orgService.getUserHandler().authenticate(user, password))
-      throw new LoginException("Login failed for " + user);
+      if (user == null || password == null)
+        throw new LoginException("Username or Password is not defined");
 
+      if (this.encrypter != null)
+        password = new String(encrypter.encrypt(password.getBytes()));
+
+      if (!orgService.getUserHandler().authenticate(user, password))
+        throw new LoginException("Login failed for " + user);
+    }
     Set<MembershipEntry> entries = new HashSet<MembershipEntry>();
     Collection<Membership> memberships = orgService.getMembershipHandler().findMembershipsByUser(user);
     if (memberships != null) {
       for (Membership membership : memberships)
         entries.add(new MembershipEntry(membership.getGroupId(), membership.getMembershipType()));
     }
-    //identity.setMemberships(entries); // TODO
+    // identity.setMemberships(entries); // TODO
     return new Identity(user, entries, rolesExtractor.extractRoles(user, entries));
   }
   
