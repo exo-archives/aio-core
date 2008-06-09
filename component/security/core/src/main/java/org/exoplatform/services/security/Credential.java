@@ -17,6 +17,8 @@
 
 package org.exoplatform.services.security;
 
+import java.io.Serializable;
+
 /**
  * Created by The eXo Platform SAS        .<br/>
  * Abstraction for authentication credential
@@ -24,7 +26,7 @@ package org.exoplatform.services.security;
  * @version $Id:$
  */
 
-public interface Credential {
+public interface Credential extends Serializable {
 
 }
 

@@ -25,6 +25,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.login.LoginException;
+import javax.security.auth.spi.LoginModule;
 
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.ExoContainer;
@@ -46,12 +47,12 @@ import org.exoplatform.services.security.UsernameCredential;
  * @version $Id: $
  */
 
-public class DefaultLoginModule {
+public class DefaultLoginModule implements LoginModule {
 
   protected Log             log              = ExoLogger.getLogger("core.DefaultLoginModule");
 
   protected Subject         subject_;
-  private CallbackHandler callbackHandler_;
+  private CallbackHandler   callbackHandler_;
   protected Identity        identity_;
   protected Map             sharedState_;
 
@@ -126,8 +127,6 @@ public class DefaultLoginModule {
     }
     return true;
   }
-  
-  
 
   public boolean abort() throws LoginException {
     if (log.isDebugEnabled())

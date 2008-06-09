@@ -41,12 +41,12 @@ public class TomcatLoginModule extends DefaultLoginModule {
     if (super.commit()) {
 
       Set<Principal> principals = subject_.getPrincipals();
-      for (String role : identity_.getRoles()) {
+      
+      for (String role : identity_.getRoles())
         principals.add(new RolePrincipal(role));
-      }
 
       // username principal
-      subject_.getPrincipals().add(new UserPrincipal(identity_.getUserId()));
+      principals.add(new UserPrincipal(identity_.getUserId()));
 
       return true;
     } else {

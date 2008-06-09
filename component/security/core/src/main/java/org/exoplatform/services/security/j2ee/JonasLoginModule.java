@@ -17,7 +17,9 @@
 
 package org.exoplatform.services.security.j2ee;
 
+import java.security.Principal;
 import java.security.acl.Group;
+import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 
@@ -38,16 +40,18 @@ public class JonasLoginModule extends DefaultLoginModule {
   public boolean commit() throws LoginException {
 
     if (super.commit()) {
+      
+      Set<Principal> principals = subject_.getPrincipals();
 
       Group roleGroup = new JAASGroup(JAASGroup.ROLES);
       for (String role : identity_.getRoles())
         roleGroup.addMember(new RolePrincipal(role));
 
       // group principal
-      subject_.getPrincipals().add(roleGroup);
+      principals.add(roleGroup);
 
       // username principal
-      subject_.getPrincipals().add(new UserPrincipal(identity_.getUserId()));
+      principals.add(new UserPrincipal(identity_.getUserId()));
       
       return true;
     } else {
