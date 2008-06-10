@@ -29,14 +29,21 @@ import javax.security.auth.login.LoginException;
  */
 
 public interface Authenticator {
-
   /**
+   * Authenticate user and return userId which can be different to username. 
    * @param credentials - list of users credentials (such as name/password, X509 certificate etc)
-   * @return session
+   * @return userId
    * @throws LoginException
    * @throws Exception
    */
-  Identity authenticate(Credential[] credentials) throws LoginException, Exception;  
+  String validateUser(Credential[] credentials) throws LoginException, Exception;
+
+  /**
+   * @param credentials - userId.
+   * @return Identity
+   * @throws Exception
+   */
+  Identity createIdentity(String userId) throws Exception;  
 
 }
 

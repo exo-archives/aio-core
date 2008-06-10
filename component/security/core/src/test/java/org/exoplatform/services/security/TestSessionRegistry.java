@@ -74,16 +74,17 @@ public class TestSessionRegistry extends TestCase {
   public void testRegistry() throws Exception {
     Credential[] cred = new Credential[] { new UsernameCredential("exo") };
 
-    Identity id = authenticator.authenticate(cred);
-    assertEquals("exo", id.getUserId());
+    String userId = authenticator.validateUser(cred);
+    assertEquals("exo", userId);
 
     try {
       cred[0] = new UsernameCredential("enemy");
-      authenticator.authenticate(cred);
+      authenticator.validateUser(cred);
       fail("login exception have been thrown");
     } catch (LoginException e) {
     }
     
+    Identity id = authenticator.createIdentity(userId);
     ConversationState s = new ConversationState(id);
     ConversationState.setCurrent(s);
     assertEquals(s, ConversationState.getCurrent());

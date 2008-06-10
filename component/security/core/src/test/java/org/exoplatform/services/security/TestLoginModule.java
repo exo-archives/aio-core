@@ -33,7 +33,8 @@ import org.exoplatform.services.security.jaas.BasicCallbackHandler;
  */
 public class TestLoginModule extends TestCase {
 
-  protected ConversationRegistry registry;
+  protected ConversationRegistry conversationRegistry;
+  protected IdentityRegistry identityRegistry;
   protected Authenticator    authenticator;
 
   public TestLoginModule(String name) {
@@ -42,7 +43,7 @@ public class TestLoginModule extends TestCase {
 
   protected void setUp() throws Exception {
 
-    if (registry == null) {
+    if (conversationRegistry == null) {
       URL containerConfURL = TestLoginModule.class.getResource("/conf/standalone/test-configuration.xml");
       assertNotNull(containerConfURL);
       String containerConf = containerConfURL.toString();
@@ -57,11 +58,14 @@ public class TestLoginModule extends TestCase {
 
       authenticator = (DummyAuthenticatorImpl) manager.getComponentInstanceOfType(DummyAuthenticatorImpl.class);
       assertNotNull(authenticator);
-      registry = (ConversationRegistry) manager.getComponentInstanceOfType(ConversationRegistry.class);
-      assertNotNull(registry);
+      conversationRegistry = (ConversationRegistry) manager.getComponentInstanceOfType(ConversationRegistry.class);
+      assertNotNull(conversationRegistry);
+      identityRegistry = (IdentityRegistry) manager.getComponentInstanceOfType(IdentityRegistry.class);
+      assertNotNull(identityRegistry);
 
     }
-    registry.clear();
+    identityRegistry.clear();
+    conversationRegistry.clear();
   }
 
   public void testLogin() throws Exception {
@@ -72,12 +76,16 @@ public class TestLoginModule extends TestCase {
     LoginContext loginContext = new LoginContext("exo", handler);
     loginContext.login();
     
-    assertNotNull(registry.getState("exo").getIdentity());
-    assertEquals("exo", registry.getState("exo").getIdentity().getUserId());
+//    assertNotNull(conversationRegistry.getState("exo").getIdentity());
+    assertNotNull(identityRegistry.getIdentity("exo"));
+//    assertEquals("exo", conversationRegistry.getState("exo").getIdentity().getUserId());
+    assertEquals("exo", identityRegistry.getIdentity("exo").getUserId());
 
-    assertEquals(1, registry.getState("exo").getIdentity().getGroups().size());
+//    assertEquals(1, conversationRegistry.getState("exo").getIdentity().getGroups().size());
+    assertEquals(1, identityRegistry.getIdentity("exo").getGroups().size());
     
-    assertNotNull(registry.getState("exo"));
+    conversationRegistry.register("exo", new ConversationState(identityRegistry.getIdentity("exo")));
+    assertNotNull(conversationRegistry.getState("exo"));
     
 
   }
@@ -87,15 +95,17 @@ public class TestLoginModule extends TestCase {
     BasicCallbackHandler handler = new BasicCallbackHandler("exo", "exo".toCharArray());
     LoginContext loginContext = new LoginContext("exo", handler);
     loginContext.login();
-    Identity id = registry.getState("exo").getIdentity();
+//    Identity id = conversationRegistry.getState("exo").getIdentity();
+    Identity id = identityRegistry.getIdentity("exo");
     
     handler = new BasicCallbackHandler("exo", "exo".toCharArray());
     loginContext = new LoginContext("exo", handler);
     loginContext.login();
-    assertNotSame(id, registry.getState("exo").getIdentity());
+//    assertNotSame(id, conversationRegistry.getState("exo").getIdentity());
+    assertSame(id, identityRegistry.getIdentity("exo"));
     
-    assertNotNull(registry.getState("exo"));
-    assertEquals(1, registry.getStateKeys("exo").size());
+//    assertNotNull(conversationRegistry.getState("exo"));
+//    assertEquals(1, conversationRegistry.getStateKeys("exo").size());
     
   }
 
@@ -103,21 +113,23 @@ public class TestLoginModule extends TestCase {
     BasicCallbackHandler handler = new BasicCallbackHandler("exo", "exo".toCharArray());
     LoginContext loginContext = new LoginContext("exo", handler);
     loginContext.login();
-    Identity id = registry.getState("exo").getIdentity();
-    ConversationState s1 = registry.getState("exo");
+//    Identity id = conversationRegistry.getState("exo").getIdentity();
+    Identity id = identityRegistry.getIdentity("exo");
+    ConversationState s1 = new ConversationState(id);//conversationRegistry.getState("exo");
+    conversationRegistry.register("exo1", s1);
+    ConversationState.setCurrent(s1);
     //assertNotNull(s1.getSubject());
-    assertNotNull(registry.getState("exo"));
+    assertNotNull(conversationRegistry.getState("exo1"));
     loginContext.logout();
-    assertNull(registry.getState("exo"));
     
-    handler = new BasicCallbackHandler("exo", "exo".toCharArray());
-    loginContext = new LoginContext("exo", handler);
-    loginContext.login();
-    assertNotSame(s1, registry.getState("exo"));
-    //assertNotSame(s1.getSubject(), registry.getState("exo").getSubject());
-    assertNotSame(id, registry.getState("exo").getIdentity());
-    assertEquals(id.getUserId(), registry.getState("exo").getIdentity().getUserId());
-    //assertEquals(id, registry.getIdentity());
+//    handler = new BasicCallbackHandler("exo", "exo".toCharArray());
+//    loginContext = new LoginContext("exo", handler);
+//    loginContext.login();
+//    assertNotSame(s1, conversationRegistry.getState("exo"));
+//    //assertNotSame(s1.getSubject(), registry.getState("exo").getSubject());
+//    assertNotSame(id, conversationRegistry.getState("exo").getIdentity());
+//    assertEquals(id.getUserId(), conversationRegistry.getState("exo").getIdentity().getUserId());
+//    //assertEquals(id, registry.getIdentity());
   }
   
 /*

@@ -38,20 +38,25 @@ public class DummyAuthenticatorImpl implements Authenticator {
 
   }
 
-  public Identity authenticate(Credential[] credentials) throws LoginException,
-      Exception {
-
-      String myID = ((UsernameCredential) credentials[0]).getUsername();
-      Set<MembershipEntry> entries = new HashSet<MembershipEntry>();
-      for (String id : this.acceptableUIDs)
-        if (id.equals(myID)) {
-          entries.add(new MembershipEntry("exo"));
-          //identity.setMemberships(entries);
-        } else {
-          throw new LoginException();
-        }
-      return new Identity(myID, entries, rolesExtractor.extractRoles(myID, entries));
+  /* (non-Javadoc)
+   * @see org.exoplatform.services.security.Authenticator#createIdentity(java.lang.String)
+   */
+  public Identity createIdentity(String userId) {
+    Set<MembershipEntry> entries = new HashSet<MembershipEntry>();
+    entries.add(new MembershipEntry(userId));
+    return new Identity(userId, entries, rolesExtractor.extractRoles(userId, entries));
   }
 
+  /* (non-Javadoc)
+   * @see org.exoplatform.services.security.Authenticator#validateUser(org.exoplatform.services.security.Credential[])
+   */
+  public String validateUser(Credential[] credentials) throws LoginException, Exception {
+    String myID = ((UsernameCredential) credentials[0]).getUsername();
+    for (String id : this.acceptableUIDs) {
+      if (id.equals(myID))
+        return id;
+    }
+    throw new LoginException();
+  }
 
 }

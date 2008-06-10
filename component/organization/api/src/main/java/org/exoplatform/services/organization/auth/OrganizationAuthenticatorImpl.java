@@ -24,7 +24,6 @@ import java.util.Set;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.logging.Log;
-import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.OrganizationService;
@@ -48,44 +47,82 @@ import org.exoplatform.services.security.UsernameCredential;
 
 public class OrganizationAuthenticatorImpl implements Authenticator {
 
-  protected static Log              log = ExoLogger.getLogger("org.exoplatform.services.organization.auth.OrganizationUserRegistry");
+  protected static Log log = ExoLogger.getLogger("org.exoplatform.services.organization.auth.OrganizationUserRegistry");
 
   private final OrganizationService orgService;
   private final PasswordEncrypter   encrypter;
   private final RolesExtractor rolesExtractor;
-  private boolean  shouldAuthenticate = true;
 
-  public OrganizationAuthenticatorImpl(InitParams params, 
-  																		 OrganizationService orgService,
-      																 PasswordEncrypter encrypter,
-      																 RolesExtractor rolesExtractor) {
-
-    if (params != null) {
-      try {
-        this.shouldAuthenticate = Boolean.valueOf(params.getValueParam("shouldAuthenticate")
-            .getValue());
-      } catch (Exception e) {
-        log.equals("Boolean value expected for init param shouldAuthenticate, got: "
-            + params.getValueParam("shouldAuthenticate"));
-      }
-    }
+  public OrganizationAuthenticatorImpl(OrganizationService orgService,
+      RolesExtractor rolesExtractor, PasswordEncrypter encrypter) {
     this.orgService = orgService;
     this.encrypter = encrypter;
     this.rolesExtractor = rolesExtractor;
   }
 
-  public OrganizationAuthenticatorImpl(OrganizationService orgService, RolesExtractor rolesExtractor) {
-
-    this(null, orgService, null, rolesExtractor);
+  public OrganizationAuthenticatorImpl(OrganizationService orgService,
+      RolesExtractor rolesExtractor) {
+    this(orgService, rolesExtractor, null);
   }
   
+  public OrganizationAuthenticatorImpl(OrganizationService orgService) {
+    this(orgService, null, null);
+  }
   
+//  /* (non-Javadoc)
+//   * @see org.exoplatform.services.security.Authenticator#authenticate(org.exoplatform.services.security.Credential[])
+//   */
+//  public Identity authenticate(Credential[] credentials) throws LoginException,
+//      Exception {
+//    String user = null;
+//    String password = null;
+//    for (Credential cred : credentials) {
+//      if (cred instanceof UsernameCredential)
+//        user = ((UsernameCredential) cred).getUsername();
+//      if (cred instanceof PasswordCredential)
+//        password = ((PasswordCredential) cred).getPassword();
+//    }
+//    if (user == null || password == null)
+//      throw new LoginException("Username or Password is not defined");
+//
+//    if (this.encrypter != null)
+//      password = new String(encrypter.encrypt(password.getBytes()));
+//
+//    if (!orgService.getUserHandler().authenticate(user, password))
+//      throw new LoginException("Login failed for " + user);
+//
+//    Collection<MembershipEntry> entries = new HashSet<MembershipEntry>();
+//    Collection<Membership> memberships = orgService.getMembershipHandler().findMembershipsByUser(user);
+//    if (memberships != null) {
+//      for (Membership membership : memberships)
+//        entries.add(new MembershipEntry(membership.getGroupId(), membership.getMembershipType()));
+//    }
+//    return new Identity(user, entries);
+//  }
+  
+  public OrganizationService getOrganizationService() {
+    return orgService;
+  }
 
   /* (non-Javadoc)
-   * @see org.exoplatform.services.security.Authenticator#authenticate(org.exoplatform.services.security.Credential[])
+   * @see org.exoplatform.services.security.Authenticator#createIdentity(java.lang.String)
    */
-  public Identity authenticate(Credential[] credentials) throws LoginException,
-      Exception {
+  public Identity createIdentity(String userId) throws Exception {
+    Set<MembershipEntry> entries = new HashSet<MembershipEntry>();
+    Collection<Membership> memberships = orgService.getMembershipHandler().findMembershipsByUser(userId);
+    if (memberships != null) {
+      for (Membership membership : memberships)
+        entries.add(new MembershipEntry(membership.getGroupId(), membership.getMembershipType()));
+    }
+    if (rolesExtractor == null)
+      return new Identity(userId, entries);
+    return new Identity(userId, entries, rolesExtractor.extractRoles(userId, entries));
+  }
+
+  /* (non-Javadoc)
+   * @see org.exoplatform.services.security.Authenticator#validateUser(org.exoplatform.services.security.Credential[])
+   */
+  public String validateUser(Credential[] credentials) throws LoginException, Exception {
     String user = null;
     String password = null;
     for (Credential cred : credentials) {
@@ -94,30 +131,16 @@ public class OrganizationAuthenticatorImpl implements Authenticator {
       if (cred instanceof PasswordCredential)
         password = ((PasswordCredential) cred).getPassword();
     }
+    if (user == null || password == null)
+      throw new LoginException("Username or Password is not defined");
 
-    if (shouldAuthenticate) {
+    if (this.encrypter != null)
+      password = new String(encrypter.encrypt(password.getBytes()));
 
-      if (user == null || password == null)
-        throw new LoginException("Username or Password is not defined");
-
-      if (this.encrypter != null)
-        password = new String(encrypter.encrypt(password.getBytes()));
-
-      if (!orgService.getUserHandler().authenticate(user, password))
-        throw new LoginException("Login failed for " + user);
-    }
-    Set<MembershipEntry> entries = new HashSet<MembershipEntry>();
-    Collection<Membership> memberships = orgService.getMembershipHandler().findMembershipsByUser(user);
-    if (memberships != null) {
-      for (Membership membership : memberships)
-        entries.add(new MembershipEntry(membership.getGroupId(), membership.getMembershipType()));
-    }
-    // identity.setMemberships(entries); // TODO
-    return new Identity(user, entries, rolesExtractor.extractRoles(user, entries));
+    if (!orgService.getUserHandler().authenticate(user, password))
+      throw new LoginException("Login failed for " + user);
+    
+    return user;
   }
   
-  public OrganizationService getOrganizationService() {
-    return orgService;
-  }
-
 }

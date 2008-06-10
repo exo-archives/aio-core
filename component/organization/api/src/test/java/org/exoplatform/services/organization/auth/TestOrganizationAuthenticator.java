@@ -71,8 +71,9 @@ public class TestOrganizationAuthenticator extends TestCase {
     assertNotNull(authenticator);
     assertTrue(authenticator instanceof OrganizationAuthenticatorImpl);
     Credential[] cred = new Credential[] { new UsernameCredential("admin"), new PasswordCredential("admin") };
-    Identity session = authenticator.authenticate(cred);
-    assertEquals("admin", session.getUserId());
-    assertTrue(session.getGroups().size() > 0);
+    String userId = authenticator.validateUser(cred);
+    assertEquals("admin", userId);
+    Identity identity = authenticator.createIdentity(userId);
+    assertTrue(identity.getGroups().size() > 0);
   }
 }

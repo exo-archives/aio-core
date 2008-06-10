@@ -31,16 +31,16 @@ import java.util.Map;
 
 public final class ConversationRegistry {
   
-//  private HashMap<String, Identity>  identities             = new HashMap<String, Identity>();
+//  private HashMap<String, Identity> identities = new HashMap<String, Identity>();
 
-  private HashMap<Object, ConversationState>    states              = new HashMap<Object, ConversationState>();
+  private HashMap<Object, ConversationState> states = new HashMap<Object, ConversationState>();
 
-  private IdentityRegistry identityRegistry;
+//  private IdentityRegistry identityRegistry;
 
-  public ConversationRegistry(IdentityRegistry identityRegistry) {
-    this.identityRegistry = identityRegistry;
+//  public ConversationRegistry(IdentityRegistry identityRegistry) {
+//    this.identityRegistry = identityRegistry;
 //    this.listenerService = listenerService;
-  }
+//  }
   
 
   public ConversationState getState(Object key) {
@@ -60,7 +60,7 @@ public final class ConversationRegistry {
    *          store or not the session into thread local
    * @throws Exception
    */
-  public void register(Object key, ConversationState state) throws Exception {
+  public void register(Object key, ConversationState state) {//throws Exception {
     
 //    if(states.containsKey(key))
 //      throw new Exception("The state ID already exists "+key);
@@ -75,7 +75,7 @@ public final class ConversationRegistry {
     // login and possible use - first state will be just missed
     states.put(key, state);
     
-    identityRegistry.register(state.getIdentity());
+//    identityRegistry.register(state.getIdentity());
     
     //identities.put(state.getIdentity().getUserId(), state.getIdentity());
     
@@ -83,8 +83,8 @@ public final class ConversationRegistry {
   
   public ConversationState unregister(Object key) {
     ConversationState s = states.remove(key);
-    if(!states.containsKey(key))
-      identityRegistry.unregister(s.getIdentity().getUserId());
+//    if(!states.containsKey(key))
+//      identityRegistry.unregister(s.getIdentity().getUserId());
       //identities.remove(s.getIdentity().getUserId());
     return s;
   }
@@ -95,13 +95,11 @@ public final class ConversationRegistry {
   }
   
   public List <Object> getStateKeys(String userId) {
-    
     ArrayList<Object> s = new ArrayList<Object>();
     for (Map.Entry<Object, ConversationState> a : states.entrySet()) {
       if (a.getValue().getIdentity().getUserId().equals(userId))
         s.add(a.getKey());
     }
-    
     return s;
   }
 

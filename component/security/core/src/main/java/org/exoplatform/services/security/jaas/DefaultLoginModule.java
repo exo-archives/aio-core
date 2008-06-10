@@ -30,10 +30,12 @@ import javax.security.auth.spi.LoginModule;
 import org.apache.commons.logging.Log;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.RootContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.security.Authenticator;
 import org.exoplatform.services.security.Credential;
 import org.exoplatform.services.security.Identity;
+import org.exoplatform.services.security.IdentityRegistry;
 import org.exoplatform.services.security.PasswordCredential;
 import org.exoplatform.services.security.RolesExtractor;
 import org.exoplatform.services.security.ConversationState;
@@ -49,7 +51,7 @@ import org.exoplatform.services.security.UsernameCredential;
 
 public class DefaultLoginModule implements LoginModule {
 
-  protected Log             log              = ExoLogger.getLogger("core.DefaultLoginModule");
+  protected Log log = ExoLogger.getLogger("core.DefaultLoginModule");
 
   protected Subject         subject_;
   private CallbackHandler   callbackHandler_;
@@ -61,7 +63,13 @@ public class DefaultLoginModule implements LoginModule {
   }
 
   protected ExoContainer getContainer() throws Exception {
-    return ExoContainerContext.getCurrentContainer(); //RootContainer.getInstance().getPortalContainer("portal");
+    // TODO set correct current container 
+//    return ExoContainerContext.getCurrentContainer();
+    ExoContainer container = ExoContainerContext.getCurrentContainer();                                                                                  
+    if (container instanceof RootContainer) {                                                                                                            
+      container = RootContainer.getInstance().getPortalContainer("portal");                                                                              
+    }                                                                                                                                                    
+    return container;                                                                                                                                    
   }
 
   public void initialize(Subject subject,
@@ -94,17 +102,16 @@ public class DefaultLoginModule implements LoginModule {
       subject_.getPublicCredentials().add(new UsernameCredential(username));
      
       Authenticator authenticator = (Authenticator) getContainer().getComponentInstanceOfType(Authenticator.class);
-      RolesExtractor rolesExtractor = (RolesExtractor) getContainer().getComponentInstanceOfType(RolesExtractor.class);
+//      RolesExtractor rolesExtractor = (RolesExtractor) getContainer().getComponentInstanceOfType(RolesExtractor.class);
 
       if (authenticator == null)
         throw new LoginException("No Authenticator component found, check your configuration");
 
       Credential[] credentials = new Credential[] { new UsernameCredential(username), new PasswordCredential(password) };
       
-      identity_ = authenticator.authenticate(credentials);
+      String userId = authenticator.validateUser(credentials);
+      identity_ = authenticator.createIdentity(userId);
       
-      //identity_.setRolesExtractor(rolesExtractor);
-
       return true;
 
     } catch (final Throwable e) {
@@ -118,8 +125,14 @@ public class DefaultLoginModule implements LoginModule {
   public boolean commit() throws LoginException {
     try {
       
-      ConversationRegistry registry = (ConversationRegistry) getContainer().getComponentInstanceOfType(ConversationRegistry.class);
-      registry.register(identity_.getUserId(), new ConversationState(identity_));
+//      ConversationRegistry conversationRegistry = (ConversationRegistry) getContainer()
+//          .getComponentInstanceOfType(ConversationRegistry.class);
+//      conversationRegistry.register(identity_.getUserId(), new ConversationState(identity_));
+      
+      IdentityRegistry identityRegistry = (IdentityRegistry) getContainer()
+          .getComponentInstanceOfType(IdentityRegistry.class);
+      if (identityRegistry.getIdentity(identity_.getUserId()) == null)
+        identityRegistry.register(identity_);
 
     } catch (final Throwable e) {
       log.warn(e.getLocalizedMessage());
@@ -137,15 +150,15 @@ public class DefaultLoginModule implements LoginModule {
   public boolean logout() throws LoginException {
     if (log.isDebugEnabled())
       log.debug("In logout of DefaultLoginModule, It seems this method is never called in tomcat");
-    try {
-      ConversationRegistry registry = (ConversationRegistry) getContainer().getComponentInstanceOfType(ConversationRegistry.class);
-      registry.unregister(identity_.getUserId());
-
-    } catch (final Throwable e) {
-      log.warn(e.getLocalizedMessage());
-      throw new LoginException(e.getMessage());
-
-    }
+//    try {
+//      ConversationRegistry conversationRegistry = (ConversationRegistry) getContainer()
+//          .getComponentInstanceOfType(ConversationRegistry.class);
+//      conversationRegistry.unregister(identity_.getUserId());
+//    } catch (final Throwable e) {
+//      log.warn(e.getLocalizedMessage());
+//      throw new LoginException(e.getMessage());
+//
+//    }
     return true;
   }
 }
