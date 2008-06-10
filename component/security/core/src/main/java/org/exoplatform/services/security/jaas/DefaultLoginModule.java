@@ -69,6 +69,10 @@ public class DefaultLoginModule implements LoginModule {
     return container;                                                                                                                                    
   }
 
+  /* (non-Javadoc)
+   * @see javax.security.auth.spi.LoginModule#initialize(javax.security.auth.Subject,
+   * javax.security.auth.callback.CallbackHandler, java.util.Map, java.util.Map)
+   */
   public void initialize(Subject subject,
                                CallbackHandler callbackHandler,
                                Map sharedState,
@@ -78,6 +82,9 @@ public class DefaultLoginModule implements LoginModule {
     this.sharedState_ = sharedState;
   }
  
+  /* (non-Javadoc)
+   * @see javax.security.auth.spi.LoginModule#login()
+   */
   public boolean login() throws LoginException {
     if (log.isDebugEnabled())
       log.debug("In login of DefaultLoginModule");
@@ -119,6 +126,9 @@ public class DefaultLoginModule implements LoginModule {
     }
   }
 
+  /* (non-Javadoc)
+   * @see javax.security.auth.spi.LoginModule#commit()
+   */
   public boolean commit() throws LoginException {
     try {
       
@@ -134,12 +144,18 @@ public class DefaultLoginModule implements LoginModule {
     return true;
   }
 
+  /* (non-Javadoc)
+   * @see javax.security.auth.spi.LoginModule#abort()
+   */
   public boolean abort() throws LoginException {
     if (log.isDebugEnabled())
       log.debug("In abort of DefaultLoginModule");
     return true;
   }
 
+  /* (non-Javadoc)
+   * @see javax.security.auth.spi.LoginModule#logout()
+   */
   public boolean logout() throws LoginException {
     if (log.isDebugEnabled())
       log.debug("In logout of DefaultLoginModule, It seems this method is never called in tomcat");
