@@ -34,25 +34,45 @@ import org.exoplatform.services.security.UsernameCredential;
 
 public class JPamAuthenticator implements Authenticator {
 
-  private static final Log LOGGER = ExoLogger.getLogger("JPamAuthenticator");
-  private static final String PROPERTIES_NAME = "jpam-configuration";
-  private static final String SERVICE_NAME_PARAM = "service-name";
+  private static final Log log = ExoLogger.getLogger("core.JPamAuthenticator");
   private static final String DEFAULT_SERVICE_NAME = "exo-jpam";
-  private String serviceName_;
+  private String serviceName;
 
   public JPamAuthenticator(InitParams params) {
-    PropertiesParam pparams = params.getPropertiesParam(PROPERTIES_NAME);
-    if (pparams == null || pparams.getProperty(SERVICE_NAME_PARAM) == null)
-      LOGGER.warn("Properties param were not found in configuration.xml. "
+    PropertiesParam pparams = params.getPropertiesParam("jpam-configuration");
+    if (pparams == null || pparams.getProperty("service-name") == null)
+      log.warn("Properties param were not found in configuration.xml. "
           + "Service name unknown, " + DEFAULT_SERVICE_NAME + " will be used.");
     else
-      serviceName_ = pparams.getProperty(SERVICE_NAME_PARAM);
+      serviceName = pparams.getProperty("service-name");
   }
 
-   public JPamAuthenticator() {
-   }
+  public JPamAuthenticator(String serviceName) {
+    this.serviceName = serviceName;
+  }
 
-  public Identity authenticate(Credential[] credentials) throws LoginException,
+  public JPamAuthenticator() {
+    log.warn("Properties param were not found in configuration.xml. "
+        + "Service name unknown, " + DEFAULT_SERVICE_NAME + " will be used.");
+    this.serviceName = DEFAULT_SERVICE_NAME;
+  }
+  
+  /* (non-Javadoc)
+   * @see org.exoplatform.services.security.Authenticator#createIdentity(java.lang.String)
+   */
+  public Identity createIdentity(String userId) throws Exception {
+    Collection<MembershipEntry> entries = new HashSet<MembershipEntry>();
+    Pam pam = new Pam(serviceName);
+    for (String g : pam.getGroups())
+      entries.add(new MembershipEntry(g));
+    
+    return new Identity(userId, entries);
+  }
+
+  /* (non-Javadoc)
+   * @see org.exoplatform.services.security.Authenticator#validateUser(org.exoplatform.services.security.Credential[])
+   */
+  public String validateUser(Credential[] credentials) throws LoginException,
       Exception {
     String user = null;
     String pass = null;
@@ -62,21 +82,21 @@ public class JPamAuthenticator implements Authenticator {
       if (cred instanceof PasswordCredential)
         pass = ((PasswordCredential) cred).getPassword();
     }
-    Pam pam = new Pam(serviceName_ == null ? DEFAULT_SERVICE_NAME
-        : serviceName_);
+    Pam pam = new Pam(serviceName);
+    
     PamReturnValue res = null;
-    if (!(res = pam.authenticate(user, pass))
-        .equals(PamReturnValue.PAM_SUCCESS))
-      throw new LoginException("Authentication failed. Status : "
-          + res.toString());
-    LOGGER.debug("Authentication for user '" + user + "' success.");
+    if (!(res = pam.authenticate(user, pass)).equals(PamReturnValue.PAM_SUCCESS)) {
+      throw new LoginException("Authentication failed. Status : " + res.toString());
+    }
+    
+    if (log.isDebugEnabled()) {
+      log.debug("Authentication for user '" + user + "' success.");
+    }
+    
     Collection<MembershipEntry> entries = new HashSet<MembershipEntry>();
     for (String g : pam.getGroups())
       entries.add(new MembershipEntry(g));
-    return new Identity(user, entries);
-    //identity.setMemberships(entries);
+    return user;
   }
-
-
 
 }

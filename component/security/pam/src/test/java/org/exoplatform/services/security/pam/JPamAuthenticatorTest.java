@@ -17,6 +17,7 @@
 package org.exoplatform.services.security.pam;
 
 import org.exoplatform.services.security.Credential;
+import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.PasswordCredential;
 import org.exoplatform.services.security.UsernameCredential;
 
@@ -33,8 +34,10 @@ public class JPamAuthenticatorTest {
     JPamAuthenticator auth = new JPamAuthenticator();
     Credential[] credentials = new Credential[] {
     new UsernameCredential(args[0]), new PasswordCredential(args[1])};
-    auth.authenticate(credentials);
+    String userId = auth.validateUser(credentials);
     System.out.println("authentication ok");
+    Identity identity = auth.createIdentity(userId);
+    System.out.println(identity.getGroups());
   }
 
 }

@@ -34,7 +34,7 @@ import org.exoplatform.services.log.ExoLogger;
  */
 
 public class Pam {
-  private static final Log LOGGER = ExoLogger.getLogger("Pam");
+  private static final Log log = ExoLogger.getLogger("Pam");
   private static final String JPAM_SHARED_LIBRARY_NAME = "jpam";
 
   private String serviceName_;
@@ -117,8 +117,8 @@ public class Pam {
    */
   public PamReturnValue authenticate(String username, String password)
       throws NullPointerException {
-    boolean debug = LOGGER.isDebugEnabled();
-    LOGGER.debug("Debug mode active.");
+    boolean debug = log.isDebugEnabled();
+    log.debug("Debug mode active.");
     if (serviceName_ == null) {
       throw new NullPointerException("Service name is null");
     } else if (username == null) {
