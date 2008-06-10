@@ -34,7 +34,7 @@ public class NTLMAuthenticatorTest {
     Authenticator auth = new NTLMAuthenticator();
     Credential[] credentials = new Credential[] {
         new UsernameCredential(args[0]), new PasswordCredential(args[1])};
-    auth.authenticate(credentials);
+    auth.validateUser(credentials);
     System.out.println("authentication ok");
   }
   

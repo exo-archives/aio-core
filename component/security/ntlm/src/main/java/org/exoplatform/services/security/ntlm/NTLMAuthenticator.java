@@ -44,27 +44,34 @@ import org.exoplatform.services.security.UsernameCredential;
  */
 public class NTLMAuthenticator implements Authenticator {
 
-  private final static Log LOGGER = ExoLogger
+  private final static Log log = ExoLogger
       .getLogger("core.NTLMAuthenticator");
 
-  private String domainControllerName_;
-
-  private static final String PROPERTIES_NAME = "ntlm-configuration";
-
-  private static final String DOMAIN = "domain";
+  private String domainControllerName;
 
   public NTLMAuthenticator(InitParams params) {
     // super(registry);
-    PropertiesParam pparams = params.getPropertiesParam(PROPERTIES_NAME);
-    if (pparams == null || pparams.getProperty(DOMAIN) == null)
-      LOGGER.warn("Properties param were not found in configuration.xml. "
-          + "Domain name is not specified, it should be passed by user.");
+    PropertiesParam pparams = params.getPropertiesParam("ntlm-configuration");
+    if (pparams == null || pparams.getProperty("domain") == null) {
+      log.warn("Properties param were not found in configuration.xml. "
+          + "Domain name is not specified, it should be passed by user. domain_ctrl\\username");
+    } else
+      this.domainControllerName = pparams.getProperty("domain");
   }
 
   public NTLMAuthenticator() {
+    log.warn("Properties param were not found in configuration.xml. "
+        + "Domain name is not specified, it should be passed by user. domain_ctrl\\username");
   }
 
-  public Identity authenticate(Credential[] credentials) throws LoginException,
+  public Identity createIdentity(String userId) throws Exception {
+    // TODO: getting group for user and then create set of memberships.
+    // identity.setMemberships(new HashSet<MembershipEntry>());
+
+    return new Identity(userId, new HashSet<MembershipEntry>());
+  }
+
+  public String validateUser(Credential[] credentials) throws LoginException,
       Exception {
     String user = null;
     String pass = null;
@@ -80,43 +87,30 @@ public class NTLMAuthenticator implements Authenticator {
       domainControllerName = user.substring(0, backSlash);
       user = user.substring(backSlash + 1);
     } else
-      domainControllerName = domainControllerName_;
+      domainControllerName = this.domainControllerName;
     if (domainControllerName == null) {
-      LOGGER.error("Authentication failed, domain controller name is null.");
+      log.error("Authentication failed, domain controller name is null.");
       throw new LoginException("Domain controller name is null.");
     }
+    if (log.isDebugEnabled()) {
+      log.debug("domain controller: " + domainControllerName);
+    }
+    
     UniAddress domainController;
     try {
       domainController = UniAddress.getByName(domainControllerName, true);
     } catch (UnknownHostException e) {
-      LOGGER.error("Authentication failed, domain controller not found.");
+      log.error("Authentication failed, domain controller not found.");
       throw new LoginException("Domain controller not found.");
     }
     try {
       SmbSession.logon(domainController, new NtlmPasswordAuthentication(
           domainControllerName, user, pass));
     } catch (SmbException e) {
-      LOGGER.error("Authentication failed: " + e.getMessage());
+      log.error("Authentication failed: " + e.getMessage());
       throw new LoginException(e.getMessage());
     }
-    // TODO: getting group for user and then create set of memberships.
-    // identity.setMemberships(new HashSet<MembershipEntry>());
-
-    return new Identity(user, new HashSet<MembershipEntry>());
+    return user;
   }
-
-  // /*
-  // * (non-Javadoc)
-  // *
-  // * @see org.exoplatform.services.security.Authenticator#initIdentity(
-  // * org.exoplatform.services.security.Credential[])
-  // */
-  //
-  // @Override
-  // protected void initIdentity(Identity identity, Credential[] credentials)
-  // throws LoginException, Exception {
-  //    
-  //
-  // }
 
 }
