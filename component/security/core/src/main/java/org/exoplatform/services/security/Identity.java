@@ -107,25 +107,20 @@ public class Identity {
     return memberships;
   }
 
-//  /**
-//   * Sets the roles extractor component for J2EE environment using
-//   * 
-//   * @param rolesExtractor
-//   */
-//  public void setRolesExtractor(RolesExtractor rolesExtractor) {
-//    this.rolesExtractor = rolesExtractor;
-//  }
+  /**
+   * Sets the roles for J2EE environment using
+   * 
+   * @param rolesExtractor
+   */
+  public void setRoles(Collection<String> roles) {
+    this.roles = roles;
+  }
 
   /**
    * 
-   * @param rolesExtractor
-   * @return set of J2EE roles extracted from this user's groups using giving
-   *         extraction algorithm
+   * @return roles
    */
   public Collection<String> getRoles() {
-//    if (this.rolesExtractor == null)
-//      return new HashSet<String>();
-//    return rolesExtractor.extractRoles(getGroups());
     return roles;
   }
 
