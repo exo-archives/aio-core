@@ -119,8 +119,8 @@ public class DefaultLoginModule implements LoginModule {
       return true;
 
     } catch (final Throwable e) {
-      e.printStackTrace();
-      log.warn(e.getLocalizedMessage());
+//      e.printStackTrace();
+      log.error(e.getLocalizedMessage());
       throw new LoginException(e.getMessage());
 
     }
