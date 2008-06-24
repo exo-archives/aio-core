@@ -41,7 +41,7 @@ public interface UserProfile {
    */
   final static public String[] PERSONAL_INFO_KEYS =  {
     "user.name.given", "user.name.family", "user.name.nickName", "user.bdate" , 
-    "user.gender" , "user.employer" , "user.department",  "user.jobtitle", 
+    "user.gender" , "user.employer" , "user.department",  "user.jobtitle", "user.language",
   } ;
 
   /**
