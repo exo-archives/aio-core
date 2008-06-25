@@ -23,7 +23,7 @@ import java.util.Set;
 import javax.security.auth.login.LoginException;
 
 /**
- * Created by The eXo Platform SAS        .
+ * Created by The eXo Platform SAS .
  * @author Gennady Azarenkov
  * @version $Id:$
  */
@@ -38,7 +38,8 @@ public class DummyAuthenticatorImpl implements Authenticator {
 
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see org.exoplatform.services.security.Authenticator#createIdentity(java.lang.String)
    */
   public Identity createIdentity(String userId) {
@@ -47,7 +48,8 @@ public class DummyAuthenticatorImpl implements Authenticator {
     return new Identity(userId, entries, rolesExtractor.extractRoles(userId, entries));
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see org.exoplatform.services.security.Authenticator#validateUser(org.exoplatform.services.security.Credential[])
    */
   public String validateUser(Credential[] credentials) throws LoginException, Exception {

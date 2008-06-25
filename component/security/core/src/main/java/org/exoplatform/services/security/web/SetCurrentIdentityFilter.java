@@ -65,8 +65,8 @@ public class SetCurrentIdentityFilter implements Filter {
 
     HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-// String contextName = servletContext.getServletContextName();
-    String contextName = "portal";
+    String contextName = servletContext.getServletContextName();
+//    String contextName = "portal";
     ExoContainer container = ExoContainerContext.getContainerByName(contextName);
     if (container == null) {
       log.error("Container not found for the servlet context " + contextName);

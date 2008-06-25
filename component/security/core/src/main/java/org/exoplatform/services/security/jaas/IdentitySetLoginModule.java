@@ -134,7 +134,6 @@ public class IdentitySetLoginModule implements LoginModule {
 
   protected ExoContainer getContainer() throws Exception {
     // TODO set correct current container
-// return ExoContainerContext.getCurrentContainer();
     ExoContainer container = ExoContainerContext.getCurrentContainer();
     if (container instanceof RootContainer) {
       container = RootContainer.getInstance().getPortalContainer("portal");

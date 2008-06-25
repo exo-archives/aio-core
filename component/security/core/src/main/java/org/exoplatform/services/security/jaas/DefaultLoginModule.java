@@ -41,7 +41,6 @@ import org.exoplatform.services.security.UsernameCredential;
 
 /**
  * Created by The eXo Platform SAS .
- * 
  * @author Gennady Azarenkov
  * @version $Id: $
  */
@@ -50,39 +49,37 @@ public class DefaultLoginModule implements LoginModule {
 
   protected Log log = ExoLogger.getLogger("core.DefaultLoginModule");
 
-  protected Subject         subject_;
-  private CallbackHandler   callbackHandler_;
-  protected Identity        identity_;
-  protected Map             sharedState_;
-
+  protected Subject subject_;
+  private CallbackHandler callbackHandler_;
+  protected Identity identity_;
+  protected Map sharedState_;
 
   public DefaultLoginModule() {
   }
 
   protected ExoContainer getContainer() throws Exception {
-    // TODO set correct current container 
-//    return ExoContainerContext.getCurrentContainer();
-    ExoContainer container = ExoContainerContext.getCurrentContainer();                                                                                  
-    if (container instanceof RootContainer) {                                                                                                            
-      container = RootContainer.getInstance().getPortalContainer("portal");                                                                              
-    }                                                                                                                                                    
-    return container;                                                                                                                                    
+    // TODO set correct current container
+    ExoContainer container = ExoContainerContext.getCurrentContainer();
+    if (container instanceof RootContainer) {
+      container = RootContainer.getInstance().getPortalContainer("portal");
+    }
+    return container;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see javax.security.auth.spi.LoginModule#initialize(javax.security.auth.Subject,
-   * javax.security.auth.callback.CallbackHandler, java.util.Map, java.util.Map)
+   *      javax.security.auth.callback.CallbackHandler, java.util.Map,
+   *      java.util.Map)
    */
-  public void initialize(Subject subject,
-                               CallbackHandler callbackHandler,
-                               Map sharedState,
-                               Map options) {
+  public void initialize(Subject subject, CallbackHandler callbackHandler, Map sharedState, Map options) {
     this.subject_ = subject;
     this.callbackHandler_ = callbackHandler;
     this.sharedState_ = sharedState;
   }
- 
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
    * @see javax.security.auth.spi.LoginModule#login()
    */
   public boolean login() throws LoginException {
@@ -102,14 +99,13 @@ public class DefaultLoginModule implements LoginModule {
       if (username == null || password == null)
         return false;
 
-     
       Authenticator authenticator = (Authenticator) getContainer().getComponentInstanceOfType(Authenticator.class);
 
       if (authenticator == null)
         throw new LoginException("No Authenticator component found, check your configuration");
 
-      Credential[] credentials = new Credential[] { new UsernameCredential(username), new PasswordCredential(password) };
-      
+      Credential[] credentials = new Credential[]{ new UsernameCredential(username), new PasswordCredential(password) };
+
       String userId = authenticator.validateUser(credentials);
       identity_ = authenticator.createIdentity(userId);
 
@@ -119,21 +115,21 @@ public class DefaultLoginModule implements LoginModule {
       return true;
 
     } catch (final Throwable e) {
-//      e.printStackTrace();
       log.error(e.getLocalizedMessage());
       throw new LoginException(e.getMessage());
 
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see javax.security.auth.spi.LoginModule#commit()
    */
   public boolean commit() throws LoginException {
     try {
-      
-     IdentityRegistry identityRegistry = (IdentityRegistry) getContainer()
-          .getComponentInstanceOfType(IdentityRegistry.class);
+
+      IdentityRegistry identityRegistry = (IdentityRegistry) getContainer().getComponentInstanceOfType(
+          IdentityRegistry.class);
       if (identityRegistry.getIdentity(identity_.getUserId()) == null)
         identityRegistry.register(identity_);
 
@@ -144,7 +140,8 @@ public class DefaultLoginModule implements LoginModule {
     return true;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see javax.security.auth.spi.LoginModule#abort()
    */
   public boolean abort() throws LoginException {
@@ -153,7 +150,8 @@ public class DefaultLoginModule implements LoginModule {
     return true;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see javax.security.auth.spi.LoginModule#logout()
    */
   public boolean logout() throws LoginException {

@@ -27,45 +27,45 @@ import org.exoplatform.services.security.MembershipEntry;
 import org.exoplatform.services.security.RolesExtractor;
 
 /**
- * Created by The eXo Platform SAS .
- * Implements "default" roles extraction algorythm applicable for current Organization service
+ * Created by The eXo Platform SAS . Implements "default" roles extraction
+ * algorythm applicable for current Organization service
  * @author Gennady Azarenkov
  * @version $Id:$
  */
 
 public class DefaultRolesExtractorImpl implements RolesExtractor {
-  
-  protected String userRoleParentGroup = null ;
+
+  protected String userRoleParentGroup = null;
 
   public DefaultRolesExtractorImpl(InitParams params) {
-    if(params != null) {
+    if (params != null) {
       ValueParam param = params.getValueParam("user.role.parent.group");
-      if(param!= null && param.getValue().length()>0) {
+      if (param != null && param.getValue().length() > 0) {
         userRoleParentGroup = param.getValue();
-      } 
-    }  
+      }
+    }
 
   }
-  
+
   public DefaultRolesExtractorImpl() {
   }
-  
+
   public void setUserRoleParentGroup(String userRoleParentGroup) {
     this.userRoleParentGroup = userRoleParentGroup;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see org.exoplatform.services.security.RolesExtractor#extractRoles(java.util.Set)
    */
   public Set<String> extractRoles(String userId, Set<MembershipEntry> memberships) {
-    
+
     Set<String> roles = new HashSet<String>();
     for (MembershipEntry membership : memberships) {
       String[] splittedGroupName = StringUtils.split(membership.getGroup(), "/");
-      
-      if (userRoleParentGroup != null
-          && splittedGroupName[0].equals(userRoleParentGroup)
-          && splittedGroupName.length > 1) {
+
+      if (userRoleParentGroup != null && splittedGroupName[0].equals(userRoleParentGroup) &&
+          splittedGroupName.length > 1) {
         roles.add(splittedGroupName[splittedGroupName.length - 1]);
       } else {
         roles.add(splittedGroupName[0]);

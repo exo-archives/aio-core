@@ -45,34 +45,28 @@ public class TestSessionRegistry extends TestCase {
   protected void setUp() throws Exception {
 
     if (registry == null) {
-      String containerConf = TestLoginModule.class.getResource(
-          "/conf/standalone/test-configuration.xml").toString();
-      String loginConf = TestLoginModule.class.getResource("/login.conf")
-          .toString();
+      String containerConf = TestLoginModule.class.getResource("/conf/standalone/test-configuration.xml").toString();
+      String loginConf = TestLoginModule.class.getResource("/login.conf").toString();
       StandaloneContainer.addConfigurationURL(containerConf);
       if (System.getProperty("java.security.auth.login.config") == null)
         System.setProperty("java.security.auth.login.config", loginConf);
 
       StandaloneContainer manager = StandaloneContainer.getInstance();
 
-      authenticator = (DummyAuthenticatorImpl) manager
-          .getComponentInstanceOfType(DummyAuthenticatorImpl.class);
-      // System.out.println(">>>>>>>>>>>>>>>>>> " + authenticator);
-      registry = (ConversationRegistry) manager
-          .getComponentInstanceOfType(ConversationRegistry.class);
+      authenticator = (DummyAuthenticatorImpl) manager.getComponentInstanceOfType(DummyAuthenticatorImpl.class);
+      registry = (ConversationRegistry) manager.getComponentInstanceOfType(ConversationRegistry.class);
       assertNotNull(registry);
 
-      listenerService = (ListenerService) manager
-          .getComponentInstanceOfType(ListenerService.class);
+      listenerService = (ListenerService) manager.getComponentInstanceOfType(ListenerService.class);
 
     }
-    
+
     registry.clear();
 
   }
 
   public void testRegistry() throws Exception {
-    Credential[] cred = new Credential[] { new UsernameCredential("exo") };
+    Credential[] cred = new Credential[]{ new UsernameCredential("exo") };
 
     String userId = authenticator.validateUser(cred);
     assertEquals("exo", userId);
@@ -83,13 +77,13 @@ public class TestSessionRegistry extends TestCase {
       fail("login exception have been thrown");
     } catch (LoginException e) {
     }
-    
+
     Identity id = authenticator.createIdentity(userId);
     ConversationState s = new ConversationState(id);
     ConversationState.setCurrent(s);
     assertEquals(s, ConversationState.getCurrent());
-    
-    registry.register("key", s); 
+
+    registry.register("key", s);
     assertNotNull(registry.getState("key"));
     assertEquals(id, registry.getState("key").getIdentity());
 
@@ -115,15 +109,12 @@ public class TestSessionRegistry extends TestCase {
     assertTrue(session.isMemberOf("exogroup", "member"));
     assertTrue(session.isMemberOf("exogroup1", "member"));
     assertFalse(session.isMemberOf("exogroup1", "validator"));
-    //assertFalse(session.isMemberOf("exogroup1", "*"));
   }
-  
 
   public void testDefaultRolesExtractor() throws Exception {
     Set<MembershipEntry> memberships = new HashSet<MembershipEntry>();
     memberships.add(new MembershipEntry("exogroup"));
-    memberships.add(new MembershipEntry("exogroup/exogroup1/exogroup2",
-        "member"));
+    memberships.add(new MembershipEntry("exogroup/exogroup1/exogroup2", "member"));
     DefaultRolesExtractorImpl extractor = new DefaultRolesExtractorImpl();
     extractor.setUserRoleParentGroup("exogroup");
     Set<String> roles = extractor.extractRoles("exo", memberships);
@@ -133,85 +124,6 @@ public class TestSessionRegistry extends TestCase {
     Identity session = new Identity("exo", memberships, roles);
     Collection<String> roles2 = session.getRoles();
     assertEquals(2, roles2.size());
-    
-    //session.setRolesExtractor(extractor);
-    
   }
 
-  
-  /*
-  public void testListeners() throws Exception {
-    listenerService.addListener(IdentityRegistry.StateRegistry,
-        new DummyListener());
-    listenerService.addListener(IdentityRegistry.StateRegistry,
-        new DummyListener());
-    Set<MembershipEntry> memberships = new HashSet<MembershipEntry>();
-    memberships.add(new MembershipEntry("exogroup"));
-    Identity session = new Identity("exo", memberships, registry);
-    assertNull(session.getAttribute("test"));
-    //registry.register(session, true);
-    session.register(true);
-    assertEquals(session.getAttribute("test"), "added");
-    //registry.unregister();
-    session.invalidate();
-    assertNull(session.getAttribute("test"));
-
-  }
-
-  
-  public void testAlias() throws Exception {
-    Identity session = new Identity("exo", new HashSet<MembershipEntry>(), registry);
-    
-    try {
-      session.setAlias("exo-session");
-      fail("IllegalStateException should have been thrown");
-    } catch (IllegalStateException e) {
-    }
-   
-    session.register(true);
-    session.setAlias("exo-session");
-    
-    assertNotNull(registry.getIdentity(session.getUserId()));
-    assertNotNull(registry.getIdentityByAlias("exo-session"));
-    assertEquals(registry.getIdentity(session.getUserId()), registry.getIdentityByAlias("exo-session"));
-    
-    session.invalidate();
-    assertNull(registry.getIdentityByAlias("exo-session"));
-  }
-  
-  public void testReRegistration() throws Exception {
-    Set<MembershipEntry> memberships = new HashSet<MembershipEntry>();
-    memberships.add(new MembershipEntry("exogroup"));
-    Identity session = new Identity("exo", memberships, registry);
-    Identity session1 = session.register(true);
-    assertNotNull(registry.getIdentity("exo"));
-    assertNotNull(session1);
-    assertEquals(session, session1);
-    Identity session2 = new Identity("exo", memberships, registry);
-    Identity session3 = session2.register(true);
-    assertEquals(session, session3);
-    assertNotSame(session2, session3);
-    
-  }
-
-  private class DummyListener extends Listener<StateRegistry, Identity> {
-
-    public DummyListener() {
-
-    }
-
-    public void onEvent(Event<StateRegistry, Identity> event)
-        throws Exception {
-      Identity s = event.getData();
-      if (s != null) {
-        if (event.getEventName().equals(IdentityRegistry.StateRegistry))
-          s.setAttribute("test", "added");
-        else if (event.getEventName().equals(
-            IdentityRegistry.StateRegistry))
-          s.removeAttribute("test");
-      }
-    }
-  }
-  
-  */
 }

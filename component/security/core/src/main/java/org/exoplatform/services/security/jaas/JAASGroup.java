@@ -30,6 +30,9 @@ import java.util.Iterator;
  * Date: 29 avr. 2004
  */
 public class JAASGroup implements Group, Serializable {
+
+  private static final long serialVersionUID = -1224998629739318069L;
+
   public static final String ROLES = "Roles";
 
   private String name = null;
@@ -75,20 +78,35 @@ public class JAASGroup implements Group, Serializable {
     return new MembersEnumeration(members.iterator());
   }
 
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
   public int hashCode() {
     return getName().hashCode();
   }
 
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
   public boolean equals(Object object) {
     if (!(object instanceof Group))
       return false;
     return ((Group) object).getName().equals(getName());
   }
 
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
   public String toString() {
     return getName();
   }
 
+  /* (non-Javadoc)
+   * @see java.security.Principal#getName()
+   */
   public String getName() {
     return name;
   }

@@ -26,13 +26,22 @@ import java.security.Principal;
  */
 public class RolePrincipal implements Principal, Serializable {
 
+  private static final long serialVersionUID = -8943003720689495978L;
+
   private String name;
 
   public RolePrincipal(String name) {
     this.name = name;
   }
 
+  /* (non-Javadoc)
+   * @see java.security.Principal#getName()
+   */
   public String getName() { return name; }
 
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
   public String toString() {  return getName();  }
 }

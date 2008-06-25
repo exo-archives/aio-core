@@ -24,77 +24,49 @@ import java.util.Map;
 
 /**
  * Created by The eXo Platform SAS .<br/> In-memory registry of user's sessions
- * 
  * @author Gennady Azarenkov
  * @version $Id:$
  */
 
 public final class ConversationRegistry {
-  
-//  private HashMap<String, Identity> identities = new HashMap<String, Identity>();
 
   private HashMap<Object, ConversationState> states = new HashMap<Object, ConversationState>();
-
-//  private IdentityRegistry identityRegistry;
-
-//  public ConversationRegistry(IdentityRegistry identityRegistry) {
-//    this.identityRegistry = identityRegistry;
-//    this.listenerService = listenerService;
-//  }
-  
 
   public ConversationState getState(Object key) {
     return states.get(key);
   }
-  
 
   /**
    * Sets the user's session to the registry and broadcasts ADD_SESSION_EVENT
    * message to interested listeners
-   * 
-   * @param key -
-   *          a session identifier
-   * @param session -
-   *          the session
-   * @param makeCurrent -
-   *          store or not the session into thread local
+   * @param key - a session identifier
+   * @param session - the session
+   * @param makeCurrent - store or not the session into thread local
    * @throws Exception
    */
-  public void register(Object key, ConversationState state) {//throws Exception {
-    
-//    if(states.containsKey(key))
-//      throw new Exception("The state ID already exists "+key);
-    
-    
+  public void register(Object key, ConversationState state) {
+
     // supposed that "old" stored value (if any) is no more useful in registry
     // so we "push" it
     // for example - we have to do "login" register with username as a key
-    // but it is possible to have more than one state (session) with the same UID
-    // so old one will be pushed
-    // possible drawback of this case if another "same" login occurs between
+    // but it is possible to have more than one state (session) with the same
+    // UID so old one will be pushed possible drawback of this case if
+    // another "same" login occurs between
     // login and possible use - first state will be just missed
     states.put(key, state);
-    
-//    identityRegistry.register(state.getIdentity());
-    
-    //identities.put(state.getIdentity().getUserId(), state.getIdentity());
-    
+
   }
-  
+
   public ConversationState unregister(Object key) {
     ConversationState s = states.remove(key);
-//    if(!states.containsKey(key))
-//      identityRegistry.unregister(s.getIdentity().getUserId());
-      //identities.remove(s.getIdentity().getUserId());
     return s;
   }
 
   void clear() {
-    //identities.clear();
     states.clear();
   }
-  
-  public List <Object> getStateKeys(String userId) {
+
+  public List<Object> getStateKeys(String userId) {
     ArrayList<Object> s = new ArrayList<Object>();
     for (Map.Entry<Object, ConversationState> a : states.entrySet()) {
       if (a.getValue().getIdentity().getUserId().equals(userId))

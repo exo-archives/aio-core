@@ -22,7 +22,6 @@ import java.util.Set;
 
 /**
  * Created by The eXo Platform SAS .
- * 
  * @author Gennady Azarenkov
  * @version $Id: $
  */
@@ -34,25 +33,16 @@ public class ConversationState {
   private Identity identity;
 
   private HashMap<String, Object> attributes;
-  
-  //private Subject subject;
 
   public ConversationState(Identity identity) {
-    //this(identity, null);
     this.identity = identity;
     this.attributes = new HashMap<String, Object>();
   }
-  
-//  public State(Identity identity, Subject subject) {
-//    this.identity = identity;
-//    this.attributes = new HashMap<String, Object>();
-//    this.subject = subject;
-//  }
-  
+
   public static ConversationState getCurrent() {
     return current.get();
   }
-  
+
   public static void setCurrent(ConversationState state) {
     current.set(state);
   }
@@ -60,18 +50,13 @@ public class ConversationState {
   public Identity getIdentity() {
     return identity;
   }
-  
-//  public Subject getSubject() {
-//    return subject;
-//  }
-  
+
   /**
-   * sets attribute 
+   * sets attribute
    * @param key
    * @param value
    */
-  public void setAttribute(String name,
-                           Object value) {
+  public void setAttribute(String name, Object value) {
     this.attributes.put(name, value);
   }
 

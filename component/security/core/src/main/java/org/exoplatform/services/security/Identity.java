@@ -39,8 +39,6 @@ public class Identity {
   private Subject subject;
   private Collection<String> roles;
 
-  // private RolesExtractor rolesExtractor;
-
   public Identity(String userId) {
     this(userId, new HashSet<MembershipEntry>(), new HashSet<String>());
   }
@@ -142,9 +140,6 @@ public class Identity {
     for (MembershipEntry membership : memberships) {
       if (checkMe.equals(membership))
         return true;
-      // else
-      // if(membership.getMembershipType().equals(MembershipEntry.ANY_TYPE))
-      // return membership.getGroup().equals(checkMe.getGroup());
     }
     return false;
   }

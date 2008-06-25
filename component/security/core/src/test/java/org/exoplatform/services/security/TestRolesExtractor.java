@@ -28,14 +28,13 @@ import org.exoplatform.services.security.impl.DefaultRolesExtractorImpl;
 
 /**
  * Created by The eXo Platform SAS .
- * @author <a href="mailto:alexey.zavizionov@exoplatform.com.ua">Alexey Zavizionov</a>
- * @version $Id: $
- *
- * Mar 27, 2008  
-*/
+ * @author <a href="mailto:alexey.zavizionov@exoplatform.com.ua">Alexey
+ *         Zavizionov</a>
+ * @version $Id: $ Mar 27, 2008
+ */
 public class TestRolesExtractor extends TestCase {
 
-  private static Log       log = ExoLogger.getLogger("pc.TestRolesExtractor");
+  private static Log log = ExoLogger.getLogger("pc.TestRolesExtractor");
 
   protected RolesExtractor rolesExtractor;
 
@@ -59,7 +58,7 @@ public class TestRolesExtractor extends TestCase {
 
     Set<MembershipEntry> groups = getGroups1();
 
-    Set<String> extractRoles = rolesExtractor.extractRoles("exo",groups);
+    Set<String> extractRoles = rolesExtractor.extractRoles("exo", groups);
     assertNotNull(extractRoles);
     assertFalse(extractRoles.isEmpty());
     assertEquals(2, extractRoles.size());
