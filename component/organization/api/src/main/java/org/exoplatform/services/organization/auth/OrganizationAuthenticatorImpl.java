@@ -69,37 +69,6 @@ public class OrganizationAuthenticatorImpl implements Authenticator {
     this(orgService, null, null);
   }
   
-//  /* (non-Javadoc)
-//   * @see org.exoplatform.services.security.Authenticator#authenticate(org.exoplatform.services.security.Credential[])
-//   */
-//  public Identity authenticate(Credential[] credentials) throws LoginException,
-//      Exception {
-//    String user = null;
-//    String password = null;
-//    for (Credential cred : credentials) {
-//      if (cred instanceof UsernameCredential)
-//        user = ((UsernameCredential) cred).getUsername();
-//      if (cred instanceof PasswordCredential)
-//        password = ((PasswordCredential) cred).getPassword();
-//    }
-//    if (user == null || password == null)
-//      throw new LoginException("Username or Password is not defined");
-//
-//    if (this.encrypter != null)
-//      password = new String(encrypter.encrypt(password.getBytes()));
-//
-//    if (!orgService.getUserHandler().authenticate(user, password))
-//      throw new LoginException("Login failed for " + user);
-//
-//    Collection<MembershipEntry> entries = new HashSet<MembershipEntry>();
-//    Collection<Membership> memberships = orgService.getMembershipHandler().findMembershipsByUser(user);
-//    if (memberships != null) {
-//      for (Membership membership : memberships)
-//        entries.add(new MembershipEntry(membership.getGroupId(), membership.getMembershipType()));
-//    }
-//    return new Identity(user, entries);
-//  }
-  
   public OrganizationService getOrganizationService() {
     return orgService;
   }

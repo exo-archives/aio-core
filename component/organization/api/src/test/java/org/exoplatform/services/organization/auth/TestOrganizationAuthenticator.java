@@ -59,7 +59,6 @@ public class TestOrganizationAuthenticator extends TestCase {
       authenticator = (Authenticator) container.getComponentInstanceOfType(OrganizationAuthenticatorImpl.class);
       assertNotNull(authenticator);
 
-      //System.out.println(">>>>>>>>>>>>>>>>>> " + authenticator);
       registry = (ConversationRegistry) container.getComponentInstanceOfType(ConversationRegistry.class);
       assertNotNull(registry);
 
