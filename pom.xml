@@ -7,6 +7,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>component/common</module>
     <module>component/security/core</module>  
     <module>component/security/pam</module>
     <module>component/security/ntlm</module>
