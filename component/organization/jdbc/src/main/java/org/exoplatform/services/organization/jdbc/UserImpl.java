@@ -23,7 +23,7 @@ import org.exoplatform.services.organization.User;
 public class UserImpl extends DBObject implements User {
 
   private String userName = null;
-  private String password = null;
+  private transient String password = null;
   private String firstName = null;
   private String lastName = null;
   private String email = null;
