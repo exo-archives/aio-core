@@ -45,8 +45,8 @@ public class HTMLDocumentReader extends BaseDocumentReader {
   public HTMLDocumentReader(InitParams params) {
   }
 
-  public HTMLDocumentReader() {
-  }
+/*  public HTMLDocumentReader() {
+  }*/
 
   /**
    * Get the text/html mime type.
@@ -74,15 +74,20 @@ public class HTMLDocumentReader extends BaseDocumentReader {
       bos.close();
 
       String html = new String(bos.toByteArray());
-      StringBean sb = new StringBean();
+
       Parser parser = Parser.createParser(html, null);
+      StringBean sb = new StringBean();
+
+      // read links or not
+      // sb.setLinks(true); //TODO make this configurable
+
+      // extract text
       parser.visitAllNodesWith(sb);
+
       String text = sb.getStrings();
-      sb.setLinks(true);
-      parser.reset();
-      parser.visitAllNodesWith(sb);
-      text = new String(sb.getStrings().getBytes());
-      refined_text = delete(text);
+
+      refined_text = (text != null) ? text : ""; // delete(text);
+
     } catch (IOException e) {
       return new String("");
     } catch (ParserException e) {
@@ -90,28 +95,6 @@ public class HTMLDocumentReader extends BaseDocumentReader {
     }
 
     return refined_text;
-
-    // String text = "";
-    // try {
-    // int size = is.available();
-    // byte b[] = new byte[size];
-    // is.read(b);
-    // String html = new String(b);
-    // StringBean sb = new StringBean();
-    // Parser parser = Parser.createParser(html, null);
-    // parser.visitAllNodesWith(sb);
-    // text = sb.getStrings();
-    // sb.setLinks(true);
-    // parser.reset();
-    // parser.visitAllNodesWith(sb);
-    // //String s1 = sb.getStrings();
-    // text = new String(sb.getStrings().getBytes());
-    // text = this.delete(text);
-    // }
-    // catch(Exception e){
-    // }
-    //
-    // return text ;
   }
 
   public String getContentAsText(InputStream is, String encoding) throws Exception {

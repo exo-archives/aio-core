@@ -40,6 +40,7 @@ public class DocumentReaderServiceImpl implements DocumentReaderService {
     readers_ = new HashMap<String, BaseDocumentReader>();
   }
   
+  @Deprecated 
   public String getContentAsText(String  mimeType, InputStream is) throws Exception {    
     BaseDocumentReader reader = readers_.get(mimeType.toLowerCase());   
     if(reader != null)  return reader.getContentAsText(is);
