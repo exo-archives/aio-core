@@ -116,7 +116,7 @@ public class SetCurrentIdentityFilter implements Filter {
         if (state != null) {
           conversationRegistry.register(sessionId, state);
           if (log.isDebugEnabled()) {
-            log.debug(".....Register Conversation state " + sessionId);
+            log.debug("..... Register Conversation state " + sessionId);
           }
         }
       }

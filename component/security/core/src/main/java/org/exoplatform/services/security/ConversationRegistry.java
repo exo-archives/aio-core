@@ -32,6 +32,12 @@ public final class ConversationRegistry {
 
   private HashMap<Object, ConversationState> states = new HashMap<Object, ConversationState>();
 
+  private IdentityRegistry identityRegistry;
+  
+  public ConversationRegistry(IdentityRegistry identityRegistry) {
+    this.identityRegistry = identityRegistry;
+  }
+  
   public ConversationState getState(Object key) {
     return states.get(key);
   }
@@ -45,7 +51,6 @@ public final class ConversationRegistry {
    * @throws Exception
    */
   public void register(Object key, ConversationState state) {
-
     // supposed that "old" stored value (if any) is no more useful in registry
     // so we "push" it
     // for example - we have to do "login" register with username as a key
@@ -59,11 +64,19 @@ public final class ConversationRegistry {
 
   public ConversationState unregister(Object key) {
     ConversationState s = states.remove(key);
+    String userId = s.getIdentity().getUserId();
+    
+    // if no more conversation then remove identity.
+//    if (getStateKeys(userId).size() == 0) {
+    // TODO : temporary , now old code keeps one more conversation state with key userId.
+    // This state created by method broadcastAuthentication in AuthenticationService
+    List<Object> keys = getStateKeys(userId); 
+    if (keys.size() == 1 && keys.get(0).equals(userId)) {
+    //  
+      identityRegistry.unregister(userId);
+    }
+    
     return s;
-  }
-
-  void clear() {
-    states.clear();
   }
 
   public List<Object> getStateKeys(String userId) {
@@ -73,6 +86,10 @@ public final class ConversationRegistry {
         s.add(a.getKey());
     }
     return s;
+  }
+
+  void clear() {
+    states.clear();
   }
 
 }
