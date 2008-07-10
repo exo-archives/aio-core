@@ -33,6 +33,9 @@ public class ConversationStateListener implements HttpSessionListener {
       ConversationRegistry conversationRegistry = (ConversationRegistry) getContainer().getComponentInstanceOfType(
           ConversationRegistry.class);
       
+      if (conversationRegistry.getState(sesionId) == null)
+        return;
+      
       ConversationState conversationState = conversationRegistry.unregister(sesionId);
       
       if (conversationState != null)
