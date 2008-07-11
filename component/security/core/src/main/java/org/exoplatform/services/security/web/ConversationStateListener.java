@@ -37,8 +37,6 @@ public class ConversationStateListener implements HttpSessionListener {
       
       if (conversationState != null)
         log.info("Remove conversation state " + sesionId);
-      else
-        log.warn("Not found conversation state " + sesionId);
       
     } catch (Exception e) {
       log.error("Can't remove conversation state " + sesionId);
