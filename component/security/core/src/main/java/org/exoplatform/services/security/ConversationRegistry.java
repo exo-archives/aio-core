@@ -64,6 +64,9 @@ public final class ConversationRegistry {
 
   public ConversationState unregister(Object key) {
     ConversationState s = states.remove(key);
+    if (s == null)
+      return null;
+    
     String userId = s.getIdentity().getUserId();
     
     // if no more conversation then remove identity.
