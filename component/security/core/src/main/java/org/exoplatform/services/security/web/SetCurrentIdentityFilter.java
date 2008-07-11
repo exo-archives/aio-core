@@ -64,7 +64,7 @@ public class SetCurrentIdentityFilter implements Filter {
       throws IOException, ServletException {
 
     HttpServletRequest httpRequest = (HttpServletRequest) request;
-
+log.info("++++++++++++++++++++++ "+httpRequest.getRequestURL().toString());
     String contextName = servletContext.getServletContextName();
 //    String contextName = "portal";
     ExoContainer container = ExoContainerContext.getContainerByName(contextName);
@@ -93,7 +93,8 @@ public class SetCurrentIdentityFilter implements Filter {
       HttpSession httpSession = httpRequest.getSession();
       sessionId = httpSession.getId();
     }
-
+log.info("++++++++++++++++++++++ "+ sessionId);
+log.info("++++++++++++++++++++++ "+ userId);
     if (sessionId != null) {
       if (log.isDebugEnabled()) { 
         log.debug("..... Looking for Conversation State " + sessionId);
