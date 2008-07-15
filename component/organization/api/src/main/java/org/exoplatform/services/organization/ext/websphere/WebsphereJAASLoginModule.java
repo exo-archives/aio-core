@@ -34,7 +34,7 @@ import org.exoplatform.services.security.jaas.UserPrincipal;
  * User:  Tuan Nguyen
  * Date: May 6th, 2007
  * 
- * @version $Id: ExoLoginJAASLoginModule.java 8478 2007-12-03 10:45:34Z rainf0x $
+ * @version $Id: WebsphereJAASLoginModule.java 8478 2007-12-03 10:45:34Z rainf0x $
  */
 public class WebsphereJAASLoginModule extends DefaultLoginModule {
 
