@@ -1,5 +1,6 @@
 package org.exoplatform.services.security.web;
 
+import javax.security.auth.login.LoginContext;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
@@ -13,19 +14,21 @@ import org.exoplatform.services.security.ConversationState;
 
 public class ConversationStateListener implements HttpSessionListener {
 
-  private static final Log log = ExoLogger.getLogger("core.security.ConversationStateListener");
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger("core.security.ConversationStateListener");
   
-  /*
-   * (non-Javadoc)
-   * @see javax.servlet.http.HttpSessionListener#sessionCreated(javax.servlet.http.HttpSessionEvent)
+  /**
+   * {@inheritDoc} 
    */
   public void sessionCreated(HttpSessionEvent event) {
     // nothing to do here
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.servlet.http.HttpSessionListener#sessionDestroyed(javax.servlet.http.HttpSessionEvent)
+  /**
+   * Remove {@link ConversationState}.
+   * {@inheritDoc} 
    */
   public void sessionDestroyed(HttpSessionEvent event) {
     String sesionId = event.getSession().getId();
@@ -35,14 +38,21 @@ public class ConversationStateListener implements HttpSessionListener {
       
       ConversationState conversationState = conversationRegistry.unregister(sesionId);
       
-      if (conversationState != null)
-        log.info("Remove conversation state " + sesionId);
+      if (conversationState != null) {
+        LOG.info("Remove conversation state " + sesionId);
+        LoginContext ctx = new LoginContext("exo-domain",
+            (javax.security.auth.Subject) conversationState.getAttribute(ConversationState.SUBJECT));
+        ctx.logout();
+      }
       
     } catch (Exception e) {
-      log.error("Can't remove conversation state " + sesionId);
+      LOG.error("Can't remove conversation state " + sesionId);
     }
   }
 
+  /**
+   * @return actual ExoContainer instance.
+   */
   protected ExoContainer getContainer() throws Exception {
     ExoContainer container = ExoContainerContext.getCurrentContainer();
     if (container instanceof RootContainer) {

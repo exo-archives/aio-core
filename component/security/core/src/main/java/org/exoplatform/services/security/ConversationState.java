@@ -27,6 +27,8 @@ import java.util.Set;
  */
 
 public class ConversationState {
+  
+  public static final String SUBJECT = "subject";
 
   private static ThreadLocal<ConversationState> current = new ThreadLocal<ConversationState>();
 

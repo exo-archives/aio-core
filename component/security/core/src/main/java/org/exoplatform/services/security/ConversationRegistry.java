@@ -27,28 +27,40 @@ import java.util.Map;
  * @author Gennady Azarenkov
  * @version $Id:$
  */
-
 public final class ConversationRegistry {
 
+  /**
+   * Storage for ConversationStates.
+   */
   private HashMap<Object, ConversationState> states = new HashMap<Object, ConversationState>();
 
+  /**
+   * @see {@link IdentityRegistry}
+   */
   private IdentityRegistry identityRegistry;
   
+  /**
+   * @param identityRegistry @see {@link IdentityRegistry} .
+   */
   public ConversationRegistry(IdentityRegistry identityRegistry) {
     this.identityRegistry = identityRegistry;
   }
   
+  /**
+   * Get ConversationState with specified key.
+   * @param key the key. 
+   * @return ConversationState.
+   */
   public ConversationState getState(Object key) {
     return states.get(key);
   }
 
   /**
    * Sets the user's session to the registry and broadcasts ADD_SESSION_EVENT
-   * message to interested listeners
-   * @param key - a session identifier
-   * @param session - the session
-   * @param makeCurrent - store or not the session into thread local
-   * @throws Exception
+   * message to interested listeners.
+   * @param key the session identifier.
+   * @param session the session.
+   * @param makeCurrent the store or not the session into thread local.
    */
   public void register(Object key, ConversationState state) {
     // supposed that "old" stored value (if any) is no more useful in registry
@@ -62,6 +74,13 @@ public final class ConversationRegistry {
 
   }
 
+  /**
+   * Remove ConversationStae with specified key.
+   * If there is no more ConversationState for user then remove Identity
+   * from IdentityRegistry. 
+   * @param key the key.
+   * @return removed ConversationState or null.
+   */
   public ConversationState unregister(Object key) {
     ConversationState s = states.remove(key);
     if (s == null)
@@ -82,6 +101,10 @@ public final class ConversationRegistry {
     return s;
   }
 
+  /**
+   * @param userId the user identifier.
+   * @return list of users ConversationState.
+   */
   public List<Object> getStateKeys(String userId) {
     ArrayList<Object> s = new ArrayList<Object>();
     for (Map.Entry<Object, ConversationState> a : states.entrySet()) {
@@ -91,6 +114,9 @@ public final class ConversationRegistry {
     return s;
   }
 
+  /**
+   * Remove all ConversationStates.
+   */
   void clear() {
     states.clear();
   }

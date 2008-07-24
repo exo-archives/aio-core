@@ -45,30 +45,47 @@ import org.exoplatform.services.security.IdentityRegistry;
  */
 public class IdentitySetLoginModule implements LoginModule {
 
+  /**
+   * Login.
+   */
   protected Log log = ExoLogger.getLogger("core.IdentitySetLoginModule");
 
-  private Map<String, ?> sharedState;
+  /**
+   * @see {@link Subject} .
+   */
+  protected Subject subject;
+  
+  /**
+   * Shared state.
+   */
+  protected Map sharedState;
 
-  /*
-   * (non-Javadoc)
-   * @see javax.security.auth.spi.LoginModule#abort()
+  /**
+   * Is allowed for one user login again if he already login.
+   * If must set in LM options.
+   */
+  protected boolean singleLogin = false;
+
+  /**
+   * {@inheritDoc} 
    */
   public boolean abort() throws LoginException {
     if (log.isDebugEnabled()) {
-      log.debug("abort of IdentitySetLoginModule");
+      log.debug("in abort");
     }
+    log.info("in abort");
 
     return true;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.security.auth.spi.LoginModule#commit()
+  /**
+   * {@inheritDoc} 
    */
   public boolean commit() throws LoginException {
     if (log.isDebugEnabled()) {
       log.debug("in commit");
     }
+    log.info("in commit");
     
     String userId = (String) sharedState.get("javax.security.auth.login.name");
     try {
@@ -76,15 +93,18 @@ public class IdentitySetLoginModule implements LoginModule {
           .getComponentInstanceOfType(Authenticator.class);
 
       if (authenticator == null)
-        throw new LoginException("No Authenticator component found, check your configuration");
+        throw new LoginException("No Authenticator component found, check your configuration.");
 
       IdentityRegistry identityRegistry = (IdentityRegistry) getContainer()
           .getComponentInstanceOfType(IdentityRegistry.class);
 
-      if (identityRegistry.getIdentity(userId) == null) {
-        Identity identity = authenticator.createIdentity(userId);
-        identityRegistry.register(identity);
-      }
+      if (singleLogin && identityRegistry.getIdentity(userId) != null) 
+        throw new LoginException("User " + userId + " already logined.");
+
+      Identity identity = authenticator.createIdentity(userId);
+      identity.setSubject(subject);
+      
+      identityRegistry.register(identity);
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -93,45 +113,52 @@ public class IdentitySetLoginModule implements LoginModule {
     return true;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.security.auth.spi.LoginModule#initialize(javax.security.auth.Subject,
-   *      javax.security.auth.callback.CallbackHandler, java.util.Map,
-   *      java.util.Map)
+  /**
+   * {@inheritDoc} 
    */
-  public void initialize(Subject subject, CallbackHandler callbackHandler,
-      Map<String, ?> sharedState, Map<String, ?> options) {
+  public void initialize(Subject subject, CallbackHandler callbackHandler, Map sharedState, Map options) {
     if (log.isDebugEnabled()) {
       log.debug("in initialize");
     }
+    log.info("in initialize");
 
+    this.subject = subject;
     this.sharedState = sharedState;
+
+    String sl = (String) options.get("singleLogin");
+    if (sl != null
+        && (sl.equalsIgnoreCase("yes") || sl.equalsIgnoreCase("true"))) {
+      this.singleLogin = true;
+    }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.security.auth.spi.LoginModule#login()
+  /**
+   * {@inheritDoc} 
    */
   public boolean login() throws LoginException {
     if (log.isDebugEnabled()) {
       log.debug("in login");
     }
+    log.info("in login");
 
     return true;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.security.auth.spi.LoginModule#logout()
+  /**
+   * {@inheritDoc} 
    */
   public boolean logout() throws LoginException {
     if (log.isDebugEnabled()) {
       log.debug("in logout");
     }
+    log.info("in logout");
 
     return true;
   }
 
+  /**
+   * @return actual ExoContainer instance.
+   */
   protected ExoContainer getContainer() throws Exception {
     // TODO set correct current container
     ExoContainer container = ExoContainerContext.getCurrentContainer();

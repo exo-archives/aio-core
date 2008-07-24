@@ -47,44 +47,61 @@ import org.exoplatform.services.security.UsernameCredential;
 
 public class DefaultLoginModule implements LoginModule {
 
+  /**
+   * Logger.
+   */
   protected Log log = ExoLogger.getLogger("core.DefaultLoginModule");
 
-  protected Subject subject_;
-  private CallbackHandler callbackHandler_;
-  protected Identity identity_;
-  protected Map sharedState_;
+  /**
+   * @see {@link Subject} .
+   */
+  protected Subject subject;
+  
+  /**
+   * @see {@link CallbackHandler}
+   */
+  private CallbackHandler callbackHandler;
+  
+  /**
+   * encapsulates user's principals such as name, groups, etc .
+   */
+  protected Identity identity;
+  
+  /**
+   * Shared state.
+   */
+  protected Map sharedState;
+  
+  /**
+   * Is allowed for one user login again if he already login.
+   * If must set in LM options.
+   */
+  protected boolean singleLogin = false;
 
   public DefaultLoginModule() {
   }
 
-  protected ExoContainer getContainer() throws Exception {
-    // TODO set correct current container
-    ExoContainer container = ExoContainerContext.getCurrentContainer();
-    if (container instanceof RootContainer) {
-      container = RootContainer.getInstance().getPortalContainer("portal");
-    }
-    return container;
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see javax.security.auth.spi.LoginModule#initialize(javax.security.auth.Subject,
-   *      javax.security.auth.callback.CallbackHandler, java.util.Map,
-   *      java.util.Map)
+  /**
+   * {@inheritDoc} 
    */
   public void initialize(Subject subject, CallbackHandler callbackHandler, Map sharedState, Map options) {
-    this.subject_ = subject;
-    this.callbackHandler_ = callbackHandler;
-    this.sharedState_ = sharedState;
+    this.subject = subject;
+    this.callbackHandler = callbackHandler;
+    this.sharedState = sharedState;
+    
+    String sl = (String) options.get("singleLogin");
+    if (sl != null
+        && (sl.equalsIgnoreCase("yes") || sl.equalsIgnoreCase("true"))) {
+      this.singleLogin = true;
+    }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.security.auth.spi.LoginModule#login()
+  /**
+   * {@inheritDoc} 
    */
   public boolean login() throws LoginException {
     if (log.isDebugEnabled())
-      log.debug("In login of DefaultLoginModule");
+      log.debug("In login of DefaultLoginModule.");
 
     Callback[] callbacks = new Callback[2];
     callbacks[0] = new NameCallback("Username");
@@ -92,7 +109,7 @@ public class DefaultLoginModule implements LoginModule {
 
     try {
 
-      callbackHandler_.handle(callbacks);
+      callbackHandler.handle(callbacks);
       String username = ((NameCallback) callbacks[0]).getName();
       String password = new String(((PasswordCallback) callbacks[1]).getPassword());
       ((PasswordCallback) callbacks[1]).clearPassword();
@@ -107,11 +124,11 @@ public class DefaultLoginModule implements LoginModule {
       Credential[] credentials = new Credential[]{ new UsernameCredential(username), new PasswordCredential(password) };
 
       String userId = authenticator.validateUser(credentials);
-      identity_ = authenticator.createIdentity(userId);
+      identity = authenticator.createIdentity(userId);
 
-      sharedState_.put("javax.security.auth.login.name", userId);
-      subject_.getPrivateCredentials().add(password);
-      subject_.getPublicCredentials().add(new UsernameCredential(username));
+      sharedState.put("javax.security.auth.login.name", userId);
+      subject.getPrivateCredentials().add(password);
+      subject.getPublicCredentials().add(new UsernameCredential(username));
       return true;
 
     } catch (final Throwable e) {
@@ -121,43 +138,56 @@ public class DefaultLoginModule implements LoginModule {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.security.auth.spi.LoginModule#commit()
+  /**
+   * {@inheritDoc} 
    */
   public boolean commit() throws LoginException {
     try {
 
       IdentityRegistry identityRegistry = (IdentityRegistry) getContainer().getComponentInstanceOfType(
           IdentityRegistry.class);
-      if (identityRegistry.getIdentity(identity_.getUserId()) == null)
-        identityRegistry.register(identity_);
+      
+      if (singleLogin && identityRegistry.getIdentity(identity.getUserId()) != null) 
+        throw new LoginException("User " + identity.getUserId() + " already logined.");
+
+      identity.setSubject(subject);
+      identityRegistry.register(identity);
 
     } catch (final Throwable e) {
-      log.warn(e.getLocalizedMessage());
+      log.error(e.getLocalizedMessage());
       throw new LoginException(e.getMessage());
     }
     return true;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.security.auth.spi.LoginModule#abort()
+  /**
+   * {@inheritDoc} 
    */
   public boolean abort() throws LoginException {
     if (log.isDebugEnabled())
-      log.debug("In abort of DefaultLoginModule");
+      log.debug("In abort of DefaultLoginModule.");
     return true;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.security.auth.spi.LoginModule#logout()
+  /**
+   * {@inheritDoc} 
    */
   public boolean logout() throws LoginException {
     if (log.isDebugEnabled())
-      log.debug("In logout of DefaultLoginModule, It seems this method is never called in tomcat");
+      log.debug("In logout of DefaultLoginModule.");
 
     return true;
+  }
+
+  /**
+   * @return actual ExoContainer instance.
+   */
+  protected ExoContainer getContainer() {
+    // TODO set correct current container
+    ExoContainer container = ExoContainerContext.getCurrentContainer();
+    if (container instanceof RootContainer) {
+      container = RootContainer.getInstance().getPortalContainer("portal");
+    }
+    return container;
   }
 }

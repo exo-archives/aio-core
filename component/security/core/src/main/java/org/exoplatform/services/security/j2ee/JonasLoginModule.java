@@ -41,17 +41,17 @@ public class JonasLoginModule extends DefaultLoginModule {
 
     if (super.commit()) {
       
-      Set<Principal> principals = subject_.getPrincipals();
+      Set<Principal> principals = subject.getPrincipals();
 
       Group roleGroup = new JAASGroup(JAASGroup.ROLES);
-      for (String role : identity_.getRoles())
+      for (String role : identity.getRoles())
         roleGroup.addMember(new RolePrincipal(role));
 
       // group principal
       principals.add(roleGroup);
 
       // username principal
-      principals.add(new UserPrincipal(identity_.getUserId()));
+      principals.add(new UserPrincipal(identity.getUserId()));
       
       return true;
     } else {
