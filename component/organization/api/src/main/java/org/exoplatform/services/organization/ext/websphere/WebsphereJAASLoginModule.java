@@ -50,14 +50,14 @@ public class WebsphereJAASLoginModule extends DefaultLoginModule {
     if (super.login()) {
       ArrayList<String> roleGroupList = new ArrayList<String>();
 
-      for (String role : identity_.getRoles()) {
+      for (String role : identity.getRoles()) {
         roleGroupList.add(role);
       }
 
       // username principal
 //     Principal usernamePrincipal = new UserPrincipal(identity_.getUserId());
 
-      websphereLogin(identity_.getUserId(), roleGroupList);
+      websphereLogin(identity.getUserId(), roleGroupList);
       
       return true;
     } else {
@@ -70,13 +70,13 @@ public class WebsphereJAASLoginModule extends DefaultLoginModule {
 
     if (super.commit()) {
 
-      Set<Principal> principals = subject_.getPrincipals();
+      Set<Principal> principals = subject.getPrincipals();
 
-      for (String role : identity_.getRoles())
+      for (String role : identity.getRoles())
         principals.add(new RolePrincipal(role));
 
       // username principal
-      principals.add(new UserPrincipal(identity_.getUserId()));
+      principals.add(new UserPrincipal(identity.getUserId()));
 
       return true;
     } else {
@@ -114,6 +114,6 @@ public class WebsphereJAASLoginModule extends DefaultLoginModule {
     hashtable.put(WSCREDENTIAL_GROUPS, roleGroupList);
     hashtable.put(WSCREDENTIAL_CACHE_KEY, uniqueid + "WebsphereJAASLoginModule");
     //sharedState.put(WSCREDENTIAL_PROPERTIES_KEY, hashtable);
-    subject_.getPublicCredentials().add(hashtable);
+    subject.getPublicCredentials().add(hashtable);
   }
 }
