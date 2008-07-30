@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.exoplatform.services.listener.ListenerService;
+
 /**
  * Created by The eXo Platform SAS .<br/> In-memory registry of user's sessions
  * @author Gennady Azarenkov
@@ -40,10 +42,17 @@ public final class ConversationRegistry {
   private IdentityRegistry identityRegistry;
   
   /**
-   * @param identityRegistry @see {@link IdentityRegistry} .
+   * @see {@link ListenerService}
    */
-  public ConversationRegistry(IdentityRegistry identityRegistry) {
+  private ListenerService listenerService;
+  
+  /**
+   * @param identityRegistry @see {@link IdentityRegistry} 
+   * @param listenerService  @see {@link ListenerService} 
+   */
+  public ConversationRegistry(IdentityRegistry identityRegistry, ListenerService listenerService) {
     this.identityRegistry = identityRegistry;
+    this.listenerService = listenerService;
   }
   
   /**
@@ -71,7 +80,11 @@ public final class ConversationRegistry {
     // another "same" login occurs between
     // login and possible use - first state will be just missed
     states.put(key, state);
-
+    try {
+      listenerService.broadcast("exo.core.security.ConversationRegistry.register", this, state);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -82,23 +95,28 @@ public final class ConversationRegistry {
    * @return removed ConversationState or null.
    */
   public ConversationState unregister(Object key) {
-    ConversationState s = states.remove(key);
-    if (s == null)
+    ConversationState state = states.remove(key);
+
+    if (state == null)
       return null;
     
-    String userId = s.getIdentity().getUserId();
+    String userId = state.getIdentity().getUserId();
     
     // if no more conversation then remove identity.
-//    if (getStateKeys(userId).size() == 0) {
     // TODO : temporary , now old code keeps one more conversation state with key userId.
     // This state created by method broadcastAuthentication in AuthenticationService
     List<Object> keys = getStateKeys(userId); 
-    if (keys.size() == 1 && keys.get(0).equals(userId)) {
-    //  
+    if (keys.size() == 0 || (keys.size() == 1 && keys.get(0).equals(userId))) {
       identityRegistry.unregister(userId);
     }
     
-    return s;
+    try {
+      listenerService.broadcast("exo.core.security.ConversationRegistry.unregister", this, state);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    return state;
   }
 
   /**
@@ -120,5 +138,7 @@ public final class ConversationRegistry {
   void clear() {
     states.clear();
   }
+  
+  
 
 }

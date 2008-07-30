@@ -83,20 +83,20 @@ public class TestLoginModule extends TestCase {
     
   }
 
-  public void testRepeatLoginSameCredentials() throws Exception {
-
-    BasicCallbackHandler handler = new BasicCallbackHandler("exo", "exo".toCharArray());
-    LoginContext loginContext = new LoginContext("exo", handler);
-    loginContext.login();
-
-    Identity id = identityRegistry.getIdentity("exo");
-    
-    handler = new BasicCallbackHandler("exo", "exo".toCharArray());
-    loginContext = new LoginContext("exo", handler);
-    loginContext.login();
-    assertSame(id, identityRegistry.getIdentity("exo"));
-    
-  }
+//  public void testRepeatLoginSameCredentials() throws Exception {
+//
+//    BasicCallbackHandler handler = new BasicCallbackHandler("exo", "exo".toCharArray());
+//    LoginContext loginContext = new LoginContext("exo", handler);
+//    loginContext.login();
+//
+//    Identity id = identityRegistry.getIdentity("exo");
+//    
+//    handler = new BasicCallbackHandler("exo", "exo".toCharArray());
+//    loginContext = new LoginContext("exo", handler);
+//    loginContext.login();
+//    assertSame(id, identityRegistry.getIdentity("exo"));
+//    
+//  }
 
   public void testRepeatLoginLogoutSameCredentials() throws Exception {
     BasicCallbackHandler handler = new BasicCallbackHandler("exo", "exo".toCharArray());
