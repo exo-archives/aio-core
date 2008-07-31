@@ -193,15 +193,14 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
   public Membership findMembershipByUserGroupAndType(String userName, String groupId, String type)
       throws Exception {
     Membership membership = null;
-
+   // TODO try to optimize with better filter
+    
     // check if user exists
     String userDN = getDNFromUsername(userName);
     if (userDN == null)
       return null;
     userDN = userDN.trim();
-    String mbfilter = ldapAttrMapping_.membershipObjectClassFilter;
-    if (!mbfilter.startsWith("(")) mbfilter = "(" + mbfilter;
-    if (!mbfilter.endsWith(")")) mbfilter += ")";
+    String mbfilter = membershipClassFilter();
     String filter = "(&" + mbfilter + "("
         + ldapAttrMapping_.membershipTypeNameAttr + "=" + type + "))";
 
@@ -211,6 +210,7 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
       return null;
 
     // add memberships matching user
+
     if (results.hasMore()) {
       SearchResult sr = results.next();
       if (haveUser(sr.getAttributes(), userDN)) {
@@ -218,9 +218,10 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
         membership = createObject(userName, groupId, type);
       }
     }
-
+ 
     return membership;
   }
+
   
   public Collection findMembershipsByUserAndGroup(String userName, String groupId) throws Exception {
     ArrayList<Membership> memberships = new ArrayList<Membership>();
@@ -230,22 +231,28 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
     if (userDN == null)
       return memberships;
     userDN = userDN.trim();
+    
+    
+    String userFilter = "(" + ldapAttrMapping_.membershipTypeMemberValue + "=" + userDN + ")";
+    String mbfilter = membershipClassFilter();
+    String filter = "(&" + userFilter + mbfilter + ")";    
 
     // retrieve memberships
-    NamingEnumeration<SearchResult> results = findMembershipsInGroup(groupId,
-        ldapAttrMapping_.membershipObjectClassFilter);
+    NamingEnumeration<SearchResult> results = findMembershipsInGroup(groupId, filter);
     if (results == null)
       return memberships;
 
     // add memberships matching user
     while (results.hasMore()) {
       SearchResult sr = results.next();
-      if (haveUser(sr.getAttributes(), userDN)) {
         String type = explodeDN(sr.getNameInNamespace(), true)[0];
         Membership membership = createObject(userName, groupId, type);
         memberships.add(membership);
       }
-    }
+
+  if (log.isDebugEnabled()) {
+    log.debug("Retrieved " + memberships.size()  + " memberships from ldap for user " + userName + " in group " + groupId);
+  }    
     return memberships;
   }
 
@@ -275,16 +282,20 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
   public Collection findMembershipsByUser( String userName) throws Exception {
     ArrayList<Membership> memberships = new ArrayList<Membership>();
 
+    String mbfilter = membershipClassFilter();
+    
     // check if user exists
     String userDN = getDNFromUsername(userName);
     if (userDN == null)
       return memberships;
     userDN = userDN.trim();
-
+    
+   String userFilter = "(" + ldapAttrMapping_.membershipTypeMemberValue + "=" + userDN + ")";
+   
+    String filter = "(&" + userFilter + mbfilter + ")";
+    
     NamingEnumeration<SearchResult> results = null;
     LdapContext ctx = ldapService_.getLdapContext();
-    // TODO : Need to optimize! Retrieving ALL memberships!
-    String filter = ldapAttrMapping_.membershipObjectClassFilter;
     try {
       SearchControls constraints = new SearchControls();
       constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -298,14 +309,16 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
     // add memberships matching user
     while (results.hasMore()) {
       SearchResult sr = results.next();
-      if (haveUser(sr.getAttributes(), userDN)) {
         String membershipDN = sr.getNameInNamespace();
         Group group = getGroupFromMembershipDN(membershipDN);
         String type = explodeDN(membershipDN, true)[0];        
         Membership membership = createObject(userName, group.getId(), type);
         memberships.add(membership);
-      }
     }
+  if (log.isDebugEnabled()) {
+    log.debug("Retrieved " + memberships.size()  + " memberships from ldap for user " + userName );
+  }
+
     return memberships;
     
   }

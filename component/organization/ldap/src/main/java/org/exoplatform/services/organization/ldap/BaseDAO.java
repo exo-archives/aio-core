@@ -233,4 +233,11 @@ public class BaseDAO {
     return false;
   }  
   
+  protected String membershipClassFilter() {
+    String mbfilter = ldapAttrMapping_.membershipObjectClassFilter;
+    if (!mbfilter.startsWith("(")) mbfilter = "(" + mbfilter;
+    if (!mbfilter.endsWith(")")) mbfilter += ")";
+    return mbfilter;
+  }  
+  
 }

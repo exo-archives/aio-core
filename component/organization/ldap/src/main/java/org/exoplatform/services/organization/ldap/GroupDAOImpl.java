@@ -39,7 +39,6 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.GroupEventListener;
 import org.exoplatform.services.organization.GroupHandler;
-import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.impl.GroupImpl;
 
 /**
@@ -155,6 +154,11 @@ public class GroupDAOImpl extends BaseDAO implements  GroupHandler {
       Group group = getGroupByDN(groupDN);
       if (group != null) addGroup(groups, group); 
     }
+    
+  if (log.isDebugEnabled()) {
+    log.debug("Retrieved " + groups.size() + " groups from ldap for user " + userName + " with membershiptype " + membershipType);
+  }
+
     return groups;
   }
   
@@ -258,8 +262,9 @@ public class GroupDAOImpl extends BaseDAO implements  GroupHandler {
     try {
       SearchControls constraints = new SearchControls();
       constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-      // TODO : Need to optimize! Retrieving ALL memberships!
-      String filter = ldapAttrMapping_.membershipObjectClassFilter;
+      String mbfilter = membershipClassFilter();
+      String userFilter = "(" + ldapAttrMapping_.membershipTypeMemberValue + "=" + userDN + ")";      
+      String filter = "(&" + userFilter + mbfilter + ")";          
       results = ctx.search(ldapAttrMapping_.groupsURL, filter, constraints);
     } catch (Exception exp) {
       if (log.isWarnEnabled())
@@ -267,9 +272,10 @@ public class GroupDAOImpl extends BaseDAO implements  GroupHandler {
     }
 
     // add groups for memberships matching user
+    int total = 0;
     while (results.hasMore()) {
       SearchResult sr = results.next();
-      if (haveUser(sr.getAttributes(), userDN)) {
+      total++;
         NameParser parser = ctx.getNameParser("");
         CompositeName name = new CompositeName(sr.getName());
         if (name.size() < 1)
@@ -279,8 +285,11 @@ public class GroupDAOImpl extends BaseDAO implements  GroupHandler {
         Group group = this.getGroupFromMembershipDN(membershipDN);
         if (group != null)
           addGroup(groups, group);
-      }
     }
+    if (log.isDebugEnabled()) {
+      log.debug("Retrieved " + groups.size() + " groups from ldap for user " + userName);
+    }
+
     return groups;
   }
   

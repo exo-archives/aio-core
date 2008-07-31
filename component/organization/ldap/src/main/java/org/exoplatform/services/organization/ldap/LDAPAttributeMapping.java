@@ -42,11 +42,11 @@ import org.exoplatform.services.organization.impl.UserProfileData;
  */
 public class LDAPAttributeMapping {
   
-   String userLDAPClasses ;
-   String profileLDAPClasses ;
-   String groupLDAPClasses ;
-   String membershipTypeLDAPClasses;
-   String membershipLDAPClasses;
+   public String userLDAPClasses ;
+   public String profileLDAPClasses ;
+   public String groupLDAPClasses ;
+   public String membershipTypeLDAPClasses;
+   public String membershipLDAPClasses;
   
    static String[] USER_LDAP_CLASSES ;
    static String[] PROFILE_LDAP_CLASSES;
@@ -54,7 +54,7 @@ public class LDAPAttributeMapping {
    static String[] MEMBERSHIPTYPE_LDAP_CLASSES;
    static String[] MEMBERSHIP_LDAP_CLASSES;  
   
-   String baseURL, groupsURL, membershipTypeURL, userURL, profileURL  ;
+   public String baseURL, groupsURL, membershipTypeURL, userURL, profileURL  ;
   
    String userDNKey;
    
