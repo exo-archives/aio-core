@@ -199,8 +199,10 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
     if (userDN == null)
       return null;
     userDN = userDN.trim();
-
-    String filter = "(&" + ldapAttrMapping_.membershipObjectClassFilter + "("
+    String mbfilter = ldapAttrMapping_.membershipObjectClassFilter;
+    if (!mbfilter.startsWith("(")) mbfilter = "(" + mbfilter;
+    if (!mbfilter.endsWith(")")) mbfilter += ")";
+    String filter = "(&" + mbfilter + "("
         + ldapAttrMapping_.membershipTypeNameAttr + "=" + type + "))";
 
     // retrieve memberships
@@ -265,7 +267,7 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
       results = ctx.search(groupDN, filter, constraints);
     } catch (Exception exp) {
       if (log.isWarnEnabled())
-        log.warn("Failed to retrieve memberships for " + groupId + ": " + exp.getMessage());
+        log.warn("Failed to retrieve memberships for " + groupId + " with filter " + filter +": " + exp.getMessage());
     }
     return results;
   }
@@ -281,15 +283,16 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
 
     NamingEnumeration<SearchResult> results = null;
     LdapContext ctx = ldapService_.getLdapContext();
+    // TODO : Need to optimize! Retrieving ALL memberships!
+    String filter = ldapAttrMapping_.membershipObjectClassFilter;
     try {
       SearchControls constraints = new SearchControls();
       constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-      // TODO : Need to optimize! Retrieving ALL memberships!
-      String filter = ldapAttrMapping_.membershipObjectClassFilter;
+
       results = ctx.search(ldapAttrMapping_.groupsURL, filter, constraints);
     } catch (Exception exp) {
       if (log.isWarnEnabled())
-        log.warn("Failed to retrieve memberships for user " + userName + ": " + exp.getMessage());
+        log.warn("Failed to retrieve memberships for user " + userName + " with filter " + filter + ": " + exp.getMessage());
     }
 
     // add memberships matching user
