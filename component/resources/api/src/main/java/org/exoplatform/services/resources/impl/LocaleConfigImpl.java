@@ -24,7 +24,7 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.ResourceBundleService;
 /**
@@ -75,14 +75,14 @@ public class LocaleConfigImpl implements LocaleConfig {
   
   public ResourceBundle getResourceBundle(String name) {
     ResourceBundleService service = 
-      (ResourceBundleService)PortalContainer.getComponent(ResourceBundleService.class) ;
+      (ResourceBundleService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(ResourceBundleService.class) ;
     ResourceBundle res = service.getResourceBundle(name, locale_) ;
     return res ;
   }
   
   public ResourceBundle getMergeResourceBundle(String[] names) {
     ResourceBundleService service = 
-      (ResourceBundleService)PortalContainer.getComponent(ResourceBundleService.class) ;
+      (ResourceBundleService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(ResourceBundleService.class) ;
     ResourceBundle res = service.getResourceBundle(names, locale_) ;
     return res ;
   }

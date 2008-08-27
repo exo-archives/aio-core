@@ -22,8 +22,12 @@ import org.exoplatform.services.organization.Query;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserEventListener;
 import org.exoplatform.services.organization.UserHandler;
+import org.exoplatform.services.organization.UserProfile;
+import org.exoplatform.services.organization.UserProfileEventListener;
+import org.exoplatform.services.organization.UserProfileHandler;
 import org.exoplatform.services.organization.impl.MembershipImpl;
 import org.exoplatform.services.organization.impl.UserImpl;
+import org.exoplatform.services.organization.impl.UserProfileImpl;
 
 /**
  * @author benjaminmestrallet
@@ -33,6 +37,7 @@ public class DummyOrganizationService extends BaseOrganizationService {
     this.userDAO_ = new UserHandlerImpl();
     this.groupDAO_ = new GroupHandlerImpl();
     this.membershipDAO_ = new MembershipHandlerImpl();
+    this.userProfileDAO_ = new DummyUserProfileHandler();
   }
   
   static public class MembershipHandlerImpl implements MembershipHandler {
@@ -366,4 +371,35 @@ public class DummyOrganizationService extends BaseOrganizationService {
       return "Group[" + id + "|" + groupName + "]";
     }
   }
+
+  public class DummyUserProfileHandler implements UserProfileHandler {
+
+    public void addUserProfileEventListener(UserProfileEventListener listener) {
+    }
+
+    public UserProfile createUserProfileInstance() {
+      return new UserProfileImpl();
+    }
+
+    public UserProfile createUserProfileInstance(String userName) {
+      return new UserProfileImpl(userName);
+    }
+
+    public UserProfile findUserProfileByName(String userName) throws Exception {
+      return createUserProfileInstance(userName);
+    }
+
+    public Collection findUserProfiles() throws Exception {
+      return new ArrayList();
+    }
+
+    public UserProfile removeUserProfile(String userName, boolean broadcast) throws Exception {
+      return new UserProfileImpl();
+    }
+
+    public void saveUserProfile(UserProfile profile, boolean broadcast) throws Exception {
+    }
+
+  }
+
 }
