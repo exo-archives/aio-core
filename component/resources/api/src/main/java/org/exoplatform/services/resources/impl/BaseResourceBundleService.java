@@ -144,8 +144,6 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
       if (parent != null) {
         res = getResourceBundleFromDb(id, parent, locale);
         if (res == null) res = parent;
-        System.out.println("PUTTING1: " + res);
-        System.out.println("PUTTING2: " + res.getLocale());
         cache_.put(id, res);
         return res;
       }
@@ -158,12 +156,10 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
   public ResourceBundle getResourceBundle(String[] name, Locale locale, ClassLoader cl) {
     StringBuilder idBuf = new StringBuilder("merge:");
     for (String n : name) idBuf.append(n).append("_");
-    idBuf.append(locale.getLanguage());
+    idBuf.append(locale);
     String id = idBuf.toString();
     try {
       ResourceBundle  res = (ResourceBundle) cache_.get(id);
-         System.out.println("GETTTING1: " + res);
-//        System.out.println("GETTTING2: " + res.getLocale());
       if (res != null)   return res;
       MapResourceBundle outputBundled = new MapResourceBundle(locale);
       for (int i = 0; i < name.length; i++) {
