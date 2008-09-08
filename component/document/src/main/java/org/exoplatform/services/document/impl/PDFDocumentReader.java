@@ -18,7 +18,6 @@ package org.exoplatform.services.document.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Properties;
@@ -107,7 +106,7 @@ public class PDFDocumentReader extends BaseDocumentReader {
     byte[] metadata = reader.getMetadata();
     if (metadata != null) {
       // there is XMP metadata
-      System.out.println(new String(metadata));
+      //System.out.println(new String(metadata));
       props = getPropertiesFromMetadata(metadata);
     } else {
       // it's old pdf document version
@@ -164,7 +163,7 @@ public class PDFDocumentReader extends BaseDocumentReader {
     list = doc.getElementsByTagName("xmp:CreateDate");
     if (list != null && list.getLength() > 0) {
       String creationDate = list.item(0).getLastChild().getTextContent();
-      Calendar c = parse(creationDate);
+      Calendar c = ISO8601.parseEx(creationDate);
       props.put(DCMetaData.DATE, c);
     }
 
@@ -172,7 +171,7 @@ public class PDFDocumentReader extends BaseDocumentReader {
     list = doc.getElementsByTagName("xmp:ModifyDate");
     if (list != null && list.getLength() > 0) {
       String modifyDate = list.item(0).getLastChild().getTextContent();
-      Calendar c = parse(modifyDate);
+      Calendar c = ISO8601.parseEx(modifyDate);
       props.put(DCMetaData.DATE, c);
     }
 
@@ -228,15 +227,4 @@ public class PDFDocumentReader extends BaseDocumentReader {
     return props;
   }
   
-  
-  /**
-   * Parse date string using possible formats list.
-   * 
-   * @param dateString - date string
-   * @return - calendar
-   * @throws ParseException
-   */
-  private Calendar parse(String dateString) throws ParseException {
-    return ISO8601.parseEx(dateString);
-  }
 }
