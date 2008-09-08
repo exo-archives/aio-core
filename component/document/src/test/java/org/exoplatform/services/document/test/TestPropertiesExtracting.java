@@ -17,13 +17,17 @@
 package org.exoplatform.services.document.test;
 
 import java.io.InputStream;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
 import junit.framework.TestCase;
 
+import org.exoplatform.commons.utils.ISO8601;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.document.DCMetaData;
+import org.exoplatform.services.document.DocumentReader;
 import org.exoplatform.services.document.DocumentReaderService;
 
 public class TestPropertiesExtracting extends TestCase {
@@ -42,8 +46,26 @@ public class TestPropertiesExtracting extends TestCase {
 
   public void testPDFDocumentReaderService() throws Exception {
     InputStream is = TestPropertiesExtracting.class.getResourceAsStream("/test.pdf");
-    Properties props = service_.getDocumentReader("application/pdf").getProperties(is);
+    DocumentReader rdr = service_.getDocumentReader("application/pdf");
+    Properties props = rdr.getProperties(is);
     printProps(props);
+  }
+  
+  public void testPDFDocumentReaderServiceXMPMetadata() throws Exception {
+    InputStream is = TestPropertiesExtracting.class.getResourceAsStream("/MyTest.pdf");
+    DocumentReader rdr = service_.getDocumentReader("application/pdf");
+    
+    Properties testprops = rdr.getProperties(is);
+    printProps(testprops);
+    
+    Properties etalon = new Properties();
+    etalon.put(DCMetaData.TITLE, "Test de convertion de fichier tif");
+    etalon.put(DCMetaData.CREATOR, "Christian Klaus");
+    etalon.put(DCMetaData.SUBJECT, "20080901 TEST Christian Etat OK");
+    Calendar c = ISO8601.parseEx("2008-09-01T08:01:10+00:00");;
+    etalon.put(DCMetaData.DATE, c);
+    
+    evalProps(etalon, testprops);
   }
 
 
@@ -57,38 +79,38 @@ public class TestPropertiesExtracting extends TestCase {
     InputStream is = TestPropertiesExtracting.class.getResourceAsStream("/test.ppt");
     Properties props = service_.getDocumentReader("application/powerpoint").getProperties(is);
     printProps(props);
-
   }
 
   public void testExcelDocumentReaderService() throws Exception {
     InputStream is = TestPropertiesExtracting.class.getResourceAsStream("/test.xls");
     Properties props = service_.getDocumentReader("application/excel").getProperties(is);
     printProps(props);
-
   }
 
   public void testOODocumentReaderService() throws Exception {
     InputStream is = TestPropertiesExtracting.class.getResourceAsStream("/test.odt");
     Properties props = service_.getDocumentReader("application/vnd.oasis.opendocument.text").getProperties(is);
     printProps(props);
-
   }
 
-/*
-  public void testHTMLDocumentReaderService() throws Exception {
-    InputStream is = null;
-    File f = new File("src/resources/test.html");
-    is = new FileInputStream(f);
-    String text = service_.getDocumentReader("text/html").getContentAsText(is);
-    System.out.println(text);
-  }
-*/
   private void printProps(Properties props) {
     Iterator it = props.entrySet().iterator();
+    props.toString();
     while(it.hasNext()) {
       Map.Entry entry = (Map.Entry)it.next();
-      System.out.println(" "+entry.getKey()+" -> "+entry.getValue());
+      System.out.println(" "+entry.getKey()+" -> ["+entry.getValue()+"]");
     }
   }
 
+  private void evalProps(Properties etalon, Properties testedProps){
+    Iterator it = etalon.entrySet().iterator();
+    while(it.hasNext()){
+      Map.Entry prop = (Map.Entry)it.next();
+      Object tval = testedProps.get(prop.getKey());  
+      assertNotNull(prop.getKey() + " property not founded. ",tval);
+      assertEquals(prop.getKey() + " property value is incorrect",prop.getValue(),tval);
+     }
+     assertEquals("size is incorrect", etalon.size(), testedProps.size());
+  }
+  
 }

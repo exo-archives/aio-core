@@ -16,22 +16,30 @@
  */
 package org.exoplatform.services.document.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Properties;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.apache.commons.logging.Log;
+import org.exoplatform.commons.utils.ISO8601;
 import org.exoplatform.services.document.DCMetaData;
 import org.exoplatform.services.log.ExoLogger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.lowagie.text.pdf.PRTokeniser;
 import com.lowagie.text.pdf.PdfDate;
 import com.lowagie.text.pdf.PdfReader;
 
 /**
- * Created by The eXo Platform SAS
- * 
- * A parser of Adobe PDF files.
+ * Created by The eXo Platform SAS A parser of Adobe PDF files.
  * 
  * @author Phung Hai Nam
  * @author Gennady Azarenkov
@@ -53,33 +61,34 @@ public class PDFDocumentReader extends BaseDocumentReader {
   /**
    * Returns only a text from .pdf file content.
    * 
-   * @param is
-   *          an input stream with .pdf file content.
+   * @param is an input stream with .pdf file content.
    * @return The string only with text from file content.
    * @throws Exception
    */
   public String getContentAsText(InputStream is) throws Exception {
-      
-    PdfReader reader = new PdfReader(is);
+
+    PdfReader reader = new PdfReader(is, "".getBytes());
     PRTokeniser token;
     StringBuilder builder = new StringBuilder();
-      
-    for(int i = 1; i<=reader.getNumberOfPages(); i++){
+
+    for (int i = 1; i <= reader.getNumberOfPages(); i++) {
       byte[] pageBytes = reader.getPageContent(i);
-      if (pageBytes != null){
+      if (pageBytes != null) {
         token = new PRTokeniser(pageBytes);
-        while (token.nextToken()){
-          if (token.getTokenType() == PRTokeniser.TK_STRING){
-            builder.append(token.getStringValue()+" ");
+        while (token.nextToken()) {
+          if (token.getTokenType() == PRTokeniser.TK_STRING) {
+            builder.append(token.getStringValue() + " ");
           }
         }
       }
     }
-    return builder.toString(); 
+
+    reader.close();
+    return builder.toString();
   }
-  
+
   public String getContentAsText(InputStream is, String encoding) throws Exception {
-    //Ignore encoding
+    // Ignore encoding
     return getContentAsText(is);
   }
 
@@ -90,55 +99,144 @@ public class PDFDocumentReader extends BaseDocumentReader {
    */
   public Properties getProperties(InputStream is) throws Exception {
 
-    PdfReader reader = new PdfReader(is,"".getBytes());
-    
-    //Read the file metadata
-    HashMap info = reader.getInfo();
-    
+    Properties props;
+
+    PdfReader reader = new PdfReader(is, "".getBytes()); 
+
+    // Read the file metadata
+    byte[] metadata = reader.getMetadata();
+    if (metadata != null) {
+      // there is XMP metadata
+      System.out.println(new String(metadata));
+      props = getPropertiesFromMetadata(metadata);
+    } else {
+      // it's old pdf document version
+      props = getPropertiesFromInfo(reader.getInfo());
+    }
+    reader.close();
+    return props;
+  }
+
+  
+  /**
+   * Extract properties from XMP xml.
+   * 
+   * @param metadata XML as byte array
+   * @return extracted properties
+   * @throws Exception if extracting fails
+   */
+  protected Properties getPropertiesFromMetadata(byte[] metadata) throws Exception {
     Properties props = new Properties();
-                
-    String author = (String)info.get("Author");
-    if(author!=null){
-      props.put(DCMetaData.CONTRIBUTOR, author);
+
+    //parse xml
+    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+    Document doc = docBuilder.parse(new ByteArrayInputStream(metadata));
+
+    // get properties
+    NodeList list = doc.getElementsByTagName("rdf:li");
+    if (list != null && list.getLength() > 0) {
+      for (int i = 0; i < list.getLength(); i++) {
+        
+        Node n = list.item(i);
+        // dc:title - TITLE
+        if (n.getParentNode().getParentNode().getNodeName().equals("dc:title")) {
+          String title = n.getLastChild().getTextContent();
+          props.put(DCMetaData.TITLE, title);
+        }
+
+        // dc:creator - CREATOR
+        if (n.getParentNode().getParentNode().getNodeName().equals("dc:creator")) {
+          String author = n.getLastChild().getTextContent();
+          props.put(DCMetaData.CREATOR, author);
+        }
+
+        // DC:description - SUBJECT 
+        if (n.getParentNode().getParentNode().getNodeName().equals("dc:description")) {
+          String description = n.getLastChild().getTextContent();
+          props.put(DCMetaData.SUBJECT, description);
+          // props.put(DCMetaData.DESCRIPTION, description);
+        }
+      }
     }
-     
-    String creationDate = (String)info.get("CreationDate");
-    if(creationDate!=null){
-      props.put(DCMetaData.DATE, PdfDate.decode(creationDate));
+ 
+    // xmp:CreateDate - DATE
+    list = doc.getElementsByTagName("xmp:CreateDate");
+    if (list != null && list.getLength() > 0) {
+      String creationDate = list.item(0).getLastChild().getTextContent();
+      Calendar c = parse(creationDate);
+      props.put(DCMetaData.DATE, c);
     }
-    
-    String creator = (String)info.get("Creator");
-    if(creator!=null){
-      props.put(DCMetaData.CREATOR, creator);
-    }
-    
-    String subject = (String)info.get("Subject");
-    if(subject!=null){
-      props.put(DCMetaData.SUBJECT, subject);
-    }
-    
-    String modDate = (String)info.get("ModDate");
-    if(modDate!=null){
-      props.put(DCMetaData.DATE, PdfDate.decode(modDate));
-    }
-    
-    String publisher = (String)info.get("Producer");
-    if(publisher!=null){
-      props.put(DCMetaData.PUBLISHER, publisher);
-    }
-    
-    //TODO "Desc"?
-    String description = (String)info.get("Desc");
-    if(description!=null){
-      props.put(DCMetaData.DESCRIPTION, description);
-    }
-    
-    String title = (String)info.get("Title");
-    if(title!=null){
-      props.put(DCMetaData.TITLE, title);
+
+    // xmp:ModifyDate - DATE
+    list = doc.getElementsByTagName("xmp:ModifyDate");
+    if (list != null && list.getLength() > 0) {
+      String modifyDate = list.item(0).getLastChild().getTextContent();
+      Calendar c = parse(modifyDate);
+      props.put(DCMetaData.DATE, c);
     }
 
     return props;
   }
 
+  
+  /**
+   * Extracts properties from PDF Info hash set.
+   * 
+   * @param Pdf Info hash set
+   * @return Extracted properties
+   * @throws Exception if extracting fails
+   */
+  protected Properties getPropertiesFromInfo(HashMap info) throws Exception{
+    Properties props = new Properties();
+   
+    String title = (String) info.get("Title");
+    if (title != null) {
+      props.put(DCMetaData.TITLE, title);
+    }
+    
+    String author = (String) info.get("Author");
+    if (author != null) {
+      props.put(DCMetaData.CREATOR, author);
+    }
+
+    String subject = (String) info.get("Subject");
+    if (subject != null) {
+      props.put(DCMetaData.SUBJECT, subject);
+    }
+
+    /*String publisher = (String) info.get("Producer");
+    if (publisher != null) {
+      props.put(DCMetaData.PUBLISHER, publisher);
+    }
+
+    String description = (String) info.get("Desc");
+    if (description != null) {
+      props.put(DCMetaData.DESCRIPTION, description);
+    }*/
+
+    String creationDate = (String) info.get("CreationDate");
+    if (creationDate != null) {
+      props.put(DCMetaData.DATE, PdfDate.decode(creationDate));
+    }
+    
+    String modDate = (String) info.get("ModDate");
+    if (modDate != null) {
+      props.put(DCMetaData.DATE, PdfDate.decode(modDate));
+    }
+    
+    return props;
+  }
+  
+  
+  /**
+   * Parse date string using possible formats list.
+   * 
+   * @param dateString - date string
+   * @return - calendar
+   * @throws ParseException
+   */
+  private Calendar parse(String dateString) throws ParseException {
+    return ISO8601.parseEx(dateString);
+  }
 }
