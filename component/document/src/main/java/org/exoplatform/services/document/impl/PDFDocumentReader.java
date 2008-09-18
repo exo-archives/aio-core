@@ -18,6 +18,7 @@ package org.exoplatform.services.document.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Properties;
@@ -29,11 +30,12 @@ import org.apache.commons.logging.Log;
 import org.exoplatform.commons.utils.ISO8601;
 import org.exoplatform.services.document.DCMetaData;
 import org.exoplatform.services.log.ExoLogger;
+import org.pdfbox.pdmodel.PDDocument;
+import org.pdfbox.util.PDFTextStripper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.lowagie.text.pdf.PRTokeniser;
 import com.lowagie.text.pdf.PdfDate;
 import com.lowagie.text.pdf.PdfReader;
 
@@ -58,32 +60,25 @@ public class PDFDocumentReader extends BaseDocumentReader {
   }
 
   /**
-   * Returns only a text from .pdf file content.
+   * Returns only a text from pdf file content.
    * 
    * @param is an input stream with .pdf file content.
    * @return The string only with text from file content.
    * @throws Exception
    */
   public String getContentAsText(InputStream is) throws Exception {
-
-    PdfReader reader = new PdfReader(is, "".getBytes());
-    PRTokeniser token;
-    StringBuilder builder = new StringBuilder();
-
-    for (int i = 1; i <= reader.getNumberOfPages(); i++) {
-      byte[] pageBytes = reader.getPageContent(i);
-      if (pageBytes != null) {
-        token = new PRTokeniser(pageBytes);
-        while (token.nextToken()) {
-          if (token.getTokenType() == PRTokeniser.TK_STRING) {
-            builder.append(token.getStringValue() + " ");
-          }
-        }
-      }
+    PDDocument pdDocument = PDDocument.load(is);
+    StringWriter sw = new StringWriter();
+    try {
+      PDFTextStripper stripper = new PDFTextStripper();
+      stripper.setStartPage(1);
+      stripper.setEndPage(Integer.MAX_VALUE);
+      stripper.writeText(pdDocument, sw);
+    } finally {
+      if (pdDocument != null)
+        pdDocument.close();
     }
-
-    reader.close();
-    return builder.toString();
+    return sw.toString();
   }
 
   public String getContentAsText(InputStream is, String encoding) throws Exception {
