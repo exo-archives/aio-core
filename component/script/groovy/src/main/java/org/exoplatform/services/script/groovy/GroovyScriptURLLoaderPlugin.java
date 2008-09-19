@@ -31,9 +31,9 @@ import org.exoplatform.container.xml.ObjectParameter;
  * @version $Id: $
  */
 public class GroovyScriptURLLoaderPlugin extends BaseComponentPlugin {
-  
+
   private List<String> urls;
-  
+
   public GroovyScriptURLLoaderPlugin(InitParams params) {
     if (params != null) {
       ObjectParameter param = params.getObjectParam("scripts");
@@ -41,14 +41,14 @@ public class GroovyScriptURLLoaderPlugin extends BaseComponentPlugin {
         urls = ((GroovyScriptURLs) param.getObject()).getUrls();
     }
   }
-  
+
   /**
    * @return list of URL from configuration.
    */
   public List<String> getUrls() {
     return urls;
   }
-  
+
   /*
    * Should be used in configuration as object parameter.
    */
@@ -62,8 +62,7 @@ public class GroovyScriptURLLoaderPlugin extends BaseComponentPlugin {
 
     public void setUrls(List<String> urls) {
       this.urls = urls;
-    }    
+    }
   }
 
 }
-

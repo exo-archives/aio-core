@@ -16,8 +16,10 @@
  */
 
 package org.exoplatform.services.document;
+
 /**
- * Created by The eXo Platform SAS        .
+ * Created by The eXo Platform SAS .
+ * 
  * @author Gennady Azarenkov
  * @version $Id: $
  */

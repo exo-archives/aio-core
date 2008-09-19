@@ -26,9 +26,9 @@ package org.exoplatform.services.security.pam;
  * @version $Id: PamException.java 1 2006-12-31 23:27:21Z gregluck $
  */
 public class PamException extends Exception {
-  
+
   private final static long serialVersionUID = -1L;
-  
+
   /**
    * Constructor for the PamException object
    */

@@ -24,17 +24,17 @@ import java.util.Set;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.logging.Log;
+
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.security.jaas.DefaultLoginModule;
 import org.exoplatform.services.security.jaas.RolePrincipal;
 import org.exoplatform.services.security.jaas.UserPrincipal;
 
 /**
- * Created y the eXo platform team
- * User:  Tuan Nguyen
- * Date: May 6th, 2007
+ * Created y the eXo platform team User: Tuan Nguyen Date: May 6th, 2007
  * 
- * @version $Id: WebsphereJAASLoginModule.java 8478 2007-12-03 10:45:34Z rainf0x $
+ * @version $Id: WebsphereJAASLoginModule.java 8478 2007-12-03 10:45:34Z rainf0x
+ *          $
  */
 public class WebsphereJAASLoginModule extends DefaultLoginModule {
 
@@ -55,10 +55,10 @@ public class WebsphereJAASLoginModule extends DefaultLoginModule {
       }
 
       // username principal
-//     Principal usernamePrincipal = new UserPrincipal(identity_.getUserId());
+      // Principal usernamePrincipal = new UserPrincipal(identity_.getUserId());
 
       websphereLogin(identity.getUserId(), roleGroupList);
-      
+
       return true;
     } else {
       return false;
@@ -95,25 +95,28 @@ public class WebsphereJAASLoginModule extends DefaultLoginModule {
   public boolean logout() throws LoginException {
     if (log.isDebugEnabled())
       log.debug("In logout of WebsphereJAASLoginModule");
-//    getSubject().getPrincipals().remove(usernamePrincipal);
+    // getSubject().getPrincipals().remove(usernamePrincipal);
     return super.logout();
   }
 
   final public static String WSCREDENTIAL_PROPERTIES_KEY = "com.ibm.wsspi.security.cred.propertiesObject";
+
   final public static String WSCREDENTIAL_UNIQUEID       = "com.ibm.wsspi.security.cred.uniqueId";
+
   final public static String WSCREDENTIAL_SECURITYNAME   = "com.ibm.wsspi.security.cred.securityName";
+
   final public static String WSCREDENTIAL_GROUPS         = "com.ibm.wsspi.security.cred.groups";
+
   final public static String WSCREDENTIAL_CACHE_KEY      = "com.ibm.wsspi.security.cred.cacheKey";
 
-  private void websphereLogin(String user,
-                              ArrayList<String> roleGroupList) {
+  private void websphereLogin(String user, ArrayList<String> roleGroupList) {
     Hashtable hashtable = new Hashtable();
     String uniqueid = user;
     hashtable.put(WSCREDENTIAL_UNIQUEID, uniqueid);
     hashtable.put(WSCREDENTIAL_SECURITYNAME, user);
     hashtable.put(WSCREDENTIAL_GROUPS, roleGroupList);
     hashtable.put(WSCREDENTIAL_CACHE_KEY, uniqueid + "WebsphereJAASLoginModule");
-    //sharedState.put(WSCREDENTIAL_PROPERTIES_KEY, hashtable);
+    // sharedState.put(WSCREDENTIAL_PROPERTIES_KEY, hashtable);
     subject.getPublicCredentials().add(hashtable);
   }
 }

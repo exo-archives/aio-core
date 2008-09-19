@@ -20,8 +20,9 @@ package org.exoplatform.services.security;
 import java.util.Set;
 
 /**
- * Created by The eXo Platform SAS        .<br/>
- * Strategy of extraction J2EE roles from given group names  
+ * Created by The eXo Platform SAS .<br/> Strategy of extraction J2EE roles from
+ * given group names
+ * 
  * @author Gennady Azarenkov
  * @version $Id:$
  */
@@ -29,12 +30,12 @@ import java.util.Set;
 public interface RolesExtractor {
 
   /**
-   * Extracts J2EE roles from userId and|or groups the user belongs to
-   * both parameters may be null
+   * Extracts J2EE roles from userId and|or groups the user belongs to both
+   * parameters may be null
+   * 
    * @param userId
    * @param groups
    * @return
    */
-  Set <String> extractRoles(String userId, Set<MembershipEntry> memberships);
+  Set<String> extractRoles(String userId, Set<MembershipEntry> memberships);
 }
-

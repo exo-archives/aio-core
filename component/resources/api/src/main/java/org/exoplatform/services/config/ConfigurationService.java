@@ -22,7 +22,9 @@ package org.exoplatform.services.config;
  * @version $Id: ConfigurationService.java 5799 2006-05-28 17:55:42Z geaz $
  */
 public interface ConfigurationService {
-  public Object getServiceConfiguration(Class serviceType) throws Exception ;
-  public void   saveServiceConfiguration(Class serviceType, Object config) throws Exception ;
-  public void   removeServiceConfiguration(Class serviceType) throws Exception ;
+  public Object getServiceConfiguration(Class serviceType) throws Exception;
+
+  public void saveServiceConfiguration(Class serviceType, Object config) throws Exception;
+
+  public void removeServiceConfiguration(Class serviceType) throws Exception;
 }

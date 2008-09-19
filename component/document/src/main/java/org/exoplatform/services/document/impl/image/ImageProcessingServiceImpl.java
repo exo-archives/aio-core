@@ -34,25 +34,28 @@ public class ImageProcessingServiceImpl implements ImageProcessingService {
     BufferedImage scaledImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
     Graphics2D aImage = scaledImage.createGraphics();
     aImage.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-        RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                            RenderingHints.VALUE_INTERPOLATION_BICUBIC);
     aImage.drawImage(img, 0, 0, newWidth, newHeight, null);
 
     // Crop the image
     BufferedImage croppedImage = scaledImage.getSubimage(topX, topY, chosenWidth, chosenHeight);
 
     // Create the new image
-    BufferedImage imageBuf = new BufferedImage(chosenWidth, chosenHeight,
-        BufferedImage.TYPE_INT_RGB);
+    BufferedImage imageBuf = new BufferedImage(chosenWidth,
+                                               chosenHeight,
+                                               BufferedImage.TYPE_INT_RGB);
     Graphics2D newImage = imageBuf.createGraphics();
     newImage.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-        RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                              RenderingHints.VALUE_INTERPOLATION_BICUBIC);
     newImage.drawImage(croppedImage, 0, 0, chosenWidth, chosenHeight, null);
 
     return imageBuf;
   }
 
-  public BufferedImage createBoundImage(BufferedImage img, int chosenWidth,
-      int chosenHeight, String bgColor) {
+  public BufferedImage createBoundImage(BufferedImage img,
+                                        int chosenWidth,
+                                        int chosenHeight,
+                                        String bgColor) {
     // Calculate the scale factor according to bounds
     double factor = 0;
     double scaleHorizontalFactor = getScaleFactor(chosenWidth, img.getWidth());
@@ -67,23 +70,27 @@ public class ImageProcessingServiceImpl implements ImageProcessingService {
     int newHeight = (int) Math.round(img.getHeight() * factor);
 
     // Scale the image
-    Image imgScaled = img.getScaledInstance(newWidth, newHeight,
-        Image.SCALE_DEFAULT);
+    Image imgScaled = img.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT);
 
     // Copy the scaled image into the new one
-    BufferedImage imageBuf = new BufferedImage(chosenWidth, chosenHeight,
-        BufferedImage.TYPE_INT_RGB);
+    BufferedImage imageBuf = new BufferedImage(chosenWidth,
+                                               chosenHeight,
+                                               BufferedImage.TYPE_INT_RGB);
     Graphics2D newImage = imageBuf.createGraphics();
     newImage.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-        RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                              RenderingHints.VALUE_INTERPOLATION_BICUBIC);
     newImage.setBackground(hexToColor(bgColor)); // Set the background color
     newImage.clearRect(0, 0, chosenWidth, chosenHeight);
-    newImage.drawImage(imgScaled, getImageOffset(chosenWidth, newWidth),
-        getImageOffset(chosenHeight, newHeight), newWidth, newHeight, null);
+    newImage.drawImage(imgScaled,
+                       getImageOffset(chosenWidth, newWidth),
+                       getImageOffset(chosenHeight, newHeight),
+                       newWidth,
+                       newHeight,
+                       null);
 
     return imageBuf;
   }
-  
+
   public BufferedImage createScaledImage(BufferedImage img, double factor) {
     // The original size
     int imgWidth = img.getWidth();
@@ -93,22 +100,20 @@ public class ImageProcessingServiceImpl implements ImageProcessingService {
     int newHeight = (new Double(imgHeight * factor)).intValue();
 
     // Scale the image
-    Image imgScaled = img.getScaledInstance(newWidth, newHeight,
-        Image.SCALE_DEFAULT);
-    BufferedImage scaledImage = new BufferedImage(newWidth, newHeight,
-        BufferedImage.TYPE_INT_RGB);
+    Image imgScaled = img.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT);
+    BufferedImage scaledImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
     Graphics2D aImage = scaledImage.createGraphics();
     aImage.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-        RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                            RenderingHints.VALUE_INTERPOLATION_BICUBIC);
     aImage.drawImage(imgScaled, 0, 0, newWidth, newHeight, null);
 
     return scaledImage;
   }
-  
+
   private double getScaleFactor(int chosenDim, int imgDim) {
     return (double) chosenDim / (double) imgDim;
   }
-  
+
   private int getImageOffset(int newDim, int oldDim) {
     int offset = 0;
     if (newDim >= oldDim) {
@@ -116,7 +121,7 @@ public class ImageProcessingServiceImpl implements ImageProcessingService {
     }
     return offset;
   }
-  
+
   private Color hexToColor(final String rrggbb) {
     Color color = Color.WHITE; // Default value: white
 

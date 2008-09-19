@@ -21,45 +21,45 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.xml.sax.EntityResolver;
+
 import org.apache.commons.logging.Log;
+
 import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.xml.resolving.XMLResolvingService;
-import org.xml.sax.EntityResolver;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class XMLResolvingServiceImpl implements XMLResolvingService {
-  
-  private static final Log LOGGER = ExoLogger.getLogger("XMLResolvingServiceImpl");
+
+  private static final Log    LOGGER     = ExoLogger.getLogger("XMLResolvingServiceImpl");
+
   private Map<String, String> publicIDs_ = new HashMap<String, String>();
+
   private Map<String, String> systemIDs_ = new HashMap<String, String>();
-  
+
   public XMLResolvingServiceImpl() {
   }
-  
+
   public EntityResolver getEntityResolver() {
     return new XMLResolver(publicIDs_, systemIDs_);
   }
-  
+
   private void addEntityPublicID(String publicId, String uri) {
     if (publicIDs_.get(publicId) != null)
-      throw new IllegalArgumentException("Entity whith publicId "
-      		+ publicId + " already exists.");
+      throw new IllegalArgumentException("Entity whith publicId " + publicId + " already exists.");
     publicIDs_.put(publicId, uri);
-    LOGGER.info("New entries to ResolvingService added (public) : "
-        + publicId + " : " + uri);
+    LOGGER.info("New entries to ResolvingService added (public) : " + publicId + " : " + uri);
   }
 
   private void addEntitySystemID(String systemId, String uri) {
     if (systemIDs_.get(systemId) != null)
-      throw new IllegalArgumentException("Entity whith systemId "
-            + systemId + " already exists.");
+      throw new IllegalArgumentException("Entity whith systemId " + systemId + " already exists.");
     systemIDs_.put(systemId, uri);
-    LOGGER.info("New entries to ResolvingService added (system) : "
-        + systemId + " : " + uri);
+    LOGGER.info("New entries to ResolvingService added (system) : " + systemId + " : " + uri);
   }
 
   public void addPlugin(ComponentPlugin plugin) {
@@ -79,4 +79,3 @@ public class XMLResolvingServiceImpl implements XMLResolvingService {
   }
 
 }
-

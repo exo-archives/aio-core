@@ -41,7 +41,7 @@ public class JbossLoginModule extends DefaultLoginModule {
   public boolean commit() throws LoginException {
 
     if (super.commit()) {
-      
+
       Set<Principal> principals = subject.getPrincipals();
 
       Group roleGroup = new JAASGroup(JAASGroup.ROLES);
@@ -53,7 +53,7 @@ public class JbossLoginModule extends DefaultLoginModule {
 
       // username principal
       principals.add(new UserPrincipal(identity.getUserId()));
-      
+
       return true;
     } else {
       return false;

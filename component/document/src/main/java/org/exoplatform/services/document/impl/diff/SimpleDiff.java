@@ -57,7 +57,11 @@
 
 package org.exoplatform.services.document.impl.diff;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.exoplatform.services.document.diff.DiffAlgorithm;
 import org.exoplatform.services.document.diff.Revision;
@@ -69,93 +73,83 @@ import org.exoplatform.services.document.diff.Revision;
  * @date $Date: 2003/10/13 08:00:24 $
  * @version $Revision: 1.7 $
  * @author <a href="mailto:juanco@suigeneris.org">Juanco Anez</a>
+ *         <p>
+ *         <b>Overview of Algorithm</b>
+ *         </p>
+ *         <p>
+ *         <i>by <a href='http://www.topmeadow.net/bwm'> bwm</a>
+ *         </p>
+ *         <p>
+ *         The algorithm is optimised for situations where the input sequences
+ *         have few repeated objects. If it is given input with many repeated
+ *         objects it will report sub-optimal changes. However, given
+ *         appropriate input, it is fast, and linear in memory usage.
+ *         </p>
+ *         <p>
+ *         The algorithm consists of the following steps:
+ *         </p>
+ *         <ul>
+ *         <li>compute an equivalence set for the input data</li>
+ *         <li>translate each element of the orginal and revised input sequences
+ *         to a member of the equivalence set</li>
+ *         <li>match the the input sequences to determine the deltas, i.e. the
+ *         differences between the original and revised sequences.</li>
+ *         </ul>
+ *         <p>
+ *         The first step is to compute a an equivalence set for the input data.
+ *         The equivalence set is computed from objects that are in the original
+ *         input sequence
+ *         </p>
  * 
- * <p>
- * <b>Overview of Algorithm</b>
- * </p>
- * 
- * <p>
- * <i>by <a href='http://www.topmeadow.net/bwm'> bwm</a>
- * </p>
- * 
- * <p>
- * The algorithm is optimised for situations where the input sequences have few
- * repeated objects. If it is given input with many repeated objects it will
- * report sub-optimal changes. However, given appropriate input, it is fast, and
- * linear in memory usage.
- * </p>
- * 
- * <p>
- * The algorithm consists of the following steps:
- * </p>
- * <ul>
- * <li>compute an equivalence set for the input data</li>
- * <li>translate each element of the orginal and revised input sequences to a
- * member of the equivalence set </li>
- * <li>match the the input sequences to determine the deltas, i.e. the
- * differences between the original and revised sequences.</li>
- * </ul>
- * 
- * <p>
- * The first step is to compute a an equivalence set for the input data. The
- * equivalence set is computed from objects that are in the original input
- * sequence
- * </p>
- * 
- * <pre>
+ *         <pre>
  *    eq(x) = the index of the first occurence of x in the original sequence.
  * </pre>
- * 
- * <p>
- * With this equivalence function, the algorithm can compare integers rather
- * than strings, which is considerably more efficient.
- * </p>
- * 
- * <p>
- * The second step is to compute the datastructure on which the algorithm will
- * operate. Having computed the equivalence function in the previous step, we
- * can compute two arrays where indx[i] = eqs(orig[i]) and jndx[i] =
- * eqs(rev[i]). The algorithm can now operate on indx and jndx instead of orig
- * and rev. Thus, comparisons are then on O(int == int) instead of
- * O(Object.equals(Object)).
- * </p>
- * 
- * <p>
- * The algorithm now matches indx and jndx. Whilst indx[i] == jndx[i] it skips
- * matching objects in the sequence. In seeking to match objects in the input
- * sequence it assumes that each object is likely to be unique. It uses the
- * known characteristics of the unique equivalence function. It can tell from
- * the eq value if this object appeared in the other sequence at all. If it did
- * not, there is no point in searching for a match.
- * </p>
- * 
- * <p>
- * Recall that the eq function value is the index earliest occurrence in the
- * orig sequence. This information is used to search efficiently for the next
- * match. The algorithm is perfect when all input objects are unique, but
- * degrades when input objects are not unique. When input objects are not unique
- * an optimal match may not be found, but a correct match will be.
- * </p>
- * 
- * <p>
- * Having identified common matching objects in the orig and revised sequences,
- * the differences between them are easily computed.
- * </p>
- * 
+ *         <p>
+ *         With this equivalence function, the algorithm can compare integers
+ *         rather than strings, which is considerably more efficient.
+ *         </p>
+ *         <p>
+ *         The second step is to compute the datastructure on which the
+ *         algorithm will operate. Having computed the equivalence function in
+ *         the previous step, we can compute two arrays where indx[i] =
+ *         eqs(orig[i]) and jndx[i] = eqs(rev[i]). The algorithm can now operate
+ *         on indx and jndx instead of orig and rev. Thus, comparisons are then
+ *         on O(int == int) instead of O(Object.equals(Object)).
+ *         </p>
+ *         <p>
+ *         The algorithm now matches indx and jndx. Whilst indx[i] == jndx[i] it
+ *         skips matching objects in the sequence. In seeking to match objects
+ *         in the input sequence it assumes that each object is likely to be
+ *         unique. It uses the known characteristics of the unique equivalence
+ *         function. It can tell from the eq value if this object appeared in
+ *         the other sequence at all. If it did not, there is no point in
+ *         searching for a match.
+ *         </p>
+ *         <p>
+ *         Recall that the eq function value is the index earliest occurrence in
+ *         the orig sequence. This information is used to search efficiently for
+ *         the next match. The algorithm is perfect when all input objects are
+ *         unique, but degrades when input objects are not unique. When input
+ *         objects are not unique an optimal match may not be found, but a
+ *         correct match will be.
+ *         </p>
+ *         <p>
+ *         Having identified common matching objects in the orig and revised
+ *         sequences, the differences between them are easily computed.
+ *         </p>
  * @see DeltaImpl
- * @see RevisionImpl Modifications:
- * 
- * 27/Apr/2003 bwm Added some comments whilst trying to figure out the algorithm
- * 
- * 03 May 2003 bwm Created this implementation class by refactoring it out of
- * the Diff class to enable plug in difference algorithms
- * 
+ * @see RevisionImpl Modifications: 27/Apr/2003 bwm Added some comments whilst
+ *      trying to figure out the algorithm 03 May 2003 bwm Created this
+ *      implementation class by refactoring it out of the Diff class to enable
+ *      plug in difference algorithms
  */
 public class SimpleDiff implements DiffAlgorithm {
 
   static final int NOT_FOUND_i = -2;
+
   static final int NOT_FOUND_j = -1;
-  static final int EOS = Integer.MAX_VALUE;
+
+  static final int EOS         = Integer.MAX_VALUE;
 
   public SimpleDiff() {
   }
@@ -170,16 +164,12 @@ public class SimpleDiff implements DiffAlgorithm {
   /**
    * Compute the difference between original and revised sequences.
    * 
-   * @param orig
-   *          The original sequence.
-   * @param rev
-   *          The revised sequence to be compared with the original.
+   * @param orig The original sequence.
+   * @param rev The revised sequence to be compared with the original.
    * @return A Revision object describing the differences.
-   * @throws Exception
-   *           if the diff could not be computed.
+   * @throws Exception if the diff could not be computed.
    */
-  public Revision diff(Object[] orig, Object[] rev)
-      throws Exception {
+  public Revision diff(Object[] orig, Object[] rev) throws Exception {
     // create map eqs, such that for each item in both orig and rev
     // eqs(item) = firstOccurrence(item, orig);
     Map eqs = buildEqSet(orig, rev);
@@ -249,8 +239,8 @@ public class SimpleDiff implements DiffAlgorithm {
         --j;
       }
 
-      deltas.addDelta(DeltaImpl.newDelta(new ChunkImpl(orig, ia, i - ia),
-          new ChunkImpl(rev, ja, j - ja)));
+      deltas.addDelta(DeltaImpl.newDelta(new ChunkImpl(orig, ia, i - ia), new ChunkImpl(rev, ja, j
+          - ja)));
       // skip matching
       for (; indx[i] != EOS && indx[i] == jndx[j]; i++, j++) {
         /* void */
@@ -263,10 +253,8 @@ public class SimpleDiff implements DiffAlgorithm {
    * create a <code>Map</code> from each common item in orig and rev to the
    * index of its first occurrence in orig
    * 
-   * @param orig
-   *          the original sequence of items
-   * @param rev
-   *          the revised sequence of items
+   * @param orig the original sequence of items
+   * @param rev the revised sequence of items
    */
   protected Map buildEqSet(Object[] orig, Object[] rev) {
     // construct a set of the objects that orig and rev have in common
@@ -293,12 +281,9 @@ public class SimpleDiff implements DiffAlgorithm {
   /**
    * build a an array such each a[i] = eqs([i]) or NF if eqs([i]) undefined
    * 
-   * @param eqs
-   *          a mapping from Object to Integer
-   * @param seq
-   *          a sequence of objects
-   * @param NF
-   *          the not found marker
+   * @param eqs a mapping from Object to Integer
+   * @param seq a sequence of objects
+   * @param NF the not found marker
    */
   protected int[] buildIndex(Map eqs, Object[] seq, int NF) {
     int[] result = new int[seq.length + 1];

@@ -34,27 +34,27 @@ import org.exoplatform.services.xml.transform.trax.TRAXTemplates;
 import org.exoplatform.services.xml.transform.trax.TRAXTransformer;
 import org.exoplatform.services.xml.transform.trax.TRAXTransformerService;
 
-
 /**
  * Created by the Exo Development team.
  */
 public class TestPipe extends BaseTest {
 
   private HTMLTransformer htmlTransformer;
-  private TRAXTemplates traxTemplates;
+
+  private TRAXTemplates   traxTemplates;
 
   public void setUp() throws Exception {
-    
+
     // html transformer
-    StandaloneContainer.setConfigurationPath(Thread.currentThread().getContextClassLoader()
-        .getResource("conf/standalone/test-configuration.xml").getPath());
+    StandaloneContainer.setConfigurationPath(Thread.currentThread()
+                                                   .getContextClassLoader()
+                                                   .getResource("conf/standalone/test-configuration.xml")
+                                                   .getPath());
     StandaloneContainer container = StandaloneContainer.getInstance();
 
-    TRAXTransformerService traxService = (TRAXTransformerService) container
-        .getComponentInstanceOfType(TRAXTransformerService.class);
+    TRAXTransformerService traxService = (TRAXTransformerService) container.getComponentInstanceOfType(TRAXTransformerService.class);
     assertNotNull("traxService", traxService);
-    HTMLTransformerService htmlService = (HTMLTransformerService) container
-        .getComponentInstanceOfType(HTMLTransformerService.class);
+    HTMLTransformerService htmlService = (HTMLTransformerService) container.getComponentInstanceOfType(HTMLTransformerService.class);
     assertNotNull("htmlService", htmlService);
 
     htmlTransformer = htmlService.getTransformer();

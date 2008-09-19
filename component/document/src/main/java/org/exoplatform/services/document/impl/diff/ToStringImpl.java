@@ -59,8 +59,8 @@ package org.exoplatform.services.document.impl.diff;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.exoplatform.services.document.diff.ToString;
 
@@ -74,7 +74,8 @@ public class ToStringImpl implements ToString {
   public ToStringImpl() {
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see org.exoplatform.services.diff.ToString#toString()
    */
   public String toString() {
@@ -83,8 +84,10 @@ public class ToStringImpl implements ToString {
     return s.toString();
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.diff.ToString#toString(java.lang.StringBuffer)
+  /*
+   * (non-Javadoc)
+   * @see
+   * org.exoplatform.services.diff.ToString#toString(java.lang.StringBuffer)
    */
   public void toString(StringBuffer s) {
     s.append(super.toString());
@@ -94,8 +97,7 @@ public class ToStringImpl implements ToString {
    * Breaks a string into an array of strings. Use the value of the
    * <code>line.separator</code> system property as the linebreak character.
    * 
-   * @param value
-   *          the string to convert.
+   * @param value the string to convert.
    */
   public String[] stringToArray(String value) {
     BufferedReader reader = new BufferedReader(new StringReader(value));
@@ -114,8 +116,7 @@ public class ToStringImpl implements ToString {
    * Converts an array of {@link Object Object} to a string Use the value of the
    * <code>line.separator</code> system property the line separator.
    * 
-   * @param o
-   *          the array of objects.
+   * @param o the array of objects.
    */
   public String arrayToString(Object[] o) {
     return arrayToString(o, System.getProperty("line.separator"));
@@ -125,10 +126,8 @@ public class ToStringImpl implements ToString {
    * Converts an array of {@link Object Object} to a string using the given line
    * separator.
    * 
-   * @param o
-   *          the array of objects.
-   * @param EOL
-   *          the string to use as line separator.
+   * @param o the array of objects.
+   * @param EOL the string to use as line separator.
    */
   public String arrayToString(Object[] o, String EOL) {
     StringBuffer buf = new StringBuffer();

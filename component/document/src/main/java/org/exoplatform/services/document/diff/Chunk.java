@@ -2,7 +2,7 @@ package org.exoplatform.services.document.diff;
 
 import java.util.List;
 
-public interface Chunk extends ToString{
+public interface Chunk extends ToString {
 
   /**
    * Returns the anchor position of the chunk.
@@ -32,12 +32,12 @@ public interface Chunk extends ToString{
    * Returns the <i>from</i> index of the chunk in RCS terms.
    */
   public int rcsfrom();
-  
+
   /**
    * Returns the <i>to</i> index of the chunk in RCS terms.
    */
-  public int rcsto();  
-  
+  public int rcsto();
+
   /**
    * Returns the text saved for this chunk.
    * 
@@ -49,8 +49,7 @@ public interface Chunk extends ToString{
    * Verifies that this chunk's saved text matches the corresponding text in the
    * given sequence.
    * 
-   * @param target
-   *          the sequence to verify against.
+   * @param target the sequence to verify against.
    * @return true if the texts match.
    */
   public boolean verify(List target);
@@ -58,18 +57,15 @@ public interface Chunk extends ToString{
   /**
    * Delete this chunk from he given text.
    * 
-   * @param target
-   *          the text to delete from.
+   * @param target the text to delete from.
    */
   public void applyDelete(List target);
 
   /**
    * Add the text of this chunk to the target at the given position.
    * 
-   * @param start
-   *          where to add the text.
-   * @param target
-   *          the text to add to.
+   * @param start where to add the text.
+   * @param target the text to add to.
    */
   public void applyAdd(int start, List target);
 
@@ -81,24 +77,18 @@ public interface Chunk extends ToString{
   /**
    * Provide a string image of the chunk using the given prefix and postfix.
    * 
-   * @param s
-   *          where the string image should be appended.
-   * @param prefix
-   *          the text thatshould prefix each line.
-   * @param postfix
-   *          the text that should end each line.
+   * @param s where the string image should be appended.
+   * @param prefix the text thatshould prefix each line.
+   * @param postfix the text that should end each line.
    */
   public StringBuffer toString(StringBuffer s, String prefix, String postfix);
 
   /**
    * Retreives the specified part from a {@link List List}.
    * 
-   * @param seq
-   *          the list to retreive a slice from.
-   * @param pos
-   *          the start position.
-   * @param count
-   *          the number of items in the slice.
+   * @param seq the list to retreive a slice from.
+   * @param pos the start position.
+   * @param count the number of items in the slice.
    * @return a {@link List List} containing the specified items.
    */
   public List slice(List seq, int pos, int count);
@@ -106,12 +96,9 @@ public interface Chunk extends ToString{
   /**
    * Retrieves a slice from an {@link Object Object} array.
    * 
-   * @param seq
-   *          the list to retreive a slice from.
-   * @param pos
-   *          the start position.
-   * @param count
-   *          the number of items in the slice.
+   * @param seq the list to retreive a slice from.
+   * @param pos the start position.
+   * @param count the number of items in the slice.
    * @return a {@link List List} containing the specified items.
    */
   public List slice(Object[] seq, int pos, int count);
@@ -124,19 +111,16 @@ public interface Chunk extends ToString{
   /**
    * Provide a string representation of the numeric range of this chunk.
    * 
-   * @param s
-   *          where the string representation should be appended.
+   * @param s where the string representation should be appended.
    */
   public void rangeString(StringBuffer s);
 
   /**
    * Provide a string representation of the numeric range of this chunk.
    * 
-   * @param s
-   *          where the string representation should be appended.
-   * @param separ
-   *          what to use as line separator.
+   * @param s where the string representation should be appended.
+   * @param separ what to use as line separator.
    */
-  public void rangeString(StringBuffer s, String separ);  
-  
+  public void rangeString(StringBuffer s, String separ);
+
 }

@@ -22,37 +22,45 @@ package org.exoplatform.services.script.groovy;
  * @version $Id: $
  */
 public class Book {
-  
-  private String title = "Groovy in Action";
+
+  private String title  = "Groovy in Action";
+
   private String author = "Andrew Glover";
-  private float price = 20.10F;
-  private String isdn = "1234567890987654321";
-  
+
+  private float  price  = 20.10F;
+
+  private String isdn   = "1234567890987654321";
+
   public String getTitle() {
     return title;
   }
+
   public void setTitle(String title) {
     this.title = title;
   }
+
   public String getAuthor() {
     return author;
   }
+
   public void setAuthor(String author) {
     this.author = author;
   }
+
   public float getPrice() {
     return price;
   }
+
   public void setPrice(float price) {
     this.price = price;
   }
+
   public String getIsdn() {
     return isdn;
   }
+
   public void setIsdn(String isdn) {
     this.isdn = isdn;
   }
-  
 
 }
-

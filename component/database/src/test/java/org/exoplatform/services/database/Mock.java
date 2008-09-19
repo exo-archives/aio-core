@@ -25,58 +25,71 @@ import org.exoplatform.services.database.annotation.Table;
 import org.exoplatform.services.database.annotation.TableField;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Tuan Nguyen
- *          tuan.nguyen@exoplatform.com
- * Mar 16, 2007  
+ * Created by The eXo Platform SAS Author : Tuan Nguyen
+ * tuan.nguyen@exoplatform.com Mar 16, 2007
  */
-@Table(
-    name = "MockTable" ,
-    field = {
-        @TableField(name = "name", type = "string", length = 500, unique = true, nullable = false),
-        @TableField(name = "status", type = "int", defaultValue= "0"),
-        @TableField(name = "start", type = "date"),
-        @TableField(name = "pass", type = "boolean", defaultValue="false")
-    }
-)
+@Table(name = "MockTable", field = {
+    @TableField(name = "name", type = "string", length = 500, unique = true, nullable = false),
+    @TableField(name = "status", type = "int", defaultValue = "0"),
+    @TableField(name = "start", type = "date"),
+    @TableField(name = "pass", type = "boolean", defaultValue = "false") })
 public class Mock extends DBObject {
 
-  private String name ;
-  private int status;
-  private Calendar  start = Calendar.getInstance();
-  private boolean pass = false;
+  private String   name;
 
-  public Mock() { }
+  private int      status;
+
+  private Calendar start = Calendar.getInstance();
+
+  private boolean  pass  = false;
+
+  public Mock() {
+  }
 
   public Mock(String name, int status) {
-    this.name = name ;
+    this.name = name;
     this.status = status;
   }
 
-  public String getName() { return name; }
-  public void setName(String name) { this.name = name; }
+  public String getName() {
+    return name;
+  }
 
-  public boolean isPass() { return pass;}
-  public void setPass(boolean pass) { this.pass = pass; }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-  public Calendar getStart() { return start; }
-  public void setStart(Calendar start) { this.start = start; }
+  public boolean isPass() {
+    return pass;
+  }
 
-  public int getStatus() { return status; }
-  public void setStatus(int status) { this.status = status; }
+  public void setPass(boolean pass) {
+    this.pass = pass;
+  }
 
+  public Calendar getStart() {
+    return start;
+  }
+
+  public void setStart(Calendar start) {
+    this.start = start;
+  }
+
+  public int getStatus() {
+    return status;
+  }
+
+  public void setStatus(int status) {
+    this.status = status;
+  }
 
   static public class MockMapper implements DBObjectMapper<Mock> {
 
     public String[][] toParameters(Mock bean) throws Exception {
       java.sql.Date date = new java.sql.Date(bean.getStart().getTimeInMillis());
-      return new String[][] {
-          {"id", String.valueOf(bean.getDBObjectId())}          ,
-          {"name", bean.getName()}                      ,
-          {"status", String.valueOf(bean.getStatus())}  ,
-          {"start", date.toString()}                    ,
-          {"pass", String.valueOf(bean.isPass())}
-      };
+      return new String[][] { { "id", String.valueOf(bean.getDBObjectId()) },
+          { "name", bean.getName() }, { "status", String.valueOf(bean.getStatus()) },
+          { "start", date.toString() }, { "pass", String.valueOf(bean.isPass()) } };
     }
 
     public void mapResultSet(ResultSet res, Mock bean) throws Exception {
@@ -97,26 +110,22 @@ public class Mock extends DBObject {
   }
 
   /**
-   * Query(
-   *   name = "GetUserByUserName"
-   *   oracle = "select * from user where username= N'?' and fname = $fname" +
-   *            ".............................................................." +
-   *            ".............................................................." ,
-   *   standard="......................................................." ,
-   * )
-   * 
+   * Query( name = "GetUserByUserName" oracle =
+   * "select * from user where username= N'?' and fname = $fname" +
+   * ".............................................................." +
+   * ".............................................................." ,
+   * standard="......................................................." , )
    */
-  public  void getUserByName(String s) {
-    HashMap<String, String>  values = new HashMap<String, String>();
-    values.put("username" , s) ;
-    values.put("fname" , s) ;
-    //Object[]  params = {
-    //  {"username", "value"},
-    //  {"username", "value"},
-    //  {"username", "value"}
-    //}
-    //String query =  createQuery("GetUserByUserName", params) ;
+  public void getUserByName(String s) {
+    HashMap<String, String> values = new HashMap<String, String>();
+    values.put("username", s);
+    values.put("fname", s);
+    // Object[] params = {
+    // {"username", "value"},
+    // {"username", "value"},
+    // {"username", "value"}
+    // }
+    // String query = createQuery("GetUserByUserName", params) ;
   }
-
 
 }

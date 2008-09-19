@@ -24,9 +24,8 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 /**
- * Created by The eXo Platform SAS .<br/>
- * User Session encapsulates user's principals such as name,
- * groups along with JAAS subject (useful in J2EE
+ * Created by The eXo Platform SAS .<br/> User Session encapsulates user's
+ * principals such as name, groups along with JAAS subject (useful in J2EE
  * environment) as well as other optional attributes
  * 
  * @author Gennady Azarenkov
@@ -38,26 +37,25 @@ public class Identity {
   /**
    * User's identifier.
    */
-  private String userId;
-  
+  private String                      userId;
+
   /**
-   * Memberships. 
+   * Memberships.
    */
   private Collection<MembershipEntry> memberships;
-  
+
   /**
-   * javax.security.auth.Subject can be used for logout process.
-   * <code>
+   * javax.security.auth.Subject can be used for logout process. <code>
    * LoginContext ctx = new LoginContext("exo-domain", subject);
    * ctx.logout();
-   * </code> 
+   * </code>
    */
-  private Subject subject;
-  
+  private Subject                     subject;
+
   /**
-   * User's roles. 
+   * User's roles.
    */
-  private Collection<String> roles;
+  private Collection<String>          roles;
 
   /**
    * @param userId the iser's identifier.
@@ -112,8 +110,10 @@ public class Identity {
 
   /**
    * Check is user member of group.
+   * 
    * @param group the group.
-   * @return true if user has any membershipType for given group, false otherwise.
+   * @return true if user has any membershipType for given group, false
+   *         otherwise.
    */
   public boolean isMemberOf(String group) {
     return containsMembership(new MembershipEntry(group));
@@ -146,6 +146,7 @@ public class Identity {
 
   /**
    * Sets the roles for J2EE environment using.
+   * 
    * @param roles the roles.
    */
   public void setRoles(Collection<String> roles) {
@@ -175,6 +176,7 @@ public class Identity {
 
   /**
    * Check is given {@link MembershipEntry} presents in user's memberships.
+   * 
    * @param checkMe the MembershipEntry.
    * @return true if presents false otherwise.
    */

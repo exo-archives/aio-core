@@ -18,16 +18,15 @@
 package org.exoplatform.services.security;
 
 /**
- * Created by The eXo Platform SAS        .
- * 
- * Encapsulates some implementation of (one way) password encrypting mechanism 
+ * Created by The eXo Platform SAS . Encapsulates some implementation of (one
+ * way) password encrypting mechanism
  * 
  * @author Gennady Azarenkov
  * @version $Id: $
  */
 
 public interface PasswordEncrypter {
-  
+
   /**
    * @param plainPassword
    * @return encrypted password
@@ -35,4 +34,3 @@ public interface PasswordEncrypter {
   byte[] encrypt(byte[] plainPassword);
 
 }
-

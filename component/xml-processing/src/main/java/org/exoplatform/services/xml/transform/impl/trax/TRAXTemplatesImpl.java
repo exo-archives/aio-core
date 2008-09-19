@@ -27,17 +27,15 @@ import org.exoplatform.services.xml.transform.trax.TRAXTemplates;
 import org.exoplatform.services.xml.transform.trax.TRAXTransformer;
 
 /**
- * Created by The eXo Platform SAS .
- * 
- * Wrapper for Trax Transformer.
+ * Created by The eXo Platform SAS . Wrapper for Trax Transformer.
  * 
  * @author <a href="mailto:alex.kravchuk@gmail.com">Alexander Kravchuk</a>
  * @version $Id: TRAXTemplatesImpl.java 5799 2006-05-28 17:55:42Z geaz $
- * 
  */
 
 public class TRAXTemplatesImpl implements TRAXTemplates {
-  private Templates templates;
+  private Templates           templates;
+
   private XMLResolvingService resolvingService;
 
   public TRAXTemplatesImpl(Templates templates) {
@@ -48,13 +46,12 @@ public class TRAXTemplatesImpl implements TRAXTemplates {
     return templates.getOutputProperties();
   }
 
-  public TRAXTransformer newTransformer()
-      throws TransformerConfigurationException {
+  public TRAXTransformer newTransformer() throws TransformerConfigurationException {
     TRAXTransformerImpl transf = new TRAXTransformerImpl(this.templates);
     transf.setResolvingService(resolvingService);
     return transf;
   }
-  
+
   public void setResolvingService(XMLResolvingService r) {
     resolvingService = r;
   }

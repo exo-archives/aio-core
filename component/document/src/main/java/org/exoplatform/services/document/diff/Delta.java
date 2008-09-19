@@ -2,55 +2,45 @@ package org.exoplatform.services.document.diff;
 
 import java.util.List;
 
-public interface Delta extends ToString{
+public interface Delta extends ToString {
 
   /**
    * Verifies that this delta can be used to patch the given text.
    * 
-   * @param target
-   *          the text to patch.
-   * @throws PatchFailedException
-   *           if the patch cannot be applied.
+   * @param target the text to patch.
+   * @throws PatchFailedException if the patch cannot be applied.
    */
   public void verify(List target) throws Exception;
 
   /**
    * Applies this delta as a patch to the given text.
    * 
-   * @param target
-   *          the text to patch.
-   * @throws PatchFailedException
-   *           if the patch cannot be applied.
+   * @param target the text to patch.
+   * @throws PatchFailedException if the patch cannot be applied.
    */
-  public void patch(List target) throws Exception ;
+  public void patch(List target) throws Exception;
 
   /**
    * Applies this delta as a patch to the given text.
    * 
-   * @param target
-   *          the text to patch.
-   * @throws PatchFailedException
-   *           if the patch cannot be applied.
+   * @param target the text to patch.
+   * @throws PatchFailedException if the patch cannot be applied.
    */
   public void applyTo(List target);
-
 
   /**
    * Converts this delta into its RCS style string representation.
    * 
-   * @param s
-   *          a {@link StringBuffer StringBuffer} to which the string
+   * @param s a {@link StringBuffer StringBuffer} to which the string
    *          representation will be appended.
-   * @param EOL
-   *          the string to use as line separator.
+   * @param EOL the string to use as line separator.
    */
   public void toRCSString(StringBuffer s, String EOL);
 
   /**
    * Converts this delta into its RCS style string representation.
    * 
-   * @param EOL
-   *          the string to use as line separator.
+   * @param EOL the string to use as line separator.
    */
   public String toRCSString(String EOL);
 
@@ -69,15 +59,13 @@ public interface Delta extends ToString{
    * @return the updated sequence
    */
   public Chunk getRevised();
-  
-  
+
   /**
    * Accepts a visitor.
    * <p>
    * See the Visitor pattern in "Design Patterns" by the GOF4.
    * 
-   * @param visitor
-   *          The visitor.
+   * @param visitor The visitor.
    */
   public abstract void accept(RevisionVisitor visitor);
 

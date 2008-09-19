@@ -57,6 +57,8 @@
 
 package org.exoplatform.services.document.diff.test;
 
+import junit.framework.TestCase;
+
 import org.exoplatform.services.document.diff.AddDelta;
 import org.exoplatform.services.document.diff.ChangeDelta;
 import org.exoplatform.services.document.diff.DeleteDelta;
@@ -68,24 +70,24 @@ import org.exoplatform.services.document.diff.RevisionVisitor;
 import org.exoplatform.services.document.impl.diff.DeltaImpl;
 import org.exoplatform.services.document.impl.diff.DiffServiceImpl;
 
-import junit.framework.*;
+public abstract class DiffTest extends TestCase {
+  static final int LARGE    = 2 * 1024;
 
-public abstract class DiffTest  extends TestCase{
-  static final int LARGE = 2 * 1024;
+  Object[]         empty    = new Object[] {};
 
-  Object[] empty = new Object[] {};
-  Object[] original = new String[] { "[1] one", "[2] two", "[3] three",
-      "[4] four", "[5] five", "[6] six", "[7] seven", "[8] eight", "[9] nine" };
+  Object[]         original = new String[] { "[1] one", "[2] two", "[3] three", "[4] four",
+      "[5] five", "[6] six", "[7] seven", "[8] eight", "[9] nine" };
+
   // lines 3 and 9 deleted
-  Object[] rev1 = new String[] { "[1] one", "[2] two", "[4] four", "[5] five",
+  Object[]         rev1     = new String[] { "[1] one", "[2] two", "[4] four", "[5] five",
       "[6] six", "[7] seven", "[8] eight", };
 
   // lines 7 and 8 changed, 9 deleted
-  Object[] rev2 = new String[] { "[1] one", "[2] two", "[3] three", "[4] four",
+  Object[]         rev2     = new String[] { "[1] one", "[2] two", "[3] three", "[4] four",
       "[5] five", "[6] six", "[7] seven revised", "[8] eight revised", };
 
-  protected abstract DiffAlgorithm getAlgo();  
-  
+  protected abstract DiffAlgorithm getAlgo();
+
   public void testCompare() {
     DiffService diffService = new DiffServiceImpl(getAlgo());
     assertTrue(!diffService.compare(original, empty));
@@ -106,7 +108,7 @@ public abstract class DiffTest  extends TestCase{
   public void testOriginalEmpty() throws Exception {
     String[] emptyOrig = {};
     String[] rev = { "1", "2", "3" };
-    DiffService diffService = new DiffServiceImpl(getAlgo());    
+    DiffService diffService = new DiffServiceImpl(getAlgo());
     Revision revision = diffService.diff(emptyOrig, rev);
 
     assertEquals("revision size should be one", 1, revision.size());
@@ -116,7 +118,7 @@ public abstract class DiffTest  extends TestCase{
   public void testRevisedEmpty() throws Exception {
     String[] orig = { "1", "2", "3" };
     String[] emptyRev = {};
-    DiffService diffService = new DiffServiceImpl(getAlgo());    
+    DiffService diffService = new DiffServiceImpl(getAlgo());
     Revision revision = diffService.diff(orig, emptyRev);
 
     assertEquals("revision size should be one", 1, revision.size());
@@ -139,7 +141,7 @@ public abstract class DiffTest  extends TestCase{
     assertTrue(revision.getDelta(1) instanceof DeleteDelta);
     assertTrue(diffService.compare(revision.patch(original), rev1));
     assertEquals("3d2" + DiffService.NL + "< [3] three" + DiffService.NL + "9d7" + DiffService.NL
-        + "< [9] nine" + DiffService.NL, revision.toString());    
+        + "< [9] nine" + DiffService.NL, revision.toString());
   }
 
   public void testChangeAtTheEnd() throws Exception {
@@ -162,13 +164,13 @@ public abstract class DiffTest  extends TestCase{
     }
   }
 
-  public void testPreviouslyFailedShuffle() throws Exception{
-    Object[] orig = new String[] { "[1] one", "[2] two", "[3] three",
-        "[4] four", "[5] five", "[6] six" };
+  public void testPreviouslyFailedShuffle() throws Exception {
+    Object[] orig = new String[] { "[1] one", "[2] two", "[3] three", "[4] four", "[5] five",
+        "[6] six" };
 
-    Object[] rev = new String[] { "[3] three", "[1] one", "[5] five",
-        "[2] two", "[6] six", "[4] four" };
-    
+    Object[] rev = new String[] { "[3] three", "[1] one", "[5] five", "[2] two", "[6] six",
+        "[4] four" };
+
     DiffService diffService = new DiffServiceImpl(getAlgo());
     Revision revision = diffService.diff(orig, rev);
     Object[] patched = revision.patch(orig);
@@ -176,26 +178,26 @@ public abstract class DiffTest  extends TestCase{
   }
 
   public void testEdit5() throws Exception {
-    Object[] orig = new String[] { "[1] one", "[2] two", "[3] three",
-        "[4] four", "[5] five", "[6] six" };
+    Object[] orig = new String[] { "[1] one", "[2] two", "[3] three", "[4] four", "[5] five",
+        "[6] six" };
 
-    Object[] rev = new String[] { "one revised", "two revised", "[2] two",
-        "[3] three", "five revised", "six revised", "[5] five" };
-    
+    Object[] rev = new String[] { "one revised", "two revised", "[2] two", "[3] three",
+        "five revised", "six revised", "[5] five" };
+
     DiffService diffService = new DiffServiceImpl(getAlgo());
-    Revision revision = diffService.diff(orig, rev);    
+    Revision revision = diffService.diff(orig, rev);
     Object[] patched = revision.patch(orig);
     assertTrue(diffService.compare(patched, rev));
   }
 
   public void testShuffle() throws Exception {
-    Object[] orig = new String[] { "[1] one", "[2] two", "[3] three",
-        "[4] four", "[5] five", "[6] six" };
-    
+    Object[] orig = new String[] { "[1] one", "[2] two", "[3] three", "[4] four", "[5] five",
+        "[6] six" };
+
     DiffService diffService = new DiffServiceImpl(getAlgo());
-    
+
     for (int seed = 0; seed < 10; seed++) {
-      Object[] shuffle = ((DiffServiceImpl)diffService).shuffle(orig);
+      Object[] shuffle = ((DiffServiceImpl) diffService).shuffle(orig);
       Revision revision = diffService.diff(orig, shuffle);
       Object[] patched = revision.patch(orig);
       if (!diffService.compare(patched, shuffle)) {
@@ -206,10 +208,10 @@ public abstract class DiffTest  extends TestCase{
 
   public void testRandomEdit() throws Exception {
     Object[] orig = original;
-    
-    DiffService diffService = new DiffServiceImpl(getAlgo());    
+
+    DiffService diffService = new DiffServiceImpl(getAlgo());
     for (int seed = 0; seed < 10; seed++) {
-      Object[] random =((DiffServiceImpl) diffService).randomEdit(orig, seed);
+      Object[] random = ((DiffServiceImpl) diffService).randomEdit(orig, seed);
       Revision revision = diffService.diff(orig, random);
       Object[] patched = revision.patch(orig);
       if (!diffService.compare(patched, random)) {
@@ -220,10 +222,10 @@ public abstract class DiffTest  extends TestCase{
   }
 
   public void testVisitor() {
-    Object[] orig = new String[] { "[1] one", "[2] two", "[3] three",
-        "[4] four", "[5] five", "[6] six" };
-    Object[] rev = new String[] { "[1] one", "[2] two revised", "[3] three",
-        "[4] four revised", "[5] five", "[6] six" };
+    Object[] orig = new String[] { "[1] one", "[2] two", "[3] three", "[4] four", "[5] five",
+        "[6] six" };
+    Object[] rev = new String[] { "[1] one", "[2] two revised", "[3] three", "[4] four revised",
+        "[5] five", "[6] six" };
 
     class Visitor implements RevisionVisitor {
 
@@ -256,21 +258,21 @@ public abstract class DiffTest  extends TestCase{
     }
 
     Visitor visitor = new Visitor();
-    DiffService diffService = new DiffServiceImpl(getAlgo());    
+    DiffService diffService = new DiffServiceImpl(getAlgo());
     try {
       diffService.diff(orig, rev).accept(visitor);
-      assertEquals(visitor.toString(), "visited Revision\n"
-          + "[2] two revised\n" + "[4] four revised\n");      
+      assertEquals(visitor.toString(), "visited Revision\n" + "[2] two revised\n"
+          + "[4] four revised\n");
     } catch (Exception e) {
       fail(e.toString());
     }
   }
 
   public void testLargeShuffles() throws Exception {
-    DiffService diffService = new DiffServiceImpl(getAlgo());    
-    Object[] orig = ((DiffServiceImpl)diffService).randomSequence(LARGE);
+    DiffService diffService = new DiffServiceImpl(getAlgo());
+    Object[] orig = ((DiffServiceImpl) diffService).randomSequence(LARGE);
     for (int seed = 0; seed < 3; seed++) {
-      Object[] rev = ((DiffServiceImpl)diffService).shuffle(orig);
+      Object[] rev = ((DiffServiceImpl) diffService).shuffle(orig);
       Revision revision = diffService.diff(orig, rev);
       Object[] patched = revision.patch(orig);
       if (!diffService.compare(patched, rev)) {
@@ -281,10 +283,10 @@ public abstract class DiffTest  extends TestCase{
   }
 
   public void testLargeShuffleEdits() throws Exception {
-    DiffService diffService = new DiffServiceImpl(getAlgo());  
-    Object[] orig = ((DiffServiceImpl)diffService).randomSequence(LARGE);
+    DiffService diffService = new DiffServiceImpl(getAlgo());
+    Object[] orig = ((DiffServiceImpl) diffService).randomSequence(LARGE);
     for (int seed = 0; seed < 3; seed++) {
-      Object[] rev = ((DiffServiceImpl)diffService).randomEdit(orig, seed);
+      Object[] rev = ((DiffServiceImpl) diffService).randomEdit(orig, seed);
       Revision revision = diffService.diff(orig, rev);
       Object[] patched = revision.patch(orig);
       if (!diffService.compare(patched, rev)) {
@@ -295,8 +297,8 @@ public abstract class DiffTest  extends TestCase{
 
   public void testLargeAllEdited() throws Exception {
     DiffService diffService = new DiffServiceImpl(getAlgo());
-    Object[] orig = ((DiffServiceImpl)diffService).randomSequence(LARGE);
-    Object[] rev = ((DiffServiceImpl)diffService).editAll(orig);
+    Object[] orig = ((DiffServiceImpl) diffService).randomSequence(LARGE);
+    Object[] rev = ((DiffServiceImpl) diffService).editAll(orig);
     Revision revision = diffService.diff(orig, rev);
     Object[] patched = revision.patch(orig);
     if (!diffService.compare(patched, rev)) {

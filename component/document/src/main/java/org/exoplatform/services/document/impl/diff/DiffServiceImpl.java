@@ -67,13 +67,10 @@ import org.exoplatform.services.document.diff.DiffAlgorithm;
 import org.exoplatform.services.document.diff.DiffService;
 import org.exoplatform.services.document.diff.Revision;
 
-
-
 public class DiffServiceImpl extends ToStringImpl implements DiffService {
-  
+
   /** The differencing algorithm to use. */
   protected DiffAlgorithm algorithm;
-
 
   public DiffServiceImpl(DiffAlgorithm algorithm) {
     this.algorithm = algorithm;
@@ -82,10 +79,8 @@ public class DiffServiceImpl extends ToStringImpl implements DiffService {
   /**
    * compute the difference between an original and a revision.
    * 
-   * @param orig
-   *          the original
-   * @param rev
-   *          the revision to compare with the original.
+   * @param orig the original
+   * @param rev the revision to compare with the original.
    * @return a Revision describing the differences
    */
   public Revision diff(Object[] orig, Object[] rev) throws Exception {
@@ -98,10 +93,8 @@ public class DiffServiceImpl extends ToStringImpl implements DiffService {
   /**
    * Compares the two input sequences.
    * 
-   * @param orig
-   *          The original sequence.
-   * @param rev
-   *          The revised sequence.
+   * @param orig The original sequence.
+   * @param rev The revised sequence.
    * @return true if the sequences are identical. False otherwise.
    */
   public boolean compare(Object[] orig, Object[] rev) {
@@ -121,8 +114,7 @@ public class DiffServiceImpl extends ToStringImpl implements DiffService {
    * Converts an array of {@link Object Object} to a string using
    * {@link DiffServiceImpl#NL Diff.NL} as the line separator.
    * 
-   * @param o
-   *          the array of objects.
+   * @param o the array of objects.
    */
   public String arrayToString(Object[] o) {
     return arrayToString(o, NL);
@@ -131,8 +123,7 @@ public class DiffServiceImpl extends ToStringImpl implements DiffService {
   /**
    * Edits all of the items in the input sequence.
    * 
-   * @param text
-   *          The input sequence.
+   * @param text The input sequence.
    * @return A sequence of the same length with all the lines differing from the
    *         corresponding ones in the input.
    */
@@ -148,8 +139,7 @@ public class DiffServiceImpl extends ToStringImpl implements DiffService {
   /**
    * Performs random edits on the input sequence. Useful for testing.
    * 
-   * @param text
-   *          The input sequence.
+   * @param text The input sequence.
    * @return The sequence with random edits performed.
    */
   public Object[] randomEdit(Object[] text) {
@@ -159,10 +149,8 @@ public class DiffServiceImpl extends ToStringImpl implements DiffService {
   /**
    * Performs random edits on the input sequence. Useful for testing.
    * 
-   * @param text
-   *          The input sequence.
-   * @param seed
-   *          A seed value for the randomizer.
+   * @param text The input sequence.
+   * @param seed A seed value for the randomizer.
    * @return The sequence with random edits performed.
    */
   public Object[] randomEdit(Object[] text, long seed) {
@@ -187,8 +175,7 @@ public class DiffServiceImpl extends ToStringImpl implements DiffService {
   /**
    * Shuffles around the items in the input sequence.
    * 
-   * @param text
-   *          The input sequence.
+   * @param text The input sequence.
    * @return The shuffled sequence.
    */
   public Object[] shuffle(Object[] text) {
@@ -198,10 +185,8 @@ public class DiffServiceImpl extends ToStringImpl implements DiffService {
   /**
    * Shuffles around the items in the input sequence.
    * 
-   * @param text
-   *          The input sequence.
-   * @param seed
-   *          A seed value for randomizing the suffle.
+   * @param text The input sequence.
+   * @param seed A seed value for randomizing the suffle.
    * @return The shuffled sequence.
    */
   public Object[] shuffle(Object[] text, long seed) {
@@ -213,8 +198,7 @@ public class DiffServiceImpl extends ToStringImpl implements DiffService {
   /**
    * Generate a random sequence of the given size.
    * 
-   * @param The
-   *          size of the sequence to generate.
+   * @param The size of the sequence to generate.
    * @return The generated sequence.
    */
   public Object[] randomSequence(int size) {
@@ -224,10 +208,8 @@ public class DiffServiceImpl extends ToStringImpl implements DiffService {
   /**
    * Generate a random sequence of the given size.
    * 
-   * @param The
-   *          size of the sequence to generate.
-   * @param seed
-   *          A seed value for randomizing the generation.
+   * @param The size of the sequence to generate.
+   * @param seed A seed value for randomizing the generation.
    * @return The generated sequence.
    */
   public Object[] randomSequence(int size, long seed) {

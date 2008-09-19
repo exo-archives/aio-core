@@ -39,7 +39,7 @@ public class DummyOrganizationService extends BaseOrganizationService {
     this.membershipDAO_ = new MembershipHandlerImpl();
     this.userProfileDAO_ = new DummyUserProfileHandler();
   }
-  
+
   static public class MembershipHandlerImpl implements MembershipHandler {
 
     public void addMembershipEventListener(MembershipEventListener listener) {
@@ -56,8 +56,7 @@ public class DummyOrganizationService extends BaseOrganizationService {
       return null;
     }
 
-    public Membership findMembershipByUserGroupAndType(String userName, String groupId, String type)
-        throws Exception {
+    public Membership findMembershipByUserGroupAndType(String userName, String groupId, String type) throws Exception {
       return null;
     }
 
@@ -71,26 +70,24 @@ public class DummyOrganizationService extends BaseOrganizationService {
         MembershipImpl admin = new MembershipImpl();
         admin.setMembershipType("*");
         admin.setUserName(userName);
-        admin.setGroupId("/admin");    
+        admin.setGroupId("/admin");
         memberships.add(admin);
-      } 
-      
+      }
+
       MembershipImpl membership = new MembershipImpl();
       membership.setMembershipType("*");
       membership.setUserName(userName);
       membership.setGroupId("/exo");
       memberships.add(membership);
-      
+
       return memberships;
     }
 
-    public Collection findMembershipsByUserAndGroup(String userName, String groupId)
-        throws Exception {
+    public Collection findMembershipsByUserAndGroup(String userName, String groupId) throws Exception {
       return null;
     }
 
-    public void linkMembership(User user, Group group, MembershipType m, boolean broadcast)
-        throws Exception {
+    public void linkMembership(User user, Group group, MembershipType m, boolean broadcast) throws Exception {
     }
 
     public Membership removeMembership(String id, boolean broadcast) throws Exception {
@@ -106,12 +103,12 @@ public class DummyOrganizationService extends BaseOrganizationService {
 
     private static final int DEFAULT_LIST_SIZE = 6;
 
-    private List<User> users;
+    private List<User>       users;
 
     public UserHandlerImpl() {
-      
+
       users = new ArrayList<User>();
-      
+
       User usr = new UserImpl("exo");
       usr.setPassword("exo");
       users.add(usr);
@@ -134,7 +131,7 @@ public class DummyOrganizationService extends BaseOrganizationService {
 
       usr = new UserImpl("__anonim");
       users.add(usr);
-      
+
       // webos users
       usr = new UserImpl("root");
       usr.setPassword("exo");
@@ -143,23 +140,23 @@ public class DummyOrganizationService extends BaseOrganizationService {
       usr = new UserImpl("john");
       usr.setPassword("exo");
       users.add(usr);
-      
+
       usr = new UserImpl("james");
       usr.setPassword("exo");
       users.add(usr);
-      
+
       usr = new UserImpl("mary");
       usr.setPassword("exo");
       users.add(usr);
-      
+
       usr = new UserImpl("marry");
       usr.setPassword("exo");
       users.add(usr);
-      
+
       usr = new UserImpl("demo");
       usr.setPassword("exo");
       users.add(usr);
-      
+
     }
 
     public User createUserInstance() {
@@ -231,15 +228,14 @@ public class DummyOrganizationService extends BaseOrganizationService {
     public void addUserEventListener(UserEventListener listener) {
     }
 
-    public boolean authenticate(String username, String password)
-        throws Exception {
+    public boolean authenticate(String username, String password) throws Exception {
       Iterator<User> it = users.iterator();
 
       User usr = null;
       User temp = null;
       while (it.hasNext()) {
         temp = it.next();
-        if (temp.getUserName().equals(username)){
+        if (temp.getUserName().equals(username)) {
           usr = temp;
           break;
         }
@@ -247,8 +243,8 @@ public class DummyOrganizationService extends BaseOrganizationService {
 
       if (usr != null) {
         if (usr.getUserName().equals("__anonim"))
-          return true; 
-        
+          return true;
+
         if (usr.getPassword().equals(password))
           return true;
       }
@@ -265,8 +261,7 @@ public class DummyOrganizationService extends BaseOrganizationService {
     public void createGroup(Group group, boolean broadcast) throws Exception {
     }
 
-    public void addChild(Group parent, Group child, boolean broadcast)
-        throws Exception {
+    public void addChild(Group parent, Group child, boolean broadcast) throws Exception {
     }
 
     public void saveGroup(Group group, boolean broadcast) throws Exception {
@@ -276,8 +271,7 @@ public class DummyOrganizationService extends BaseOrganizationService {
       return null;
     }
 
-    public Collection findGroupByMembership(String userName,
-        String membershipType) throws Exception {
+    public Collection findGroupByMembership(String userName, String membershipType) throws Exception {
       return null;
     }
 
@@ -302,7 +296,8 @@ public class DummyOrganizationService extends BaseOrganizationService {
 
     public Collection findGroupsOfUser(String user) throws Exception {
       List<Group> groups = new ArrayList<Group>(1);
-      if (user.startsWith("exo") || user.equals("demo") || user.equals("mary") || user.equals("marry") ||  user.equals("james"))
+      if (user.startsWith("exo") || user.equals("demo") || user.equals("mary")
+          || user.equals("marry") || user.equals("james"))
         groups.add(new DummyGroup("/exo", "exo"));
       else if (user.equals("admin") || user.equals("root") || user.equals("john"))
         groups.add(new DummyGroup("/admin", "admin"));

@@ -35,8 +35,10 @@ import org.exoplatform.services.security.impl.DefaultRolesExtractorImpl;
 public class TestSessionRegistry extends TestCase {
 
   protected ConversationRegistry registry;
-  protected Authenticator authenticator;
-  protected ListenerService listenerService;
+
+  protected Authenticator        authenticator;
+
+  protected ListenerService      listenerService;
 
   public TestSessionRegistry(String name) {
     super(name);
@@ -45,7 +47,8 @@ public class TestSessionRegistry extends TestCase {
   protected void setUp() throws Exception {
 
     if (registry == null) {
-      String containerConf = TestLoginModule.class.getResource("/conf/standalone/test-configuration.xml").toString();
+      String containerConf = TestLoginModule.class.getResource("/conf/standalone/test-configuration.xml")
+                                                  .toString();
       String loginConf = TestLoginModule.class.getResource("/login.conf").toString();
       StandaloneContainer.addConfigurationURL(containerConf);
       if (System.getProperty("java.security.auth.login.config") == null)
@@ -66,7 +69,7 @@ public class TestSessionRegistry extends TestCase {
   }
 
   public void testRegistry() throws Exception {
-    Credential[] cred = new Credential[]{ new UsernameCredential("exo") };
+    Credential[] cred = new Credential[] { new UsernameCredential("exo") };
 
     String userId = authenticator.validateUser(cred);
     assertEquals("exo", userId);

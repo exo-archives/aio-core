@@ -18,7 +18,8 @@
 package org.exoplatform.services.security;
 
 /**
- * Created by The eXo Platform SAS        .
+ * Created by The eXo Platform SAS .
+ * 
  * @author Gennady Azarenkov
  * @version $Id:$
  */
@@ -27,12 +28,12 @@ public class UsernameCredential implements Credential {
 
   private static final long serialVersionUID = -7447343070156524211L;
 
-  private String username;
-  
+  private String            username;
+
   public UsernameCredential(String username) {
     this.username = username;
   }
-  
+
   /**
    * @return username
    */
@@ -40,4 +41,3 @@ public class UsernameCredential implements Credential {
     return this.username;
   }
 }
-

@@ -27,76 +27,106 @@ import javax.servlet.http.HttpServletResponse;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.ResourceBundleService;
+
 /**
- * @author Benjamin Mestrallet
- * benjamin.mestrallet@exoplatform.com
+ * @author Benjamin Mestrallet benjamin.mestrallet@exoplatform.com
  */
 public class LocaleConfigImpl implements LocaleConfig {
-  
-  static private Map<String, Locale> predefinedLocaleMap_ = null ;
-  
+
+  static private Map<String, Locale> predefinedLocaleMap_ = null;
+
   static {
-    predefinedLocaleMap_ = new HashMap<String, Locale>(10) ;
-    predefinedLocaleMap_.put("us" , Locale.US) ;
-    predefinedLocaleMap_.put("en" , Locale.ENGLISH) ;
-    predefinedLocaleMap_.put("fr" , Locale.FRANCE) ;
-    predefinedLocaleMap_.put("zh" , Locale.SIMPLIFIED_CHINESE) ;
+    predefinedLocaleMap_ = new HashMap<String, Locale>(10);
+    predefinedLocaleMap_.put("us", Locale.US);
+    predefinedLocaleMap_.put("en", Locale.ENGLISH);
+    predefinedLocaleMap_.put("fr", Locale.FRANCE);
+    predefinedLocaleMap_.put("zh", Locale.SIMPLIFIED_CHINESE);
   }
-    
-  private Locale locale_;
-  private String outputEncoding_;
-  private String inputEncoding_;
-  private String description_ ;
-  private String localeName_ ;
-  
+
+  private Locale                     locale_;
+
+  private String                     outputEncoding_;
+
+  private String                     inputEncoding_;
+
+  private String                     description_;
+
+  private String                     localeName_;
+
   public LocaleConfigImpl() {
   }
-   
-  public final String getDescription() { return description_; }
-  public final void   setDescription(String desc) { description_ = desc; }
-  
-  public final String getOutputEncoding() { return outputEncoding_; }
-  public final void   setOutputEncoding(String enc) { outputEncoding_ = enc; }
-  
-  public final String getInputEncoding() { return inputEncoding_ ; }
-  public final void setInputEncoding(String enc) {  inputEncoding_ = enc;}
-  
-  public final Locale getLocale() { return locale_ ; }
-  public final void setLocale(Locale locale) { locale_ = locale; }
+
+  public final String getDescription() {
+    return description_;
+  }
+
+  public final void setDescription(String desc) {
+    description_ = desc;
+  }
+
+  public final String getOutputEncoding() {
+    return outputEncoding_;
+  }
+
+  public final void setOutputEncoding(String enc) {
+    outputEncoding_ = enc;
+  }
+
+  public final String getInputEncoding() {
+    return inputEncoding_;
+  }
+
+  public final void setInputEncoding(String enc) {
+    inputEncoding_ = enc;
+  }
+
+  public final Locale getLocale() {
+    return locale_;
+  }
+
+  public final void setLocale(Locale locale) {
+    locale_ = locale;
+  }
+
   public final void setLocale(String localeName) {
-    localeName_ = localeName ;
-    locale_ =  predefinedLocaleMap_.get(localeName) ;
-    if(locale_ == null) locale_ = new Locale(localeName) ;
+    localeName_ = localeName;
+    locale_ = predefinedLocaleMap_.get(localeName);
+    if (locale_ == null)
+      locale_ = new Locale(localeName);
   }
-  
-  public final String getLanguage() { return locale_.getLanguage() ; }
- 
-  public final String getLocaleName() { return localeName_ ; }
-  
+
+  public final String getLanguage() {
+    return locale_.getLanguage();
+  }
+
+  public final String getLocaleName() {
+    return localeName_;
+  }
+
   public ResourceBundle getResourceBundle(String name) {
-    ResourceBundleService service = 
-      (ResourceBundleService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(ResourceBundleService.class) ;
-    ResourceBundle res = service.getResourceBundle(name, locale_) ;
-    return res ;
+    ResourceBundleService service = (ResourceBundleService) ExoContainerContext.getCurrentContainer()
+                                                                               .getComponentInstanceOfType(ResourceBundleService.class);
+    ResourceBundle res = service.getResourceBundle(name, locale_);
+    return res;
   }
-  
+
   public ResourceBundle getMergeResourceBundle(String[] names) {
-    ResourceBundleService service = 
-      (ResourceBundleService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(ResourceBundleService.class) ;
-    ResourceBundle res = service.getResourceBundle(names, locale_) ;
-    return res ;
+    ResourceBundleService service = (ResourceBundleService) ExoContainerContext.getCurrentContainer()
+                                                                               .getComponentInstanceOfType(ResourceBundleService.class);
+    ResourceBundle res = service.getResourceBundle(names, locale_);
+    return res;
   }
-  
+
   public ResourceBundle getNavigationResourceBundle(String ownerType, String ownerId) {
-    return getResourceBundle("locale.navigation." + ownerType + "." + ownerId.replaceAll("/",".")) ;
+    return getResourceBundle("locale.navigation." + ownerType + "." + ownerId.replaceAll("/", "."));
   }
-  
+
   public void setInput(HttpServletRequest req) throws java.io.UnsupportedEncodingException {
-    req.setCharacterEncoding(inputEncoding_) ;
+    req.setCharacterEncoding(inputEncoding_);
   }
-  
+
   public void setOutput(HttpServletResponse res) {
-    res.setContentType("text/html; charset=" +  outputEncoding_) ;
-    res.setLocale(locale_) ;
-  }  
+    res.setContentType("text/html; charset=" + outputEncoding_);
+    res.setLocale(locale_);
+  }
 }

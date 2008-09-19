@@ -25,9 +25,9 @@ package org.exoplatform.services.xml.transform.trax;
  */
 
 public class Constants {
-  public static final String XSLT_DIR = "xslt";
-  public static final String DOCBOOK_TO_HTML_STYLE = XSLT_DIR
-      + "/docbook/html/docbook.xsl";
-  public static final String DOCBOOK_TO_FO_STYLE = XSLT_DIR
-      + "/docbook/fo/docbook.xsl";
+  public static final String XSLT_DIR              = "xslt";
+
+  public static final String DOCBOOK_TO_HTML_STYLE = XSLT_DIR + "/docbook/html/docbook.xsl";
+
+  public static final String DOCBOOK_TO_FO_STYLE   = XSLT_DIR + "/docbook/fo/docbook.xsl";
 }

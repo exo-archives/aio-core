@@ -29,40 +29,47 @@ import org.xml.sax.SAXException;
  * @version $Id: $
  */
 public class XMLResolver implements EntityResolver {
-  
+
   private Map<String, String> publicIDs_;
+
   private Map<String, String> systemIDs_;
-  
+
   /**
    * Is publicID prefer.
    */
-  private boolean publicIDPrefer_ = false;
-  
-  public XMLResolver(Map<String, String> publicIDs,
-      Map<String, String> systemIDs) {
+  private boolean             publicIDPrefer_ = false;
+
+  public XMLResolver(Map<String, String> publicIDs, Map<String, String> systemIDs) {
     publicIDs_ = publicIDs;
     systemIDs_ = systemIDs;
   }
 
-  /* (non-Javadoc)
-   * @see org.xml.sax.EntityResolver#resolveEntity(java.lang.String, java.lang.String)
+  /*
+   * (non-Javadoc)
+   * @see org.xml.sax.EntityResolver#resolveEntity(java.lang.String,
+   * java.lang.String)
    */
-  public InputSource resolveEntity(String publicId, String systemId)
-      throws SAXException, IOException {
+  public InputSource resolveEntity(String publicId, String systemId) throws SAXException,
+                                                                    IOException {
     String entity = null;
-    // if publicId is prefer first check publicIDs table 
-    if (publicIDPrefer_ && publicId !=null && publicId.length() != 0)
+    // if publicId is prefer first check publicIDs table
+    if (publicIDPrefer_ && publicId != null && publicId.length() != 0)
       entity = publicIDs_.get(publicId);
-    // if publicId is not prefer  
-    if (entity == null && systemId !=null && systemId.length() != 0)
+    // if publicId is not prefer
+    if (entity == null && systemId != null && systemId.length() != 0)
       entity = systemIDs_.get(systemId);
-    // if entity still null try get it from publicIDs table  
-    if (entity == null && publicId !=null && publicId.length() != 0) 
+    // if entity still null try get it from publicIDs table
+    if (entity == null && publicId != null && publicId.length() != 0)
       entity = publicIDs_.get(publicId);
     if (entity != null) {
       if (Thread.currentThread().getContextClassLoader().getResource(entity) != null) {
-        InputSource src = new InputSource(Thread.currentThread().getContextClassLoader().getResourceAsStream(entity));
-        src.setSystemId(Thread.currentThread().getContextClassLoader().getResource(entity).getPath());
+        InputSource src = new InputSource(Thread.currentThread()
+                                                .getContextClassLoader()
+                                                .getResourceAsStream(entity));
+        src.setSystemId(Thread.currentThread()
+                              .getContextClassLoader()
+                              .getResource(entity)
+                              .getPath());
         return src;
       }
     }
@@ -72,10 +79,9 @@ public class XMLResolver implements EntityResolver {
   public boolean isPublicIDPrefer() {
     return publicIDPrefer_;
   }
-  
+
   public void setPublicIDPrefer(boolean publicPrefer) {
     publicIDPrefer_ = publicPrefer;
   }
 
 }
-

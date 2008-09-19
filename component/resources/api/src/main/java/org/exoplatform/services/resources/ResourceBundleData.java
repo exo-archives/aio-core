@@ -17,26 +17,30 @@
 package org.exoplatform.services.resources;
 
 import java.io.Serializable;
+
 /**
- * Created by The eXo Platform SAS        .
- * Author : Tuan Nguyen
- *          tuan08@users.sourceforge.net
- * Date: May 14, 2004
- * Time: 1:12:22 PM
+ * Created by The eXo Platform SAS . Author : Tuan Nguyen
+ * tuan08@users.sourceforge.net Date: May 14, 2004 Time: 1:12:22 PM
  */
 @SuppressWarnings("serial")
 public class ResourceBundleData extends ResourceBundleDescription implements Serializable {
-  
-  private String data_ ;
+
+  private String data_;
 
   public ResourceBundleData() {
-    setResourceType("-") ;
-    setLanguage(DEFAULT_LANGUAGE) ;
+    setResourceType("-");
+    setLanguage(DEFAULT_LANGUAGE);
   }
 
   /**
-   * @hibernate.property length="65535" type="org.exoplatform.services.database.impl.TextClobType"
+   * @hibernate.property length="65535"
+   *                     type="org.exoplatform.services.database.impl.TextClobType"
    **/
-  public String   getData() { return data_ ; }
-  public void     setData(String data) { data_ = data; }
+  public String getData() {
+    return data_;
+  }
+
+  public void setData(String data) {
+    data_ = data;
+  }
 }

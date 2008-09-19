@@ -18,8 +18,9 @@
 package org.exoplatform.services.xml.transform.trax;
 
 import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import org.exoplatform.services.xml.transform.NotSupportedIOTypeException;
 
 /**
@@ -32,9 +33,8 @@ import org.exoplatform.services.xml.transform.NotSupportedIOTypeException;
 public interface TRAXTransformerService {
   TRAXTransformer getTransformer() throws TransformerConfigurationException;
 
-  TRAXTransformer getTransformer(Source source)
-      throws TransformerConfigurationException;
+  TRAXTransformer getTransformer(Source source) throws TransformerConfigurationException;
 
   TRAXTemplates getTemplates(Source source) throws TransformerException,
-      NotSupportedIOTypeException;
+                                           NotSupportedIOTypeException;
 }

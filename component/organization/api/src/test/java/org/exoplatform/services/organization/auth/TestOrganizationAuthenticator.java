@@ -23,9 +23,9 @@ import junit.framework.TestCase;
 
 import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.services.security.Authenticator;
+import org.exoplatform.services.security.ConversationRegistry;
 import org.exoplatform.services.security.Credential;
 import org.exoplatform.services.security.Identity;
-import org.exoplatform.services.security.ConversationRegistry;
 import org.exoplatform.services.security.PasswordCredential;
 import org.exoplatform.services.security.UsernameCredential;
 
@@ -35,7 +35,8 @@ import org.exoplatform.services.security.UsernameCredential;
 public class TestOrganizationAuthenticator extends TestCase {
 
   protected ConversationRegistry registry;
-  protected Authenticator    authenticator;
+
+  protected Authenticator        authenticator;
 
   public TestOrganizationAuthenticator(String name) {
     super(name);
@@ -69,7 +70,8 @@ public class TestOrganizationAuthenticator extends TestCase {
   public void testAuthenticator() throws Exception {
     assertNotNull(authenticator);
     assertTrue(authenticator instanceof OrganizationAuthenticatorImpl);
-    Credential[] cred = new Credential[] { new UsernameCredential("admin"), new PasswordCredential("admin") };
+    Credential[] cred = new Credential[] { new UsernameCredential("admin"),
+        new PasswordCredential("admin") };
     String userId = authenticator.validateUser(cred);
     assertEquals("admin", userId);
     Identity identity = authenticator.createIdentity(userId);

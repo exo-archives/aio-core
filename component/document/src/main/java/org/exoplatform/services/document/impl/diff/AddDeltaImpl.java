@@ -72,7 +72,7 @@ import org.exoplatform.services.document.diff.RevisionVisitor;
  * @see DiffServiceImpl
  * @see ChunkImpl
  */
-public class AddDeltaImpl extends DeltaImpl implements AddDelta{
+public class AddDeltaImpl extends DeltaImpl implements AddDelta {
 
   AddDeltaImpl() {
     super();

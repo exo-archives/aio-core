@@ -24,26 +24,26 @@ import org.exoplatform.services.document.DocumentReaderService;
 import org.exoplatform.test.BasicTestCase;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Sergey Karpenko <sergey.karpenko@exoplatform.com.ua>
+ * Created by The eXo Platform SAS Author : Sergey Karpenko
+ * <sergey.karpenko@exoplatform.com.ua>
+ * 
  * @version $Id: $
  */
 
-public class TestPDFDocumentReader  extends BasicTestCase {
+public class TestPDFDocumentReader extends BasicTestCase {
   DocumentReaderService service_;
 
   public void setUp() throws Exception {
-    PortalContainer pcontainer = PortalContainer.getInstance() ;
-    service_ =
-      (DocumentReaderService) pcontainer.getComponentInstanceOfType(DocumentReaderService.class) ;
+    PortalContainer pcontainer = PortalContainer.getInstance();
+    service_ = (DocumentReaderService) pcontainer.getComponentInstanceOfType(DocumentReaderService.class);
   }
 
   public void testGetContentAsString() throws Exception {
     InputStream is = TestPDFDocumentReader.class.getResourceAsStream("/test.pdf");
     String text = service_.getDocumentReader("application/pdf").getContentAsText(is);
     String etalon = "Hello\nThis is my first Cocoon page!\npage 1 \n";
-    
-    System.out.println("["+text+"]");
-   // assertEquals("Wrong string returned",etalon ,text );
+
+    System.out.println("[" + text + "]");
+    // assertEquals("Wrong string returned",etalon ,text );
   }
 }

@@ -18,8 +18,8 @@
 package org.exoplatform.services.xml.transform;
 
 /**
- * Created by The eXo Platform SAS . Conversions between IANA encoding names
- * and Java encoding names,
+ * Created by The eXo Platform SAS . Conversions between IANA encoding names and
+ * Java encoding names,
  * 
  * @author <a href="mailto:alex.kravchuk@gmail.com">Alexander Kravchuk</a>
  * @version $Id:

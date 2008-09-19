@@ -22,19 +22,21 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
+
 import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.security.impl.DefaultRolesExtractorImpl;
 
 /**
  * Created by The eXo Platform SAS .
+ * 
  * @author <a href="mailto:alexey.zavizionov@exoplatform.com.ua">Alexey
  *         Zavizionov</a>
  * @version $Id: $ Mar 27, 2008
  */
 public class TestRolesExtractor extends TestCase {
 
-  private static Log log = ExoLogger.getLogger("pc.TestRolesExtractor");
+  private static Log       log = ExoLogger.getLogger("pc.TestRolesExtractor");
 
   protected RolesExtractor rolesExtractor;
 
@@ -44,7 +46,8 @@ public class TestRolesExtractor extends TestCase {
 
   protected void setUp() throws Exception {
     if (rolesExtractor == null) {
-      String containerConf = TestRolesExtractor.class.getResource("/conf/standalone/test-configuration.xml").toString();
+      String containerConf = TestRolesExtractor.class.getResource("/conf/standalone/test-configuration.xml")
+                                                     .toString();
       StandaloneContainer.addConfigurationURL(containerConf);
 
       StandaloneContainer manager = StandaloneContainer.getInstance();

@@ -28,6 +28,7 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
 import org.apache.commons.logging.Log;
+
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.RootContainer;
@@ -41,6 +42,7 @@ import org.exoplatform.services.security.UsernameCredential;
 
 /**
  * Created by The eXo Platform SAS .
+ * 
  * @author Gennady Azarenkov
  * @version $Id: $
  */
@@ -50,54 +52,56 @@ public class DefaultLoginModule implements LoginModule {
   /**
    * Logger.
    */
-  protected Log log = ExoLogger.getLogger("core.DefaultLoginModule");
+  protected Log           log         = ExoLogger.getLogger("core.DefaultLoginModule");
 
   /**
    * @see {@link Subject} .
    */
-  protected Subject subject;
-  
+  protected Subject       subject;
+
   /**
    * @see {@link CallbackHandler}
    */
   private CallbackHandler callbackHandler;
-  
+
   /**
    * encapsulates user's principals such as name, groups, etc .
    */
-  protected Identity identity;
-  
+  protected Identity      identity;
+
   /**
    * Shared state.
    */
-  protected Map sharedState;
-  
+  protected Map           sharedState;
+
   /**
-   * Is allowed for one user login again if he already login.
-   * If must set in LM options.
+   * Is allowed for one user login again if he already login. If must set in LM
+   * options.
    */
-  protected boolean singleLogin = false;
+  protected boolean       singleLogin = false;
 
   public DefaultLoginModule() {
   }
 
   /**
-   * {@inheritDoc} 
+   * {@inheritDoc}
    */
-  public void initialize(Subject subject, CallbackHandler callbackHandler, Map sharedState, Map options) {
+  public void initialize(Subject subject,
+                         CallbackHandler callbackHandler,
+                         Map sharedState,
+                         Map options) {
     this.subject = subject;
     this.callbackHandler = callbackHandler;
     this.sharedState = sharedState;
-    
+
     String sl = (String) options.get("singleLogin");
-    if (sl != null
-        && (sl.equalsIgnoreCase("yes") || sl.equalsIgnoreCase("true"))) {
+    if (sl != null && (sl.equalsIgnoreCase("yes") || sl.equalsIgnoreCase("true"))) {
       this.singleLogin = true;
     }
   }
 
   /**
-   * {@inheritDoc} 
+   * {@inheritDoc}
    */
   public boolean login() throws LoginException {
     if (log.isDebugEnabled())
@@ -121,7 +125,8 @@ public class DefaultLoginModule implements LoginModule {
       if (authenticator == null)
         throw new LoginException("No Authenticator component found, check your configuration");
 
-      Credential[] credentials = new Credential[]{ new UsernameCredential(username), new PasswordCredential(password) };
+      Credential[] credentials = new Credential[] { new UsernameCredential(username),
+          new PasswordCredential(password) };
 
       String userId = authenticator.validateUser(credentials);
       identity = authenticator.createIdentity(userId);
@@ -139,15 +144,14 @@ public class DefaultLoginModule implements LoginModule {
   }
 
   /**
-   * {@inheritDoc} 
+   * {@inheritDoc}
    */
   public boolean commit() throws LoginException {
     try {
 
-      IdentityRegistry identityRegistry = (IdentityRegistry) getContainer().getComponentInstanceOfType(
-          IdentityRegistry.class);
-      
-      if (singleLogin && identityRegistry.getIdentity(identity.getUserId()) != null) 
+      IdentityRegistry identityRegistry = (IdentityRegistry) getContainer().getComponentInstanceOfType(IdentityRegistry.class);
+
+      if (singleLogin && identityRegistry.getIdentity(identity.getUserId()) != null)
         throw new LoginException("User " + identity.getUserId() + " already logined.");
 
       identity.setSubject(subject);
@@ -161,7 +165,7 @@ public class DefaultLoginModule implements LoginModule {
   }
 
   /**
-   * {@inheritDoc} 
+   * {@inheritDoc}
    */
   public boolean abort() throws LoginException {
     if (log.isDebugEnabled())
@@ -170,7 +174,7 @@ public class DefaultLoginModule implements LoginModule {
   }
 
   /**
-   * {@inheritDoc} 
+   * {@inheritDoc}
    */
   public boolean logout() throws LoginException {
     if (log.isDebugEnabled())

@@ -17,23 +17,23 @@
 
 package org.exoplatform.services.xml.transform.html;
 
-import org.exoplatform.services.xml.transform.AbstractTransformer;
 import java.util.Properties;
 
+import org.exoplatform.services.xml.transform.AbstractTransformer;
+
 /**
- * Created by The eXo Platform SAS        .
- *
+ * Created by The eXo Platform SAS .
+ * 
  * @author <a href="mailto:geaz@users.sourceforge.net">Gennady Azarenkov</a>
  * @version $Id: HTMLTransformer.java 5799 2006-05-28 17:55:42Z geaz $
  */
 
 public interface HTMLTransformer extends AbstractTransformer {
-    /**
-     * Sets properties for Tidy parser
-     * See Tidy properties
-     */
-    public void setOutputProperties(Properties props);
+  /**
+   * Sets properties for Tidy parser See Tidy properties
+   */
+  public void setOutputProperties(Properties props);
 
-    public Properties getOutputProperties();
+  public Properties getOutputProperties();
 
 }

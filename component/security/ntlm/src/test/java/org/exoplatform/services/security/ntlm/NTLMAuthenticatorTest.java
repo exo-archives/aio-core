@@ -13,7 +13,7 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
-*/
+ */
 
 package org.exoplatform.services.security.ntlm;
 
@@ -27,15 +27,15 @@ import org.exoplatform.services.security.UsernameCredential;
  * @version $Id: $
  */
 public class NTLMAuthenticatorTest {
-  
+
   public static void main(String[] args) throws Exception {
-    if (args.length != 2) 
-      throw  new IllegalArgumentException("Username and password requiered.");
+    if (args.length != 2)
+      throw new IllegalArgumentException("Username and password requiered.");
     Authenticator auth = new NTLMAuthenticator();
-    Credential[] credentials = new Credential[] {
-        new UsernameCredential(args[0]), new PasswordCredential(args[1])};
+    Credential[] credentials = new Credential[] { new UsernameCredential(args[0]),
+        new PasswordCredential(args[1]) };
     auth.validateUser(credentials);
     System.out.println("authentication ok");
   }
-  
+
 }

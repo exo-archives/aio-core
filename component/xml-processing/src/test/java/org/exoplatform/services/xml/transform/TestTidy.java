@@ -41,11 +41,12 @@ public class TestTidy extends BaseTest {
   private HTMLTransformer htmlTransformer;
 
   public void setUp() throws Exception {
-    StandaloneContainer.setConfigurationPath(Thread.currentThread().getContextClassLoader()
-        .getResource("conf/standalone/test-configuration.xml").getPath());
+    StandaloneContainer.setConfigurationPath(Thread.currentThread()
+                                                   .getContextClassLoader()
+                                                   .getResource("conf/standalone/test-configuration.xml")
+                                                   .getPath());
     StandaloneContainer container = StandaloneContainer.getInstance();
-    HTMLTransformerService htmlService = (HTMLTransformerService) container
-        .getComponentInstanceOfType(HTMLTransformerService.class);
+    HTMLTransformerService htmlService = (HTMLTransformerService) container.getComponentInstanceOfType(HTMLTransformerService.class);
     assertNotNull("htmlService", htmlService);
     htmlTransformer = htmlService.getTransformer();
 
@@ -57,8 +58,7 @@ public class TestTidy extends BaseTest {
       InputStream res = resourceStream("rss-in.html");
 
       // output file
-      OutputStream outputFileOutputStream = new FileOutputStream(
-          OUTPUT_FILENAME);
+      OutputStream outputFileOutputStream = new FileOutputStream(OUTPUT_FILENAME);
 
       htmlTransformer.initResult(new StreamResult(outputFileOutputStream));
       htmlTransformer.transform(new StreamSource(res));
@@ -66,8 +66,7 @@ public class TestTidy extends BaseTest {
       outputFileOutputStream.close();
 
       // read the output file
-      FileInputStream outputFileInputStream = new FileInputStream(
-          OUTPUT_FILENAME);
+      FileInputStream outputFileInputStream = new FileInputStream(OUTPUT_FILENAME);
       assertTrue("Output is empty", outputFileInputStream.available() > 0);
 
       // validate output xml
@@ -86,8 +85,7 @@ public class TestTidy extends BaseTest {
 
     // create empty transformation
     TransformerHandler transformHandler = // a copy of the source to the result
-    ((SAXTransformerFactory) SAXTransformerFactory.newInstance())
-        .newTransformerHandler();
+    ((SAXTransformerFactory) SAXTransformerFactory.newInstance()).newTransformerHandler();
 
     OutputStream output = new FileOutputStream(OUTPUT_FILENAME);
 
@@ -114,8 +112,7 @@ public class TestTidy extends BaseTest {
       props.setProperty("quiet", "false");
 
       htmlTransformer.setOutputProperties(props);
-      assertEquals(htmlTransformer.getOutputProperties().getProperty("quiet"),
-          "false");
+      assertEquals(htmlTransformer.getOutputProperties().getProperty("quiet"), "false");
 
     } catch (Exception e) {
       fail("testProps() ERROR: " + e.toString());

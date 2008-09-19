@@ -60,21 +60,18 @@ package org.exoplatform.services.document.diff;
 /**
  * A simple interface for implementations of differencing algorithms.
  */
-public interface DiffAlgorithm
-{
-    /**
-     * Computes the difference between the original
-     * sequence and the revised sequence and returns it
-     * as a {@link org.apache.commons.jrcs.diff.RevisionImpl Revision}
-     * object.
-     * <p>
-     * The revision can be used to construct the revised sequence
-     * from the original sequence.
-     *
-     * @param rev the revised text
-     * @return the revision script.
-     * @throws Exception if the diff could not be computed.
-     */
-    public Revision diff(Object[] orig, Object[] rev)
-        throws Exception;
+public interface DiffAlgorithm {
+  /**
+   * Computes the difference between the original sequence and the revised
+   * sequence and returns it as a
+   * {@link org.apache.commons.jrcs.diff.RevisionImpl Revision} object.
+   * <p>
+   * The revision can be used to construct the revised sequence from the
+   * original sequence.
+   * 
+   * @param rev the revised text
+   * @return the revision script.
+   * @throws Exception if the diff could not be computed.
+   */
+  public Revision diff(Object[] orig, Object[] rev) throws Exception;
 }

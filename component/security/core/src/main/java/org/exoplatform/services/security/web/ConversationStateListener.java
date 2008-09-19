@@ -21,6 +21,7 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 import org.apache.commons.logging.Log;
+
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.RootContainer;
@@ -51,8 +52,7 @@ public class ConversationStateListener implements HttpSessionListener {
    */
   public void sessionDestroyed(HttpSessionEvent event) {
     String sesionId = event.getSession().getId();
-    ConversationRegistry conversationRegistry =
-      (ConversationRegistry) getContainer().getComponentInstanceOfType(ConversationRegistry.class);
+    ConversationRegistry conversationRegistry = (ConversationRegistry) getContainer().getComponentInstanceOfType(ConversationRegistry.class);
 
     ConversationState conversationState = conversationRegistry.unregister(sesionId);
 

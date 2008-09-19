@@ -26,15 +26,17 @@ import java.util.Properties;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.commons.logging.Log;
-import org.exoplatform.commons.utils.ISO8601;
-import org.exoplatform.services.document.DCMetaData;
-import org.exoplatform.services.log.ExoLogger;
 import org.pdfbox.pdmodel.PDDocument;
 import org.pdfbox.util.PDFTextStripper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import org.apache.commons.logging.Log;
+
+import org.exoplatform.commons.utils.ISO8601;
+import org.exoplatform.services.document.DCMetaData;
+import org.exoplatform.services.log.ExoLogger;
 
 import com.lowagie.text.pdf.PdfDate;
 import com.lowagie.text.pdf.PdfReader;
@@ -88,8 +90,9 @@ public class PDFDocumentReader extends BaseDocumentReader {
 
   /*
    * (non-Javadoc)
-   * 
-   * @see org.exoplatform.services.document.DocumentReader#getProperties(java.io.InputStream)
+   * @see
+   * org.exoplatform.services.document.DocumentReader#getProperties(java.io.
+   * InputStream)
    */
   public Properties getProperties(InputStream is) throws Exception {
 
@@ -99,13 +102,13 @@ public class PDFDocumentReader extends BaseDocumentReader {
 
     // Read the file metadata
     byte[] metadata = reader.getMetadata();
-    
+
     if (metadata != null) {
       // there is XMP metadata try exctract it
       props = getPropertiesFromMetadata(metadata);
-    } 
-    
-    if (props == null){
+    }
+
+    if (props == null) {
       // it's old pdf document version
       props = getPropertiesFromInfo(reader.getInfo());
     }
@@ -121,7 +124,7 @@ public class PDFDocumentReader extends BaseDocumentReader {
    * @throws Exception if extracting fails
    */
   protected Properties getPropertiesFromMetadata(byte[] metadata) throws Exception {
-    
+
     Properties props = null;
 
     // parse xml
@@ -129,23 +132,23 @@ public class PDFDocumentReader extends BaseDocumentReader {
     DocumentBuilder docBuilder = dbf.newDocumentBuilder();
     Document doc = docBuilder.parse(new ByteArrayInputStream(metadata));
 
-    //Check is there PDF/A-1 XMP
-    String  version = "";
+    // Check is there PDF/A-1 XMP
+    String version = "";
     NodeList list = doc.getElementsByTagName("pdfaid:conformance");
-    if(list !=null && list.item(0)!=null){
+    if (list != null && list.item(0) != null) {
       version += list.item(0).getTextContent() + "-";
     }
-    
+
     list = doc.getElementsByTagName("pdfaid:part");
-    if(list !=null && list.item(0)!=null){
+    if (list != null && list.item(0) != null) {
       version += list.item(0).getTextContent();
     }
-    
+
     // PDF/A-1a or PDF/A-1b
-    if(version.equalsIgnoreCase("A-1")){
+    if (version.equalsIgnoreCase("A-1")) {
       props = getPropsFromPDFAMetadata(doc);
     }
-    
+
     return props;
   }
 
@@ -175,8 +178,8 @@ public class PDFDocumentReader extends BaseDocumentReader {
     }
 
     /*
-     * String publisher = (String) info.get("Producer"); if (publisher != null) {
-     * props.put(DCMetaData.PUBLISHER, publisher); } String description =
+     * String publisher = (String) info.get("Producer"); if (publisher != null)
+     * { props.put(DCMetaData.PUBLISHER, publisher); } String description =
      * (String) info.get("Desc"); if (description != null) {
      * props.put(DCMetaData.DESCRIPTION, description); }
      */
@@ -194,7 +197,7 @@ public class PDFDocumentReader extends BaseDocumentReader {
     return props;
   }
 
-  private Properties getPropsFromPDFAMetadata(Document doc) throws Exception{
+  private Properties getPropsFromPDFAMetadata(Document doc) throws Exception {
     Properties props = new Properties();
     // get properties
     NodeList list = doc.getElementsByTagName("rdf:li");
@@ -246,6 +249,5 @@ public class PDFDocumentReader extends BaseDocumentReader {
     }
     return props;
   }
-  
-  
+
 }

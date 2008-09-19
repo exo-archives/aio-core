@@ -25,6 +25,7 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
 import org.apache.commons.logging.Log;
+
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.RootContainer;
@@ -34,10 +35,10 @@ import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.IdentityRegistry;
 
 /**
- * This LoginModule should be used after customer LoginModule, which makes 
+ * This LoginModule should be used after customer LoginModule, which makes
  * authentication. This one registers Identity for user in IdentityRegistry.
  * Required name of user MUST be passed to LM via sharedState (see method
- * {@link #initialize(Subject, CallbackHandler, Map, Map)}), with name 
+ * {@link #initialize(Subject, CallbackHandler, Map, Map)}), with name
  * javax.security.auth.login.name.
  * 
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -48,26 +49,26 @@ public class IdentitySetLoginModule implements LoginModule {
   /**
    * Login.
    */
-  protected Log log = ExoLogger.getLogger("core.IdentitySetLoginModule");
+  protected Log     log         = ExoLogger.getLogger("core.IdentitySetLoginModule");
 
   /**
    * @see {@link Subject} .
    */
   protected Subject subject;
-  
+
   /**
    * Shared state.
    */
-  protected Map sharedState;
+  protected Map     sharedState;
 
   /**
-   * Is allowed for one user login again if he already login.
-   * If must set in LM options.
+   * Is allowed for one user login again if he already login. If must set in LM
+   * options.
    */
   protected boolean singleLogin = false;
 
   /**
-   * {@inheritDoc} 
+   * {@inheritDoc}
    */
   public boolean abort() throws LoginException {
     if (log.isDebugEnabled()) {
@@ -79,31 +80,29 @@ public class IdentitySetLoginModule implements LoginModule {
   }
 
   /**
-   * {@inheritDoc} 
+   * {@inheritDoc}
    */
   public boolean commit() throws LoginException {
     if (log.isDebugEnabled()) {
       log.debug("in commit");
     }
     log.info("in commit");
-    
+
     String userId = (String) sharedState.get("javax.security.auth.login.name");
     try {
-      Authenticator authenticator = (Authenticator) getContainer()
-          .getComponentInstanceOfType(Authenticator.class);
+      Authenticator authenticator = (Authenticator) getContainer().getComponentInstanceOfType(Authenticator.class);
 
       if (authenticator == null)
         throw new LoginException("No Authenticator component found, check your configuration.");
 
-      IdentityRegistry identityRegistry = (IdentityRegistry) getContainer()
-          .getComponentInstanceOfType(IdentityRegistry.class);
+      IdentityRegistry identityRegistry = (IdentityRegistry) getContainer().getComponentInstanceOfType(IdentityRegistry.class);
 
-      if (singleLogin && identityRegistry.getIdentity(userId) != null) 
+      if (singleLogin && identityRegistry.getIdentity(userId) != null)
         throw new LoginException("User " + userId + " already logined.");
 
       Identity identity = authenticator.createIdentity(userId);
       identity.setSubject(subject);
-      
+
       identityRegistry.register(identity);
 
     } catch (Exception e) {
@@ -114,9 +113,12 @@ public class IdentitySetLoginModule implements LoginModule {
   }
 
   /**
-   * {@inheritDoc} 
+   * {@inheritDoc}
    */
-  public void initialize(Subject subject, CallbackHandler callbackHandler, Map sharedState, Map options) {
+  public void initialize(Subject subject,
+                         CallbackHandler callbackHandler,
+                         Map sharedState,
+                         Map options) {
     if (log.isDebugEnabled()) {
       log.debug("in initialize");
     }
@@ -126,14 +128,13 @@ public class IdentitySetLoginModule implements LoginModule {
     this.sharedState = sharedState;
 
     String sl = (String) options.get("singleLogin");
-    if (sl != null
-        && (sl.equalsIgnoreCase("yes") || sl.equalsIgnoreCase("true"))) {
+    if (sl != null && (sl.equalsIgnoreCase("yes") || sl.equalsIgnoreCase("true"))) {
       this.singleLogin = true;
     }
   }
 
   /**
-   * {@inheritDoc} 
+   * {@inheritDoc}
    */
   public boolean login() throws LoginException {
     if (log.isDebugEnabled()) {
@@ -145,7 +146,7 @@ public class IdentitySetLoginModule implements LoginModule {
   }
 
   /**
-   * {@inheritDoc} 
+   * {@inheritDoc}
    */
   public boolean logout() throws LoginException {
     if (log.isDebugEnabled()) {

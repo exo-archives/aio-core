@@ -24,8 +24,8 @@ public class TestSimpleDiff extends DiffTest {
   public TestSimpleDiff() {
   }
 
-  protected DiffAlgorithm getAlgo() { 
+  protected DiffAlgorithm getAlgo() {
     return new SimpleDiff();
-  }  
-  
+  }
+
 }

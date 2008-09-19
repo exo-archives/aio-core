@@ -21,23 +21,23 @@ import java.util.Hashtable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.exoplatform.services.xml.transform.EncodingMap;
 
 /**
- * Created by The eXo Platform SAS . Conversions between IANA encoding names
- * and Java encoding names,
+ * Created by The eXo Platform SAS . Conversions between IANA encoding names and
+ * Java encoding names,
  * 
  * @author <a href="mailto:alex.kravchuk@gmail.com">Alexander Kravchuk</a>
  * @version $Id:
  */
 
 public class EncodingMapImpl implements EncodingMap {
-  private static Log log = LogFactory.getLog(EncodingMapImpl.class);
+  private static Log                               log          = LogFactory.getLog(EncodingMapImpl.class);
 
-  protected final static Hashtable <String, String> IANA2JavaMap =
-    new Hashtable<String, String>();
-  protected final static Hashtable <String, String> Java2IANAMap =
-    new Hashtable<String, String>();
+  protected final static Hashtable<String, String> IANA2JavaMap = new Hashtable<String, String>();
+
+  protected final static Hashtable<String, String> Java2IANAMap = new Hashtable<String, String>();
 
   public static void addIANA2JavaMapping(String iana, String java) {
     IANA2JavaMap.put(iana, java);
@@ -61,8 +61,7 @@ public class EncodingMapImpl implements EncodingMap {
   }
 
   public String convertJava2IANA(String java) {
-    log.debug("convert [" + java + "] to iana coding ["
-        + Java2IANAMap.get(java) + "]");
+    log.debug("convert [" + java + "] to iana coding [" + Java2IANAMap.get(java) + "]");
     return Java2IANAMap.get(java);
   }
 
@@ -238,8 +237,7 @@ public class EncodingMapImpl implements EncodingMap {
     addIANA2JavaMapping("CCSID01149", "Cp1149");
     addIANA2JavaMapping("EUC-JP", "EUCJIS");
     addIANA2JavaMapping("CSEUCPKDFMTJAPANESE", "EUCJIS");
-    addIANA2JavaMapping("EXTENDED_UNIX_CODE_PACKED_FORMAT_FOR_JAPANESE",
-        "EUCJIS");
+    addIANA2JavaMapping("EXTENDED_UNIX_CODE_PACKED_FORMAT_FOR_JAPANESE", "EUCJIS");
     addIANA2JavaMapping("EUC-KR", "KSC5601");
     addIANA2JavaMapping("CSEUCKR", "KSC5601");
     addIANA2JavaMapping("KS_C_5601-1987", "KS_C_5601-1987");
@@ -343,8 +341,8 @@ public class EncodingMapImpl implements EncodingMap {
 
     addIANA2JavaMapping("ISO-8859-8", "ISO8859_8");
     addIANA2JavaMapping("ISO-8859-8-I", "ISO8859_8"); // added since this
-                                                      // encoding only differs
-                                                      // w.r.t. presentation
+    // encoding only differs
+    // w.r.t. presentation
     addIANA2JavaMapping("ISO-IR-138", "ISO8859_8");
     addIANA2JavaMapping("ISO_8859-8", "ISO8859_8");
     addIANA2JavaMapping("HEBREW", "ISO8859_8");

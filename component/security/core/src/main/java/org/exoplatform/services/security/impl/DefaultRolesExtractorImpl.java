@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.security.MembershipEntry;
@@ -29,6 +30,7 @@ import org.exoplatform.services.security.RolesExtractor;
 /**
  * Created by The eXo Platform SAS . Implements "default" roles extraction
  * algorythm applicable for current Organization service
+ * 
  * @author Gennady Azarenkov
  * @version $Id:$
  */
@@ -56,7 +58,9 @@ public class DefaultRolesExtractorImpl implements RolesExtractor {
 
   /*
    * (non-Javadoc)
-   * @see org.exoplatform.services.security.RolesExtractor#extractRoles(java.util.Set)
+   * @see
+   * org.exoplatform.services.security.RolesExtractor#extractRoles(java.util
+   * .Set)
    */
   public Set<String> extractRoles(String userId, Set<MembershipEntry> memberships) {
 
@@ -64,8 +68,8 @@ public class DefaultRolesExtractorImpl implements RolesExtractor {
     for (MembershipEntry membership : memberships) {
       String[] splittedGroupName = StringUtils.split(membership.getGroup(), "/");
 
-      if (userRoleParentGroup != null && splittedGroupName[0].equals(userRoleParentGroup) &&
-          splittedGroupName.length > 1) {
+      if (userRoleParentGroup != null && splittedGroupName[0].equals(userRoleParentGroup)
+          && splittedGroupName.length > 1) {
         roles.add(splittedGroupName[splittedGroupName.length - 1]);
       } else {
         roles.add(splittedGroupName[0]);

@@ -19,13 +19,15 @@ package org.exoplatform.services.resources.impl.hibernate;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.hibernate.Session;
+
 import org.exoplatform.commons.utils.MapResourceBundle;
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.database.DBObjectPageList;
-import org.exoplatform.services.database.ObjectQuery;
 import org.exoplatform.services.database.HibernateService;
+import org.exoplatform.services.database.ObjectQuery;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.resources.ExoResourceBundle;
 import org.exoplatform.services.resources.LocaleConfigService;
@@ -33,13 +35,10 @@ import org.exoplatform.services.resources.Query;
 import org.exoplatform.services.resources.ResourceBundleData;
 import org.exoplatform.services.resources.ResourceBundleDescription;
 import org.exoplatform.services.resources.impl.BaseResourceBundleService;
-import org.hibernate.Session;
 
 /**
- * Created by The eXo Platform SAS.
- * Author : Roman Pedchenko
- *          roman.pedchenko@exoplatform.com.ua
- * Apr 10, 2007
+ * Created by The eXo Platform SAS. Author : Roman Pedchenko
+ * roman.pedchenko@exoplatform.com.ua Apr 10, 2007
  */
 public class ResourceBundleServiceImpl extends BaseResourceBundleService {
 
@@ -56,9 +55,9 @@ public class ResourceBundleServiceImpl extends BaseResourceBundleService {
    * @throws Exception exception
    */
   public ResourceBundleServiceImpl(final HibernateService service,
-      final LocaleConfigService localeService,
-      final CacheService cService,
-      final InitParams params) throws Exception {
+                                   final LocaleConfigService localeService,
+                                   final CacheService cService,
+                                   final InitParams params) throws Exception {
 
     log_ = ExoLogger.getLogger("org.exoplatform.services.portletcontainer");
     cache_ = cService.getCacheInstance(getClass().getName());
@@ -70,7 +69,7 @@ public class ResourceBundleServiceImpl extends BaseResourceBundleService {
 
   /**
    * Overridden method.
-   *
+   * 
    * @param name name
    * @return data
    * @throws Exception exception
@@ -82,7 +81,7 @@ public class ResourceBundleServiceImpl extends BaseResourceBundleService {
 
   /**
    * Overridden method.
-   *
+   * 
    * @param id id
    * @return data
    * @throws Exception exception
@@ -96,7 +95,7 @@ public class ResourceBundleServiceImpl extends BaseResourceBundleService {
 
   /**
    * Overridden method.
-   *
+   * 
    * @param q query
    * @return page list
    * @throws Exception exception
@@ -115,7 +114,7 @@ public class ResourceBundleServiceImpl extends BaseResourceBundleService {
 
   /**
    * Overridden method.
-   *
+   * 
    * @param data data
    * @throws Exception exception
    * @see org.exoplatform.services.resources.ResourceBundleService#saveResourceBundle(org.exoplatform.services.resources.ResourceBundleData)
@@ -127,18 +126,19 @@ public class ResourceBundleServiceImpl extends BaseResourceBundleService {
 
   /**
    * Overridden method.
-   *
+   * 
    * @param id id
    * @param parent parent
    * @param locale locale
    * @returnresource bundle
    * @throws Exception exception
-   * @see org.exoplatform.services.resources.impl.BaseResourceBundleService#getResourceBundleFromDb(java.lang.String, java.util.ResourceBundle, java.util.Locale)
+   * @see org.exoplatform.services.resources.impl.BaseResourceBundleService#getResourceBundleFromDb(java.lang.String,
+   *      java.util.ResourceBundle, java.util.Locale)
    */
   protected final ResourceBundle getResourceBundleFromDb(final String id,
-      final ResourceBundle parent,
-      final Locale locale) throws Exception {
-    
+                                                         final ResourceBundle parent,
+                                                         final Locale locale) throws Exception {
+
     Session session = hService.openSession();
     ResourceBundleData data = (ResourceBundleData) session.get(ResourceBundleData.class, id);
     if (data != null) {
@@ -146,15 +146,14 @@ public class ResourceBundleServiceImpl extends BaseResourceBundleService {
       MapResourceBundle mres = new MapResourceBundle(res, locale);
       return mres;
     }
-  //    return null;
-    
-    ResourceBundle rB = ResourceBundle.getBundle(id, locale,
-                                                 Thread.currentThread().getContextClassLoader());
+    // return null;
+
+    ResourceBundle rB = ResourceBundle.getBundle(id, locale, Thread.currentThread()
+                                                                   .getContextClassLoader());
     if (rB != null) {
-    return new MapResourceBundle(rB, locale);
-    
-    }
-    else 
+      return new MapResourceBundle(rB, locale);
+
+    } else
       return null;
   }
- }
+}

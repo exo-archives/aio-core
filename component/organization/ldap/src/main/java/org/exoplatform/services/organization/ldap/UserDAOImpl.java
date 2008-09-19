@@ -38,28 +38,31 @@ import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserEventListener;
 import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.organization.impl.UserImpl;
+
 /**
- * Created by The eXo Platform SAS
- * Author : Tuan Nguyen
- *          tuan08@users.sourceforge.net
- * Oct 14, 2005
+ * Created by The eXo Platform SAS Author : Tuan Nguyen
+ * tuan08@users.sourceforge.net Oct 14, 2005
  */
 public class UserDAOImpl extends BaseDAO implements UserHandler {
-  
-  private List<UserEventListener> listeners_  = new ArrayList<UserEventListener>(5);
-  
+
+  private List<UserEventListener> listeners_ = new ArrayList<UserEventListener>(5);
+
   public UserDAOImpl(LDAPAttributeMapping ldapAttrMapping, LDAPService ldapService) {
-    super(ldapAttrMapping, ldapService) ;
+    super(ldapAttrMapping, ldapService);
   }
-  
+
   public void addUserEventListener(UserEventListener listener) {
-    listeners_.add(listener) ;
+    listeners_.add(listener);
   }
-  
-  public User createUserInstance() {  return new UserImpl() ;  }
-  
-  public User createUserInstance(String username) {  return new UserImpl(username) ;  }
-  
+
+  public User createUserInstance() {
+    return new UserImpl();
+  }
+
+  public User createUserInstance(String username) {
+    return new UserImpl(username);
+  }
+
   public void createUser(User user, boolean broadcast) throws Exception {
     String dnKeyValue = getDNKeyValue(user);
     String userDN = ldapAttrMapping_.userDNKey + "=" + dnKeyValue + "," + ldapAttrMapping_.userURL;
@@ -87,109 +90,123 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
     }
     return dnKeyValue;
   }
-  
-  public void saveUser(User user, boolean broadcast) throws Exception {    
+
+  public void saveUser(User user, boolean broadcast) throws Exception {
     String userDN = getDNFromUsername(user.getUserName());
-    if (userDN == null) return;
-    User existingUser = getUserFromUsername(user.getUserName());          
+    if (userDN == null)
+      return;
+    User existingUser = getUserFromUsername(user.getUserName());
     ArrayList<ModificationItem> modifications = new ArrayList<ModificationItem>();
-    
+
     // update displayName & description
-    if (!user.getFullName().equals(existingUser.getFullName())){
-      ModificationItem mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
-          new BasicAttribute( ldapAttrMapping_.userDisplayNameAttr, user.getFullName()));
+    if (!user.getFullName().equals(existingUser.getFullName())) {
+      ModificationItem mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
+                                                  new BasicAttribute(ldapAttrMapping_.userDisplayNameAttr,
+                                                                     user.getFullName()));
       modifications.add(mod);
-      mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
-          new BasicAttribute( ldapAttrMapping_.ldapDescriptionAttr, user.getFullName()));
+      mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
+                                 new BasicAttribute(ldapAttrMapping_.ldapDescriptionAttr,
+                                                    user.getFullName()));
       modifications.add(mod);
-    }      
+    }
     // update account name
-    if (!user.getUserName().equals(existingUser.getUserName())){
+    if (!user.getUserName().equals(existingUser.getUserName())) {
       ModificationItem mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
-          new BasicAttribute( ldapAttrMapping_.userUsernameAttr, user.getUserName()));
+                                                  new BasicAttribute(ldapAttrMapping_.userUsernameAttr,
+                                                                     user.getUserName()));
       modifications.add(mod);
-    }      
+    }
     // update last name
-    if (!user.getLastName().equals(existingUser.getLastName())){
-      ModificationItem mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
-          new BasicAttribute( ldapAttrMapping_.userLastNameAttr, user.getLastName()));
-      modifications.add(mod);
-    }      
-    // update first name
-    if (!user.getFirstName().equals(existingUser.getFirstName())){
-      ModificationItem mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
-          new BasicAttribute( ldapAttrMapping_.userFirstNameAttr, user.getFirstName()));
-      modifications.add(mod);
-    }      
-    // update email
-    if (!user.getEmail().equals(existingUser.getEmail())){
+    if (!user.getLastName().equals(existingUser.getLastName())) {
       ModificationItem mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
-          new BasicAttribute(ldapAttrMapping_.userMailAttr, user.getEmail()));
+                                                  new BasicAttribute(ldapAttrMapping_.userLastNameAttr,
+                                                                     user.getLastName()));
       modifications.add(mod);
-    }      
-    
-    ModificationItem[] mods = new ModificationItem[modifications.size()];      
+    }
+    // update first name
+    if (!user.getFirstName().equals(existingUser.getFirstName())) {
+      ModificationItem mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
+                                                  new BasicAttribute(ldapAttrMapping_.userFirstNameAttr,
+                                                                     user.getFirstName()));
+      modifications.add(mod);
+    }
+    // update email
+    if (!user.getEmail().equals(existingUser.getEmail())) {
+      ModificationItem mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
+                                                  new BasicAttribute(ldapAttrMapping_.userMailAttr,
+                                                                     user.getEmail()));
+      modifications.add(mod);
+    }
+
+    ModificationItem[] mods = new ModificationItem[modifications.size()];
     modifications.toArray(mods);
-    if(broadcast) preSave(user, false);
+    if (broadcast)
+      preSave(user, false);
     ldapService_.getLdapContext().modifyAttributes(userDN, mods);
-    if(broadcast) postSave(user, false);    
-    if (!user.getPassword().equals("PASSWORD")) saveUserPassword(user, userDN);    
+    if (broadcast)
+      postSave(user, false);
+    if (!user.getPassword().equals("PASSWORD"))
+      saveUserPassword(user, userDN);
   }
-  
+
   void saveUserPassword(User user, String userDN) throws Exception {
-    ModificationItem[] mods = new ModificationItem[]{ 
-        new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
-            new BasicAttribute(ldapAttrMapping_.userPassword, user.getPassword())) };  
+    ModificationItem[] mods = new ModificationItem[] { new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
+                                                                            new BasicAttribute(ldapAttrMapping_.userPassword,
+                                                                                               user.getPassword())) };
     ldapService_.getLdapContext().modifyAttributes(userDN, mods);
   }
-  
+
   public User removeUser(String userName, boolean broadcast) throws Exception {
-    User user = getUserFromUsername(userName) ;
-    if(user == null)  return null;
+    User user = getUserFromUsername(userName);
+    if (user == null)
+      return null;
     LdapContext ctx = ldapService_.getLdapContext();
-    if(broadcast) preDelete(user)  ;
-    ctx.destroySubcontext(getDNFromUsername(userName));      
-    if(broadcast) postDelete(user) ;
-    return user ;
+    if (broadcast)
+      preDelete(user);
+    ctx.destroySubcontext(getDNFromUsername(userName));
+    if (broadcast)
+      postDelete(user);
+    return user;
   }
-   
+
   public User findUserByName(String userName) throws Exception {
     return getUserFromUsername(userName);
-  }  
-  
-  public PageList findUsersByGroup(String groupId) throws Exception {    
+  }
+
+  public PageList findUsersByGroup(String groupId) throws Exception {
     ArrayList<User> users = new ArrayList<User>();
-    TreeMap< String, User> map = new TreeMap< String, User>();    
-    
+    TreeMap<String, User> map = new TreeMap<String, User>();
+
     LdapContext ctx = ldapService_.getLdapContext();
     String searchBase = this.getGroupDNFromGroupId(groupId);
-    String filter = ldapAttrMapping_.membershipObjectClassFilter;    
+    String filter = ldapAttrMapping_.membershipObjectClassFilter;
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
     NamingEnumeration<SearchResult> results = ctx.search(searchBase, filter, constraints);
-    
-    while( results.hasMore()){
+
+    while (results.hasMore()) {
       SearchResult sr = results.next();
       Attributes attrs = sr.getAttributes();
       List<Object> members = this.getAttributes(attrs, ldapAttrMapping_.membershipTypeMemberValue);
-      for (int x = 0; x < members.size(); x++){        
-        User user = findUserByDN((String)members.get(x), ctx);       
-        if( user != null) map.put(user.getUserName(), user);
+      for (int x = 0; x < members.size(); x++) {
+        User user = findUserByDN((String) members.get(x), ctx);
+        if (user != null)
+          map.put(user.getUserName(), user);
       }
-    }  
-    
-    for (Iterator<String> i = map.keySet().iterator(); i.hasNext();) users.add( map.get(i.next()));    
+    }
+
+    for (Iterator<String> i = map.keySet().iterator(); i.hasNext();)
+      users.add(map.get(i.next()));
     return new ObjectPageList(users, 20);
   }
-  
-  
-  public PageList getUserPageList(int pageSize) throws Exception {      
+
+  public PageList getUserPageList(int pageSize) throws Exception {
     String searchBase = ldapAttrMapping_.userURL;
-    String filter = ldapAttrMapping_.userObjectClassFilter;    
+    String filter = ldapAttrMapping_.userObjectClassFilter;
     return new LDAPUserPageList(ldapAttrMapping_, ldapService_, searchBase, filter, pageSize);
   }
-  
-  public PageList findUsers(Query q) throws Exception { 
+
+  public PageList findUsers(Query q) throws Exception {
     String filter = null;
     ArrayList<String> list = new ArrayList<String>();
     if (q.getUserName() != null && q.getUserName().length() > 0) {
@@ -204,49 +221,56 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
     if (q.getEmail() != null && q.getEmail().length() > 0) {
       list.add("(" + ldapAttrMapping_.userMailAttr + "=" + q.getEmail() + ")");
     }
-    
-    if (list.size() > 0){
+
+    if (list.size() > 0) {
       StringBuilder buffer = new StringBuilder();
       buffer.append("(&");
-      if (list.size() > 1){
-        for (int x = 0; x < list.size(); x++){
-          if (x == (list.size() - 1))  buffer.append(list.get(x));
-          else buffer.append(list.get(x)+" || ");          
+      if (list.size() > 1) {
+        for (int x = 0; x < list.size(); x++) {
+          if (x == (list.size() - 1))
+            buffer.append(list.get(x));
+          else
+            buffer.append(list.get(x) + " || ");
         }
-      } else 
+      } else
         buffer.append(list.get(0));
-      
-      buffer.append("(" +ldapAttrMapping_.userObjectClassFilter + ") )");
+
+      buffer.append("(" + ldapAttrMapping_.userObjectClassFilter + ") )");
       filter = buffer.toString();
-    } else  
-      filter = ldapAttrMapping_.userObjectClassFilter ;    
-    String searchBase = ldapAttrMapping_.userURL ;
-    return new LDAPUserPageList(ldapAttrMapping_, ldapService_, searchBase, filter, 20);   
-  }   
-  
+    } else
+      filter = ldapAttrMapping_.userObjectClassFilter;
+    String searchBase = ldapAttrMapping_.userURL;
+    return new LDAPUserPageList(ldapAttrMapping_, ldapService_, searchBase, filter, 20);
+  }
+
   public boolean authenticate(String username, String password) throws Exception {
     String userDN = getDNFromUsername(username);
-    if(userDN == null) return false ;
-    try{
+    if (userDN == null)
+      return false;
+    try {
       return ldapService_.authenticate(userDN, password);
-    }catch(Exception exp){
+    } catch (Exception exp) {
       return false;
     }
   }
-  
-  protected void preSave(User user , boolean isNew) throws Exception {
-    for (UserEventListener listener : listeners_)   listener.preSave(user, isNew) ;
+
+  protected void preSave(User user, boolean isNew) throws Exception {
+    for (UserEventListener listener : listeners_)
+      listener.preSave(user, isNew);
   }
-  
-  protected void postSave(User user , boolean isNew) throws Exception {
-    for (UserEventListener listener : listeners_) listener.postSave(user, isNew) ;
+
+  protected void postSave(User user, boolean isNew) throws Exception {
+    for (UserEventListener listener : listeners_)
+      listener.postSave(user, isNew);
   }
-  
+
   protected void preDelete(User user) throws Exception {
-    for (UserEventListener listener : listeners_)   listener.preDelete(user) ;
+    for (UserEventListener listener : listeners_)
+      listener.preDelete(user);
   }
-  
+
   protected void postDelete(User user) throws Exception {
-    for (UserEventListener listener : listeners_)    listener.postDelete(user)  ;
+    for (UserEventListener listener : listeners_)
+      listener.postDelete(user);
   }
 }

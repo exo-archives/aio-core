@@ -20,10 +20,8 @@ package org.exoplatform.services.document;
 import org.exoplatform.commons.utils.QName;
 
 /**
- * Created by The eXo Platform SAS .
- * 
- * Dublin Core metadata element set definitions see
- * http://dublincore.org/documents/dces/
+ * Created by The eXo Platform SAS . Dublin Core metadata element set
+ * definitions see http://dublincore.org/documents/dces/
  * 
  * @author Gennady Azarenkov
  * @version $Id: $
@@ -39,7 +37,7 @@ public interface DCMetaData {
    * service. Typically, the name of a Contributor should be used to indicate
    * the entity.
    */
-  public final QName CONTRIBUTOR = new QName(DC_NAMESPACE, "contributor");
+  public final QName  CONTRIBUTOR  = new QName(DC_NAMESPACE, "contributor");
 
   /**
    * Definition: The spatial or temporal topic of the resource, the spatial
@@ -54,7 +52,7 @@ public interface DCMetaData {
    * coordinates or date ranges. References: [TGN]
    * http://www.getty.edu/research/tools/vocabulary/tgn/index.html
    */
-  public final QName COVERAGE = new QName(DC_NAMESPACE, "coverage");
+  public final QName  COVERAGE     = new QName(DC_NAMESPACE, "coverage");
 
   /**
    * Definition: An entity primarily responsible for making the resource.
@@ -62,7 +60,7 @@ public interface DCMetaData {
    * service. Typically, the name of a Creator should be used to indicate the
    * entity.
    */
-  public final QName CREATOR = new QName(DC_NAMESPACE, "creator");
+  public final QName  CREATOR      = new QName(DC_NAMESPACE, "creator");
 
   /**
    * Definition: A point or period of time associated with an event in the
@@ -71,14 +69,14 @@ public interface DCMetaData {
    * use an encoding scheme, such as the W3CDTF profile of ISO 8601 [W3CDTF].
    * References: [W3CDTF] http://www.w3.org/TR/NOTE-datetime
    */
-  public final QName DATE = new QName(DC_NAMESPACE, "date");
+  public final QName  DATE         = new QName(DC_NAMESPACE, "date");
 
   /**
    * Definition: An account of the resource. Comment: Description may include
    * but is not limited to: an abstract, a table of contents, a graphical
    * representation, or a free-text account of the resource.
    */
-  public final QName DESCRIPTION = new QName(DC_NAMESPACE, "description");
+  public final QName  DESCRIPTION  = new QName(DC_NAMESPACE, "description");
 
   /**
    * Definition: The file format, physical medium, or dimensions of the
@@ -87,21 +85,21 @@ public interface DCMetaData {
    * list of Internet Media Types [MIME]. References: [MIME]
    * http://www.iana.org/assignments/media-types/
    */
-  public final QName FORMAT = new QName(DC_NAMESPACE, "format");
+  public final QName  FORMAT       = new QName(DC_NAMESPACE, "format");
 
   /**
    * Definition: An unambiguous reference to the resource within a given
    * context. Comment: Recommended best practice is to identify the resource by
    * means of a string conforming to a formal identification system.
    */
-  public final QName IDENTIFIER = new QName(DC_NAMESPACE, "identifier");
+  public final QName  IDENTIFIER   = new QName(DC_NAMESPACE, "identifier");
 
   /**
    * Definition: A language of the resource. Comment: Recommended best practice
    * is to use a controlled vocabulary such as RFC 3066 [RFC3066]. References:
    * [RFC3066] http://www.ietf.org/rfc/rfc3066.txt
    */
-  public final QName LANGUAGE = new QName(DC_NAMESPACE, "language");
+  public final QName  LANGUAGE     = new QName(DC_NAMESPACE, "language");
 
   /**
    * Definition: An entity responsible for making the resource available.
@@ -109,14 +107,14 @@ public interface DCMetaData {
    * service. Typically, the name of a Publisher should be used to indicate the
    * entity.
    */
-  public final QName PUBLISHER = new QName(DC_NAMESPACE, "publisher");
+  public final QName  PUBLISHER    = new QName(DC_NAMESPACE, "publisher");
 
   /**
    * Definition: A related resource. Comment: Recommended best practice is to
    * identify the related resource by means of a string conforming to a formal
    * identification system.
    */
-  public final QName RESOURCE = new QName(DC_NAMESPACE, "resource");
+  public final QName  RESOURCE     = new QName(DC_NAMESPACE, "resource");
 
   /**
    * Definition: Information about rights held in and over the resource.
@@ -124,7 +122,7 @@ public interface DCMetaData {
    * property rights associated with the resource, including intellectual
    * property rights.
    */
-  public final QName RIGHTS = new QName(DC_NAMESPACE, "rights");
+  public final QName  RIGHTS       = new QName(DC_NAMESPACE, "rights");
 
   /**
    * Definition: The resource from which the described resource is derived.
@@ -132,7 +130,7 @@ public interface DCMetaData {
    * whole or in part. Recommended best practice is to identify the related
    * resource by means of a string conforming to a formal identification system.
    */
-  public final QName SOURCE = new QName(DC_NAMESPACE, "source");
+  public final QName  SOURCE       = new QName(DC_NAMESPACE, "source");
 
   /**
    * Definition: The topic of the resource. Comment: Typically, the topic will
@@ -140,13 +138,13 @@ public interface DCMetaData {
    * Recommended best practice is to use a controlled vocabulary. To describe
    * the spatial or temporal topic of the resource, use the Coverage element.
    */
-  public final QName SUBJECT = new QName(DC_NAMESPACE, "subject");
+  public final QName  SUBJECT      = new QName(DC_NAMESPACE, "subject");
 
   /**
    * Definition: A name given to the resource. Comment: Typically, a Title will
    * be a name by which the resource is formally known.
    */
-  public final QName TITLE = new QName(DC_NAMESPACE, "title");
+  public final QName  TITLE        = new QName(DC_NAMESPACE, "title");
 
   /**
    * Definition: The nature or genre of the resource. Comment: Recommended best
@@ -155,6 +153,6 @@ public interface DCMetaData {
    * the resource, use the Format element. References: [DCMITYPE]
    * http://dublincore.org/documents/dcmi-type-vocabulary/
    */
-  public final QName TYPE = new QName(DC_NAMESPACE, "type");
+  public final QName  TYPE         = new QName(DC_NAMESPACE, "type");
 
 }

@@ -17,15 +17,15 @@
 package org.exoplatform.services.ldap;
 
 import javax.naming.directory.BasicAttribute;
+
 /**
- * Created by The eXo Platform SAS
- * Author : Tuan Nguyen
- *          tuan08@users.sourceforge.net
- * Oct 15, 2005
+ * Created by The eXo Platform SAS Author : Tuan Nguyen
+ * tuan08@users.sourceforge.net Oct 15, 2005
  */
 public class ObjectClassAttribute extends BasicAttribute {
   public ObjectClassAttribute(String[] classes) {
-    super("objectClass") ;
-    for(String clazz:  classes ) add(clazz) ;
+    super("objectClass");
+    for (String clazz : classes)
+      add(clazz);
   }
 }

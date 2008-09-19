@@ -18,29 +18,34 @@ package org.exoplatform.services.security.jaas;
 
 import java.io.Serializable;
 import java.security.Principal;
+
 /**
- * Created y the eXo platform team
- * User:  Tuan Nguyen
- * Date: May 6th, 2007
+ * Created y the eXo platform team User: Tuan Nguyen Date: May 6th, 2007
  */
 public class UserPrincipal implements Principal, Serializable {
 
   private static final long serialVersionUID = -8915147646892501932L;
-  
-  private String name;
+
+  private String            name;
 
   public UserPrincipal(String name) {
     this.name = name;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see java.security.Principal#getName()
    */
-  public String getName() { return name; }
+  public String getName() {
+    return name;
+  }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see java.lang.Object#toString()
    */
   @Override
-  public String toString() {  return getName();  }
+  public String toString() {
+    return getName();
+  }
 }

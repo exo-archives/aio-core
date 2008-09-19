@@ -20,32 +20,34 @@ import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Tuan Nguyen
- *          tuan08@users.sourceforge.net
- * Oct 16, 2005
+ * Created by The eXo Platform SAS Author : Tuan Nguyen
+ * tuan08@users.sourceforge.net Oct 16, 2005
  */
 public class ObjectClassAttributes extends BasicAttributes {
   public ObjectClassAttributes() {
-    
+
   }
-  
+
   public ObjectClassAttributes(String[] classes) {
-    setClasses(classes) ;
+    setClasses(classes);
   }
-  
+
   public void setClasses(String[] classes) {
-    BasicAttribute attr  = new BasicAttribute("objectClass") ;
-    for(String clazz:  classes ) attr.add(clazz) ;
-    put(attr) ;
+    BasicAttribute attr = new BasicAttribute("objectClass");
+    for (String clazz : classes)
+      attr.add(clazz);
+    put(attr);
   }
-  
+
   public void setClasses(String classes) {
-    String[] clazz = classes.split(",") ;
-    BasicAttribute attr  = new BasicAttribute("objectClass") ;
-    for(String c:  clazz ) attr.add(c) ;
-    put(attr) ;
+    String[] clazz = classes.split(",");
+    BasicAttribute attr = new BasicAttribute("objectClass");
+    for (String c : clazz)
+      attr.add(c);
+    put(attr);
   }
-  
-  public void addAttribute(String key, Object value) { put(key, value) ; }
+
+  public void addAttribute(String key, Object value) {
+    put(key, value);
+  }
 }

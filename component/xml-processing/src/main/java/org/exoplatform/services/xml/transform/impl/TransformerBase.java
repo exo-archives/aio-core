@@ -24,22 +24,23 @@ import java.io.OutputStream;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.logging.Log;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.xml.resolving.XMLResolvingService;
-import org.exoplatform.services.xml.transform.AbstractTransformer;
-import org.exoplatform.services.xml.transform.NotSupportedIOTypeException;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
+
+import org.apache.commons.logging.Log;
+
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.xml.resolving.XMLResolvingService;
+import org.exoplatform.services.xml.transform.AbstractTransformer;
+import org.exoplatform.services.xml.transform.NotSupportedIOTypeException;
 
 /**
  * Created by The eXo Platform SAS .
@@ -48,17 +49,17 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @version $Id: TransformerBase.java 5799 2006-05-28 17:55:42Z geaz $
  */
 public abstract class TransformerBase implements AbstractTransformer {
-  private Result result = null;
+  private Result                  result = null;
 
-  protected Log log = ExoLogger.getLogger(this.getClass());
+  protected Log                   log    = ExoLogger.getLogger(this.getClass());
+
   protected SAXTransformerFactory tSAXFactory;
 
-  protected XMLResolvingService resolvingService;
+  protected XMLResolvingService   resolvingService;
 
   public TransformerBase() {
     log.debug("Current javax.xml.parsers.SAXParserFactory sys property [ "
-        + System.getProperty("javax.xml.parsers.SAXParserFactory", "-Not set-")
-        + "]");
+        + System.getProperty("javax.xml.parsers.SAXParserFactory", "-Not set-") + "]");
 
     tSAXFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
   }
@@ -69,7 +70,7 @@ public abstract class TransformerBase implements AbstractTransformer {
   static public XMLReader getXMLReader() throws SAXException {
     return XMLReaderFactory.createXMLReader();
   }
-  
+
   public void setResolvingService(XMLResolvingService r) {
     resolvingService = r;
   }
@@ -82,8 +83,7 @@ public abstract class TransformerBase implements AbstractTransformer {
     log.debug("Result is set");
   }
 
-  final public void initResult(Result result)
-      throws NotSupportedIOTypeException {
+  final public void initResult(Result result) throws NotSupportedIOTypeException {
     if (!isResultSupported(result)) {
       throw new NotSupportedIOTypeException(result);
     }
@@ -103,24 +103,22 @@ public abstract class TransformerBase implements AbstractTransformer {
     return true;
   }
 
-  protected abstract void internalTransform(Source src)
-      throws NotSupportedIOTypeException, TransformerException,
-      IllegalStateException;
+  protected abstract void internalTransform(Source src) throws NotSupportedIOTypeException,
+                                                       TransformerException,
+                                                       IllegalStateException;
 
-  final public void transform(Source source)
-      throws NotSupportedIOTypeException, TransformerException,
-      IllegalStateException {
+  final public void transform(Source source) throws NotSupportedIOTypeException,
+                                            TransformerException,
+                                            IllegalStateException {
 
     if (!isSourceSupported(source)) {
-      log.error("source of type " + source.getClass().getName()
-          + " not supported");
+      log.error("source of type " + source.getClass().getName() + " not supported");
       throw new NotSupportedIOTypeException(source);
     }
 
     if (this.result == null) {
       log.error("Result not set");
-      throw new IllegalStateException(
-          "Result not specified. See initResult(Result)");
+      throw new IllegalStateException("Result not specified. See initResult(Result)");
     }
 
     internalTransform(source);
@@ -134,10 +132,8 @@ public abstract class TransformerBase implements AbstractTransformer {
    * @throws TransformerException
    */
 
-  public void transformInputStream2Result(InputStream input, Result result)
-      throws TransformerException {
-    log.debug("Transform InputStream to result of type "
-        + result.getClass().getName());
+  public void transformInputStream2Result(InputStream input, Result result) throws TransformerException {
+    log.debug("Transform InputStream to result of type " + result.getClass().getName());
 
     // StreamResult - write data from InputStream to OutputStream
     if (result instanceof StreamResult) {
@@ -179,8 +175,7 @@ public abstract class TransformerBase implements AbstractTransformer {
         // not StreamResult, not SAXResult - create empty transformation
         else {
           log.debug("Create empty transformation");
-          TransformerHandler transformerHandler = tSAXFactory
-              .newTransformerHandler();
+          TransformerHandler transformerHandler = tSAXFactory.newTransformerHandler();
           transformerHandler.setResult(result);
           xmlReader.setContentHandler(transformerHandler);
           log.debug("Parse to result throw empty transformer");
@@ -203,8 +198,7 @@ public abstract class TransformerBase implements AbstractTransformer {
    * @return InputStream
    * @throws NotSupportedIOTypeException
    */
-  protected InputStream sourceAsInputStream(Source source)
-      throws NotSupportedIOTypeException {
+  protected InputStream sourceAsInputStream(Source source) throws NotSupportedIOTypeException {
     InputSource inputSource = SAXSource.sourceToInputSource(source);
     if (inputSource == null) {
       throw new NotSupportedIOTypeException(source);
@@ -217,12 +211,11 @@ public abstract class TransformerBase implements AbstractTransformer {
    * @deprecated see Warning
    */
   protected void writeTofile(byte[] bytes, String postfix) {
-    String POSTFIX = new java.text.SimpleDateFormat("yy-MM-DD_HH-mm-ss_")
-        .format(new java.util.Date());
+    String POSTFIX = new java.text.SimpleDateFormat("yy-MM-DD_HH-mm-ss_").format(new java.util.Date());
     try {
 
-      java.io.FileOutputStream fileLog = new java.io.FileOutputStream(
-          "c:/tmp/transf" + POSTFIX + postfix + ".xhtml");
+      java.io.FileOutputStream fileLog = new java.io.FileOutputStream("c:/tmp/transf" + POSTFIX
+          + postfix + ".xhtml");
       fileLog.write(bytes);
       fileLog.flush();
       fileLog.close();

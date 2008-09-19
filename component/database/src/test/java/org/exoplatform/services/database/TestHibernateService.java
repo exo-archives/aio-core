@@ -17,7 +17,6 @@
 package org.exoplatform.services.database;
 
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.services.database.HibernateService;
 import org.exoplatform.test.BasicTestCase;
 
 /*
@@ -28,22 +27,23 @@ import org.exoplatform.test.BasicTestCase;
  * @email: tuan08@yahoo.com
  */
 public class TestHibernateService extends BasicTestCase {
-  HibernateService hservice_ ;
+  HibernateService hservice_;
+
   public TestHibernateService(String name) {
     super(name);
   }
 
   public void setUp() throws Exception {
-    PortalContainer pcontainer = PortalContainer.getInstance() ;
-    hservice_ = (HibernateService) pcontainer.getComponentInstanceOfType(HibernateService.class) ;
+    PortalContainer pcontainer = PortalContainer.getInstance();
+    hservice_ = (HibernateService) pcontainer.getComponentInstanceOfType(HibernateService.class);
   }
 
   public void testDabaseService() throws Exception {
-    //assertTrue("Expect hibernate service instance" , hservice_ != null) ;
-    assertTrue("Expect database service instance" , hservice_ != null) ;
+    // assertTrue("Expect hibernate service instance" , hservice_ != null) ;
+    assertTrue("Expect database service instance", hservice_ != null);
   }
-  
+
   protected String getDescription() {
-    return "Test Database Service" ;
+    return "Test Database Service";
   }
 }

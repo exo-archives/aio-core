@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
+
 import org.exoplatform.commons.utils.IdentifierUtil;
 import org.exoplatform.services.database.DBObjectMapper;
 import org.exoplatform.services.database.DBObjectQuery;
@@ -38,64 +39,75 @@ import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.User;
 
 /**
- * Created by The eXo Platform SAS
- * Apr 7, 2007  
+ * Created by The eXo Platform SAS Apr 7, 2007
  */
 public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements MembershipHandler {
-  
-  protected static Log log = ExoLogger.getLogger("organization:MembershipDAOImpl");
-  
+
+  protected static Log      log = ExoLogger.getLogger("organization:MembershipDAOImpl");
+
   protected ListenerService listenerService_;
-  
-  public MembershipDAOImpl(ListenerService lService, ExoDatasource datasource, DBObjectMapper<MembershipImpl> mapper) {
+
+  public MembershipDAOImpl(ListenerService lService,
+                           ExoDatasource datasource,
+                           DBObjectMapper<MembershipImpl> mapper) {
     super(datasource, mapper, MembershipImpl.class);
     listenerService_ = lService;
   }
-  
-  public Membership createMembershipInstance() { return new MembershipImpl(); }
+
+  public Membership createMembershipInstance() {
+    return new MembershipImpl();
+  }
 
   public void createMembership(Membership membership, boolean broadcast) throws Exception {
     MembershipImpl membershipImpl = (MembershipImpl) membership;
-    if(broadcast) listenerService_.broadcast("organization.membership.preSave", this, membershipImpl);
+    if (broadcast)
+      listenerService_.broadcast("organization.membership.preSave", this, membershipImpl);
     membershipImpl.setId(IdentifierUtil.generateUUID(membership));
     super.save(membershipImpl);
-    if(broadcast) listenerService_.broadcast("organization.membership.postSave", this, membershipImpl);
+    if (broadcast)
+      listenerService_.broadcast("organization.membership.postSave", this, membershipImpl);
   }
 
   public void linkMembership(User user, Group group, MembershipType mt, boolean broadcast) throws Exception {
-    if(log.isDebugEnabled())
-	  log.debug("LINK MEMBER SHIP (" + user.getUserName() + ", " + group.getId() + " , " + mt.getName() + ");");
+    if (log.isDebugEnabled())
+      log.debug("LINK MEMBER SHIP (" + user.getUserName() + ", " + group.getId() + " , "
+          + mt.getName() + ");");
     MembershipImpl membership = new MembershipImpl();
     membership.setUserName(user.getUserName());
-    membership.setMembershipType(mt.getName()) ;    
-    membership.setGroupId( group.getId());    
-    if(findMembershipByUserGroupAndType( user.getUserName(), group.getId(), mt.getName()) != null) return;   
+    membership.setMembershipType(mt.getName());
+    membership.setGroupId(group.getId());
+    if (findMembershipByUserGroupAndType(user.getUserName(), group.getId(), mt.getName()) != null)
+      return;
     createMembership(membership, broadcast);
   }
 
   public Membership findMembership(String id) throws Exception {
-    if(id == null ) return null;
+    if (id == null)
+      return null;
     DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
     query.addLIKE("MEMBERSHIP_ID", id);
     return loadUnique(query.toQuery());
   }
 
   public Membership findMembershipByUserGroupAndType(String userName, String groupId, String type) throws Exception {
-    
-    if(userName == null || groupId == null || type == null) return null;
+
+    if (userName == null || groupId == null || type == null)
+      return null;
     DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
     query.addLIKE("USER_NAME", userName);
     query.addLIKE("GROUP_ID", groupId);
     query.addLIKE("MEMBERSHIP_TYPE", type);
     Membership member = loadUnique(query.toQuery());
-    if(log.isDebugEnabled())
-	  log.debug("FIND MEMBERSHIP BY USER " + userName + ", GROUP " + groupId + ", TYPE " + type  + " - " + (member!=null));
+    if (log.isDebugEnabled())
+      log.debug("FIND MEMBERSHIP BY USER " + userName + ", GROUP " + groupId + ", TYPE " + type
+          + " - " + (member != null));
     return member;
   }
-  
+
   public Collection findMembershipsByGroup(Group group) throws Exception {
-   
-    if(group == null) return null;
+
+    if (group == null)
+      return null;
     List<MembershipImpl> list = new ArrayList<MembershipImpl>();
     DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
     query.addLIKE("GROUP_ID", group.getId());
@@ -104,28 +116,30 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
   }
 
   public Collection findMembershipsByUser(String userName) throws Exception {
-    if(userName == null) return null;
+    if (userName == null)
+      return null;
     List<MembershipImpl> list = new ArrayList<MembershipImpl>();
     DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
     query.addLIKE("USER_NAME", userName);
     loadInstances(query.toQuery(), list);
-    if(log.isDebugEnabled())
-	  log.debug("FIND MEMBERSHIP BY USER " + userName + " Size = " + list.size());
+    if (log.isDebugEnabled())
+      log.debug("FIND MEMBERSHIP BY USER " + userName + " Size = " + list.size());
     return list;
   }
 
   public Collection findMembershipsByUserAndGroup(String userName, String groupId) throws Exception {
-    if(userName ==null || groupId == null) return null;
+    if (userName == null || groupId == null)
+      return null;
     List<MembershipImpl> list = new ArrayList<MembershipImpl>();
     DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
     query.addLIKE("USER_NAME", userName);
     query.addLIKE("GROUP_ID", groupId);
     loadInstances(query.toQuery(), list);
-    if(log.isDebugEnabled())
-	  log.debug("FIND MEMBERSHIP BY USER " + userName + ", GROUP " + groupId + " Size = " + list.size() );
+    if (log.isDebugEnabled())
+      log.debug("FIND MEMBERSHIP BY USER " + userName + ", GROUP " + groupId + " Size = "
+          + list.size());
     return list;
   }
-
 
   public Membership removeMembership(String id, boolean broadcast) throws Exception {
     DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
@@ -133,54 +147,62 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
     Connection connection = eXoDS_.getConnection();
     try {
       MembershipImpl membershipImpl = super.loadUnique(connection, query.toQuery());
-      if(membershipImpl == null) return null;
-      if(broadcast) listenerService_.broadcast("organization.membership.preDelete", this, membershipImpl);
-      String sql = eXoDS_.getQueryBuilder().createRemoveQuery(type_, membershipImpl.getDBObjectId());
-      super.execute(connection, sql, (MembershipImpl)null);
-      if(broadcast) listenerService_.broadcast("organization.membership.postDelete", this, membershipImpl);
+      if (membershipImpl == null)
+        return null;
+      if (broadcast)
+        listenerService_.broadcast("organization.membership.preDelete", this, membershipImpl);
+      String sql = eXoDS_.getQueryBuilder()
+                         .createRemoveQuery(type_, membershipImpl.getDBObjectId());
+      super.execute(connection, sql, (MembershipImpl) null);
+      if (broadcast)
+        listenerService_.broadcast("organization.membership.postDelete", this, membershipImpl);
       return membershipImpl;
-    }catch (Exception e) {
+    } catch (Exception e) {
       throw e;
     } finally {
-      eXoDS_.closeConnection(connection) ; 
+      eXoDS_.closeConnection(connection);
     }
   }
 
   @SuppressWarnings("unchecked")
   public Collection removeMembershipByUser(String username, boolean broadcast) throws Exception {
-//    DBObjectQuery<MembershipImpl> query = new DBObjectQuery<MembershipImpl>(MembershipImpl.class);
-//    query.addLIKE("userName", username);
+    // DBObjectQuery<MembershipImpl> query = new
+    // DBObjectQuery<MembershipImpl>(MembershipImpl.class);
+    // query.addLIKE("userName", username);
     List<Membership> members = (List<Membership>) findMembershipsByUser(username);
-    for(Membership member: members){
+    for (Membership member : members) {
       removeMembership(member.getId(), true);
     }
     return null;
   }
-  
-  public Collection removeMemberships(DBObjectQuery<MembershipImpl> query , boolean broadcast) throws Exception {
+
+  public Collection removeMemberships(DBObjectQuery<MembershipImpl> query, boolean broadcast) throws Exception {
     DBPageList<MembershipImpl> pageList = new DBPageList<MembershipImpl>(20, this, query);
     List<MembershipImpl> list = pageList.getAll();
     Connection connection = eXoDS_.getConnection();
     try {
-      for(MembershipImpl membershipImpl : list) {
-        if(broadcast) listenerService_.broadcast("organization.membership.preDelete", this, membershipImpl);
-        if(membershipImpl == null) return null;
-        String sql = eXoDS_.getQueryBuilder().createRemoveQuery(type_, membershipImpl.getDBObjectId());
-        super.execute(connection, sql, (MembershipImpl)null);
-        if(broadcast) listenerService_.broadcast("organization.membership.postDelete", this, membershipImpl);
+      for (MembershipImpl membershipImpl : list) {
+        if (broadcast)
+          listenerService_.broadcast("organization.membership.preDelete", this, membershipImpl);
+        if (membershipImpl == null)
+          return null;
+        String sql = eXoDS_.getQueryBuilder().createRemoveQuery(type_,
+                                                                membershipImpl.getDBObjectId());
+        super.execute(connection, sql, (MembershipImpl) null);
+        if (broadcast)
+          listenerService_.broadcast("organization.membership.postDelete", this, membershipImpl);
       }
       return list;
-    }catch (Exception e) {
+    } catch (Exception e) {
       throw e;
     } finally {
-      eXoDS_.closeConnection(connection) ; 
+      eXoDS_.closeConnection(connection);
     }
   }
-  
-  
+
   @SuppressWarnings("unchecked")
-  public void addMembershipEventListener(MembershipEventListener listener) { 
-    throw new RuntimeException("This method is not supported anymore, please use the new api") ;
+  public void addMembershipEventListener(MembershipEventListener listener) {
+    throw new RuntimeException("This method is not supported anymore, please use the new api");
   }
 
 }

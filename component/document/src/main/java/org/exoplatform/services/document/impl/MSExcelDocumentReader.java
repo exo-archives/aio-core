@@ -38,7 +38,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 public class MSExcelDocumentReader extends BaseDocumentReader {
 
   private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
-  
+
   /**
    * Get the application/excel mime type.
    * 
@@ -62,7 +62,7 @@ public class MSExcelDocumentReader extends BaseDocumentReader {
       for (int sheetNum = 0; sheetNum < wb.getNumberOfSheets(); sheetNum++) {
         HSSFSheet sheet = wb.getSheetAt(sheetNum);
         if (sheet != null) {
-          for (int rowNum = sheet.getFirstRowNum(); rowNum <= sheet.getLastRowNum() ; rowNum++) {
+          for (int rowNum = sheet.getFirstRowNum(); rowNum <= sheet.getLastRowNum(); rowNum++) {
             HSSFRow row = sheet.getRow(rowNum);
 
             if (row != null) {
@@ -77,9 +77,9 @@ public class MSExcelDocumentReader extends BaseDocumentReader {
                       Date date = HSSFDateUtil.getJavaDate(d);
                       String cellText = this.DATE_FORMAT.format(date);
                       text = text + cellText + " ";
-                    } else{
+                    } else {
                       text = text + d + " ";
-                    }  
+                    }
                     break;
                   }
                   case HSSFCell.CELL_TYPE_FORMULA:
@@ -104,7 +104,7 @@ public class MSExcelDocumentReader extends BaseDocumentReader {
         }
       }
     } catch (Exception e) {
-      //e.printStackTrace();
+      // e.printStackTrace();
     }
     return text;
   }
@@ -116,8 +116,9 @@ public class MSExcelDocumentReader extends BaseDocumentReader {
 
   /*
    * (non-Javadoc)
-   * 
-   * @see org.exoplatform.services.document.DocumentReader#getProperties(java.io.InputStream)
+   * @see
+   * org.exoplatform.services.document.DocumentReader#getProperties(java.io.
+   * InputStream)
    */
   public Properties getProperties(InputStream is) throws Exception {
     POIPropertiesReader reader = new POIPropertiesReader();
@@ -132,27 +133,27 @@ public class MSExcelDocumentReader extends BaseDocumentReader {
       HSSFCellStyle style = cell.getCellStyle();
       int i = style.getDataFormat();
       switch (i) {
-      case 0xe:  // m/d/yy
-      case 0xf:  // d-mmm-yy
+      case 0xe: // m/d/yy
+      case 0xf: // d-mmm-yy
       case 0x10: // d-mmm
       case 0x11: // mmm-yy
-      case 0x12: // h:mm AM/PM 
+      case 0x12: // h:mm AM/PM
       case 0x13: // h:mm:ss AM/PM
       case 0x14: // h:mm
-      case 0x15: // h:mm:ss 
+      case 0x15: // h:mm:ss
       case 0x16: // m/d/yy h:mm
       case 0x2d: // mm:ss
       case 0x2e: // [h]:mm:ss
       case 0x2f: // mm:ss.0
-      
-      case 0xa5: // ??  
-      case 0xa7: // ??         
-      case 0xa9: // ?? 
-        
-      case 0xac: // mm:dd:yy     not specified in javadoc   
-      case 0xad: // yyyy-mm-dd   not specified in javadoc   
-      case 0xae: // mm:dd:yyyy   not specified in javadoc  
-      case 0xaf: // m:d:yy       not specified in javadoc   
+
+      case 0xa5: // ??
+      case 0xa7: // ??
+      case 0xa9: // ??
+
+      case 0xac: // mm:dd:yy not specified in javadoc
+      case 0xad: // yyyy-mm-dd not specified in javadoc
+      case 0xae: // mm:dd:yyyy not specified in javadoc
+      case 0xaf: // m:d:yy not specified in javadoc
         bDate = true;
         break;
       default:

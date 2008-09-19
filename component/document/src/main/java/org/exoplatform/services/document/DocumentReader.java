@@ -20,37 +20,37 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Nam
+ * Created by The eXo Platform SAS Author : Nam
+ * 
  * @author Gennady Azarenkov
  * @version $Id: DocumentReader.java 11659 2007-01-05 15:35:06Z geaz $
  */
- public interface DocumentReader  {
-   
+public interface DocumentReader {
+
   /**
    * @return all appropriate mime types
    */
-  String[] getMimeTypes() ;
-  
+  String[] getMimeTypes();
+
   /**
    * @param is
    * @return document content
    * @throws Exception
    */
-  String getContentAsText(InputStream is) throws Exception ;
-  
+  String getContentAsText(InputStream is) throws Exception;
+
   /**
    * @param is data input stream
    * @param encoding char set for input stream
    * @return document content
    * @throws Exception
    */
-  String getContentAsText(InputStream is, String encoding) throws Exception ;
-  
-  
+  String getContentAsText(InputStream is, String encoding) throws Exception;
+
   /**
    * @param mimeType
-   * @return metainfo properties reduced to some supported metadata set (Dublin Core or other)
+   * @return metainfo properties reduced to some supported metadata set (Dublin
+   *         Core or other)
    */
   Properties getProperties(InputStream is) throws Exception;
 

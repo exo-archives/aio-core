@@ -27,43 +27,44 @@ import javax.naming.ldap.LdapContext;
 import org.exoplatform.services.ldap.LDAPService;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Thuannd
- *         nhudinhthuan@yahoo.com
- * Feb 22, 2006
+ * Created by The eXo Platform SAS Author : Thuannd nhudinhthuan@yahoo.com Feb
+ * 22, 2006
  */
 public class ADSearchBySID {
-  
-  protected LDAPAttributeMapping ldapAttrMapping_ ; 
-  
-  protected LDAPService ldapService_ ; 
-  
+
+  protected LDAPAttributeMapping ldapAttrMapping_;
+
+  protected LDAPService          ldapService_;
+
   public ADSearchBySID(LDAPAttributeMapping ldapAttrMapping, LDAPService ldapService) {
     ldapAttrMapping_ = ldapAttrMapping;
     ldapService_ = ldapService;
   }
-  
+
   public String findMembershipDNBySID(byte[] sid, String baseDN, String scopedRole) throws Exception {
-    LdapContext ctx = ldapService_.getLdapContext();    
+    LdapContext ctx = ldapService_.getLdapContext();
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    constraints.setReturningAttributes(new String[]{""});
-    constraints.setDerefLinkFlag(true); 
-    
+    constraints.setReturningAttributes(new String[] { "" });
+    constraints.setDerefLinkFlag(true);
+
     NamingEnumeration answer;
-    if (scopedRole == null){
-      answer = ctx.search(baseDN, "objectSid={0}", new Object[] {sid}, constraints);
+    if (scopedRole == null) {
+      answer = ctx.search(baseDN, "objectSid={0}", new Object[] { sid }, constraints);
     } else {
-      answer =ctx.search(baseDN, "(& (objectSid={0}) ("+ 
-         ldapAttrMapping_.membershipTypeRoleNameAttr+ "={1}))",new Object[] {sid, scopedRole}, constraints);
-    }   
-    
+      answer = ctx.search(baseDN,
+                          "(& (objectSid={0}) (" + ldapAttrMapping_.membershipTypeRoleNameAttr
+                              + "={1}))",
+                          new Object[] { sid, scopedRole },
+                          constraints);
+    }
+
     while (answer.hasMoreElements()) {
       SearchResult sr = (SearchResult) answer.next();
       NameParser parser = ctx.getNameParser("");
-      Name entryName = parser.parse(new CompositeName(sr.getName()).get(0));     
+      Name entryName = parser.parse(new CompositeName(sr.getName()).get(0));
       return entryName + "," + baseDN;
-    }    
+    }
     return null;
   }
 }

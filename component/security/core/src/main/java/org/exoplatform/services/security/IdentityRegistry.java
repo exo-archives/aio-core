@@ -20,14 +20,15 @@ package org.exoplatform.services.security;
 import java.util.HashMap;
 
 /**
- * Created by The eXo Platform SAS        .
+ * Created by The eXo Platform SAS .
+ * 
  * @author Gennady Azarenkov
  * @version $Id: $
  */
 
 public class IdentityRegistry {
-  
-  private HashMap<String, Identity>  identities   = new HashMap<String, Identity>();
+
+  private HashMap<String, Identity> identities = new HashMap<String, Identity>();
 
   public IdentityRegistry() {
 
@@ -36,7 +37,6 @@ public class IdentityRegistry {
   public Identity getIdentity(String userId) {
     return identities.get(userId);
   }
-  
 
   public void register(Identity identity) {
     this.identities.put(identity.getUserId(), identity);
@@ -45,9 +45,8 @@ public class IdentityRegistry {
   public void unregister(String userId) {
     this.identities.remove(userId);
   }
-  
+
   void clear() {
     identities.clear();
   }
 }
-

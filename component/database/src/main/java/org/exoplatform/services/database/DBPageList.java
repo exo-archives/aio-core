@@ -30,61 +30,62 @@ import org.exoplatform.commons.utils.PageList;
 import com.sun.rowset.CachedRowSetImpl;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Nhu Dinh Thuan
- *          nhudinhthuan@exoplatform.com
- * Mar 30, 2007  
+ * Created by The eXo Platform SAS Author : Nhu Dinh Thuan
+ * nhudinhthuan@exoplatform.com Mar 30, 2007
  */
 public class DBPageList<T extends DBObject> extends PageList {
-  
+
   protected DAO<T> dao_;
-  
+
   protected String query_;
-  
+
   public DBPageList(int pageSize, DAO<T> dao, DBObjectQuery<T> query) throws Exception {
     super(pageSize);
     dao_ = dao;
     query_ = query.toQuery();
-    
-    Object retObj = dao_.<Object>loadDBField(query.toCountQuery());
-    if(retObj instanceof  Integer) {
-      super.setAvailablePage(((Integer)retObj).intValue());
-    }else if (retObj instanceof BigDecimal){
-      super.setAvailablePage(((BigDecimal)retObj).intValue());
-    }else{
-      super.setAvailablePage(((Long)retObj).intValue());
+
+    Object retObj = dao_.<Object> loadDBField(query.toCountQuery());
+    if (retObj instanceof Integer) {
+      super.setAvailablePage(((Integer) retObj).intValue());
+    } else if (retObj instanceof BigDecimal) {
+      super.setAvailablePage(((BigDecimal) retObj).intValue());
+    } else {
+      super.setAvailablePage(((Long) retObj).intValue());
     }
   }
-  
+
   public DBPageList(int pageSize, DAO<T> dao, String query, String queryCounter) throws Exception {
     super(pageSize);
     dao_ = dao;
     query_ = query;
-    
-    Object retObj = dao_.<Object>loadDBField(queryCounter);
-    if(retObj instanceof  Integer) {
-      super.setAvailablePage(((Integer)retObj).intValue());
-    }else if (retObj instanceof BigDecimal){
-      super.setAvailablePage(((BigDecimal)retObj).intValue());
-    }else {
-      super.setAvailablePage(((Long)retObj).intValue());
+
+    Object retObj = dao_.<Object> loadDBField(queryCounter);
+    if (retObj instanceof Integer) {
+      super.setAvailablePage(((Integer) retObj).intValue());
+    } else if (retObj instanceof BigDecimal) {
+      super.setAvailablePage(((BigDecimal) retObj).intValue());
+    } else {
+      super.setAvailablePage(((Long) retObj).intValue());
     }
-//    super.setAvailablePage(counter.intValue());
+    // super.setAvailablePage(counter.intValue());
   }
-  
+
   protected void populateCurrentPage(int currentPage) throws Exception {
-    this.currentPage_ = currentPage;   
-    if(currentListPage_ != null) currentListPage_.clear(); 
-    else currentListPage_ = new ArrayList<T>();
+    this.currentPage_ = currentPage;
+    if (currentListPage_ != null)
+      currentListPage_.clear();
+    else
+      currentListPage_ = new ArrayList<T>();
     loadPageList(this, query_);
   }
-  
+
   @SuppressWarnings("unchecked")
   private void loadPageList(DBPageList<T> pageList, String query) throws Exception {
     Connection connection = null;
     try {
-      connection = dao_.getExoDatasource().getConnection() ;
-      Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+      connection = dao_.getExoDatasource().getConnection();
+      Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                                       ResultSet.CONCUR_READ_ONLY);
       ResultSet resultSet = statement.executeQuery(query);
 
       CachedRowSet crs = new CachedRowSetImpl();
@@ -92,40 +93,41 @@ public class DBPageList<T extends DBObject> extends PageList {
       crs.populate(resultSet, (pageList.getCurrentPage() - 1) * pageList.getPageSize() + 1);
 
       while (crs.next()) {
-        T bean = dao_.createInstance() ;
-        dao_.getDBObjectMapper().mapResultSet(crs, bean) ;
-        currentListPage_.add(bean) ;
+        T bean = dao_.createInstance();
+        dao_.getDBObjectMapper().mapResultSet(crs, bean);
+        currentListPage_.add(bean);
       }
-      
-      resultSet.close() ;
+
+      resultSet.close();
       statement.close();
     } catch (Exception e) {
       throw e;
     } finally {
-      dao_.getExoDatasource().closeConnection(connection) ;  
+      dao_.getExoDatasource().closeConnection(connection);
     }
   }
-  
-  public List<T> getAll() throws Exception { 
+
+  public List<T> getAll() throws Exception {
     Connection connection = null;
     try {
-      connection = dao_.getExoDatasource().getConnection() ;
-      Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+      connection = dao_.getExoDatasource().getConnection();
+      Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                                       ResultSet.CONCUR_READ_ONLY);
       ResultSet resultSet = statement.executeQuery(query_);
-      
-      List<T>  list = new ArrayList<T>();
+
+      List<T> list = new ArrayList<T>();
       while (resultSet.next()) {
-        T bean = dao_.createInstance() ;
-        dao_.getDBObjectMapper().mapResultSet(resultSet, bean) ;
-        list.add(bean) ;
+        T bean = dao_.createInstance();
+        dao_.getDBObjectMapper().mapResultSet(resultSet, bean);
+        list.add(bean);
       }
-      resultSet.close() ;
+      resultSet.close();
       statement.close();
       return list;
     } catch (Exception e) {
       throw e;
     } finally {
-      dao_.getExoDatasource().closeConnection(connection) ;  
+      dao_.getExoDatasource().closeConnection(connection);
     }
   }
 

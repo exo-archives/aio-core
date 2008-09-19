@@ -30,10 +30,11 @@ import org.exoplatform.container.xml.PropertiesParam;
  * @version $Id: $
  */
 public class AddXMLResolvingContextPlugin extends BaseComponentPlugin {
-  
+
   private Map<String, String> publicIDs_ = new HashMap<String, String>();
+
   private Map<String, String> systemIDs_ = new HashMap<String, String>();
-  
+
   public AddXMLResolvingContextPlugin(InitParams params) {
     if (params != null) {
       Iterator<PropertiesParam> iterator = params.getPropertiesParamIterator();
@@ -49,7 +50,7 @@ public class AddXMLResolvingContextPlugin extends BaseComponentPlugin {
       }
     }
   }
-  
+
   public Map<String, String> getPublicIDsResolvingtable() {
     return publicIDs_;
   }
@@ -59,4 +60,3 @@ public class AddXMLResolvingContextPlugin extends BaseComponentPlugin {
   }
 
 }
-

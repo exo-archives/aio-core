@@ -35,18 +35,14 @@ public class TestXMLDocumentReader extends BasicTestCase {
 
   public void setUp() throws Exception {
     PortalContainer pcontainer = PortalContainer.getInstance();
-    service_ = (DocumentReaderService) pcontainer
-        .getComponentInstanceOfType(DocumentReaderService.class);
+    service_ = (DocumentReaderService) pcontainer.getComponentInstanceOfType(DocumentReaderService.class);
   }
 
   public void testGetContentAsString() throws Exception {
     InputStream is = TestXMLDocumentReader.class.getResourceAsStream("/test.xml");
     String text = service_.getDocumentReader("text/xml").getContentAsText(is);
-    String etalon = 
-      "\n\n  John\n"
-      +"  Alice\n"
-      +"  Reminder\n"
-      +"  Don't forget it this weekend!\n\n";
+    String etalon = "\n\n  John\n" + "  Alice\n" + "  Reminder\n"
+        + "  Don't forget it this weekend!\n\n";
     assertEquals("Wrong string returned", etalon, text);
   }
 }

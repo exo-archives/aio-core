@@ -22,19 +22,20 @@ import java.util.Set;
 
 /**
  * Created by The eXo Platform SAS .
+ * 
  * @author Gennady Azarenkov
  * @version $Id: $
  */
 
 public class ConversationState {
-  
-  public static final String SUBJECT = "subject";
+
+  public static final String                    SUBJECT = "subject";
 
   private static ThreadLocal<ConversationState> current = new ThreadLocal<ConversationState>();
 
-  private Identity identity;
+  private Identity                              identity;
 
-  private HashMap<String, Object> attributes;
+  private HashMap<String, Object>               attributes;
 
   public ConversationState(Identity identity) {
     this.identity = identity;
@@ -55,6 +56,7 @@ public class ConversationState {
 
   /**
    * sets attribute
+   * 
    * @param key
    * @param value
    */
@@ -79,6 +81,7 @@ public class ConversationState {
 
   /**
    * removes attribute
+   * 
    * @param key
    */
   public void removeAttribute(String name) {

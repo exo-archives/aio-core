@@ -25,59 +25,67 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamSource;
 
+import org.picocontainer.Startable;
+
 import org.apache.commons.logging.Log;
+
 import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.xml.transform.NotSupportedIOTypeException;
 import org.exoplatform.services.xml.transform.trax.TRAXTemplates;
 import org.exoplatform.services.xml.transform.trax.TRAXTemplatesService;
 import org.exoplatform.services.xml.transform.trax.TRAXTransformerService;
-import org.picocontainer.Startable;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
  * @version $Id: $
  */
 public class TRAXTemplatesServiceImpl implements TRAXTemplatesService, Startable {
-  
-  private static final Log LOGGER = ExoLogger.getLogger("TRAXTemplatesServiceImpl");
+
+  private static final Log           LOGGER = ExoLogger.getLogger("TRAXTemplatesServiceImpl");
+
   private Map<String, TRAXTemplates> templates_;
-  private TRAXTransformerService traxTransformerService_;
-  
+
+  private TRAXTransformerService     traxTransformerService_;
+
   public TRAXTemplatesServiceImpl(TRAXTransformerService traxTransformerService) {
     traxTransformerService_ = traxTransformerService;
     templates_ = new HashMap<String, TRAXTemplates>();
   }
-  
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.xml.transform.trax.TRAXTemplatesService#getTemplates(
-   * java.lang.String)
+
+  /*
+   * (non-Javadoc)
+   * @see
+   * org.exoplatform.services.xml.transform.trax.TRAXTemplatesService#getTemplates
+   * ( java.lang.String)
    */
   public TRAXTemplates getTemplates(String key) {
     return templates_.get(key);
   }
-  
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.xml.transform.trax.TRAXTemplatesService#addTRAXTemplates(
-   * java.lang.String, org.exoplatform.services.xml.transform.trax.TRAXTemplates)
+
+  /*
+   * (non-Javadoc)
+   * @seeorg.exoplatform.services.xml.transform.trax.TRAXTemplatesService#
+   * addTRAXTemplates( java.lang.String,
+   * org.exoplatform.services.xml.transform.trax.TRAXTemplates)
    */
-  public void addTRAXTemplates(String key,
-      TRAXTemplates templates) throws IllegalArgumentException {
+  public void addTRAXTemplates(String key, TRAXTemplates templates) throws IllegalArgumentException {
     if (templates_.get(key) != null) {
       throw new IllegalArgumentException("Templates with key '" + key + "' already exists!");
     }
     templates_.put(key, templates);
   }
-  
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.xml.transform.trax.TRAXTemplatesService#addTRAXTemplates(
-   * java.lang.String, javax.xml.transform.Source)
+
+  /*
+   * (non-Javadoc)
+   * @seeorg.exoplatform.services.xml.transform.trax.TRAXTemplatesService#
+   * addTRAXTemplates( java.lang.String, javax.xml.transform.Source)
    */
-  public void addTRAXTemplates(String key,
-      Source source) throws IllegalArgumentException {
+  public void addTRAXTemplates(String key, Source source) throws IllegalArgumentException {
     if (templates_.get(key) != null) {
       throw new IllegalArgumentException("Templates with key '" + key + "' already exists!");
-    } try {
+    }
+    try {
       templates_.put(key, traxTransformerService_.getTemplates(source));
     } catch (NotSupportedIOTypeException e) {
       throw new IllegalArgumentException("Source has unsupported context." + e);
@@ -95,29 +103,33 @@ public class TRAXTemplatesServiceImpl implements TRAXTemplatesService, Startable
         try {
           if (Thread.currentThread().getContextClassLoader().getResource(xsltSchema) != null) {
             LOGGER.info("XSLT schema found by relative path: " + xsltSchema);
-            addTRAXTemplates(key, traxTransformerService_.getTemplates(new StreamSource(
-                Thread.currentThread().getContextClassLoader().getResourceAsStream(xsltSchema))));
-          } else 
+            addTRAXTemplates(key,
+                             traxTransformerService_.getTemplates(new StreamSource(Thread.currentThread()
+                                                                                         .getContextClassLoader()
+                                                                                         .getResourceAsStream(xsltSchema))));
+          } else
             LOGGER.error("XSLT schema not found: " + xsltSchema);
-         } catch(Exception e) {
-           LOGGER.error("Add new TRAXTemplates failed : " + e);
-         }
+        } catch (Exception e) {
+          LOGGER.error("Add new TRAXTemplates failed : " + e);
+        }
       }
     }
   }
+
   // ------ Startable -------
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
    * @see org.picocontainer.Startable#start()
    */
-  public void start(){
+  public void start() {
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
    * @see org.picocontainer.Startable#stop()
    */
   public void stop() {
   }
 
 }
-

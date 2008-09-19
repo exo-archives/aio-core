@@ -25,13 +25,14 @@ import java.util.zip.ZipInputStream;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.exoplatform.commons.utils.QName;
-import org.exoplatform.services.document.DCMetaData;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
+
+import org.exoplatform.commons.utils.QName;
+import org.exoplatform.services.document.DCMetaData;
 
 /**
  * Created by The eXo Platform SAS .
@@ -44,23 +45,21 @@ public class OpenOfficeDocumentReader extends BaseDocumentReader {
 
   /*
    * (non-Javadoc)
-   * 
    * @see org.exoplatform.services.document.DocumentReader#getMimeTypes()
    */
   public String[] getMimeTypes() {
-    return new String[] {
-        "application/vnd.oasis.opendocument.database",
+    return new String[] { "application/vnd.oasis.opendocument.database",
         "application/vnd.oasis.opendocument.formula",
         "application/vnd.oasis.opendocument.graphics",
         "application/vnd.oasis.opendocument.presentation",
-        "application/vnd.oasis.opendocument.spreadsheet",
-        "application/vnd.oasis.opendocument.text" };
+        "application/vnd.oasis.opendocument.spreadsheet", "application/vnd.oasis.opendocument.text" };
   }
 
   /*
    * (non-Javadoc)
-   * 
-   * @see org.exoplatform.services.document.DocumentReader#getContentAsText(java.io.InputStream)
+   * @see
+   * org.exoplatform.services.document.DocumentReader#getContentAsText(java.
+   * io.InputStream)
    */
   public String getContentAsText(InputStream is) throws Exception {
     try {
@@ -69,9 +68,7 @@ public class OpenOfficeDocumentReader extends BaseDocumentReader {
       SAXParser saxParser = saxParserFactory.newSAXParser();
       XMLReader xmlReader = saxParser.getXMLReader();
       xmlReader.setFeature("http://xml.org/sax/features/validation", false);
-      xmlReader.setFeature(
-          "http://apache.org/xml/features/nonvalidating/load-external-dtd",
-          false);
+      xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
       ZipInputStream zis = new ZipInputStream(is);
       ZipEntry ze = zis.getNextEntry();
@@ -88,24 +85,25 @@ public class OpenOfficeDocumentReader extends BaseDocumentReader {
       }
 
       return contentHandler.getContent();
-//    } catch (ParserConfigurationException e) {
-//      return "";
-//    } catch (SAXException e) {
-//      return "";
+      // } catch (ParserConfigurationException e) {
+      // return "";
+      // } catch (SAXException e) {
+      // return "";
     } finally {
       is.close();
     }
   }
 
   public String getContentAsText(InputStream is, String encoding) throws Exception {
-    //Ignore encoding
+    // Ignore encoding
     return getContentAsText(is);
   }
-  
+
   /*
    * (non-Javadoc)
-   * 
-   * @see org.exoplatform.services.document.DocumentReader#getProperties(java.io.InputStream)
+   * @see
+   * org.exoplatform.services.document.DocumentReader#getProperties(java.io.
+   * InputStream)
    */
   public Properties getProperties(InputStream is) throws Exception {
     try {
@@ -114,9 +112,7 @@ public class OpenOfficeDocumentReader extends BaseDocumentReader {
       SAXParser saxParser = saxParserFactory.newSAXParser();
       XMLReader xmlReader = saxParser.getXMLReader();
       xmlReader.setFeature("http://xml.org/sax/features/validation", false);
-      xmlReader.setFeature(
-          "http://apache.org/xml/features/nonvalidating/load-external-dtd",
-          false);
+      xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
       ZipInputStream zis = new ZipInputStream(is);
       ZipEntry ze = zis.getNextEntry();
@@ -133,20 +129,19 @@ public class OpenOfficeDocumentReader extends BaseDocumentReader {
       }
 
       return metaHandler.getProperties();
-      
+
     } finally {
       is.close();
     }
   }
 
-  
   // --------------------------------------------< OpenOfficeContentHandler >
 
   private class OpenOfficeContentHandler extends DefaultHandler {
 
     private StringBuffer content;
 
-    private boolean appendChar;
+    private boolean      appendChar;
 
     public OpenOfficeContentHandler() {
       content = new StringBuffer();
@@ -160,34 +155,33 @@ public class OpenOfficeDocumentReader extends BaseDocumentReader {
       return content.toString();
     }
 
-    public void startElement(String namespaceURI, String localName,
-        String rawName, Attributes atts) throws SAXException {
+    public void startElement(String namespaceURI, String localName, String rawName, Attributes atts) throws SAXException {
       if (rawName.startsWith("text:")) {
         appendChar = true;
       }
     }
 
-    public void characters(char[] ch, int start, int length)
-        throws SAXException {
+    public void characters(char[] ch, int start, int length) throws SAXException {
       if (appendChar) {
         content.append(ch, start, length).append(" ");
       }
     }
 
     public void endElement(java.lang.String namespaceURI,
-        java.lang.String localName, java.lang.String qName) throws SAXException {
+                           java.lang.String localName,
+                           java.lang.String qName) throws SAXException {
       appendChar = false;
     }
   }
-  
+
   private class OpenOfficeMetaHandler extends DefaultHandler {
 
-    private Properties props;
+    private Properties   props;
 
-    private QName curPropertyName;
-    
+    private QName        curPropertyName;
+
     private StringBuffer curPropertyValue;
-    
+
     public OpenOfficeMetaHandler() {
       props = new Properties();
       curPropertyValue = new StringBuffer();
@@ -197,23 +191,22 @@ public class OpenOfficeDocumentReader extends BaseDocumentReader {
       return props;
     }
 
-    public void startElement(String namespaceURI, String localName,
-        String rawName, Attributes atts) throws SAXException {
+    public void startElement(String namespaceURI, String localName, String rawName, Attributes atts) throws SAXException {
       if (rawName.startsWith("dc:")) {
         curPropertyName = new QName(DCMetaData.DC_NAMESPACE, rawName.substring(3));
       }
     }
 
-    public void characters(char[] ch, int start, int length)
-        throws SAXException {
-      if(curPropertyName != null) {
+    public void characters(char[] ch, int start, int length) throws SAXException {
+      if (curPropertyName != null) {
         curPropertyValue.append(ch, start, length);
       }
     }
 
     public void endElement(java.lang.String namespaceURI,
-        java.lang.String localName, java.lang.String qName) throws SAXException {
-      if(curPropertyName != null) {
+                           java.lang.String localName,
+                           java.lang.String qName) throws SAXException {
+      if (curPropertyName != null) {
         props.put(curPropertyName, curPropertyValue.toString());
         curPropertyValue = new StringBuffer();
         curPropertyName = null;

@@ -37,16 +37,15 @@ public class JAASConversationStateListener extends ConversationStateListener {
   public void sessionDestroyed(HttpSessionEvent event) {
     String sesionId = event.getSession().getId();
     try {
-      ConversationRegistry conversationRegistry =
-        (ConversationRegistry) getContainer().getComponentInstanceOfType(ConversationRegistry.class);
+      ConversationRegistry conversationRegistry = (ConversationRegistry) getContainer().getComponentInstanceOfType(ConversationRegistry.class);
 
       ConversationState conversationState = conversationRegistry.unregister(sesionId);
 
       if (conversationState != null) {
         log.info("Remove conversation state " + sesionId);
         if (conversationState.getAttribute(ConversationState.SUBJECT) != null) {
-          Subject subject = (Subject) conversationState.getAttribute(ConversationState.SUBJECT); 
-          LoginContext ctx = new LoginContext("exo-domain",  subject);
+          Subject subject = (Subject) conversationState.getAttribute(ConversationState.SUBJECT);
+          LoginContext ctx = new LoginContext("exo-domain", subject);
           ctx.logout();
         } else {
           log.warn("Subject was not found in ConversationState attributes.");

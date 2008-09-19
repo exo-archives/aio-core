@@ -20,9 +20,7 @@ import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.services.document.DocumentReader;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Phung Hai Nam
- *          phunghainam@gmail.com
+ * Created by The eXo Platform SAS Author : Phung Hai Nam phunghainam@gmail.com
  * Oct 20, 2005
  */
 abstract public class BaseDocumentReader extends BaseComponentPlugin implements DocumentReader {

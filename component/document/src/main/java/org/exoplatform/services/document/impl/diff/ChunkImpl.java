@@ -73,21 +73,19 @@ import org.exoplatform.services.document.diff.Chunk;
  * @see DiffServiceImpl
  * @see DeltaImpl
  */
-public class ChunkImpl extends ToStringImpl implements Chunk{
+public class ChunkImpl extends ToStringImpl implements Chunk {
 
-  protected int anchor;
+  protected int  anchor;
 
-  protected int count;
+  protected int  count;
 
   protected List chunk;
 
   /**
    * Creates a chunk that doesn't copy the original text.
    * 
-   * @param pos
-   *          the start position in the text.
-   * @param count
-   *          the size of the chunk.
+   * @param pos the start position in the text.
+   * @param count the size of the chunk.
    */
   public ChunkImpl(int pos, int count) {
     this.anchor = pos;
@@ -97,12 +95,9 @@ public class ChunkImpl extends ToStringImpl implements Chunk{
   /**
    * Creates a chunk and saves a copy the original chunk's text.
    * 
-   * @param iseq
-   *          the original text.
-   * @param pos
-   *          the start position in the text.
-   * @param count
-   *          the size of the chunk.
+   * @param iseq the original text.
+   * @param pos the start position in the text.
+   * @param count the size of the chunk.
    */
   public ChunkImpl(Object[] iseq, int pos, int count) {
     this(pos, count);
@@ -113,14 +108,10 @@ public class ChunkImpl extends ToStringImpl implements Chunk{
    * Creates a chunk that will be displaced in the resulting text, and saves a
    * copy the original chunk's text.
    * 
-   * @param iseq
-   *          the original text.
-   * @param pos
-   *          the start position in the text.
-   * @param count
-   *          the size of the chunk.
-   * @param offset
-   *          the position the chunk should have in the resulting text.
+   * @param iseq the original text.
+   * @param pos the start position in the text.
+   * @param count the size of the chunk.
+   * @param offset the position the chunk should have in the resulting text.
    */
   public ChunkImpl(Object[] iseq, int pos, int count, int offset) {
     this(offset, count);
@@ -130,12 +121,9 @@ public class ChunkImpl extends ToStringImpl implements Chunk{
   /**
    * Creates a chunk and saves a copy the original chunk's text.
    * 
-   * @param iseq
-   *          the original text.
-   * @param pos
-   *          the start position in the text.
-   * @param count
-   *          the size of the chunk.
+   * @param iseq the original text.
+   * @param pos the start position in the text.
+   * @param count the size of the chunk.
    */
   public ChunkImpl(List iseq, int pos, int count) {
     this(pos, count);
@@ -146,14 +134,10 @@ public class ChunkImpl extends ToStringImpl implements Chunk{
    * Creates a chunk that will be displaced in the resulting text, and saves a
    * copy the original chunk's text.
    * 
-   * @param iseq
-   *          the original text.
-   * @param pos
-   *          the start position in the text.
-   * @param count
-   *          the size of the chunk.
-   * @param offset
-   *          the position the chunk should have in the resulting text.
+   * @param iseq the original text.
+   * @param pos the start position in the text.
+   * @param count the size of the chunk.
+   * @param offset the position the chunk should have in the resulting text.
    */
   public ChunkImpl(List iseq, int pos, int count, int offset) {
     this(offset, count);
@@ -219,8 +203,7 @@ public class ChunkImpl extends ToStringImpl implements Chunk{
    * Verifies that this chunk's saved text matches the corresponding text in the
    * given sequence.
    * 
-   * @param target
-   *          the sequence to verify against.
+   * @param target the sequence to verify against.
    * @return true if the texts match.
    */
   public boolean verify(List target) {
@@ -241,8 +224,7 @@ public class ChunkImpl extends ToStringImpl implements Chunk{
   /**
    * Delete this chunk from he given text.
    * 
-   * @param target
-   *          the text to delete from.
+   * @param target the text to delete from.
    */
   public void applyDelete(List target) {
     for (int i = last(); i >= first(); i--) {
@@ -253,10 +235,8 @@ public class ChunkImpl extends ToStringImpl implements Chunk{
   /**
    * Add the text of this chunk to the target at the given position.
    * 
-   * @param start
-   *          where to add the text.
-   * @param target
-   *          the text to add to.
+   * @param start where to add the text.
+   * @param target the text to add to.
    */
   public void applyAdd(int start, List target) {
     Iterator i = chunk.iterator();
@@ -275,12 +255,9 @@ public class ChunkImpl extends ToStringImpl implements Chunk{
   /**
    * Provide a string image of the chunk using the given prefix and postfix.
    * 
-   * @param s
-   *          where the string image should be appended.
-   * @param prefix
-   *          the text thatshould prefix each line.
-   * @param postfix
-   *          the text that should end each line.
+   * @param s where the string image should be appended.
+   * @param prefix the text thatshould prefix each line.
+   * @param postfix the text that should end each line.
    */
   public StringBuffer toString(StringBuffer s, String prefix, String postfix) {
     if (chunk != null) {
@@ -297,12 +274,9 @@ public class ChunkImpl extends ToStringImpl implements Chunk{
   /**
    * Retreives the specified part from a {@link List List}.
    * 
-   * @param seq
-   *          the list to retreive a slice from.
-   * @param pos
-   *          the start position.
-   * @param count
-   *          the number of items in the slice.
+   * @param seq the list to retreive a slice from.
+   * @param pos the start position.
+   * @param count the number of items in the slice.
    * @return a {@link List List} containing the specified items.
    */
   public List slice(List seq, int pos, int count) {
@@ -316,12 +290,9 @@ public class ChunkImpl extends ToStringImpl implements Chunk{
   /**
    * Retrieves a slice from an {@link Object Object} array.
    * 
-   * @param seq
-   *          the list to retreive a slice from.
-   * @param pos
-   *          the start position.
-   * @param count
-   *          the number of items in the slice.
+   * @param seq the list to retreive a slice from.
+   * @param pos the start position.
+   * @param count the number of items in the slice.
    * @return a {@link List List} containing the specified items.
    */
   public List slice(Object[] seq, int pos, int count) {
@@ -340,8 +311,7 @@ public class ChunkImpl extends ToStringImpl implements Chunk{
   /**
    * Provide a string representation of the numeric range of this chunk.
    * 
-   * @param s
-   *          where the string representation should be appended.
+   * @param s where the string representation should be appended.
    */
   public void rangeString(StringBuffer s) {
     rangeString(s, ",");
@@ -350,10 +320,8 @@ public class ChunkImpl extends ToStringImpl implements Chunk{
   /**
    * Provide a string representation of the numeric range of this chunk.
    * 
-   * @param s
-   *          where the string representation should be appended.
-   * @param separ
-   *          what to use as line separator.
+   * @param s where the string representation should be appended.
+   * @param separ what to use as line separator.
    */
   public void rangeString(StringBuffer s, String separ) {
     if (size() <= 1) {

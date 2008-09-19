@@ -24,31 +24,31 @@ import javax.xml.transform.Source;
  * @version $Id: $
  */
 public interface TRAXTemplatesService {
-  
+
   /**
    * Add new TRAXTemplates to the service.
+   * 
    * @param key the key for this templates.
    * @param templates the TRAXTemplates.
    * @throws IllegalArgumentException
    */
-  void addTRAXTemplates(String key, TRAXTemplates templates)
-      throws IllegalArgumentException;
-  
+  void addTRAXTemplates(String key, TRAXTemplates templates) throws IllegalArgumentException;
+
   /**
    * Add new TRAXTemplates to the service from javax.xml.transform.Source.
+   * 
    * @param key the key for this templates.
    * @param templates the TRAXTemplates.
    * @throws IllegalArgumentException
    */
-  void addTRAXTemplates(String key, Source source)
-      throws IllegalArgumentException;
+  void addTRAXTemplates(String key, Source source) throws IllegalArgumentException;
 
   /**
    * Get templates by key.
+   * 
    * @param key the key.
    * @return the TRAXTemplates or null.
    */
   TRAXTemplates getTemplates(String key);
-  
-}
 
+}

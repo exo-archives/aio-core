@@ -39,9 +39,8 @@ public class TestPropertiesExtracting extends TestCase {
   }
 
   public void setUp() throws Exception {
-    PortalContainer pcontainer = PortalContainer.getInstance() ;
-    service_ =
-      (DocumentReaderService) pcontainer.getComponentInstanceOfType(DocumentReaderService.class) ;
+    PortalContainer pcontainer = PortalContainer.getInstance();
+    service_ = (DocumentReaderService) pcontainer.getComponentInstanceOfType(DocumentReaderService.class);
   }
 
   public void testPDFDocumentReaderService() throws Exception {
@@ -50,24 +49,24 @@ public class TestPropertiesExtracting extends TestCase {
     Properties props = rdr.getProperties(is);
     printProps(props);
   }
-  
+
   public void testPDFDocumentReaderServiceXMPMetadata() throws Exception {
     InputStream is = TestPropertiesExtracting.class.getResourceAsStream("/MyTest.pdf");
     DocumentReader rdr = service_.getDocumentReader("application/pdf");
-    
+
     Properties testprops = rdr.getProperties(is);
     printProps(testprops);
-    
+
     Properties etalon = new Properties();
     etalon.put(DCMetaData.TITLE, "Test de convertion de fichier tif");
     etalon.put(DCMetaData.CREATOR, "Christian Klaus");
     etalon.put(DCMetaData.SUBJECT, "20080901 TEST Christian Etat OK");
-    Calendar c = ISO8601.parseEx("2008-09-01T08:01:10+00:00");;
+    Calendar c = ISO8601.parseEx("2008-09-01T08:01:10+00:00");
+    ;
     etalon.put(DCMetaData.DATE, c);
-    
+
     evalProps(etalon, testprops);
   }
-
 
   public void testWordDocumentReaderService() throws Exception {
     InputStream is = TestPropertiesExtracting.class.getResourceAsStream("/test.doc");
@@ -89,28 +88,29 @@ public class TestPropertiesExtracting extends TestCase {
 
   public void testOODocumentReaderService() throws Exception {
     InputStream is = TestPropertiesExtracting.class.getResourceAsStream("/test.odt");
-    Properties props = service_.getDocumentReader("application/vnd.oasis.opendocument.text").getProperties(is);
+    Properties props = service_.getDocumentReader("application/vnd.oasis.opendocument.text")
+                               .getProperties(is);
     printProps(props);
   }
 
   private void printProps(Properties props) {
     Iterator it = props.entrySet().iterator();
     props.toString();
-    while(it.hasNext()) {
-      Map.Entry entry = (Map.Entry)it.next();
-      System.out.println(" "+entry.getKey()+" -> ["+entry.getValue()+"]");
+    while (it.hasNext()) {
+      Map.Entry entry = (Map.Entry) it.next();
+      System.out.println(" " + entry.getKey() + " -> [" + entry.getValue() + "]");
     }
   }
 
-  private void evalProps(Properties etalon, Properties testedProps){
+  private void evalProps(Properties etalon, Properties testedProps) {
     Iterator it = etalon.entrySet().iterator();
-    while(it.hasNext()){
-      Map.Entry prop = (Map.Entry)it.next();
-      Object tval = testedProps.get(prop.getKey());  
-      assertNotNull(prop.getKey() + " property not founded. ",tval);
-      assertEquals(prop.getKey() + " property value is incorrect",prop.getValue(),tval);
-     }
-     assertEquals("size is incorrect", etalon.size(), testedProps.size());
+    while (it.hasNext()) {
+      Map.Entry prop = (Map.Entry) it.next();
+      Object tval = testedProps.get(prop.getKey());
+      assertNotNull(prop.getKey() + " property not founded. ", tval);
+      assertEquals(prop.getKey() + " property value is incorrect", prop.getValue(), tval);
+    }
+    assertEquals("size is incorrect", etalon.size(), testedProps.size());
   }
-  
+
 }

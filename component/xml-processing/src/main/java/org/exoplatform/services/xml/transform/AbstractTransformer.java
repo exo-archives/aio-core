@@ -17,8 +17,8 @@
 
 package org.exoplatform.services.xml.transform;
 
-import javax.xml.transform.Source;
 import javax.xml.transform.Result;
+import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 
 /**
@@ -33,26 +33,22 @@ public interface AbstractTransformer {
   /**
    * Initialize a result of transformation
    * 
-   * @param result
-   *          Result
-   * @throws NotSupportedIOTypeException
-   *           if try to initialize with not supported implementation of Result
+   * @param result Result
+   * @throws NotSupportedIOTypeException if try to initialize with not supported
+   *           implementation of Result
    */
   void initResult(Result result) throws NotSupportedIOTypeException;
 
   /**
    * Transform source data to result
    * 
-   * @param source
-   *          Source - input of transformation
-   * 
-   * @throws NotSupportedIOTypeException
-   *           if not supported implementation of Source
-   * @throws TransformerException
-   *           if error occurred on transformation process
-   * @throws IllegalStateException
-   *           if result not initialized by initResult
+   * @param source Source - input of transformation
+   * @throws NotSupportedIOTypeException if not supported implementation of
+   *           Source
+   * @throws TransformerException if error occurred on transformation process
+   * @throws IllegalStateException if result not initialized by initResult
    */
   void transform(Source source) throws NotSupportedIOTypeException,
-      TransformerException, IllegalStateException;
+                               TransformerException,
+                               IllegalStateException;
 }

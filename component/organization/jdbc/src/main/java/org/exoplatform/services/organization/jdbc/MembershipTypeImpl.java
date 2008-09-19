@@ -24,51 +24,73 @@ import org.exoplatform.services.database.annotation.TableField;
 import org.exoplatform.services.organization.MembershipType;
 
 /**
- * Created by The eXo Platform SAS        .
- * Author : Tuan Nguyen
- *          tuan08@users.sourceforge.net
- * Date: Jun 14, 2003
- * Time: 1:12:22 PM
+ * Created by The eXo Platform SAS . Author : Tuan Nguyen
+ * tuan08@users.sourceforge.net Date: Jun 14, 2003 Time: 1:12:22 PM
  */
-@Table(
-    name = "EXO_MEMBERSHIP_TYPE" ,
-    field = {
-        @TableField(name = "MT_NAME", type = "string", length = 200, unique = true, nullable = false),
-        @TableField(name = "MT_OWNER", type = "string", length = 100),
-        @TableField(name = "MT_DESCRIPTION", type = "string", length = 500),
-        @TableField(name = "CREATED_DATE", type = "date", length = 100),
-        @TableField(name = "MODIFIED_DATE", type = "date", length = 100)
-    }
-)
+@Table(name = "EXO_MEMBERSHIP_TYPE", field = {
+    @TableField(name = "MT_NAME", type = "string", length = 200, unique = true, nullable = false),
+    @TableField(name = "MT_OWNER", type = "string", length = 100),
+    @TableField(name = "MT_DESCRIPTION", type = "string", length = 500),
+    @TableField(name = "CREATED_DATE", type = "date", length = 100),
+    @TableField(name = "MODIFIED_DATE", type = "date", length = 100) })
 public class MembershipTypeImpl extends DBObject implements MembershipType {
 
-  private String name ;
-  private String description ;
-  private String owner ;
-  private Date createdDate ;
-  private Date modifiedDate ;
-  
+  private String name;
+
+  private String description;
+
+  private String owner;
+
+  private Date   createdDate;
+
+  private Date   modifiedDate;
+
   public MembershipTypeImpl() {
   }
 
   public MembershipTypeImpl(String name, String owner, String desc) {
-    this.name = name ;
-    this.owner = owner ;
-    this.description = desc ;
+    this.name = name;
+    this.owner = owner;
+    this.description = desc;
   }
-  
-  public String   getName() { return name ; }
-  public void     setName(String s) { name = s ; }
 
-  public String   getDescription() { return description ; }
-  public void     setDescription(String s) { description = s ; }
+  public String getName() {
+    return name;
+  }
 
-  public String   getOwner() { return owner ; }
-  public void     setOwner(String s) { owner = s ; }
+  public void setName(String s) {
+    name = s;
+  }
 
-  public Date     getCreatedDate() { return createdDate ; }
-  public void     setCreatedDate(Date d) { createdDate = d ; }
+  public String getDescription() {
+    return description;
+  }
 
-  public Date     getModifiedDate() { return modifiedDate ; }
-  public void     setModifiedDate(Date d) { modifiedDate = d ;}
+  public void setDescription(String s) {
+    description = s;
+  }
+
+  public String getOwner() {
+    return owner;
+  }
+
+  public void setOwner(String s) {
+    owner = s;
+  }
+
+  public Date getCreatedDate() {
+    return createdDate;
+  }
+
+  public void setCreatedDate(Date d) {
+    createdDate = d;
+  }
+
+  public Date getModifiedDate() {
+    return modifiedDate;
+  }
+
+  public void setModifiedDate(Date d) {
+    modifiedDate = d;
+  }
 }

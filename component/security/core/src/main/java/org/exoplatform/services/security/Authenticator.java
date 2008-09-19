@@ -19,19 +19,21 @@ package org.exoplatform.services.security;
 
 import javax.security.auth.login.LoginException;
 
-
 /**
- * Created by The eXo Platform SAS        .
- * Component responsible for user authentication (session creation)
- * In JAAS LoginModule typically called in login() method   
+ * Created by The eXo Platform SAS . Component responsible for user
+ * authentication (session creation) In JAAS LoginModule typically called in
+ * login() method
+ * 
  * @author Gennady Azarenkov
  * @version $Id:$
  */
 
 public interface Authenticator {
   /**
-   * Authenticate user and return userId which can be different to username. 
-   * @param credentials - list of users credentials (such as name/password, X509 certificate etc)
+   * Authenticate user and return userId which can be different to username.
+   * 
+   * @param credentials - list of users credentials (such as name/password, X509
+   *          certificate etc)
    * @return userId
    * @throws LoginException
    * @throws Exception
@@ -43,7 +45,6 @@ public interface Authenticator {
    * @return Identity
    * @throws Exception
    */
-  Identity createIdentity(String userId) throws Exception;  
+  Identity createIdentity(String userId) throws Exception;
 
 }
-

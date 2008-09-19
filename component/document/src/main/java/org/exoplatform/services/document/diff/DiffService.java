@@ -1,14 +1,11 @@
 package org.exoplatform.services.document.diff;
 
-
 /**
- * Implements a differencing engine that works on arrays of
- * {@link Object Object}.
- * 
+ * Implements a differencing engine that works on arrays of {@link Object
+ * Object}.
  * <p>
- * Within this library, the word <i>text</i> means a unit of information
- * subject to version control.
- * 
+ * Within this library, the word <i>text</i> means a unit of information subject
+ * to version control.
  * <p>
  * Text is represented as <code>Object[]</code> because the diff engine is
  * capable of handling more than plain ascci. In fact, arrays of any type that
@@ -16,28 +13,25 @@ package org.exoplatform.services.document.diff;
  * {@link java.lang.Object#equals equals()} correctly can be subject to
  * differencing using this library.
  * </p>
- * 
  * <p>
  * This library provides a framework in which different differencing algorithms
  * may be used. If no algorithm is specififed, a default algorithm is used.
  * </p>
  */
 
-public interface DiffService extends ToString{
-  
+public interface DiffService extends ToString {
+
   /** The standard line separator. */
-  public static final String NL = System.getProperty("line.separator");
+  public static final String NL      = System.getProperty("line.separator");
 
   /** The line separator to use in RCS format output. */
-  public static final String RCS_EOL = "\n";  
+  public static final String RCS_EOL = "\n";
 
   /**
    * compute the difference between an original and a revision.
    * 
-   * @param orig
-   *          the original
-   * @param rev
-   *          the revision to compare with the original.
+   * @param orig the original
+   * @param rev the revision to compare with the original.
    * @return a Revision describing the differences
    */
   public Revision diff(Object[] orig, Object[] rev) throws Exception;
@@ -45,10 +39,8 @@ public interface DiffService extends ToString{
   /**
    * Compares the two input sequences.
    * 
-   * @param orig
-   *          The original sequence.
-   * @param rev
-   *          The revised sequence.
+   * @param orig The original sequence.
+   * @param rev The revised sequence.
    * @return true if the sequences are identical. False otherwise.
    */
   public boolean compare(Object[] orig, Object[] rev);
@@ -57,16 +49,14 @@ public interface DiffService extends ToString{
    * Converts an array of {@link Object Object} to a string using
    * {@link Diff#NL Diff.NL} as the line separator.
    * 
-   * @param o
-   *          the array of objects.
+   * @param o the array of objects.
    */
   public String arrayToString(Object[] o);
 
   /**
    * Edits all of the items in the input sequence.
    * 
-   * @param text
-   *          The input sequence.
+   * @param text The input sequence.
    * @return A sequence of the same length with all the lines differing from the
    *         corresponding ones in the input.
    */

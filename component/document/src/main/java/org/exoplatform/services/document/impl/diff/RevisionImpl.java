@@ -69,24 +69,18 @@ import org.exoplatform.services.document.diff.DiffService;
 import org.exoplatform.services.document.diff.Revision;
 import org.exoplatform.services.document.diff.RevisionVisitor;
 
-
 /**
  * A Revision holds the series of deltas that describe the differences between
  * two sequences.
  * 
  * @version $Revision: 1.8 $ $Date: 2003/10/13 08:00:24 $
- * 
  * @author <a href="mailto:juanco@suigeneris.org">Juanco Anez</a>
  * @author <a href="mailto:bwm@hplb.hpl.hp.com">Brian McBride</a>
- * 
  * @see DeltaImpl
  * @see DiffServiceImpl
  * @see ChunkImpl
- * @see RevisionImpl
- * 
- * modifications 27 Apr 2003 bwm
- * 
- * Added visitor pattern Visitor interface and accept() method.
+ * @see RevisionImpl modifications 27 Apr 2003 bwm Added visitor pattern Visitor
+ *      interface and accept() method.
  */
 
 public class RevisionImpl extends ToStringImpl implements Revision {
@@ -99,8 +93,11 @@ public class RevisionImpl extends ToStringImpl implements Revision {
   public RevisionImpl() {
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.diff.Rev#addDelta(org.exoplatform.services.diff.Delta)
+  /*
+   * (non-Javadoc)
+   * @see
+   * org.exoplatform.services.diff.Rev#addDelta(org.exoplatform.services.diff
+   * .Delta)
    */
   public synchronized void addDelta(Delta delta) {
     if (delta == null) {
@@ -109,8 +106,11 @@ public class RevisionImpl extends ToStringImpl implements Revision {
     deltas_.add(delta);
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.diff.Rev#insertDelta(org.exoplatform.services.diff.Delta)
+  /*
+   * (non-Javadoc)
+   * @see
+   * org.exoplatform.services.diff.Rev#insertDelta(org.exoplatform.services.
+   * diff.Delta)
    */
   public synchronized void insertDelta(Delta delta) {
     if (delta == null) {
@@ -119,21 +119,24 @@ public class RevisionImpl extends ToStringImpl implements Revision {
     deltas_.add(0, delta);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see org.exoplatform.services.diff.Rev#getDelta(int)
    */
   public DeltaImpl getDelta(int i) {
     return (DeltaImpl) deltas_.get(i);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see org.exoplatform.services.diff.Rev#size()
    */
   public int size() {
     return deltas_.size();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see org.exoplatform.services.diff.Rev#patch(java.lang.Object[])
    */
   public Object[] patch(Object[] src) throws Exception {
@@ -142,7 +145,8 @@ public class RevisionImpl extends ToStringImpl implements Revision {
     return target.toArray();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see org.exoplatform.services.diff.Rev#applyTo(java.util.List)
    */
   public synchronized void applyTo(List target) throws Exception {
@@ -153,7 +157,8 @@ public class RevisionImpl extends ToStringImpl implements Revision {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see org.exoplatform.services.diff.Rev#toString(java.lang.StringBuffer)
    */
   public synchronized void toString(StringBuffer s) {
@@ -163,8 +168,10 @@ public class RevisionImpl extends ToStringImpl implements Revision {
     }
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.diff.Rev#toRCSString(java.lang.StringBuffer, java.lang.String)
+  /*
+   * (non-Javadoc)
+   * @see org.exoplatform.services.diff.Rev#toRCSString(java.lang.StringBuffer,
+   * java.lang.String)
    */
   public synchronized void toRCSString(StringBuffer s, String EOL) {
     Iterator i = deltas_.iterator();
@@ -173,14 +180,16 @@ public class RevisionImpl extends ToStringImpl implements Revision {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see org.exoplatform.services.diff.Rev#toRCSString(java.lang.StringBuffer)
    */
   public void toRCSString(StringBuffer s) {
     toRCSString(s, DiffService.NL);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see org.exoplatform.services.diff.Rev#toRCSString(java.lang.String)
    */
   public String toRCSString(String EOL) {
@@ -189,15 +198,19 @@ public class RevisionImpl extends ToStringImpl implements Revision {
     return s.toString();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see org.exoplatform.services.diff.Rev#toRCSString()
    */
   public String toRCSString() {
     return toRCSString(DiffService.NL);
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.diff.Rev#accept(org.exoplatform.services.diff.RevisionVisitor)
+  /*
+   * (non-Javadoc)
+   * @see
+   * org.exoplatform.services.diff.Rev#accept(org.exoplatform.services.diff.
+   * RevisionVisitor)
    */
   public void accept(RevisionVisitor visitor) {
     visitor.visit(this);

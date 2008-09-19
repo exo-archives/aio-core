@@ -26,8 +26,9 @@ import org.exoplatform.services.document.DocumentReaderService;
 import org.exoplatform.test.BasicTestCase;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Sergey Karpenko <sergey.karpenko@exoplatform.com.ua>
+ * Created by The eXo Platform SAS Author : Sergey Karpenko
+ * <sergey.karpenko@exoplatform.com.ua>
+ * 
  * @version $Id: $
  */
 
@@ -36,17 +37,16 @@ public class TestHtmlDocumentReader extends BasicTestCase {
 
   public void setUp() throws Exception {
     PortalContainer pcontainer = PortalContainer.getInstance();
-    service_ = (DocumentReaderService) pcontainer
-        .getComponentInstanceOfType(DocumentReaderService.class);
+    service_ = (DocumentReaderService) pcontainer.getComponentInstanceOfType(DocumentReaderService.class);
   }
 
   public void testGetContentAsString() throws Exception {
     InputStream is = TestHtmlDocumentReader.class.getResourceAsStream("/test.html");
     MimeTypeResolver mimetypeResolver = new MimeTypeResolver();
     String mimeType = mimetypeResolver.getMimeType("test.html");
-    
-    DocumentReader dr = service_.getDocumentReader(mimeType); 
+
+    DocumentReader dr = service_.getDocumentReader(mimeType);
     String text = dr.getContentAsText(is);
-    //TODO text is too huge, need small test file
+    // TODO text is too huge, need small test file
   }
 }

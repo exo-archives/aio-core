@@ -30,42 +30,41 @@ public class TestXMLResolver extends BaseTest {
 
   public void setUp() throws Exception {
     if (service == null) {
-      StandaloneContainer.setConfigurationPath(Thread.currentThread().getContextClassLoader()
-          .getResource("conf/standalone/test-configuration.xml").getPath());
+      StandaloneContainer.setConfigurationPath(Thread.currentThread()
+                                                     .getContextClassLoader()
+                                                     .getResource("conf/standalone/test-configuration.xml")
+                                                     .getPath());
       StandaloneContainer container = StandaloneContainer.getInstance();
-      service = (XMLResolvingService) container
-          .getComponentInstanceOfType(XMLResolvingService.class);
+      service = (XMLResolvingService) container.getComponentInstanceOfType(XMLResolvingService.class);
     }
   }
 
   public void testLookupFailed() throws Exception {
-      javax.xml.parsers.SAXParserFactory factory = javax.xml.parsers.SAXParserFactory
-          .newInstance();
-      factory.setNamespaceAware(true);
-      javax.xml.parsers.SAXParser jaxpParser = factory.newSAXParser();
-      org.xml.sax.XMLReader reader = jaxpParser.getXMLReader();
+    javax.xml.parsers.SAXParserFactory factory = javax.xml.parsers.SAXParserFactory.newInstance();
+    factory.setNamespaceAware(true);
+    javax.xml.parsers.SAXParser jaxpParser = factory.newSAXParser();
+    org.xml.sax.XMLReader reader = jaxpParser.getXMLReader();
 
-      reader.setEntityResolver(service.getEntityResolver());
-      try {
-        reader.parse(resourceURL("tmp/dtd-not-found.xml").getPath());
+    reader.setEntityResolver(service.getEntityResolver());
+    try {
+      reader.parse(resourceURL("tmp/dtd-not-found.xml").getPath());
 
-      } catch (Throwable e) {
-        return;
-      }
-      fail("Lookup should have been Failed as there is not such local DTD.");
+    } catch (Throwable e) {
+      return;
+    }
+    fail("Lookup should have been Failed as there is not such local DTD.");
   }
 
   public void testWebXmlResolving() throws Exception {
     try {
 
-      javax.xml.parsers.SAXParserFactory factory = javax.xml.parsers.SAXParserFactory
-          .newInstance();
+      javax.xml.parsers.SAXParserFactory factory = javax.xml.parsers.SAXParserFactory.newInstance();
       factory.setNamespaceAware(true);
       javax.xml.parsers.SAXParser jaxpParser = factory.newSAXParser();
       org.xml.sax.XMLReader reader = jaxpParser.getXMLReader();
 
       reader.setEntityResolver(service.getEntityResolver());
-      
+
       reader.parse(resourceURL("web.xml").toString());
 
     } catch (Exception e) {

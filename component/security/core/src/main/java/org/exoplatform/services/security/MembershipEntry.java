@@ -18,40 +18,42 @@
 package org.exoplatform.services.security;
 
 /**
- * Created by The eXo Platform SAS        .<br/>
+ * Created by The eXo Platform SAS .<br/>
  * 
  * @author Gennady Azarenkov
  * @version $Id:$
  */
 
 public final class MembershipEntry {
-  
-  public final static String ANY_TYPE = "*"; 
 
-  private String membershipType;
-  private String group;
-  
+  public final static String ANY_TYPE = "*";
+
+  private String             membershipType;
+
+  private String             group;
+
   /**
-   * Constructor with undefined membership type 
+   * Constructor with undefined membership type
+   * 
    * @param group
    */
   public MembershipEntry(String group) {
     this(group, null);
   }
-  
+
   /**
    * @param group
    * @param membershipType
    */
   public MembershipEntry(String group, String membershipType) {
     this.membershipType = membershipType != null ? membershipType : ANY_TYPE;
-    if(group == null)
+    if (group == null)
       throw new NullPointerException("Group is null");
     this.group = group;
   }
 
   /**
-   * @return the real membership type or "*" if not defined 
+   * @return the real membership type or "*" if not defined
    */
   public String getMembershipType() {
     return membershipType;
@@ -63,18 +65,17 @@ public final class MembershipEntry {
   public String getGroup() {
     return group;
   }
-  
+
   @Override
   public boolean equals(Object obj) {
-    if(obj == null || !(obj instanceof MembershipEntry))
+    if (obj == null || !(obj instanceof MembershipEntry))
       return false;
-    MembershipEntry me = (MembershipEntry)obj;
-    if(membershipType.equals(ANY_TYPE) || me.membershipType.equals(ANY_TYPE))
+    MembershipEntry me = (MembershipEntry) obj;
+    if (membershipType.equals(ANY_TYPE) || me.membershipType.equals(ANY_TYPE))
       return this.group.equals(me.group);
-    return this.group.equals(me.group) && this.membershipType.equals(me.membershipType); 
+    return this.group.equals(me.group) && this.membershipType.equals(me.membershipType);
   }
-  
-  
+
   public static MembershipEntry parse(String identityStr) {
 
     if (identityStr.indexOf(":") != -1) {
@@ -82,9 +83,8 @@ public final class MembershipEntry {
       String groupName = identityStr.substring(identityStr.indexOf(":") + 1);
       return new MembershipEntry(groupName, membershipName);
     }
-    
+
     return null;
-    
+
   }
 }
-

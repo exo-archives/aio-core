@@ -1,4 +1,3 @@
-
 package org.exoplatform.services.database;
 
 import java.util.List;
@@ -18,22 +17,22 @@ import org.exoplatform.services.database.jdbc.DBSchemaCreator;
 public class DBCreatorTest extends TestCase {
 
   private StandaloneContainer container;
-  
+
   public void setUp() throws Exception {
-    
+
     StandaloneContainer.setConfigurationPath("src/java/conf/standalone/test-configuration.xml");
-  	
+
     container = StandaloneContainer.getInstance();
   }
-  
+
   public void testConf() throws Exception {
-    DBSchemaCreator creator = (DBSchemaCreator)container.getComponentInstanceOfType(DBSchemaCreator.class);
-    List plugins = (List)creator.getPlugins(); 
+    DBSchemaCreator creator = (DBSchemaCreator) container.getComponentInstanceOfType(DBSchemaCreator.class);
+    List plugins = (List) creator.getPlugins();
     assertFalse(plugins.isEmpty());
-    
+
     assertTrue(plugins.get(0) instanceof CreateDBSchemaPlugin);
-    CreateDBSchemaPlugin plugin = (CreateDBSchemaPlugin)plugins.get(0);
-    
+    CreateDBSchemaPlugin plugin = (CreateDBSchemaPlugin) plugins.get(0);
+
     assertNotNull(plugin.getDataSource());
     assertNotNull(plugin.getScript());
   }

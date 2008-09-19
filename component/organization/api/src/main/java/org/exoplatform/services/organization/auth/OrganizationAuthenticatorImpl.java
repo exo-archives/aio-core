@@ -24,6 +24,7 @@ import java.util.Set;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.logging.Log;
+
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.OrganizationService;
@@ -37,48 +38,53 @@ import org.exoplatform.services.security.RolesExtractor;
 import org.exoplatform.services.security.UsernameCredential;
 
 /**
- * Created by The eXo Platform SAS        .
- * An authentication wrapper over Organization service
+ * Created by The eXo Platform SAS . An authentication wrapper over Organization
+ * service TODO move it to Organization Service / Auth
  * 
- * TODO move it to Organization Service / Auth
  * @author Gennady Azarenkov
  * @version $Id:$
  */
 
 public class OrganizationAuthenticatorImpl implements Authenticator {
 
-  protected static Log log = ExoLogger.getLogger("org.exoplatform.services.organization.auth.OrganizationUserRegistry");
+  protected static Log              log = ExoLogger.getLogger("org.exoplatform.services.organization.auth.OrganizationUserRegistry");
 
   private final OrganizationService orgService;
+
   private final PasswordEncrypter   encrypter;
-  private final RolesExtractor rolesExtractor;
+
+  private final RolesExtractor      rolesExtractor;
 
   public OrganizationAuthenticatorImpl(OrganizationService orgService,
-      RolesExtractor rolesExtractor, PasswordEncrypter encrypter) {
+                                       RolesExtractor rolesExtractor,
+                                       PasswordEncrypter encrypter) {
     this.orgService = orgService;
     this.encrypter = encrypter;
     this.rolesExtractor = rolesExtractor;
   }
 
-  public OrganizationAuthenticatorImpl(OrganizationService orgService,
-      RolesExtractor rolesExtractor) {
+  public OrganizationAuthenticatorImpl(OrganizationService orgService, RolesExtractor rolesExtractor) {
     this(orgService, rolesExtractor, null);
   }
-  
+
   public OrganizationAuthenticatorImpl(OrganizationService orgService) {
     this(orgService, null, null);
   }
-  
+
   public OrganizationService getOrganizationService() {
     return orgService;
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.security.Authenticator#createIdentity(java.lang.String)
+  /*
+   * (non-Javadoc)
+   * @see
+   * org.exoplatform.services.security.Authenticator#createIdentity(java.lang
+   * .String)
    */
   public Identity createIdentity(String userId) throws Exception {
     Set<MembershipEntry> entries = new HashSet<MembershipEntry>();
-    Collection<Membership> memberships = orgService.getMembershipHandler().findMembershipsByUser(userId);
+    Collection<Membership> memberships = orgService.getMembershipHandler()
+                                                   .findMembershipsByUser(userId);
     if (memberships != null) {
       for (Membership membership : memberships)
         entries.add(new MembershipEntry(membership.getGroupId(), membership.getMembershipType()));
@@ -88,8 +94,11 @@ public class OrganizationAuthenticatorImpl implements Authenticator {
     return new Identity(userId, entries, rolesExtractor.extractRoles(userId, entries));
   }
 
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.security.Authenticator#validateUser(org.exoplatform.services.security.Credential[])
+  /*
+   * (non-Javadoc)
+   * @see
+   * org.exoplatform.services.security.Authenticator#validateUser(org.exoplatform
+   * .services.security.Credential[])
    */
   public String validateUser(Credential[] credentials) throws LoginException, Exception {
     String user = null;
@@ -108,8 +117,8 @@ public class OrganizationAuthenticatorImpl implements Authenticator {
 
     if (!orgService.getUserHandler().authenticate(user, password))
       throw new LoginException("Login failed for " + user);
-    
+
     return user;
   }
-  
+
 }

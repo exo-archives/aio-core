@@ -29,7 +29,6 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
@@ -38,26 +37,24 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
-import org.exoplatform.services.xml.transform.NotSupportedIOTypeException;
-import org.exoplatform.services.xml.transform.impl.TransformerBase;
-import org.exoplatform.services.xml.transform.trax.TRAXTransformer;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import org.exoplatform.services.xml.transform.NotSupportedIOTypeException;
+import org.exoplatform.services.xml.transform.impl.TransformerBase;
+import org.exoplatform.services.xml.transform.trax.TRAXTransformer;
 
 /**
- * Created by The eXo Platform SAS .
- * 
- * Implementation of Trax Transformer interface
+ * Created by The eXo Platform SAS . Implementation of Trax Transformer
+ * interface
  * 
  * @author <a href="mailto:geaz@users.sourceforge.net">Gennady Azarenkov</a>
  * @author <a href="mailto:alex.kravchuk@gmail.com">Alexander Kravchuk</a>
  * @version $Id: TRAXTransformerImpl.java 5799 2006-05-28 17:55:42Z geaz $
  */
 
-public class TRAXTransformerImpl extends TransformerBase implements
-    TRAXTransformer {
+public class TRAXTransformerImpl extends TransformerBase implements TRAXTransformer {
 
   protected TransformerHandler tHandler;
 
@@ -66,27 +63,23 @@ public class TRAXTransformerImpl extends TransformerBase implements
   }
 
   public TRAXTransformerImpl() throws TransformerConfigurationException {
-    SAXTransformerFactory saxTFactory = (SAXTransformerFactory) SAXTransformerFactory
-        .newInstance();
+    SAXTransformerFactory saxTFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
     tHandler = saxTFactory.newTransformerHandler();
   }
 
-  public TRAXTransformerImpl(Source source)
-      throws TransformerConfigurationException {
-    SAXTransformerFactory saxTFactory = (SAXTransformerFactory) SAXTransformerFactory
-        .newInstance();
+  public TRAXTransformerImpl(Source source) throws TransformerConfigurationException {
+    SAXTransformerFactory saxTFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
     tHandler = saxTFactory.newTransformerHandler(source);
   }
 
-  public TRAXTransformerImpl(Templates templates)
-      throws TransformerConfigurationException {
-    SAXTransformerFactory saxTFactory = (SAXTransformerFactory) SAXTransformerFactory
-        .newInstance();
+  public TRAXTransformerImpl(Templates templates) throws TransformerConfigurationException {
+    SAXTransformerFactory saxTFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
     tHandler = saxTFactory.newTransformerHandler(templates);
   }
 
   protected void internalTransform(Source source) throws TransformerException,
-      NotSupportedIOTypeException, IllegalStateException {
+                                                 NotSupportedIOTypeException,
+                                                 IllegalStateException {
 
     XMLReader xmlReader = null;
 
@@ -108,11 +101,13 @@ public class TRAXTransformerImpl extends TransformerBase implements
 
     InputSource inputSource = null;
     // todo simplify
-    // SAXSource.sourceToInputSource(Source source) from JSDK does not supported DOMSource
+    // SAXSource.sourceToInputSource(Source source) from JSDK does not supported
+    // DOMSource
     if (source instanceof DOMSource) {
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-      SAXTransformerFactory.newInstance().newTransformer()
-          .transform(source, new StreamResult(outputStream));
+      SAXTransformerFactory.newInstance()
+                           .newTransformer()
+                           .transform(source, new StreamResult(outputStream));
       inputSource = new InputSource(new ByteArrayInputStream(outputStream.toByteArray()));
     } else {
       inputSource = SAXSource.sourceToInputSource(source);

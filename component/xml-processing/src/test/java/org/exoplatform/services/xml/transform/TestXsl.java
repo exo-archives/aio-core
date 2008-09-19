@@ -40,16 +40,17 @@ public class TestXsl extends BaseTest {
   private TRAXTransformerService traxService;
 
   public void setUp() throws Exception {
-    StandaloneContainer.setConfigurationPath(Thread.currentThread().getContextClassLoader()
-        .getResource("conf/standalone/test-configuration.xml").getPath());
+    StandaloneContainer.setConfigurationPath(Thread.currentThread()
+                                                   .getContextClassLoader()
+                                                   .getResource("conf/standalone/test-configuration.xml")
+                                                   .getPath());
     StandaloneContainer container = StandaloneContainer.getInstance();
-    traxService = (TRAXTransformerService) container
-        .getComponentInstanceOfType(TRAXTransformerService.class);
+    traxService = (TRAXTransformerService) container.getComponentInstanceOfType(TRAXTransformerService.class);
     assertNotNull("traxService", traxService);
   }
 
   public void testSimpleXslt() throws Exception {
-    
+
     InputStream res = resourceStream("rss-in.xhtml");
     String OUTPUT_FILENAME = resourceURL("rss-out.xml").getPath();
 
@@ -118,8 +119,7 @@ public class TestXsl extends BaseTest {
 
     res = resourceStream("rss-in.xhtml");
 
-    assertTrue("Empty input other file",
-        res.available() > 0);
+    assertTrue("Empty input other file", res.available() > 0);
 
     ByteArrayOutputStream byteOtherOutputStream = new ByteArrayOutputStream();
 

@@ -22,19 +22,22 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Author : Nhu Dinh Thuan
- *          nhudinhthuan@exoplatform.com
- * Jul 5, 2006
+ * Author : Nhu Dinh Thuan nhudinhthuan@exoplatform.com Jul 5, 2006
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
+@Target( { ElementType.TYPE })
 public @interface TableField {
-  String name() ;
-  String field() default "";
-  String type() ;
-  int    length() default -1;
-  boolean unique()  default false;
-  boolean nullable()  default true;
-  String  defaultValue() default "" ;
-}
+  String name();
 
+  String field() default "";
+
+  String type();
+
+  int length() default -1;
+
+  boolean unique() default false;
+
+  boolean nullable() default true;
+
+  String defaultValue() default "";
+}

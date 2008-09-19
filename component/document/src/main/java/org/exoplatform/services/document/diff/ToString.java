@@ -12,8 +12,7 @@ public interface ToString {
   /**
    * Place a string image of the object in a StringBuffer.
    * 
-   * @param s
-   *          the string buffer.
+   * @param s the string buffer.
    */
   public abstract void toString(StringBuffer s);
 

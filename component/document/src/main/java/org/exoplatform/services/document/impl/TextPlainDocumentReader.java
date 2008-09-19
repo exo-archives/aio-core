@@ -23,89 +23,93 @@ import java.util.Properties;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValuesParam;
 
-
-
 /**
- * Created by The eXo Platform SAS
- *
- * A reader of text files.
+ * Created by The eXo Platform SAS A reader of text files.
+ * 
  * @author <a href="mailto:zagrebin_v@mail.ru">Victor Zagrebin</a>
  * @version March 04, 2006
  */
 public class TextPlainDocumentReader extends BaseDocumentReader {
 
   public static final String DEFAULT_ENCODING = "defaultEncoding";
-  
-  private String defaultEncoding;
-  
+
+  private String             defaultEncoding;
+
   /**
    * Initializes a newly created object for text/plain files format parsing.
+   * 
    * @param params the container parameters.
    */
   public TextPlainDocumentReader(InitParams params) {
-    
+
     ValuesParam encoding = (ValuesParam) params.getParameter(DEFAULT_ENCODING);
-    
-    if( encoding!=null && encoding.getValue()!= null && !encoding.getValue().equalsIgnoreCase("")){
+
+    if (encoding != null && encoding.getValue() != null
+        && !encoding.getValue().equalsIgnoreCase("")) {
       defaultEncoding = encoding.getValue();
-    }else{
-      defaultEncoding=null;
+    } else {
+      defaultEncoding = null;
     }
   }
 
   /**
    * Get the text/plain mime type.
+   * 
    * @return The text/plain mime type.
    */
   public String[] getMimeTypes() {
-    return new String[] {"text/plain"};
+    return new String[] { "text/plain" };
   }
 
   /**
    * Returns a text from file content.
+   * 
    * @param is an input stream with a file content.
    * @return The string with text from file content.
    * @throws Exception
    */
   public String getContentAsText(InputStream is) throws Exception {
-    
+
     byte[] buffer = new byte[2048];
     int len;
-    ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
-    while ((len = is.read(buffer)) > 0) 
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    while ((len = is.read(buffer)) > 0)
       bos.write(buffer, 0, len);
     bos.close();
- 
-    if(this.defaultEncoding!=null){
-      return new String(bos.toByteArray(),defaultEncoding);
-    }else{
-      return new String(bos.toByteArray()); //system encoding will be used
+
+    if (this.defaultEncoding != null) {
+      return new String(bos.toByteArray(), defaultEncoding);
+    } else {
+      return new String(bos.toByteArray()); // system encoding will be used
     }
   }
-  
+
   /**
    * Returns a text from file content.
+   * 
    * @param is an input stream with a file content.
-   * @param encoding file content encoding. 
+   * @param encoding file content encoding.
    * @return The string with text from file content.
    * @throws Exception
    */
   public String getContentAsText(InputStream is, String encoding) throws Exception {
     byte[] buffer = new byte[2048];
     int len;
-    ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
-    while ((len = is.read(buffer)) > 0) 
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    while ((len = is.read(buffer)) > 0)
       bos.write(buffer, 0, len);
     bos.close();
-    return new String(bos.toByteArray(),encoding);
+    return new String(bos.toByteArray(), encoding);
   }
-  
-  /* (non-Javadoc)
-   * @see org.exoplatform.services.document.DocumentReader#getProperties(java.io.InputStream)
+
+  /*
+   * (non-Javadoc)
+   * @see
+   * org.exoplatform.services.document.DocumentReader#getProperties(java.io.
+   * InputStream)
    */
   public Properties getProperties(InputStream is) throws Exception {
     return new Properties();
   }
-  
-  
+
 }

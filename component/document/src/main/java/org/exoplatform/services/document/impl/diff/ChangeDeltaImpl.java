@@ -71,7 +71,7 @@ import org.exoplatform.services.document.diff.RevisionVisitor;
  * @see DiffServiceImpl
  * @see ChunkImpl
  */
-public class ChangeDeltaImpl extends DeltaImpl implements ChangeDelta{
+public class ChangeDeltaImpl extends DeltaImpl implements ChangeDelta {
 
   ChangeDeltaImpl() {
     super();

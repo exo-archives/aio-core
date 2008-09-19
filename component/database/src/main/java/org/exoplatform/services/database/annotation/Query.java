@@ -22,22 +22,29 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Nhu Dinh Thuan
- *          nhudinhthuan@exoplatform.com
- * Mar 30, 2007  
+ * Created by The eXo Platform SAS Author : Nhu Dinh Thuan
+ * nhudinhthuan@exoplatform.com Mar 30, 2007
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
-public @interface Query {  
-  String name() ;
+@Target( { ElementType.TYPE, ElementType.METHOD })
+public @interface Query {
+  String name();
+
   String standardSQL();
+
   String mysqlSQL() default "";
+
   String mssqlSQL() default "";
+
   String oracleSQL() default "";
+
   String postgresSQL() default "";
+
   String hsqlSQL() default "";
+
   String derbySQL() default "";
+
   String sysbaseSQL() default "";
+
   String db2SQL() default "";
 }

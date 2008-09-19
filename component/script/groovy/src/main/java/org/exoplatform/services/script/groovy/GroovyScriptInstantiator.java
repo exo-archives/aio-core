@@ -38,33 +38,34 @@ import org.exoplatform.container.ExoContainerContext;
  * @version $Id: $
  */
 public class GroovyScriptInstantiator {
-  
+
   private ExoContainer container;
 
   public GroovyScriptInstantiator(ExoContainerContext containerContext) {
     this.container = containerContext.getContainer();
   }
-  
+
   /**
-   * Load script from given address. 
+   * Load script from given address.
+   * 
    * @param spec the resource's address.
    * @return the object created from groovy script.
-   * @throws MalformedURLException if parameter <code>url</code> have wrong format. 
+   * @throws MalformedURLException if parameter <code>url</code> have wrong
+   *           format.
    * @throws IOException if can't load script from given <code>url</code>.
-   * 
    * @see GroovyScriptInstantiator#instantiateScript(URL)
    * @see GroovyScriptInstantiator#instantiateScript(InputStream)
    */
   public Object instantiateScript(String spec) throws MalformedURLException, IOException {
     return instantiateScript(new URL(spec));
   }
-  
+
   /**
-   * Load script from given address. 
+   * Load script from given address.
+   * 
    * @param url the resource's address.
    * @return the object created from groovy script.
    * @throws IOException if can't load script from given <code>url</code>.
-   * 
    * @see GroovyScriptInstantiator#instantiateScript(InputStream)
    */
   public Object instantiateScript(URL url) throws IOException {
@@ -77,6 +78,7 @@ public class GroovyScriptInstantiator {
 
   /**
    * Parse given stream, the stream must represents groovy script.
+   * 
    * @param stream the stream represented groovy script.
    * @return the object created from groovy script.
    * @throws IOException if stream can't be parsed or object can't be created.
@@ -88,55 +90,57 @@ public class GroovyScriptInstantiator {
     } catch (Exception e) {
       e.printStackTrace();
       throw new IOException("error parsing stream, not groovy script or contains error");
-    }
-    finally {
+    } finally {
       stream.close();
     }
   }
-  
-  /* Created object from given class, if class has parameters in constructor, then this
-   * parameters will be searched in container.
+
+  /*
+   * Created object from given class, if class has parameters in constructor,
+   * then this parameters will be searched in container.
    */
   private Object createObject(Class<?> clazz) throws Exception {
-    
+
     Constructor<?>[] constructors = clazz.getConstructors();
-    
-    /* Sort constructors by number of parameters.
-     * With more parameters must be first.
+
+    /*
+     * Sort constructors by number of parameters. With more parameters must be
+     * first.
      */
     Arrays.sort(constructors, COMPARATOR);
-      
-    l:for (Constructor<?> c : constructors) {
+
+    l: for (Constructor<?> c : constructors) {
       Class<?>[] parameterTypes = c.getParameterTypes();
-      if (parameterTypes.length == 0) 
+      if (parameterTypes.length == 0)
         return c.newInstance();
-      
+
       List<Object> parameters = new ArrayList<Object>(parameterTypes.length);
-      
+
       for (Class<?> parameterType : parameterTypes) {
         Object param = container.getComponentInstanceOfType(parameterType);
         if (param == null)
           continue l;
         parameters.add(param);
       }
-      
+
       return c.newInstance(parameters.toArray(new Object[parameters.size()]));
     }
     return null;
-    
+
   }
-  
-  private static final ConstructorsComparator COMPARATOR = new ConstructorsComparator(); 
-  
-  /* Sorts array of constructors by number of parameters. 
+
+  private static final ConstructorsComparator COMPARATOR = new ConstructorsComparator();
+
+  /*
+   * Sorts array of constructors by number of parameters.
    */
   private static class ConstructorsComparator implements Comparator<Constructor<?>> {
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
-    public int compare(Constructor<?> constructor1,
-        Constructor<?> constructor2) {
+    public int compare(Constructor<?> constructor1, Constructor<?> constructor2) {
       int c1 = constructor1.getParameterTypes().length;
       int c2 = constructor2.getParameterTypes().length;
       if (c1 < c2)
@@ -145,7 +149,7 @@ public class GroovyScriptInstantiator {
         return -1;
       return 0;
     }
-    
+
   }
 
 }

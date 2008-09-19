@@ -28,6 +28,7 @@ import jcifs.smb.SmbException;
 import jcifs.smb.SmbSession;
 
 import org.apache.commons.logging.Log;
+
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.PropertiesParam;
 import org.exoplatform.services.log.ExoLogger;
@@ -44,10 +45,9 @@ import org.exoplatform.services.security.UsernameCredential;
  */
 public class NTLMAuthenticator implements Authenticator {
 
-  private final static Log log = ExoLogger
-      .getLogger("core.NTLMAuthenticator");
+  private final static Log log = ExoLogger.getLogger("core.NTLMAuthenticator");
 
-  private String domainControllerName;
+  private String           domainControllerName;
 
   public NTLMAuthenticator(InitParams params) {
     // super(registry);
@@ -71,8 +71,7 @@ public class NTLMAuthenticator implements Authenticator {
     return new Identity(userId, new HashSet<MembershipEntry>());
   }
 
-  public String validateUser(Credential[] credentials) throws LoginException,
-      Exception {
+  public String validateUser(Credential[] credentials) throws LoginException, Exception {
     String user = null;
     String pass = null;
     for (Credential cred : credentials) {
@@ -95,7 +94,7 @@ public class NTLMAuthenticator implements Authenticator {
     if (log.isDebugEnabled()) {
       log.debug("domain controller: " + domainControllerName);
     }
-    
+
     UniAddress domainController;
     try {
       domainController = UniAddress.getByName(domainControllerName, true);
@@ -104,8 +103,9 @@ public class NTLMAuthenticator implements Authenticator {
       throw new LoginException("Domain controller not found.");
     }
     try {
-      SmbSession.logon(domainController, new NtlmPasswordAuthentication(
-          domainControllerName, user, pass));
+      SmbSession.logon(domainController, new NtlmPasswordAuthentication(domainControllerName,
+                                                                        user,
+                                                                        pass));
     } catch (SmbException e) {
       log.error("Authentication failed: " + e.getMessage());
       throw new LoginException(e.getMessage());

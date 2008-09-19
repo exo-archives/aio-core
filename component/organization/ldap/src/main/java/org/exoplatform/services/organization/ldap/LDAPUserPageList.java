@@ -35,108 +35,117 @@ import org.exoplatform.services.ldap.LDAPService;
 import org.exoplatform.services.organization.User;
 
 /**
- * Created by VietSpider Studio
- * Author : Nhu Dinh Thuan
- *          nhudinhthuan@yahoo.com
+ * Created by VietSpider Studio Author : Nhu Dinh Thuan nhudinhthuan@yahoo.com
  * Dec 7, 2005
  */
-public class LDAPUserPageList extends PageList {  
- 
-  private String searchBase_;
-  private String filter_;
-  private LDAPService ldapService_;
+public class LDAPUserPageList extends PageList {
+
+  private String               searchBase_;
+
+  private String               filter_;
+
+  private LDAPService          ldapService_;
+
   private LDAPAttributeMapping ldapAttrMapping_;
-  static boolean SEARCH_CONTROL = Control.NONCRITICAL;
-  
+
+  static boolean               SEARCH_CONTROL = Control.NONCRITICAL;
+
   public LDAPUserPageList(LDAPAttributeMapping ldapAttrMapping,
-      LDAPService ldapService,String searchBase,String filter,int pageSize) throws Exception {   
-    super( pageSize);
+                          LDAPService ldapService,
+                          String searchBase,
+                          String filter,
+                          int pageSize) throws Exception {
+    super(pageSize);
     ldapAttrMapping_ = ldapAttrMapping;
-    ldapService_= ldapService;
+    ldapService_ = ldapService;
     searchBase_ = searchBase;
     filter_ = filter;
-    try{
-      int size = this.getResultSize();   
+    try {
+      int size = this.getResultSize();
       setAvailablePage(size);
-    } catch(NameNotFoundException exp) {
+    } catch (NameNotFoundException exp) {
       setAvailablePage(0);
-    } catch(OperationNotSupportedException exp) {
+    } catch (OperationNotSupportedException exp) {
       setAvailablePage(0);
     }
   }
-  
-  protected void populateCurrentPage(int page) throws Exception  {
-    List<User> users = new ArrayList<User>(); 
-    PagedResultsControl prc = new PagedResultsControl(getPageSize(), Control.CRITICAL) ; 
+
+  protected void populateCurrentPage(int page) throws Exception {
+    List<User> users = new ArrayList<User>();
+    PagedResultsControl prc = new PagedResultsControl(getPageSize(), Control.CRITICAL);
     String keys[] = { ldapAttrMapping_.userUsernameAttr };
     SortControl sctl = new SortControl(keys, SEARCH_CONTROL);
-    
+
     LdapContext ctx = ldapService_.getLdapContext();
     ctx.setRequestControls(new Control[] { sctl, prc });
     SearchControls constraints = new SearchControls();
-    constraints.setSearchScope( SearchControls.SUBTREE_SCOPE);
-    
+    constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+
     byte[] cookie = null;
     int counter = 0;
-    
+
     do {
       counter++;
-      NamingEnumeration<SearchResult> results = ctx.search( searchBase_, filter_, constraints);    
-      if( results == null) break;     
-      while (results.hasMore()){
+      NamingEnumeration<SearchResult> results = ctx.search(searchBase_, filter_, constraints);
+      if (results == null)
+        break;
+      while (results.hasMore()) {
         SearchResult result = results.next();
-        if( counter == page) users.add( ldapAttrMapping_.attributesToUser(result.getAttributes()));        
-      }      
-      Control[] responseControls = ctx.getResponseControls();      
-      for (int z = 0; z < responseControls.length; z++) {
-        if (responseControls[z] instanceof PagedResultsResponseControl)                 
-          cookie = ((PagedResultsResponseControl)responseControls[z]).getCookie();         
+        if (counter == page)
+          users.add(ldapAttrMapping_.attributesToUser(result.getAttributes()));
       }
-      ctx.setRequestControls(new Control[]{
-          new PagedResultsControl(getPageSize(), cookie, Control.CRITICAL)});     
-    } while ( cookie != null);   
+      Control[] responseControls = ctx.getResponseControls();
+      for (int z = 0; z < responseControls.length; z++) {
+        if (responseControls[z] instanceof PagedResultsResponseControl)
+          cookie = ((PagedResultsResponseControl) responseControls[z]).getCookie();
+      }
+      ctx.setRequestControls(new Control[] { new PagedResultsControl(getPageSize(),
+                                                                     cookie,
+                                                                     Control.CRITICAL) });
+    } while (cookie != null);
     this.currentListPage_ = users;
   }
-  
-  private int getResultSize() throws Exception {    
-    PagedResultsControl prc = new PagedResultsControl(getPageSize(), Control.CRITICAL) ; 
+
+  private int getResultSize() throws Exception {
+    PagedResultsControl prc = new PagedResultsControl(getPageSize(), Control.CRITICAL);
     String keys[] = { ldapAttrMapping_.userUsernameAttr };
     SortControl sctl = new SortControl(keys, SEARCH_CONTROL);
-    
+
     LdapContext ctx = ldapService_.getLdapContext();
     ctx.setRequestControls(new Control[] { sctl, prc });
     SearchControls constraints = new SearchControls();
-    String returnedAtts[]={ ldapAttrMapping_.userUsernameAttr};
+    String returnedAtts[] = { ldapAttrMapping_.userUsernameAttr };
     constraints.setReturningAttributes(returnedAtts);
-    constraints.setSearchScope( SearchControls.SUBTREE_SCOPE);
-    
+    constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+
     byte[] cookie = null;
     int counter = -1;
-    
-    do {      
-      NamingEnumeration<SearchResult> results = ctx.search( searchBase_, filter_, constraints);
-      if( results == null) break;     
-      while (results.hasMore()){
+
+    do {
+      NamingEnumeration<SearchResult> results = ctx.search(searchBase_, filter_, constraints);
+      if (results == null)
+        break;
+      while (results.hasMore()) {
         counter++;
         results.next();
       }
-      
-      Control[] responseControls = ctx.getResponseControls();    
-      if(responseControls != null){
-        for (int z = 0; z < responseControls.length; z++) {
-          if (responseControls[z] instanceof PagedResultsResponseControl)                 
-            cookie = ((PagedResultsResponseControl)responseControls[z]).getCookie();     
-        }
-        ctx.setRequestControls(new Control[]{
-            new PagedResultsControl(getPageSize(), cookie, Control.NONCRITICAL)});
-      }
-    } while ( cookie != null);   
-    return  counter+1;      
-  }
-  
-  public List getAll() throws Exception  { 
-    return null;
-  }  
 
-  
+      Control[] responseControls = ctx.getResponseControls();
+      if (responseControls != null) {
+        for (int z = 0; z < responseControls.length; z++) {
+          if (responseControls[z] instanceof PagedResultsResponseControl)
+            cookie = ((PagedResultsResponseControl) responseControls[z]).getCookie();
+        }
+        ctx.setRequestControls(new Control[] { new PagedResultsControl(getPageSize(),
+                                                                       cookie,
+                                                                       Control.NONCRITICAL) });
+      }
+    } while (cookie != null);
+    return counter + 1;
+  }
+
+  public List getAll() throws Exception {
+    return null;
+  }
+
 }

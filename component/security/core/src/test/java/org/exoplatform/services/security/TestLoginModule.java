@@ -27,15 +27,15 @@ import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.services.security.jaas.BasicCallbackHandler;
 
 /**
- * Created y the eXo platform team
- * User: Benjamin Mestrallet
- * Date: 28 avr. 2004
+ * Created y the eXo platform team User: Benjamin Mestrallet Date: 28 avr. 2004
  */
 public class TestLoginModule extends TestCase {
 
   protected ConversationRegistry conversationRegistry;
-  protected IdentityRegistry identityRegistry;
-  protected Authenticator    authenticator;
+
+  protected IdentityRegistry     identityRegistry;
+
+  protected Authenticator        authenticator;
 
   public TestLoginModule(String name) {
     super(name);
@@ -72,31 +72,32 @@ public class TestLoginModule extends TestCase {
     BasicCallbackHandler handler = new BasicCallbackHandler("exo", "exo".toCharArray());
     LoginContext loginContext = new LoginContext("exo", handler);
     loginContext.login();
-    
+
     assertNotNull(identityRegistry.getIdentity("exo"));
     assertEquals("exo", identityRegistry.getIdentity("exo").getUserId());
 
     assertEquals(1, identityRegistry.getIdentity("exo").getGroups().size());
-    
+
     conversationRegistry.register("exo", new ConversationState(identityRegistry.getIdentity("exo")));
     assertNotNull(conversationRegistry.getState("exo"));
-    
+
   }
 
-//  public void testRepeatLoginSameCredentials() throws Exception {
-//
-//    BasicCallbackHandler handler = new BasicCallbackHandler("exo", "exo".toCharArray());
-//    LoginContext loginContext = new LoginContext("exo", handler);
-//    loginContext.login();
-//
-//    Identity id = identityRegistry.getIdentity("exo");
-//    
-//    handler = new BasicCallbackHandler("exo", "exo".toCharArray());
-//    loginContext = new LoginContext("exo", handler);
-//    loginContext.login();
-//    assertSame(id, identityRegistry.getIdentity("exo"));
-//    
-//  }
+  // public void testRepeatLoginSameCredentials() throws Exception {
+  //
+  // BasicCallbackHandler handler = new BasicCallbackHandler("exo",
+  // "exo".toCharArray());
+  // LoginContext loginContext = new LoginContext("exo", handler);
+  // loginContext.login();
+  //
+  // Identity id = identityRegistry.getIdentity("exo");
+  //    
+  // handler = new BasicCallbackHandler("exo", "exo".toCharArray());
+  // loginContext = new LoginContext("exo", handler);
+  // loginContext.login();
+  // assertSame(id, identityRegistry.getIdentity("exo"));
+  //    
+  // }
 
   public void testRepeatLoginLogoutSameCredentials() throws Exception {
     BasicCallbackHandler handler = new BasicCallbackHandler("exo", "exo".toCharArray());
@@ -108,7 +109,7 @@ public class TestLoginModule extends TestCase {
     ConversationState.setCurrent(s1);
     assertNotNull(conversationRegistry.getState("exo1"));
     loginContext.logout();
-    
+
   }
 
 }

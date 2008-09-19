@@ -25,19 +25,17 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 /**
- * Created y the eXo platform team
- * User: Benjamin Mestrallet
- * Date: 29 avr. 2004
+ * Created y the eXo platform team User: Benjamin Mestrallet Date: 29 avr. 2004
  */
 public class JAASGroup implements Group, Serializable {
 
-  private static final long serialVersionUID = -1224998629739318069L;
+  private static final long  serialVersionUID = -1224998629739318069L;
 
-  public static final String ROLES = "Roles";
+  public static final String ROLES            = "Roles";
 
-  private String name = null;
-  private HashSet members = null;
+  private String             name             = null;
 
+  private HashSet            members          = null;
 
   public JAASGroup(String n) {
     this.name = n;
@@ -52,11 +50,11 @@ public class JAASGroup implements Group, Serializable {
     return members.remove(principal);
   }
 
-  public boolean isMember(Principal principal) {    
+  public boolean isMember(Principal principal) {
     Enumeration en = members();
     while (en.hasMoreElements()) {
       Principal principal1 = (Principal) en.nextElement();
-      if(principal1.getName().equals(principal.getName()))
+      if (principal1.getName().equals(principal.getName()))
         return true;
     }
     return false;
@@ -65,12 +63,15 @@ public class JAASGroup implements Group, Serializable {
   public Enumeration members() {
     class MembersEnumeration implements Enumeration {
       private Iterator itor;
+
       public MembersEnumeration(Iterator itor) {
         this.itor = itor;
       }
+
       public boolean hasMoreElements() {
         return this.itor.hasNext();
       }
+
       public Object nextElement() {
         return this.itor.next();
       }
@@ -78,7 +79,8 @@ public class JAASGroup implements Group, Serializable {
     return new MembersEnumeration(members.iterator());
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -86,7 +88,8 @@ public class JAASGroup implements Group, Serializable {
     return getName().hashCode();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -96,7 +99,8 @@ public class JAASGroup implements Group, Serializable {
     return ((Group) object).getName().equals(getName());
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see java.lang.Object#toString()
    */
   @Override
@@ -104,7 +108,8 @@ public class JAASGroup implements Group, Serializable {
     return getName();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see java.security.Principal#getName()
    */
   public String getName() {

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.services.security;  
+package org.exoplatform.services.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,24 +24,22 @@ import junit.framework.TestCase;
 //import org.exoplatform.services.organization.Membership;
 
 /**
- * Created by The eXo Platform SAS
- * Author : eXoPlatform
- *          exo@exoplatform.com
- * 24 févr. 08  
+ * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com 24
+ * févr. 08
  */
 public class TestIdentity extends TestCase {
 
-  Identity               identity    = null;
+  Identity                    identity    = null;
 
   Collection<MembershipEntry> memberships = null;
 
   protected void setUp() {
-    // common setup for testIsInGroup and testHasMembership 
-    
+    // common setup for testIsInGroup and testHasMembership
+
     memberships = new ArrayList<MembershipEntry>();
     memberships.add(new MembershipEntry("/group1", "*"));
     memberships.add(new MembershipEntry("/group2", "member"));
-    
+
     identity = new Identity("user", memberships);
   }
 

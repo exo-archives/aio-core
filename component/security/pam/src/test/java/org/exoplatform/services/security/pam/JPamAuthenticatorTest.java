@@ -21,7 +21,6 @@ import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.PasswordCredential;
 import org.exoplatform.services.security.UsernameCredential;
 
-
 /**
  * Just for test JpamLoginModule!!!
  * 
@@ -32,8 +31,8 @@ public class JPamAuthenticatorTest {
 
   public static void main(String[] args) throws Exception {
     JPamAuthenticator auth = new JPamAuthenticator();
-    Credential[] credentials = new Credential[] {
-    new UsernameCredential(args[0]), new PasswordCredential(args[1])};
+    Credential[] credentials = new Credential[] { new UsernameCredential(args[0]),
+        new PasswordCredential(args[1]) };
     String userId = auth.validateUser(credentials);
     System.out.println("authentication ok");
     Identity identity = auth.createIdentity(userId);

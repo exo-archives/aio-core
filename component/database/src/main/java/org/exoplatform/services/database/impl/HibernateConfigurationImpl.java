@@ -22,15 +22,16 @@ import org.hibernate.cfg.Configuration;
 
 /**
  * Created by The eXo Platform SAS .
- * @author <a href="mailto:gennady.azarenkov@exoplatform.com">Gennady Azarenkov</a>
- * @version $Id: HibernateConfigurationImpl.java 5332 2006-04-29 18:32:44Z geaz $
  * 
- * Hibernate's Configuration. One per 'properties-param' entry in 
- * container configuration 
+ * @author <a href="mailto:gennady.azarenkov@exoplatform.com">Gennady
+ *         Azarenkov</a>
+ * @version $Id: HibernateConfigurationImpl.java 5332 2006-04-29 18:32:44Z geaz
+ *          $ Hibernate's Configuration. One per 'properties-param' entry in
+ *          container configuration
  */
-public class HibernateConfigurationImpl  extends Configuration  {
+public class HibernateConfigurationImpl extends Configuration {
 
-	public HibernateConfigurationImpl(HibernateSettingsFactory settingsFactory) throws HibernateException {
-		super(settingsFactory);
-	}
+  public HibernateConfigurationImpl(HibernateSettingsFactory settingsFactory) throws HibernateException {
+    super(settingsFactory);
+  }
 }

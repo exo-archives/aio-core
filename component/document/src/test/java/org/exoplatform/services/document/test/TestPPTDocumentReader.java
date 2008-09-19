@@ -24,32 +24,26 @@ import org.exoplatform.services.document.DocumentReaderService;
 import org.exoplatform.test.BasicTestCase;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Sergey Karpenko <sergey.karpenko@exoplatform.com.ua>
+ * Created by The eXo Platform SAS Author : Sergey Karpenko
+ * <sergey.karpenko@exoplatform.com.ua>
+ * 
  * @version $Id: $
  */
 
-public class TestPPTDocumentReader  extends BasicTestCase  {
-  
+public class TestPPTDocumentReader extends BasicTestCase {
+
   DocumentReaderService service_;
 
   public void setUp() throws Exception {
-    PortalContainer pcontainer = PortalContainer.getInstance() ;
-    service_ =
-      (DocumentReaderService) pcontainer.getComponentInstanceOfType(DocumentReaderService.class) ;
+    PortalContainer pcontainer = PortalContainer.getInstance();
+    service_ = (DocumentReaderService) pcontainer.getComponentInstanceOfType(DocumentReaderService.class);
   }
 
   public void testGetContentAsString() throws Exception {
     InputStream is = TestPPTDocumentReader.class.getResourceAsStream("/test.ppt");
     String text = service_.getDocumentReader("application/powerpoint").getContentAsText(is);
-    String etalon = "TEST POWERPOINT\n"
-      +"Manchester United \n"
-      +"AC Milan\n"
-      +"SLIDE 2 \n"
-      +"Eric Cantona\n"
-      +"Kaka\n"
-      +"Ronaldo\n"
-      +"The natural scients universitys\n\n";
-    assertEquals("Wrong string returned",etalon,text );
+    String etalon = "TEST POWERPOINT\n" + "Manchester United \n" + "AC Milan\n" + "SLIDE 2 \n"
+        + "Eric Cantona\n" + "Kaka\n" + "Ronaldo\n" + "The natural scients universitys\n\n";
+    assertEquals("Wrong string returned", etalon, text);
   }
 }

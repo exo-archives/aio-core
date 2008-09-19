@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.apache.commons.logging.Log;
+
 import org.exoplatform.commons.utils.IOUtil;
 import org.exoplatform.commons.utils.MapResourceBundle;
 import org.exoplatform.commons.utils.PageList;
@@ -37,37 +38,39 @@ import org.exoplatform.services.resources.ResourceBundleData;
 import org.exoplatform.services.resources.ResourceBundleService;
 
 /**
- * Created by The eXo Platform SAS
- * Mar 9, 2007  
+ * Created by The eXo Platform SAS Mar 9, 2007
  */
-abstract public class BaseResourceBundleService implements ResourceBundleService  {
+abstract public class BaseResourceBundleService implements ResourceBundleService {
 
-  protected Log log_;
+  protected Log                 log_;
 
-  protected List classpathResources_ ;
-  protected String[]  portalResourceBundleNames_ ;
+  protected List                classpathResources_;
+
+  protected String[]            portalResourceBundleNames_;
+
   protected LocaleConfigService localeService_;
 
-  protected ExoCache cache_;
+  protected ExoCache            cache_;
 
   @SuppressWarnings("unchecked")
   protected void initParams(InitParams params) throws Exception {
     classpathResources_ = params.getValuesParam("classpath.resources").getValues();
 
-    //resources name can use for portlets
-    List prnames =  params.getValuesParam("portal.resource.names").getValues();
-    portalResourceBundleNames_ = new String[prnames.size()] ;
-    for(int i = 0; i < prnames.size(); i++) {
-      portalResourceBundleNames_[i] = (String)prnames.get(i) ; 
+    // resources name can use for portlets
+    List prnames = params.getValuesParam("portal.resource.names").getValues();
+    portalResourceBundleNames_ = new String[prnames.size()];
+    for (int i = 0; i < prnames.size(); i++) {
+      portalResourceBundleNames_[i] = (String) prnames.get(i);
     }
 
-    PageList pl  = findResourceDescriptions(new Query(null, null)) ;
-    if(pl.getAvailable() > 0)  return ;
+    PageList pl = findResourceDescriptions(new Query(null, null));
+    if (pl.getAvailable() > 0)
+      return;
 
-  //init resources
+    // init resources
     List<String> initResources = params.getValuesParam("init.resources").getValues();
-    for(String resource : initResources) {
-      initResources(resource, Thread.currentThread().getContextClassLoader()) ;
+    for (String resource : initResources) {
+      initResources(resource, Thread.currentThread().getContextClassLoader());
     }
   }
 
@@ -81,23 +84,26 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
     return getResourceBundle(name, locale, cl);
   }
 
-  public String[] getSharedResourceBundleNames() { return portalResourceBundleNames_ ; }
+  public String[] getSharedResourceBundleNames() {
+    return portalResourceBundleNames_;
+  }
 
   public ResourceBundleData createResourceBundleDataInstance() {
     return new ResourceBundleData();
   }
 
   protected boolean isClasspathResource(String name) {
-    if (classpathResources_ == null)  return false;
+    if (classpathResources_ == null)
+      return false;
     for (int i = 0; i < classpathResources_.size(); i++) {
       String pack = (String) classpathResources_.get(i);
-      if (name.startsWith(pack)) return true;
+      if (name.startsWith(pack))
+        return true;
     }
     return false;
   }
 
-
-  protected void initResources(String baseName, ClassLoader cl) {    
+  protected void initResources(String baseName, ClassLoader cl) {
     String name = baseName.replace('.', '/');
     String fileName = null;
     try {
@@ -116,7 +122,7 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
           InputStream is = url.openStream();
           byte buf[] = IOUtil.getStreamContentAsBytes(is);
           ResourceBundleData data = new ResourceBundleData();
-          data.setId(baseName + "_" + language) ;
+          data.setId(baseName + "_" + language);
           data.setName(baseName);
           data.setLanguage(language);
           data.setData(new String(buf, "UTF-8"));
@@ -130,12 +136,15 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
   }
 
   public ResourceBundle getResourceBundle(String name, Locale locale, ClassLoader cl) {
-    if (isClasspathResource(name))  return ResourceBundle.getBundle(name, locale, cl);
+    if (isClasspathResource(name))
+      return ResourceBundle.getBundle(name, locale, cl);
     String id = name + "_" + locale.getLanguage();
     try {
       Object obj = cache_.get(id);
-      if (obj != null) return (ResourceBundle) obj;
-    } catch (Exception ex) {}
+      if (obj != null)
+        return (ResourceBundle) obj;
+    } catch (Exception ex) {
+    }
 
     try {
       ResourceBundle res = null;
@@ -143,7 +152,8 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
       ResourceBundle parent = getResourceBundleFromDb(rootId, null, locale);
       if (parent != null) {
         res = getResourceBundleFromDb(id, parent, locale);
-        if (res == null) res = parent;
+        if (res == null)
+          res = parent;
         cache_.put(id, res);
         return res;
       }
@@ -155,12 +165,14 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
 
   public ResourceBundle getResourceBundle(String[] name, Locale locale, ClassLoader cl) {
     StringBuilder idBuf = new StringBuilder("merge:");
-    for (String n : name) idBuf.append(n).append("_");
+    for (String n : name)
+      idBuf.append(n).append("_");
     idBuf.append(locale);
     String id = idBuf.toString();
     try {
-      ResourceBundle  res = (ResourceBundle) cache_.get(id);
-      if (res != null)   return res;
+      ResourceBundle res = (ResourceBundle) cache_.get(id);
+      if (res != null)
+        return res;
       MapResourceBundle outputBundled = new MapResourceBundle(locale);
       for (int i = 0; i < name.length; i++) {
         ResourceBundle temp = getResourceBundle(name[i], locale, cl);
@@ -179,6 +191,8 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
     return null;
   }
 
-  abstract protected ResourceBundle getResourceBundleFromDb(String id, ResourceBundle parent, Locale locale) throws Exception ;
+  abstract protected ResourceBundle getResourceBundleFromDb(String id,
+                                                            ResourceBundle parent,
+                                                            Locale locale) throws Exception;
 
 }

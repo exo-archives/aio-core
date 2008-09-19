@@ -23,16 +23,16 @@ package org.exoplatform.services.script.groovy;
  */
 public class SampleComponent {
 
-  // nothing to do, it must be injected it constructor of Groovy script 
-  
+  // nothing to do, it must be injected it constructor of Groovy script
+
   private String about = "sample component";
 
   public String getAbout() {
     return about;
   }
+
   public void setAbout(String about) {
     this.about = about;
   }
 
 }
-

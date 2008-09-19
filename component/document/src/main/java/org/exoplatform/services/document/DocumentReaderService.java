@@ -20,21 +20,21 @@ import java.io.InputStream;
 
 /**
  * Created by The eXo Platform SAS
+ * 
  * @author Gennady Azarenkov
  * @version $Id: DocumentReaderService.java 11659 2007-01-05 15:35:06Z geaz $
  */
-public interface DocumentReaderService  {
-  
+public interface DocumentReaderService {
+
   /**
-   * @deprecated 
+   * @deprecated
    */
-  String getContentAsText(String  mimeType, InputStream is) throws Exception ;
-  
+  String getContentAsText(String mimeType, InputStream is) throws Exception;
+
   /**
    * @param mimeType
    * @return appropriate document reader
    */
-  DocumentReader getDocumentReader(String  mimeType) throws HandlerNotFoundException;
-
+  DocumentReader getDocumentReader(String mimeType) throws HandlerNotFoundException;
 
 }

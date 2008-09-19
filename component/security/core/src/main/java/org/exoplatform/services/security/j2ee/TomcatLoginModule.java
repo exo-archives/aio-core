@@ -37,11 +37,11 @@ public class TomcatLoginModule extends DefaultLoginModule {
 
   @Override
   public boolean commit() throws LoginException {
-    
+
     if (super.commit()) {
 
       Set<Principal> principals = subject.getPrincipals();
-      
+
       for (String role : identity.getRoles())
         principals.add(new RolePrincipal(role));
 

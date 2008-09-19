@@ -26,6 +26,7 @@ import org.exoplatform.services.listener.ListenerService;
 
 /**
  * Created by The eXo Platform SAS .<br/> In-memory registry of user's sessions
+ * 
  * @author Gennady Azarenkov
  * @version $Id:$
  */
@@ -39,25 +40,26 @@ public final class ConversationRegistry {
   /**
    * @see {@link IdentityRegistry}
    */
-  private IdentityRegistry identityRegistry;
-  
+  private IdentityRegistry                   identityRegistry;
+
   /**
    * @see {@link ListenerService}
    */
-  private ListenerService listenerService;
-  
+  private ListenerService                    listenerService;
+
   /**
-   * @param identityRegistry @see {@link IdentityRegistry} 
-   * @param listenerService  @see {@link ListenerService} 
+   * @param identityRegistry @see {@link IdentityRegistry}
+   * @param listenerService @see {@link ListenerService}
    */
   public ConversationRegistry(IdentityRegistry identityRegistry, ListenerService listenerService) {
     this.identityRegistry = identityRegistry;
     this.listenerService = listenerService;
   }
-  
+
   /**
    * Get ConversationState with specified key.
-   * @param key the key. 
+   * 
+   * @param key the key.
    * @return ConversationState.
    */
   public ConversationState getState(Object key) {
@@ -67,6 +69,7 @@ public final class ConversationRegistry {
   /**
    * Sets the user's session to the registry and broadcasts ADD_SESSION_EVENT
    * message to interested listeners.
+   * 
    * @param key the session identifier.
    * @param session the session.
    * @param makeCurrent the store or not the session into thread local.
@@ -88,9 +91,9 @@ public final class ConversationRegistry {
   }
 
   /**
-   * Remove ConversationStae with specified key.
-   * If there is no more ConversationState for user then remove Identity
-   * from IdentityRegistry. 
+   * Remove ConversationStae with specified key. If there is no more
+   * ConversationState for user then remove Identity from IdentityRegistry.
+   * 
    * @param key the key.
    * @return removed ConversationState or null.
    */
@@ -99,17 +102,19 @@ public final class ConversationRegistry {
 
     if (state == null)
       return null;
-    
+
     String userId = state.getIdentity().getUserId();
-    
+
     // if no more conversation then remove identity.
-    // TODO : temporary , now old code keeps one more conversation state with key userId.
-    // This state created by method broadcastAuthentication in AuthenticationService
-    List<Object> keys = getStateKeys(userId); 
+    // TODO : temporary , now old code keeps one more conversation state with
+    // key userId.
+    // This state created by method broadcastAuthentication in
+    // AuthenticationService
+    List<Object> keys = getStateKeys(userId);
     if (keys.size() == 0 || (keys.size() == 1 && keys.get(0).equals(userId))) {
       identityRegistry.unregister(userId);
     }
-    
+
     try {
       listenerService.broadcast("exo.core.security.ConversationRegistry.unregister", this, state);
     } catch (Exception e) {
@@ -138,7 +143,5 @@ public final class ConversationRegistry {
   void clear() {
     states.clear();
   }
-  
-  
 
 }

@@ -17,6 +17,7 @@
 package org.exoplatform.services.security.pam;
 
 import org.apache.commons.logging.Log;
+
 import org.exoplatform.services.log.ExoLogger;
 
 /**
@@ -34,16 +35,17 @@ import org.exoplatform.services.log.ExoLogger;
  */
 
 public class Pam {
-  private static final Log log = ExoLogger.getLogger("Pam");
+  private static final Log    log                      = ExoLogger.getLogger("Pam");
+
   private static final String JPAM_SHARED_LIBRARY_NAME = "jpam";
 
-  private String serviceName_;
+  private String              serviceName_;
 
   /**
-   * The default service name of "exo-jpam". <p/> This service is expected to
-   * be configured in /etc/pam.d
+   * The default service name of "exo-jpam". <p/> This service is expected to be
+   * configured in /etc/pam.d
    */
-  public static final String DEFAULT_SERVICE_NAME = "exo-" + JPAM_SHARED_LIBRARY_NAME;
+  public static final String  DEFAULT_SERVICE_NAME     = "exo-" + JPAM_SHARED_LIBRARY_NAME;
 
   static {
     System.loadLibrary(JPAM_SHARED_LIBRARY_NAME);
@@ -85,10 +87,9 @@ public class Pam {
    * The {@link #isSharedLibraryWorking()} native method callsback to this
    * method to make sure all is well.
    */
-//  private void callback() {
-//    // noop
-//  }
-
+  // private void callback() {
+  // // noop
+  // }
   /**
    * Authenticates a user. <p/> This method is threadsafe. <p/> If the logging
    * toolkit is set to DEBUG, the shared library will emit debug information to
@@ -115,8 +116,7 @@ public class Pam {
    * @throws NullPointerException if any of the parameters are null
    * @see #authenticateSuccessful(String, String)
    */
-  public PamReturnValue authenticate(String username, String password)
-      throws NullPointerException {
+  public PamReturnValue authenticate(String username, String password) throws NullPointerException {
     boolean debug = log.isDebugEnabled();
     log.debug("Debug mode active.");
     if (serviceName_ == null) {
@@ -127,21 +127,22 @@ public class Pam {
       throw new NullPointerException("Password is null");
     }
     synchronized (Pam.class) {
-      PamReturnValue pamReturnValue =
-        PamReturnValue.fromId(authenticate(serviceName_, username,
-          password, debug));
+      PamReturnValue pamReturnValue = PamReturnValue.fromId(authenticate(serviceName_,
+                                                                         username,
+                                                                         password,
+                                                                         debug));
       return pamReturnValue;
     }
   }
 
-//  /**
-//   * A main method
-//   */
-//  public static void main(String[] args) {
-//    Pam pam = new Pam();
-//    PamReturnValue pamReturnValue = pam.authenticate(args[0], args[1]);
-//    LOGGER.info("Response: " + pamReturnValue);
-//  }
+  // /**
+  // * A main method
+  // */
+  // public static void main(String[] args) {
+  // Pam pam = new Pam();
+  // PamReturnValue pamReturnValue = pam.authenticate(args[0], args[1]);
+  // LOGGER.info("Response: " + pamReturnValue);
+  // }
 
   /**
    * Authenticates a user. Warning: Any calls to this method should be
@@ -154,10 +155,11 @@ public class Pam {
    * @return an integer, which can be converted to a {@link PamReturnValue}
    *         using {@link PamReturnValue#fromId(int)}
    */
-  private native int authenticate(String serviceName, String username,
-      String password, boolean debug);
+  private native int authenticate(String serviceName,
+                                  String username,
+                                  String password,
+                                  boolean debug);
 
-  
   /**
    * @return the system dependent name of the shared library the Pam class is
    *         expecting.
@@ -175,18 +177,20 @@ public class Pam {
 
   /**
    * Get groups for current user.
+   * 
    * @return String[] groups.
    */
   public String[] getGroups() {
     String[] g = groups();
     if (g != null) {
       return g;
-    } 
+    }
     throw new NullPointerException("Can't get groups for current user!");
   }
 
   /**
    * C native method. Get groups for current user.
+   * 
    * @return groups.
    */
   private native String[] groups();

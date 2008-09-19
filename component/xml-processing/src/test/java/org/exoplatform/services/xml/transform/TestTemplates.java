@@ -26,21 +26,21 @@ import org.exoplatform.services.xml.transform.trax.TRAXTemplatesService;
  * @version $Id: $
  */
 public class TestTemplates extends BaseTest {
-  
+
   private TRAXTemplatesService traxTemplatesService;
 
   public void setUp() throws Exception {
-    StandaloneContainer.setConfigurationPath(Thread.currentThread().getContextClassLoader()
-        .getResource("conf/standalone/test-configuration.xml").getPath());
+    StandaloneContainer.setConfigurationPath(Thread.currentThread()
+                                                   .getContextClassLoader()
+                                                   .getResource("conf/standalone/test-configuration.xml")
+                                                   .getPath());
     StandaloneContainer container = StandaloneContainer.getInstance();
-    traxTemplatesService = (TRAXTemplatesService) container
-        .getComponentInstanceOfType(TRAXTemplatesService.class);
+    traxTemplatesService = (TRAXTemplatesService) container.getComponentInstanceOfType(TRAXTemplatesService.class);
     assertNotNull("traxTemplatesService", traxTemplatesService);
   }
-  
+
   public void testTemplates() {
     assertNotNull(traxTemplatesService.getTemplates("xslt1"));
   }
 
 }
-

@@ -32,67 +32,72 @@ import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.impl.MembershipImpl;
 
 /**
- * Created by The eXo Platform SAS
- * Author : James Chamberlain
- *         james.chamberlain@gmail.com
- * Feb 22, 2006
+ * Created by The eXo Platform SAS Author : James Chamberlain
+ * james.chamberlain@gmail.com Feb 22, 2006
  */
 public class ADMembershipDAOImpl extends MembershipDAOImpl {
-  
+
   private ADSearchBySID adSearch;
-  
-  public ADMembershipDAOImpl(LDAPAttributeMapping ldapAttrMapping, LDAPService ldapService, ADSearchBySID ad) {
-    super(ldapAttrMapping, ldapService) ;
+
+  public ADMembershipDAOImpl(LDAPAttributeMapping ldapAttrMapping,
+                             LDAPService ldapService,
+                             ADSearchBySID ad) {
+    super(ldapAttrMapping, ldapService);
     adSearch = ad;
-  }  
-   
+  }
+
   public Membership findMembershipByUserGroupAndType(String userName, String groupId, String type) throws Exception {
     String groupDN = getGroupDNFromGroupId(groupId);
-    ArrayList memberships = (ArrayList)findMemberships(userName, groupDN, type);
-    if (memberships.size() > 0)return (MembershipImpl)memberships.get(0);    
+    ArrayList memberships = (ArrayList) findMemberships(userName, groupDN, type);
+    if (memberships.size() > 0)
+      return (MembershipImpl) memberships.get(0);
     return null;
   }
-  
+
   public Collection findMembershipsByUser(String userName) throws Exception {
-    ArrayList<Membership> list = 
-      (ArrayList<Membership>)findMemberships(userName, ldapAttrMapping_.groupsURL, null);
+    ArrayList<Membership> list = (ArrayList<Membership>) findMemberships(userName,
+                                                                         ldapAttrMapping_.groupsURL,
+                                                                         null);
     return list;
   }
-  
-  public Collection findMembershipsByUserAndGroup(String userName, String groupId) throws Exception{
-    String groupDN = getGroupDNFromGroupId(groupId);    
-    return (ArrayList)findMemberships(userName, groupDN, null);
+
+  public Collection findMembershipsByUserAndGroup(String userName, String groupId) throws Exception {
+    String groupDN = getGroupDNFromGroupId(groupId);
+    return (ArrayList) findMemberships(userName, groupDN, null);
   }
-  
+
   private Collection findMemberships(String userName, String groupId, String type) throws Exception {
     LdapContext ctx = ldapService_.getLdapContext();
-    Collection<Membership> list = new ArrayList<Membership>();    
-    String userDN = getDNFromUsername(userName);    
-    if(userDN == null) return list;
-    
+    Collection<Membership> list = new ArrayList<Membership>();
+    String userDN = getDNFromUsername(userName);
+    if (userDN == null)
+      return list;
+
     String filter = ldapAttrMapping_.userObjectClassFilter;
-    String retAttrs[] = {"tokenGroups"};
+    String retAttrs[] = { "tokenGroups" };
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.OBJECT_SCOPE);
     constraints.setReturningAttributes(retAttrs);
-    
+
     NamingEnumeration results = ctx.search(userDN, filter, constraints);
     while (results.hasMore()) {
       SearchResult sr = (SearchResult) results.next();
       Attributes attrs = sr.getAttributes();
       Attribute attr = attrs.get("tokenGroups");
-      for (int x = 0; x < attr.size(); x++){
-        byte[] SID = (byte[])attr.get(x);
-        String membershipDN = adSearch.findMembershipDNBySID(SID, groupId, type); 
-        if (membershipDN != null) list.add(createMembershipObject(membershipDN, userName, type));        
+      for (int x = 0; x < attr.size(); x++) {
+        byte[] SID = (byte[]) attr.get(x);
+        String membershipDN = adSearch.findMembershipDNBySID(SID, groupId, type);
+        if (membershipDN != null)
+          list.add(createMembershipObject(membershipDN, userName, type));
       }
-    }    
+    }
     return list;
-  }  
-  
+  }
+
   private Membership createMembershipObject(String dn, String user, String type) throws Exception {
     Group group = getGroupFromMembershipDN(dn);
-    if (type == null) type = explodeDN(dn, true)[0];          
+    if (type == null)
+      type = explodeDN(dn, true)[0];
     MembershipImpl membership = new MembershipImpl();
     membership.setId(user + "," + type + "," + group.getId());
     membership.setUserName(user);

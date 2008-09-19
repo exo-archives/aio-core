@@ -24,32 +24,32 @@ import org.exoplatform.services.document.DocumentReaderService;
 import org.exoplatform.test.BasicTestCase;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Sergey Karpenko <sergey.karpenko@exoplatform.com.ua>
+ * Created by The eXo Platform SAS Author : Sergey Karpenko
+ * <sergey.karpenko@exoplatform.com.ua>
+ * 
  * @version $Id: $
  */
 
-public class TestTextPlainDocumentReader  extends BasicTestCase  {
-  
+public class TestTextPlainDocumentReader extends BasicTestCase {
+
   DocumentReaderService service_;
 
   public void setUp() throws Exception {
-    PortalContainer pcontainer = PortalContainer.getInstance() ;
-    service_ =
-      (DocumentReaderService) pcontainer.getComponentInstanceOfType(DocumentReaderService.class) ;
+    PortalContainer pcontainer = PortalContainer.getInstance();
+    service_ = (DocumentReaderService) pcontainer.getComponentInstanceOfType(DocumentReaderService.class);
   }
 
   public void testGetContentAsString() throws Exception {
     InputStream is = TestTextPlainDocumentReader.class.getResourceAsStream("/test.txt");
     String text = service_.getDocumentReader("text/plain").getContentAsText(is);
-    assertEquals("Wrong string returned","This is a test text\n" ,text );
+    assertEquals("Wrong string returned", "This is a test text\n", text);
   }
-  
+
   public void testGetContentAsStringWithEncoding() throws Exception {
     InputStream is = TestTextPlainDocumentReader.class.getResourceAsStream("/testUTF8.txt");
-    String text = service_.getDocumentReader("text/plain").getContentAsText(is,"UTF-8");
+    String text = service_.getDocumentReader("text/plain").getContentAsText(is, "UTF-8");
     String etalon = "\ufeff\u0426\u0435 \u0442\u0435\u0441\u0442\u043e\u0432\u0438\u0439 \u0442\u0435\u043a\u0441\u0442. \u042d\u0442\u043e \u0442\u0435\u0441\u0442\u043e\u0432\u044b\u0439 \u0442\u0435\u043a\u0441\u0442.";
-    assertEquals("Wrong string returned",etalon ,text );
+    assertEquals("Wrong string returned", etalon, text);
   }
-  
+
 }

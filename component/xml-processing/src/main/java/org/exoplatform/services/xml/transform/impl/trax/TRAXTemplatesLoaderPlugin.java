@@ -29,9 +29,9 @@ import org.exoplatform.container.xml.PropertiesParam;
  * @version $Id: $
  */
 public class TRAXTemplatesLoaderPlugin extends BaseComponentPlugin {
-  
+
   private Map<String, String> templates_ = new HashMap<String, String>();
-  
+
   public TRAXTemplatesLoaderPlugin(InitParams params) throws Exception {
     if (params != null) {
       PropertiesParam pparams = params.getPropertiesParam("xsl-source-urls");
@@ -39,10 +39,9 @@ public class TRAXTemplatesLoaderPlugin extends BaseComponentPlugin {
         templates_ = pparams.getProperties();
     }
   }
-  
+
   public Map<String, String> getTRAXTemplates() {
     return templates_;
   }
 
 }
-

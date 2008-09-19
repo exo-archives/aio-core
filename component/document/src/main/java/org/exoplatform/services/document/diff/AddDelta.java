@@ -1,4 +1,4 @@
 package org.exoplatform.services.document.diff;
 
-public interface AddDelta extends Delta{
+public interface AddDelta extends Delta {
 }

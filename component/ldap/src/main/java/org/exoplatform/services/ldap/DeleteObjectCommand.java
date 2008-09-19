@@ -27,34 +27,33 @@ import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Tuan Nguyen
- *          tuan08@users.sourceforge.net
- * Oct 16, 2005
+ * Created by The eXo Platform SAS Author : Tuan Nguyen
+ * tuan08@users.sourceforge.net Oct 16, 2005
  */
 public class DeleteObjectCommand extends BaseComponentPlugin {
-  
-  public List<String> objectsToDelete_ ;
-  
+
+  public List<String> objectsToDelete_;
+
   public DeleteObjectCommand(InitParams params) {
-    objectsToDelete_ =  params.getValuesParam("objects.to.delete").getValues() ;
+    objectsToDelete_ = params.getValuesParam("objects.to.delete").getValues();
   }
-  
-  public void deleteObjects(LdapContext context)  {
-    for(String dn :  objectsToDelete_ )    unbind( context, dn) ;        
+
+  public void deleteObjects(LdapContext context) {
+    for (String dn : objectsToDelete_)
+      unbind(context, dn);
   }
-  
-  private void unbind( LdapContext context, String dn){
-    try {        
+
+  private void unbind(LdapContext context, String dn) {
+    try {
       SearchControls constraints = new SearchControls();
-      constraints.setSearchScope( SearchControls.ONELEVEL_SCOPE);      
-      NamingEnumeration results = context.search(  dn, "(objectclass=*)",  constraints);
-      while( results.hasMore()){
-        SearchResult sr = (SearchResult) results.next();        
-        unbind( context, sr.getNameInNamespace());
+      constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
+      NamingEnumeration results = context.search(dn, "(objectclass=*)", constraints);
+      while (results.hasMore()) {
+        SearchResult sr = (SearchResult) results.next();
+        unbind(context, sr.getNameInNamespace());
       }
-      context.unbind( dn);
-    }catch( Exception exp){
+      context.unbind(dn);
+    } catch (Exception exp) {
 
     }
   }

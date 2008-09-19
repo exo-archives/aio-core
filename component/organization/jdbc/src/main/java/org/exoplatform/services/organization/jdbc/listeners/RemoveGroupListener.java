@@ -19,6 +19,7 @@ package org.exoplatform.services.organization.jdbc.listeners;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
+
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
 import org.exoplatform.services.log.ExoLogger;
@@ -26,28 +27,27 @@ import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.GroupHandler;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.jdbc.GroupDAOImpl;
+
 /**
- * Created by The eXo Platform SAS
- * Author : Le Bien Thuy
- *          lebienthuy@gmail.com
- * Jun 28, 2007  
+ * Created by The eXo Platform SAS Author : Le Bien Thuy lebienthuy@gmail.com
+ * Jun 28, 2007
  */
 public class RemoveGroupListener extends Listener<GroupDAOImpl, Group> {
-  
-  protected static Log log = ExoLogger.getLogger("organisation:RemoveGroupListener");
-  
-  private OrganizationService service_ ;
-  
+
+  protected static Log        log = ExoLogger.getLogger("organisation:RemoveGroupListener");
+
+  private OrganizationService service_;
+
   public RemoveGroupListener(OrganizationService service) {
-    service_ = service ;
+    service_ = service;
   }
-  
+
   @SuppressWarnings("unchecked")
   public void onEvent(Event<GroupDAOImpl, Group> event) throws Exception {
     log.info("Remove all Child of Group: " + event.getData().getId());
     GroupHandler membershipHanler = service_.getGroupHandler();
     List<Group> children = (List<Group>) membershipHanler.findGroups(event.getData());
-    for(Group child: children) {
+    for (Group child : children) {
       membershipHanler.removeGroup(child, true);
     }
   }

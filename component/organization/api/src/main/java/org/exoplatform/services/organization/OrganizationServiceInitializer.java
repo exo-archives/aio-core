@@ -17,37 +17,35 @@
 package org.exoplatform.services.organization;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Tuan Nguyen
- *          tuan08@users.sourceforge.net
- * Nov 15, 2005
- *
- * If the other service or a  third party want to  customize the initialization phase of the
- * organization service. they should make a customize class that implements  this interface and register
- * their plugin code via xml configuration. An example  of the customization code is we have an
- * organization service database intializer that create the predifined the user , group and membership
- * if the database is empty.
+ * Created by The eXo Platform SAS Author : Tuan Nguyen
+ * tuan08@users.sourceforge.net Nov 15, 2005 If the other service or a third
+ * party want to customize the initialization phase of the organization service.
+ * they should make a customize class that implements this interface and
+ * register their plugin code via xml configuration. An example of the
+ * customization code is we have an organization service database intializer
+ * that create the predifined the user , group and membership if the database is
+ * empty. To Register the plugin code by the xml configuration: You need to
+ * create a my.package.MyMembershipEventListener that implements this interface
+ * and add a conf/portal/configuration.xml to the classpath. The
+ * configuration.xml can be in a jar file. The file should contain the following
+ * configuraiton:
  * 
- * To Register the plugin code by the xml configuration:
- * You need to create a my.package.MyMembershipEventListener that implements this interface and add
- * a conf/portal/configuration.xml to the classpath. The configuration.xml can be in a jar
- * file. The file should contain the following configuraiton:
  * <pre>
- * <configuration>
+ * &lt;configuration&gt;
  *   [..]
- *   <external-component-plugins>
- *     <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
- *     <component-plugin>
- *        <name>my.customize.initializer.plugin</name>
- *        <set-method>addListenerPlugin</set-method>
- *        <type>my.package.MyInitializerPlugin</type>
- *        <description>your listener description</description>
- *      </component-plugin>
- *  </external-component-plugins>
+ *   &lt;external-component-plugins&gt;
+ *     &lt;target-component&gt;org.exoplatform.services.organization.OrganizationService&lt;/target-component&gt;
+ *     &lt;component-plugin&gt;
+ *        &lt;name&gt;my.customize.initializer.plugin&lt;/name&gt;
+ *        &lt;set-method&gt;addListenerPlugin&lt;/set-method&gt;
+ *        &lt;type&gt;my.package.MyInitializerPlugin&lt;/type&gt;
+ *        &lt;description&gt;your listener description&lt;/description&gt;
+ *      &lt;/component-plugin&gt;
+ *  &lt;/external-component-plugins&gt;
  *  [...]
- *</configuration>
+ * /configuration&gt;
  * </pre>
  */
 public interface OrganizationServiceInitializer {
-  public void init(OrganizationService service) throws Exception ;
+  public void init(OrganizationService service) throws Exception;
 }

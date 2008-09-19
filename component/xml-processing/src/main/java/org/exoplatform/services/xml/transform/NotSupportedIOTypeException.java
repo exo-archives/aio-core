@@ -24,7 +24,8 @@ import javax.xml.transform.Source;
  * Created by The eXo Platform SAS .
  * 
  * @author <a href="mailto:geaz@users.sourceforge.net">Gennady Azarenkov</a>
- * @version $Id: NotSupportedIOTypeException.java 5799 2006-05-28 17:55:42Z geaz $
+ * @version $Id: NotSupportedIOTypeException.java 5799 2006-05-28 17:55:42Z geaz
+ *          $
  */
 
 public class NotSupportedIOTypeException extends Exception {
@@ -36,21 +37,18 @@ public class NotSupportedIOTypeException extends Exception {
 
   /** Constructs an Exception with a message. */
   public NotSupportedIOTypeException(Result result) {
-    super("Result type " + result.getClass().getName()
-        + " is not supported by this transformer.");
+    super("Result type " + result.getClass().getName() + " is not supported by this transformer.");
   }
 
   /** Constructs an Exception with a message. */
   public NotSupportedIOTypeException(Source source) {
-    super("Source type " + source.getClass().getName()
-        + " is not supported by this transformer.");
+    super("Source type " + source.getClass().getName() + " is not supported by this transformer.");
   }
 
   /**
    * Constructs an Exception with a detailed message.
    * 
-   * @param Message
-   *          The message associated with the exception.
+   * @param Message The message associated with the exception.
    */
   public NotSupportedIOTypeException(String message) {
     super(message);

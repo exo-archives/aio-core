@@ -18,11 +18,10 @@
 package org.exoplatform.services.script.groovy;
 
 import groovy.lang.GroovyObject;
+import junit.framework.TestCase;
 
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.StandaloneContainer;
-
-import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -31,29 +30,28 @@ import junit.framework.TestCase;
 public class GroovyInstantiatorTest extends TestCase {
 
   private GroovyScriptInstantiator groovyScriptInstantiator;
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
    * @see junit.framework.TestCase#setUp()
    */
   @Override
   public void setUp() throws Exception {
-    StandaloneContainer.setConfigurationPath(
-        "src/test/java/conf/standalone/test-configuration.xml");
+    StandaloneContainer.setConfigurationPath("src/test/java/conf/standalone/test-configuration.xml");
     ExoContainer container = StandaloneContainer.getInstance();
-    groovyScriptInstantiator = (GroovyScriptInstantiator) container.getComponentInstanceOfType(
-        GroovyScriptInstantiator.class);
+    groovyScriptInstantiator = (GroovyScriptInstantiator) container.getComponentInstanceOfType(GroovyScriptInstantiator.class);
     assertNotNull(groovyScriptInstantiator);
   }
-  
+
   public void testGroovyScriptInstantiatorSimple() throws Exception {
-    String url = Thread.currentThread().getContextClassLoader().getResource(
-        "Book.groovy").toString();
+    String url = Thread.currentThread()
+                       .getContextClassLoader()
+                       .getResource("Book.groovy")
+                       .toString();
     GroovyObject groovyObject = (GroovyObject) groovyScriptInstantiator.instantiateScript(url);
-    /*  --- Groovy code ---
-     * def title = "Groovy in Action"
-     * def author = "Andrew Glover"
-     * def price = 20.10
-     * def isdn = "1234567890987654321"
+    /*
+     * --- Groovy code --- def title = "Groovy in Action" def author =
+     * "Andrew Glover" def price = 20.10 def isdn = "1234567890987654321"
      */
     assertEquals("Andrew Glover", groovyObject.getProperty("author"));
     assertEquals("Groovy in Action", groovyObject.getProperty("title"));
@@ -62,21 +60,24 @@ public class GroovyInstantiatorTest extends TestCase {
     groovyObject.setProperty("price", 10);
     assertEquals(10, groovyObject.getProperty("price"));
   }
-  
+
   public void testGroovyScriptInstantiatorInjection() throws Exception {
-    String url = Thread.currentThread().getContextClassLoader().getResource(
-        "TestInjection.groovy").toString();
+    String url = Thread.currentThread()
+                       .getContextClassLoader()
+                       .getResource("TestInjection.groovy")
+                       .toString();
     GroovyObject groovyObject = (GroovyObject) groovyScriptInstantiator.instantiateScript(url);
     assertNotNull(groovyObject.getProperty("sampleComponent"));
     assertEquals("sample component",
-        ((SampleComponent) groovyObject.getProperty("sampleComponent")).getAbout());
+                 ((SampleComponent) groovyObject.getProperty("sampleComponent")).getAbout());
   }
-  
+
   public void testGroovyScriptInstantiatorXML() throws Exception {
-    String url = Thread.currentThread().getContextClassLoader().getResource(
-        "SimpleXMLGenerator.groovy").toString();
+    String url = Thread.currentThread()
+                       .getContextClassLoader()
+                       .getResource("SimpleXMLGenerator.groovy")
+                       .toString();
     GroovyObject groovyObject = (GroovyObject) groovyScriptInstantiator.instantiateScript(url);
-    groovyObject.invokeMethod("generateXML", new Object[] {new Book()});
+    groovyObject.invokeMethod("generateXML", new Object[] { new Book() });
   }
 }
-

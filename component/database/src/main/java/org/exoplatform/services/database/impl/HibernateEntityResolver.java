@@ -1,6 +1,6 @@
 //$Id: HibernateEntityResolver.java 5332 2006-04-29 18:32:44Z geaz $
 //Contributed by Markus Meissner
-package org.exoplatform.services.database.impl ;
+package org.exoplatform.services.database.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,42 +12,47 @@ import org.xml.sax.InputSource;
 
 public class HibernateEntityResolver implements EntityResolver, Serializable {
 
-  private static final String URL = "http://hibernate.sourceforge.net/";
+  private static final String   URL = "http://hibernate.sourceforge.net/";
+
   private transient ClassLoader resourceLoader;
 
   /**
-   * Default constructor using DTDEntityResolver classloader for
-   * resource loading.
+   * Default constructor using DTDEntityResolver classloader for resource
+   * loading.
    */
   public HibernateEntityResolver() {
-    //backward compatibility
+    // backward compatibility
     resourceLoader = this.getClass().getClassLoader();
   }
 
   /**
    * Set the class loader used to load resouces
-   *
+   * 
    * @param resourceLoader class loader to use
    */
   public HibernateEntityResolver(ClassLoader resourceLoader) {
     this.resourceLoader = resourceLoader;
   }
 
-  public InputSource resolveEntity (String publicId, String systemId) {
-//    S ystem.out.println("====> Resolve entity, public id " + publicId + " system id " + systemId) ;
-    if ( systemId!=null && systemId.startsWith(URL) ) {
-//      S ystem.out.println("trying to locate " + systemId + " in classpath under org/hibernate/");
+  public InputSource resolveEntity(String publicId, String systemId) {
+    // S ystem.out.println("====> Resolve entity, public id " + publicId +
+    // " system id " + systemId) ;
+    if (systemId != null && systemId.startsWith(URL)) {
+      // S ystem.out.println("trying to locate " + systemId +
+      // " in classpath under org/hibernate/");
       // Search for DTD
-      InputStream dtdStream = resourceLoader.getResourceAsStream( "org/hibernate/" + systemId.substring( URL.length() ) );
-      if (dtdStream == null) return null;      
-//      S ystem.out.println("found " + systemId + " in classpath");
+      InputStream dtdStream = resourceLoader.getResourceAsStream("org/hibernate/"
+          + systemId.substring(URL.length()));
+      if (dtdStream == null)
+        return null;
+      // S ystem.out.println("found " + systemId + " in classpath");
       InputSource source = new InputSource(dtdStream);
       source.setPublicId(publicId);
       source.setSystemId(systemId);
-      return source;      
+      return source;
     }
     // use the default behaviour
-    return null;    
+    return null;
   }
 
   private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {

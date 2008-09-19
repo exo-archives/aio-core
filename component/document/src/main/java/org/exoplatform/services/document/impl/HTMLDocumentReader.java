@@ -24,10 +24,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.exoplatform.container.xml.InitParams;
 import org.htmlparser.Parser;
 import org.htmlparser.beans.StringBean;
 import org.htmlparser.util.ParserException;
+
+import org.exoplatform.container.xml.InitParams;
 
 /**
  * Created by The eXo Platform SAS A parser of HTML files.
@@ -45,8 +46,9 @@ public class HTMLDocumentReader extends BaseDocumentReader {
   public HTMLDocumentReader(InitParams params) {
   }
 
-/*  public HTMLDocumentReader() {
-  }*/
+  /*
+   * public HTMLDocumentReader() { }
+   */
 
   /**
    * Get the text/html mime type.
@@ -104,8 +106,9 @@ public class HTMLDocumentReader extends BaseDocumentReader {
 
   /*
    * (non-Javadoc)
-   * 
-   * @see org.exoplatform.services.document.DocumentReader#getProperties(java.io.InputStream)
+   * @see
+   * org.exoplatform.services.document.DocumentReader#getProperties(java.io.
+   * InputStream)
    */
   public Properties getProperties(InputStream is) throws Exception {
     return new Properties();

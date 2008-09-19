@@ -17,9 +17,11 @@
 
 package org.exoplatform.services.xml.transform.trax;
 
-import javax.xml.transform.ErrorListener;
 import java.util.Properties;
+
+import javax.xml.transform.ErrorListener;
 import javax.xml.transform.URIResolver;
+
 import org.exoplatform.services.xml.transform.PipeTransformer;
 
 /**
@@ -73,7 +75,6 @@ public interface TRAXTransformer extends PipeTransformer {
   URIResolver getURIResolver();
 
   /**
-   * 
    * @see javax.xml.transform.Transformer#setURIResolver(javax.xml.transform.URIResolver)
    */
   void setURIResolver(URIResolver resolver);

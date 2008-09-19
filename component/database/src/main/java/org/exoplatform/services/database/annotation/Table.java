@@ -22,14 +22,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Author : Nhu Dinh Thuan
- *          nhudinhthuan@exoplatform.com
- * Jul 5, 2006
+ * Author : Nhu Dinh Thuan nhudinhthuan@exoplatform.com Jul 5, 2006
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
+@Target( { ElementType.TYPE })
 public @interface Table {
-  String name() ;
-  TableField[]  field() ;
-}
+  String name();
 
+  TableField[] field();
+}

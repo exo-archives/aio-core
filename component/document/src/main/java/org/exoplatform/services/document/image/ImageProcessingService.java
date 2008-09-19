@@ -10,8 +10,10 @@ public interface ImageProcessingService {
 
   public BufferedImage createCroppedImage(BufferedImage img, int chosenWidth, int chosenHeight);
 
-  public BufferedImage createBoundImage(BufferedImage img, int chosenWidth, int chosenHeight,
-      String bgColor);
+  public BufferedImage createBoundImage(BufferedImage img,
+                                        int chosenWidth,
+                                        int chosenHeight,
+                                        String bgColor);
 
   public BufferedImage createScaledImage(BufferedImage img, double factor);
 

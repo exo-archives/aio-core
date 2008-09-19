@@ -15,20 +15,20 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 package org.exoplatform.services.organization.jdbc.listeners;
+
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
+
 /**
- * Created by The eXo Platform SAS
- * Author : Le Bien Thuy
- *          lebienthuy@gmail.com
- * Jun 28, 2007  
+ * Created by The eXo Platform SAS Author : Le Bien Thuy lebienthuy@gmail.com
+ * Jun 28, 2007
  */
 public class MembershipListener extends Listener {
 
   @Override
   public void onEvent(Event arg0) throws Exception {
     // TODO Auto-generated method stub
-    
+
   }
 
 }

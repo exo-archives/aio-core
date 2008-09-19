@@ -21,13 +21,10 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.poi.hwpf.HWPFDocument;
-import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.poi.hwpf.usermodel.Range;
 
 /**
- * Created by The eXo Platform SAS
- * 
- * A parser of Microsoft Word files.
+ * Created by The eXo Platform SAS A parser of Microsoft Word files.
  * 
  * @author <a href="mailto:phunghainam@gmail.com">Phung Hai Nam</a>
  * @author Gennady Azarenkov
@@ -41,18 +38,13 @@ public class MSWordDocumentReader extends BaseDocumentReader {
    * @return The application/msword mime type.
    */
   public String[] getMimeTypes() {
-    return new String[] {
-        "application/msword",
-        "application/msworddoc",
-        "application/msworddot"
-    };
+    return new String[] { "application/msword", "application/msworddoc", "application/msworddot" };
   }
 
   /**
    * Returns only a text from .doc file content.
    * 
-   * @param is
-   *          an input stream with .doc file content.
+   * @param is an input stream with .doc file content.
    * @return The string only with text from file content.
    * @throws Exception
    */
@@ -60,24 +52,25 @@ public class MSWordDocumentReader extends BaseDocumentReader {
     String text = "";
     try {
       HWPFDocument doc = new HWPFDocument(is);
-      //WordExtractor extr = new WordExtractor(doc); 
-      
+      // WordExtractor extr = new WordExtractor(doc);
+
       Range range = doc.getRange();
       text = range.text();
-    }catch (IOException e) {
+    } catch (IOException e) {
     }
     return text.trim();
   }
 
   public String getContentAsText(InputStream is, String encoding) throws Exception {
-    //Ignore encoding
+    // Ignore encoding
     return getContentAsText(is);
   }
-  
+
   /*
    * (non-Javadoc)
-   * 
-   * @see org.exoplatform.services.document.DocumentReader#getProperties(java.io.InputStream)
+   * @see
+   * org.exoplatform.services.document.DocumentReader#getProperties(java.io.
+   * InputStream)
    */
   public Properties getProperties(InputStream is) throws Exception {
     POIPropertiesReader reader = new POIPropertiesReader();

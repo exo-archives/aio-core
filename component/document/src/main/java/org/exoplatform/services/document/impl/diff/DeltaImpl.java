@@ -67,26 +67,19 @@ import org.exoplatform.services.document.diff.DiffService;
  * Holds a "delta" difference between to revisions of a text.
  * 
  * @version $Revision: 1.6 $ $Date: 2003/10/13 08:00:24 $
- * 
  * @author <a href="mailto:juanco@suigeneris.org">Juanco Anez</a>
  * @author <a href="mailto:bwm@hplb.hpl.hp.com">Brian McBride</a>
  * @see DiffServiceImpl
  * @see ChunkImpl
- * @see RevisionImpl
- * 
- * modifications
- * 
- * 27 Apr 2003 bwm
- * 
- * Added getOriginal() and getRevised() accessor methods Added visitor pattern
- * accept() method
+ * @see RevisionImpl modifications 27 Apr 2003 bwm Added getOriginal() and
+ *      getRevised() accessor methods Added visitor pattern accept() method
  */
 
-public abstract class DeltaImpl implements Delta{
+public abstract class DeltaImpl implements Delta {
 
-  protected Chunk original;
+  protected Chunk  original;
 
-  protected Chunk revised;
+  protected Chunk  revised;
 
   static Class[][] DeltaClass;
 
@@ -106,10 +99,8 @@ public abstract class DeltaImpl implements Delta{
    * Returns a Delta that corresponds to the given chunks in the original and
    * revised text respectively.
    * 
-   * @param orig
-   *          the chunk in the original text.
-   * @param rev
-   *          the chunk in the revised text.
+   * @param orig the chunk in the original text.
+   * @param rev the chunk in the revised text.
    */
   public static DeltaImpl newDelta(Chunk orig, Chunk rev) {
     Class c = DeltaClass[orig.size() > 0 ? 1 : 0][rev.size() > 0 ? 1 : 0];
@@ -149,20 +140,16 @@ public abstract class DeltaImpl implements Delta{
   /**
    * Verifies that this delta can be used to patch the given text.
    * 
-   * @param target
-   *          the text to patch.
-   * @throws Exception
-   *           if the patch cannot be applied.
+   * @param target the text to patch.
+   * @throws Exception if the patch cannot be applied.
    */
   public abstract void verify(List target) throws Exception;
 
   /**
    * Applies this delta as a patch to the given text.
    * 
-   * @param target
-   *          the text to patch.
-   * @throws PatchFailedException
-   *           if the patch cannot be applied.
+   * @param target the text to patch.
+   * @throws PatchFailedException if the patch cannot be applied.
    */
   public final void patch(List target) throws Exception {
     verify(target);
@@ -172,18 +159,15 @@ public abstract class DeltaImpl implements Delta{
   /**
    * Applies this delta as a patch to the given text.
    * 
-   * @param target
-   *          the text to patch.
-   * @throws PatchFailedException
-   *           if the patch cannot be applied.
+   * @param target the text to patch.
+   * @throws PatchFailedException if the patch cannot be applied.
    */
   public abstract void applyTo(List target);
 
   /**
    * Converts this delta into its Unix diff style string representation.
    * 
-   * @param s
-   *          a {@link StringBuffer StringBuffer} to which the string
+   * @param s a {@link StringBuffer StringBuffer} to which the string
    *          representation will be appended.
    */
   public void toString(StringBuffer s) {
@@ -200,19 +184,16 @@ public abstract class DeltaImpl implements Delta{
   /**
    * Converts this delta into its RCS style string representation.
    * 
-   * @param s
-   *          a {@link StringBuffer StringBuffer} to which the string
+   * @param s a {@link StringBuffer StringBuffer} to which the string
    *          representation will be appended.
-   * @param EOL
-   *          the string to use as line separator.
+   * @param EOL the string to use as line separator.
    */
   public abstract void toRCSString(StringBuffer s, String EOL);
 
   /**
    * Converts this delta into its RCS style string representation.
    * 
-   * @param EOL
-   *          the string to use as line separator.
+   * @param EOL the string to use as line separator.
    */
   public String toRCSString(String EOL) {
     StringBuffer s = new StringBuffer();
@@ -239,6 +220,5 @@ public abstract class DeltaImpl implements Delta{
   public Chunk getRevised() {
     return revised;
   }
-
 
 }
