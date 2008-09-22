@@ -112,12 +112,9 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
       for (Iterator<LocaleConfig> iter = localeConfigs.iterator(); iter.hasNext();) {
         LocaleConfig localeConfig = iter.next();
         String language = localeConfig.getLanguage();
-        if (defaultLang.equals(language)) {
-          fileName = name + ".properties";
-        } else {
-          fileName = name + "_" + language + ".properties";
-        }
+        fileName = name + "_" + language + ".properties";
         URL url = cl.getResource(fileName);
+        if (url == null && defaultLang.equals(language)) cl.getResource(name + ".properties") ;
         if (url != null) {
           InputStream is = url.openStream();
           byte buf[] = IOUtil.getStreamContentAsBytes(is);
