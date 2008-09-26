@@ -17,6 +17,7 @@
 package org.exoplatform.services.resources.impl.hibernate;
 
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.hibernate.Session;
@@ -148,8 +149,13 @@ public class ResourceBundleServiceImpl extends BaseResourceBundleService {
     }
     // return null;
 
-    ResourceBundle rB = ResourceBundle.getBundle(id, locale, Thread.currentThread()
+    ResourceBundle rB;
+    try {
+      rB = ResourceBundle.getBundle(id, locale, Thread.currentThread()
                                                                    .getContextClassLoader());
+    } catch (MissingResourceException e) {
+      rB = null;
+    }
     if (rB != null) {
       return new MapResourceBundle(rB, locale);
 
