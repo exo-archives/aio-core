@@ -246,10 +246,9 @@ public class BaseDAO {
 
   protected String membershipClassFilter() {
     String mbfilter = ldapAttrMapping_.membershipObjectClassFilter;
-    if (!mbfilter.startsWith("("))
-      mbfilter = "(" + mbfilter;
-    if (!mbfilter.endsWith(")"))
-      mbfilter += ")";
+    if (mbfilter==null) return null;
+    if (!mbfilter.startsWith("(")) mbfilter = "(" + mbfilter;
+    if (!mbfilter.endsWith(")")) mbfilter += ")";
     return mbfilter;
   }
 
