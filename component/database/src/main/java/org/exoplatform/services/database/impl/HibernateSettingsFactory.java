@@ -24,27 +24,28 @@ import org.hibernate.cache.CacheProvider;
 import org.hibernate.cfg.SettingsFactory;
 
 /**
- * Created by The eXo Platform SAS        .
- * @author <a href="mailto:gennady.azarenkov@exoplatform.com">Gennady Azarenkov</a>
- * @version $Id: HibernateSettingsFactory.java 5332 2006-04-29 18:32:44Z geaz $
+ * Created by The eXo Platform SAS .
  * 
- * Hibernate's SettingsFactory for configure settings
+ * @author <a href="mailto:gennady.azarenkov@exoplatform.com">Gennady
+ *         Azarenkov</a>
+ * @version $Id: HibernateSettingsFactory.java 5332 2006-04-29 18:32:44Z geaz $
+ *          Hibernate's SettingsFactory for configure settings
  * @see SettingsFactory
  */
-public class HibernateSettingsFactory extends SettingsFactory { 
-	
-	private static final String HIBERNATE_CACHE_PROPERTY = "hibernate.cache.provider_class" ;
+public class HibernateSettingsFactory extends SettingsFactory {
 
-	private ExoCacheProvider cacheProvider;
-	
-	public HibernateSettingsFactory(ExoCacheProvider cacheProvider) throws HibernateException {
-		super();
-		this.cacheProvider = cacheProvider;
-	}
-	
-	protected CacheProvider createCacheProvider(Properties properties) {
-		properties.setProperty(HIBERNATE_CACHE_PROPERTY, ExoCacheProvider.class.getName());
-		return cacheProvider;
-	}
-	
+  private static final String HIBERNATE_CACHE_PROPERTY = "hibernate.cache.provider_class";
+
+  private ExoCacheProvider    cacheProvider;
+
+  public HibernateSettingsFactory(ExoCacheProvider cacheProvider) throws HibernateException {
+    super();
+    this.cacheProvider = cacheProvider;
+  }
+
+  protected CacheProvider createCacheProvider(Properties properties) {
+    properties.setProperty(HIBERNATE_CACHE_PROPERTY, ExoCacheProvider.class.getName());
+    return cacheProvider;
+  }
+
 }

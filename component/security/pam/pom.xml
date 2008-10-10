@@ -1,0 +1,102 @@
+<project>
+  <parent>
+    <groupId>org.exoplatform.core</groupId>
+    <artifactId>config</artifactId>
+    <version>2.1.2</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>exo.core.component.security.pam</artifactId>
+  <version>${org.exoplatform.core.version}</version>
+  <name>JPam Authenticator</name>
+  <description></description>
+
+  <dependencies>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.core</groupId>
+      <artifactId>exo.core.component.organization.api</artifactId>
+      <version>${org.exoplatform.core.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <outputDirectory>target/classes</outputDirectory>
+    <testSourceDirectory>src/test/java</testSourceDirectory>
+    <testOutputDirectory>target/test-classes</testOutputDirectory>
+
+    <resources>
+      <resource>
+        <directory>src/main/java</directory>
+        <includes>
+          <include>**/*.xml</include>
+          <include>**/*.conf</include>
+          <include>**/*.config</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*.xml</include>
+          <include>**/*.conf</include>
+          <include>**/*.config</include>
+        </includes>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/java</directory>
+        <includes>
+          <include>**/*.xml</include>
+          <include>**/*.conf</include>
+          <include>**/*.config</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <includes>
+          <include>**/*.xml</include>
+          <include>**/*.conf</include>
+          <include>**/*.config</include>
+        </includes>
+      </testResource>
+    </testResources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.2-SNAPSHOT</version>
+        <configuration>
+          <tasks>
+            <exec executable="javah">
+              <arg value="-classpath" />
+              <arg file="target/classes" />
+              <arg value="-d" />
+              <arg file="src/main/c" />
+              <arg value="-force" />
+              <arg value="org.exoplatform.services.security.pam.Pam" />
+            </exec>
+            <exec executable="make">
+              <arg value="--directory=src/main/c" />
+              <arg value="libjpam.x86" />
+            </exec>
+            <mkdir dir="${basedir}/target/c" />
+            <copy todir="${basedir}/target/c">
+              <fileset dir="src/main/c">
+                <include name="*.so" />
+              </fileset>
+            </copy>
+            <exec executable="make">
+              <arg value="--directory=src/main/c" />
+              <arg value="clean" />
+            </exec>
+          </tasks>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

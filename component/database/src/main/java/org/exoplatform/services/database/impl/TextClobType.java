@@ -34,11 +34,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.usertype.UserType;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Created by The eXo Platform SAS . Author : Travis Gregg Date: Oct 25, 2004
@@ -50,8 +50,7 @@ import org.hibernate.usertype.UserType;
  * temporaries gets around this. <BR>
  * <BR>
  * Thanks to reflection (and code on the Hibernate forum) this class can be
- * compiled without having the oracle drivers (classes12.zip) in your classpath.
- * <br>
+ * compiled without having the oracle drivers (classes12.zip) in your classpath. <br>
  * This is based on some code found in the Hibernate user forum:
  * http://www.hibernate.org/56.html <br>
  * http://www.hibernate.org/73.html
@@ -59,17 +58,17 @@ import org.hibernate.usertype.UserType;
  * @author tgregg
  */
 public class TextClobType implements UserType {
-  private static final Log logger = LogFactory.getLog(TextClobType.class);
+  private static final Log    logger                      = LogFactory.getLog(TextClobType.class);
 
   /**
    * Name of the oracle driver -- used to support Oracle clobs as a special case
    */
-  private static final String ORACLE_DRIVER_NAME = "Oracle JDBC driver";
+  private static final String ORACLE_DRIVER_NAME          = "Oracle JDBC driver";
 
   /** Version of the oracle driver being supported with clob. */
-  private static final int ORACLE_DRIVER_MAJOR_VERSION = 9;
+  private static final int    ORACLE_DRIVER_MAJOR_VERSION = 9;
 
-  private static final int ORACLE_DRIVER_MINOR_VERSION = 0;
+  private static final int    ORACLE_DRIVER_MINOR_VERSION = 0;
 
   public TextClobType() {
   }
@@ -86,8 +85,8 @@ public class TextClobType implements UserType {
     return (x == y) || (x != null && x.equals(y));
   }
 
-  public void nullSafeSet(PreparedStatement stmt, Object value, int index)
-      throws HibernateException, SQLException {
+  public void nullSafeSet(PreparedStatement stmt, Object value, int index) throws HibernateException,
+                                                                          SQLException {
 
     // if this is a PreparedStatement wrapper, get the underlying
     // PreparedStatement
@@ -112,55 +111,51 @@ public class TextClobType implements UserType {
           Class oracleClobClass = Class.forName("oracle.sql.CLOB");
 
           // Get the oracle connection class for checking
-          Class oracleConnectionClass = Class
-              .forName("oracle.jdbc.OracleConnection");
+          Class oracleConnectionClass = Class.forName("oracle.jdbc.OracleConnection");
 
           // now get the static factory method
           Class partypes[] = new Class[3];
           partypes[0] = Connection.class;
           partypes[1] = Boolean.TYPE;
           partypes[2] = Integer.TYPE;
-          Method createTemporaryMethod = oracleClobClass.getDeclaredMethod(
-              "createTemporary", partypes);
+          Method createTemporaryMethod = oracleClobClass.getDeclaredMethod("createTemporary",
+                                                                           partypes);
           // now get ready to call the factory method
-          Field durationSessionField = oracleClobClass
-              .getField("DURATION_SESSION");
+          Field durationSessionField = oracleClobClass.getField("DURATION_SESSION");
           Object arglist[] = new Object[3];
           Connection conn = realStatement.getConnection();
 
           // Make sure connection object is right type
           if (!oracleConnectionClass.isAssignableFrom(conn.getClass())) {
-            throw new HibernateException(
-                "JDBC connection object must be a oracle.jdbc.OracleConnection. "
-                    + "Connection class is " + conn.getClass().getName());
+            throw new HibernateException("JDBC connection object must be a oracle.jdbc.OracleConnection. "
+                + "Connection class is " + conn.getClass().getName());
           }
 
           arglist[0] = conn;
           arglist[1] = Boolean.TRUE;
-          arglist[2] = durationSessionField.get(null); //null is
+          arglist[2] = durationSessionField.get(null); // null is
           // valid
           // because of
           // static field
 
           // Create our CLOB
-          Object tempClob = createTemporaryMethod.invoke(null, arglist); //null
-                                                                         // is
-                                                                         // valid
-                                                                         // because
-                                                                         // of
-                                                                         // static
-                                                                         // method
+          Object tempClob = createTemporaryMethod.invoke(null, arglist); // null
+          // is
+          // valid
+          // because
+          // of
+          // static
+          // method
 
           // get the open method
           partypes = new Class[1];
           partypes[0] = Integer.TYPE;
-          Method openMethod = oracleClobClass.getDeclaredMethod("open",
-              partypes);
+          Method openMethod = oracleClobClass.getDeclaredMethod("open", partypes);
 
           // prepare to call the method
           Field modeReadWriteField = oracleClobClass.getField("MODE_READWRITE");
           arglist = new Object[1];
-          arglist[0] = modeReadWriteField.get(null); //null is valid
+          arglist[0] = modeReadWriteField.get(null); // null is valid
           // because of
           // static field
 
@@ -168,7 +163,7 @@ public class TextClobType implements UserType {
           openMethod.invoke(tempClob, arglist);
 
           // get the getCharacterOutputStream method
-          //Method getCharacterOutputStreamMethod =
+          // Method getCharacterOutputStreamMethod =
           // oracleClobClass.getDeclaredMethod(
           // "getCharacterOutputStream", null );
 
@@ -177,12 +172,12 @@ public class TextClobType implements UserType {
           // causes
           // 'No more data to read from socket' when inserting special
           // characters
-          Method getAsciiOutputStreamMethod = oracleClobClass
-              .getDeclaredMethod("getAsciiOutputStream", null);
+          Method getAsciiOutputStreamMethod = oracleClobClass.getDeclaredMethod("getAsciiOutputStream",
+                                                                                null);
 
           // call the getCharacterOutpitStream method
-          OutputStream tempClobOutputStream = (OutputStream) getAsciiOutputStreamMethod
-              .invoke(tempClob, null);
+          OutputStream tempClobOutputStream = (OutputStream) getAsciiOutputStreamMethod.invoke(tempClob,
+                                                                                               null);
 
           // write the string to the clob
           tempClobOutputStream.write(((String) value).getBytes());
@@ -199,19 +194,16 @@ public class TextClobType implements UserType {
           realStatement.setClob(index, (Clob) tempClob);
         } catch (ClassNotFoundException e) {
           // could not find the class with reflection
-          throw new HibernateException("Unable to find a required class.\n"
-              + e.getMessage());
+          throw new HibernateException("Unable to find a required class.\n" + e.getMessage());
         } catch (NoSuchMethodException e) {
           // could not find the metho with reflection
-          throw new HibernateException("Unable to find a required method.\n"
-              + e.getMessage());
+          throw new HibernateException("Unable to find a required method.\n" + e.getMessage());
         } catch (NoSuchFieldException e) {
           // could not find the field with reflection
-          throw new HibernateException("Unable to find a required field.\n"
-              + e.getMessage());
+          throw new HibernateException("Unable to find a required field.\n" + e.getMessage());
         } catch (IllegalAccessException e) {
-          throw new HibernateException(
-              "Unable to access a required method or field.\n" + e.getMessage());
+          throw new HibernateException("Unable to access a required method or field.\n"
+              + e.getMessage());
         } catch (InvocationTargetException e) {
           throw new HibernateException(e.getMessage());
         } catch (IOException e) {
@@ -219,8 +211,7 @@ public class TextClobType implements UserType {
         }
       } else {
         throw new HibernateException("No CLOBS support. Use driver version "
-            + ORACLE_DRIVER_MAJOR_VERSION + ", minor "
-            + ORACLE_DRIVER_MINOR_VERSION);
+            + ORACLE_DRIVER_MAJOR_VERSION + ", minor " + ORACLE_DRIVER_MINOR_VERSION);
       }
     } else {
       // this is the default way to handle Clobs that seems to work with
@@ -245,8 +236,7 @@ public class TextClobType implements UserType {
    *         is wrapping.
    * @throws HibernateException
    */
-  PreparedStatement getRealStatement(PreparedStatement stmt)
-      throws HibernateException {
+  PreparedStatement getRealStatement(PreparedStatement stmt) throws HibernateException {
     Method[] methods = stmt.getClass().getMethods();
     for (int i = 0; i < methods.length; i++) {
       String returnType = methods[i].getReturnType().getName();
@@ -256,32 +246,23 @@ public class TextClobType implements UserType {
       // then reflectively call this method to get the underlying
       // PreparedStatement
       // (JBoss returns a Statement that we must cast)
-      if (((Statement.class.getName().equals(returnType))
-          || (PreparedStatement.class.getName().equals(returnType)))
+      if (((Statement.class.getName().equals(returnType)) || (PreparedStatement.class.getName().equals(returnType)))
           && methods[i].getParameterTypes().length == 0) {
         Statement s = null;
         try {
           s = (Statement) methods[i].invoke(stmt, null);
         } catch (SecurityException e) {
-          throw new HibernateException(
-              "Security Error getting method [getDelegate] on ["
-                  + stmt.getClass().getName() + "::" + methods[i].getName()
-                  + "]", e);
+          throw new HibernateException("Security Error getting method [getDelegate] on ["
+              + stmt.getClass().getName() + "::" + methods[i].getName() + "]", e);
         } catch (IllegalArgumentException e) {
-          throw new HibernateException(
-              "Error calling method [getDelegate] on ["
-                  + stmt.getClass().getName() + "::" + methods[i].getName()
-                  + "]", e);
+          throw new HibernateException("Error calling method [getDelegate] on ["
+              + stmt.getClass().getName() + "::" + methods[i].getName() + "]", e);
         } catch (IllegalAccessException e) {
-          throw new HibernateException(
-              "Error calling method [getDelegate] on ["
-                  + stmt.getClass().getName() + "::" + methods[i].getName()
-                  + "]", e);
+          throw new HibernateException("Error calling method [getDelegate] on ["
+              + stmt.getClass().getName() + "::" + methods[i].getName() + "]", e);
         } catch (InvocationTargetException e) {
-          throw new HibernateException(
-              "Error calling method [getDelegate] on ["
-                  + stmt.getClass().getName() + "::" + methods[i].getName()
-                  + "]", e);
+          throw new HibernateException("Error calling method [getDelegate] on ["
+              + stmt.getClass().getName() + "::" + methods[i].getName() + "]", e);
         }
         return (PreparedStatement) s;
 
@@ -326,8 +307,8 @@ public class TextClobType implements UserType {
    * @see net.sf.hibernate.UserType#nullSafeGet(java.sql.ResultSet,
    *      java.lang.String[], java.lang.Object)
    */
-  public Object nullSafeGet(ResultSet rs, String[] names, Object owner)
-      throws HibernateException, SQLException {
+  public Object nullSafeGet(ResultSet rs, String[] names, Object owner) throws HibernateException,
+                                                                       SQLException {
     // Retrieve the value of the designated column in the current row of
     // this
     // ResultSet object as a java.io.Reader object
@@ -362,56 +343,54 @@ public class TextClobType implements UserType {
     // Return StringBuffer content as a large String
     return sb.toString();
   }
-  
+
   // Hibernate3 methods !
-  
-  
-	/*     
-	 * Reconstruct an object from the cacheable representation. 
-	 * At the very least this method should perform a deep copy if the 
-	 * type is mutable. (optional operation)
-	 * @see org.hibernate.usertype.UserType#assemble(java.io.Serializable, java.lang.Object)
-	 */
-	public Object assemble(Serializable cached, Object owner)
-			throws HibernateException {
-		// ?
-		return deepCopy(cached);
-	}
-	
-	/*     
-	 * Transform the object into its cacheable representation. 
-	 * At the very least this method should perform a deep copy if 
-	 * the type is mutable. That may not be enough for some implementations, 
-	 * however; for example, associations must be cached as identifier 
-	 * values. (optional operation)
-	 * @see org.hibernate.usertype.UserType#disassemble(java.lang.Object)
-	 */
-	public Serializable disassemble(Object value) throws HibernateException {
-		// ?
-		return new String(value.toString());
-	}
-	
-	/* 
-	 * Get a hashcode for the instance, consistent with persistence "equality"
-	 * @see org.hibernate.usertype.UserType#hashCode(java.lang.Object)
-	 */
-	public int hashCode(Object x) throws HibernateException {
-		// ?
-		return super.hashCode();
-	}
-	
-	/* During merge, replace the existing (target) value in the entity we are 
-	 * merging to with a new (original) value from the detached entity we are 
-	 * merging. For immutable objects, or null values, it is safe to simply return 
-	 * the first parameter. For mutable objects, it is safe to return a copy of 
-	 * the first parameter. For objects with component values, 
-	 * it might make sense to recursively replace component values.
-	 * 
-	 * @see org.hibernate.usertype.UserType#replace(java.lang.Object, java.lang.Object, java.lang.Object)
-	 */
-	public Object replace(Object original, Object target, Object owner)
-			throws HibernateException {
-		// ?
-		return original;
-	}
+
+  /*
+   * Reconstruct an object from the cacheable representation. At the very least
+   * this method should perform a deep copy if the type is mutable. (optional
+   * operation)
+   * @see org.hibernate.usertype.UserType#assemble(java.io.Serializable,
+   * java.lang.Object)
+   */
+  public Object assemble(Serializable cached, Object owner) throws HibernateException {
+    // ?
+    return deepCopy(cached);
+  }
+
+  /*
+   * Transform the object into its cacheable representation. At the very least
+   * this method should perform a deep copy if the type is mutable. That may not
+   * be enough for some implementations, however; for example, associations must
+   * be cached as identifier values. (optional operation)
+   * @see org.hibernate.usertype.UserType#disassemble(java.lang.Object)
+   */
+  public Serializable disassemble(Object value) throws HibernateException {
+    // ?
+    return new String(value.toString());
+  }
+
+  /*
+   * Get a hashcode for the instance, consistent with persistence "equality"
+   * @see org.hibernate.usertype.UserType#hashCode(java.lang.Object)
+   */
+  public int hashCode(Object x) throws HibernateException {
+    // ?
+    return super.hashCode();
+  }
+
+  /*
+   * During merge, replace the existing (target) value in the entity we are
+   * merging to with a new (original) value from the detached entity we are
+   * merging. For immutable objects, or null values, it is safe to simply return
+   * the first parameter. For mutable objects, it is safe to return a copy of
+   * the first parameter. For objects with component values, it might make sense
+   * to recursively replace component values.
+   * @see org.hibernate.usertype.UserType#replace(java.lang.Object,
+   * java.lang.Object, java.lang.Object)
+   */
+  public Object replace(Object original, Object target, Object owner) throws HibernateException {
+    // ?
+    return original;
+  }
 }

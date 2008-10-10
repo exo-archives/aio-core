@@ -19,12 +19,13 @@ package org.exoplatform.services.database.impl;
 
 import java.util.Properties;
 
-import org.exoplatform.services.cache.CacheService;
-import org.exoplatform.services.cache.ExoCache;
 import org.hibernate.cache.Cache;
 import org.hibernate.cache.CacheException;
 import org.hibernate.cache.CacheProvider;
 import org.hibernate.cache.Timestamper;
+
+import org.exoplatform.services.cache.CacheService;
+import org.exoplatform.services.cache.ExoCache;
 
 /**
  * Created by The eXo Platform SAS .
@@ -35,50 +36,48 @@ import org.hibernate.cache.Timestamper;
  */
 public class ExoCacheProvider implements CacheProvider {
 
-	private CacheService cacheService;
+  private CacheService cacheService;
 
-	public ExoCacheProvider(CacheService cacheService) {
-		this.cacheService = cacheService;
+  public ExoCacheProvider(CacheService cacheService) {
+    this.cacheService = cacheService;
 
-	}
+  }
 
-	public Cache buildCache(String name, Properties properties)
-			throws CacheException {
-		try {
-			ExoCache cache = cacheService.getCacheInstance(name);
-			cache.setMaxSize(5000);
-			return new ExoCachePlugin(cache);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			throw new CacheException("Cannot instanstiate cache provider");
-		}
-	}
+  public Cache buildCache(String name, Properties properties) throws CacheException {
+    try {
+      ExoCache cache = cacheService.getCacheInstance(name);
+      cache.setMaxSize(5000);
+      return new ExoCachePlugin(cache);
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      throw new CacheException("Cannot instanstiate cache provider");
+    }
+  }
 
-	public long nextTimestamp() {
-		return Timestamper.next();
-	}
+  public long nextTimestamp() {
+    return Timestamper.next();
+  }
 
-	/**
-	 * Callback to perform any necessary initialization of the underlying cache
-	 * implementation during SessionFactory construction.
-	 * 
-	 * @param properties
-	 *            current configuration settings.
-	 */
-	public void start(Properties properties) throws CacheException {
+  /**
+   * Callback to perform any necessary initialization of the underlying cache
+   * implementation during SessionFactory construction.
+   * 
+   * @param properties current configuration settings.
+   */
+  public void start(Properties properties) throws CacheException {
 
-	}
+  }
 
-	/**
-	 * Callback to perform any necessary cleanup of the underlying cache
-	 * implementation during SessionFactory.close().
-	 */
-	public void stop() {
+  /**
+   * Callback to perform any necessary cleanup of the underlying cache
+   * implementation during SessionFactory.close().
+   */
+  public void stop() {
 
-	}
+  }
 
-	public boolean isMinimalPutsEnabledByDefault() {
-		return true;
-	}
+  public boolean isMinimalPutsEnabledByDefault() {
+    return true;
+  }
 
 }
