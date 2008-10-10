@@ -1,0 +1,221 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.exoplatform.core</groupId>
+  <artifactId>config</artifactId>
+  <name>eXo Core Config</name>
+  <version>2.1.2</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>component/security/core</module>  
+    <module>component/security/pam</module>
+    <module>component/security/ntlm</module>
+    <module>component/database</module>
+    <module>component/document</module>
+    <module>component/ldap</module>
+    <module>component/organization/api</module>
+    <module>component/organization/jdbc</module>
+    <module>component/organization/ldap</module>
+    <module>component/xml-processing</module>
+    <module>component/resources/api</module>
+    <module>component/script/groovy</module>
+  </modules>
+
+  <dependencies>
+    <dependency>
+      <groupId>emma</groupId>
+      <artifactId>emma</artifactId>
+      <version>2.0.5312</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/java</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.xml</include>
+          <include>**/*.groovy</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.xml</include>
+          <include>**/*.groovy</include>
+        </includes>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/java</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.xml</include>
+          <include>**/*.groovy</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.xml</include>
+          <include>**/*.groovy</include>
+        </includes>
+      </testResource>
+    </testResources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+          <optimize>true</optimize>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skip>${exo.test.skip}</skip>
+          <useFile>${exo.test.use.file}</useFile>
+          <forkMode>${exo.test.forkmode}</forkMode>
+          <testFailureIgnore>${exo.test.failure.ignore}</testFailureIgnore>
+          <classesDirectory>${exo.test.classesdirectory}</classesDirectory>
+          <excludes>
+            <exclude>**/BaseTest.java</exclude>
+            <exclude>**/DBCreatorTest.java</exclude>
+            <exclude>**/TestOrganizationService.java</exclude>
+            <exclude>**/TestDatabaseService.java</exclude>
+            <exclude>**/TestCurrentSubject.java</exclude>
+            <exclude>**/*$*</exclude>
+          </excludes>
+          <systemProperties>
+            <property>
+              <name>emma.coverage.out.file</name>
+              <value>target/emma/coverage.ec</value>
+            </property>
+          </systemProperties>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.2-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>emma1</id>
+            <phase>test-compile</phase>
+            <configuration>
+              <tasks if="emma.run">
+                <echo message="[EMMA] Start classes instrumentation ..." />
+                <taskdef resource="emma_ant.properties" classpathref="maven.dependency.classpath" />
+                <mkdir dir="target" />
+                <mkdir dir="target/classes" />
+                <mkdir dir="target/emma/classes" />
+                <!-- Do nothing if the directory already exist-->
+                <copy todir="target/emma/classes" verbose="false" overwrite="true">
+                  <fileset dir="target/classes" />
+                </copy>
+                <emma enabled="true">
+                  <instr mode="overwrite" metadatafile="target/emma/metadata.em">
+                    <filter excludes="*.xml.*" />
+                    <filter excludes="*JiBX*" />
+                    <instrpath>
+                      <dirset dir="target">
+                        <include name="emma/classes" />
+                      </dirset>
+                    </instrpath>
+                  </instr>
+                </emma>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>emma2</id>
+            <phase>test</phase>
+            <configuration>
+              <tasks if="emma.run">
+                <echo message="[EMMA] Start report generation..." />
+                <taskdef resource="emma_ant.properties" classpathref="maven.dependency.classpath" />
+                <emma enabled="true">
+                  <!-- merged file will be rewritted by last project -->
+                  <merge outfile="${exo.projects.directory.src}/core/2.1.2/target/coverage.es">
+                    <fileset dir="${exo.projects.directory.src}/core/2.1.2/">
+                      <include name="**/target/emma/*.e*" />
+                      <include name="**/target/emma/*.e*" />
+                    </fileset>
+                    <!-- just for the first launnch -->
+                    <fileset file="${exo.projects.directory.config}/coverage.es" />
+                  </merge>
+                  <report>
+                    <sourcepath>
+                      <dirset dir="${exo.projects.directory.src}/core/2.1.2/">
+                        <include name="**/src/**/java" />
+                      </dirset>
+                    </sourcepath>
+                    <fileset dir="${exo.projects.directory.src}/core/2.1.2/target/">
+                      <include name="*.es" />
+                    </fileset>
+                    <html outfile="${exo.projects.directory.src}/core/2.1.2/target/coverage.html" />
+                    <xml outfile="${exo.projects.directory.src}/core/2.1.2/target/coverage.xml" />
+                  </report>
+                </emma>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>emma</groupId>
+            <artifactId>emma</artifactId>
+            <version>2.0.5312</version>
+            <scope>test</scope>
+          </dependency>
+          <dependency>
+            <groupId>emma</groupId>
+            <artifactId>emma_ant</artifactId>
+            <version>2.0.5312</version>
+            <scope>test</scope>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <configLocation>${exo.projects.directory.config}/exo-checkstyle-checker.xml</configLocation>
+          <suppressionsLocation>${exo.projects.directory.config}/exo-checkstyle-suppressions.xml</suppressionsLocation>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+  <profiles>
+    <profile>
+      <id>default</id>
+      <activation>
+        <property>
+          <name>default</name>
+        </property>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <org.exoplatform.kernel.version>2.0.3</org.exoplatform.kernel.version>
+        <org.exoplatform.core.version>2.1.2</org.exoplatform.core.version>
+      </properties>
+    </profile>
+  </profiles>
+</project>
