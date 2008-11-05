@@ -84,8 +84,30 @@ public class SetCurrentIdentityFilter implements Filter {
       container = ExoContainerContext.getTopContainer();
     }
 
-    ExoContainerContext.setCurrentContainer(container);
+    try {
+      ExoContainerContext.setCurrentContainer(container);
+      ConversationState state = getCurrentState(container, httpRequest);
+      // NOTE may be set as null
+      ConversationState.setCurrent(state);
+      chain.doFilter(request, response);
+    } finally {
+      try {
+        ConversationState.setCurrent(null);
+      } catch (Exception e) {
+        log.warn("An error occured while cleaning the ThreadLocal", e);
+      }
+      try {
+        ExoContainerContext.setCurrentContainer(null);
+      } catch (Exception e) {
+        log.warn("An error occured while cleaning the ThreadLocal", e);
+      }
+    }
+  }
 
+  /**
+   * Gives the current state 
+   */
+  private ConversationState getCurrentState(ExoContainer container, HttpServletRequest httpRequest) {
     ConversationRegistry conversationRegistry = (ConversationRegistry) container.getComponentInstanceOfType(ConversationRegistry.class);
 
     IdentityRegistry identityRegistry = (IdentityRegistry) container.getComponentInstanceOfType(IdentityRegistry.class);
@@ -130,10 +152,7 @@ public class SetCurrentIdentityFilter implements Filter {
         }
       }
     }
-    // NOTE may be set as null
-    ConversationState.setCurrent(state);
-    chain.doFilter(request, response);
-    ConversationState.setCurrent(null);
+    return state;
   }
 
   /**
