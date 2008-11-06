@@ -18,10 +18,11 @@
 package org.exoplatform.services.security;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.listener.ListenerService;
 
 /**
@@ -33,25 +34,42 @@ import org.exoplatform.services.listener.ListenerService;
 public final class ConversationRegistry {
 
   /**
+   * "concurrency-level".
+   */
+  public static final String INIT_PARAM_CONCURRENCY_LEVEL = "concurrency-level";
+  
+  /**
    * Storage for ConversationStates.
    */
-  private HashMap<Object, ConversationState> states = new HashMap<Object, ConversationState>();
+  private final ConcurrentHashMap<Object, ConversationState> states ;
 
   /**
    * @see {@link IdentityRegistry}
    */
-  private IdentityRegistry                   identityRegistry;
+  private final IdentityRegistry                   identityRegistry;
 
   /**
    * @see {@link ListenerService}
    */
-  private ListenerService                    listenerService;
+  private final ListenerService                    listenerService;
 
   /**
+   * @param params
    * @param identityRegistry @see {@link IdentityRegistry}
    * @param listenerService @see {@link ListenerService}
    */
-  public ConversationRegistry(IdentityRegistry identityRegistry, ListenerService listenerService) {
+  public ConversationRegistry(InitParams params, IdentityRegistry identityRegistry, ListenerService listenerService) {
+    this(params == null ? 16 : Integer.valueOf(params.getValueParam(INIT_PARAM_CONCURRENCY_LEVEL).getValue()), identityRegistry, listenerService);
+  }
+
+  /**
+   * @param concurrencyLevel the estimated number of concurrently
+   * updating threads. The implementation performs internal sizing
+   * @param identityRegistry @see {@link IdentityRegistry}
+   * @param listenerService @see {@link ListenerService}
+   */
+  public ConversationRegistry(int concurrencyLevel, IdentityRegistry identityRegistry, ListenerService listenerService) {
+    this.states = new ConcurrentHashMap<Object, ConversationState>(concurrencyLevel, 0.75f, concurrencyLevel);
     this.identityRegistry = identityRegistry;
     this.listenerService = listenerService;
   }
