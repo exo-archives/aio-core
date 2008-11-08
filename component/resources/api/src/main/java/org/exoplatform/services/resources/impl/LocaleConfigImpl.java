@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.ResourceBundleService;
+import org.exoplatform.services.resources.Orientation;
 
 /**
  * @author Benjamin Mestrallet benjamin.mestrallet@exoplatform.com
@@ -52,6 +53,8 @@ public class LocaleConfigImpl implements LocaleConfig {
   private String                     description_;
 
   private String                     localeName_;
+
+  private Orientation orientation;
 
   public LocaleConfigImpl() {
   }
@@ -126,7 +129,15 @@ public class LocaleConfigImpl implements LocaleConfig {
   }
 
   public void setOutput(HttpServletResponse res) {
-    res.setContentType("text/html; charset=" + outputEncoding_);
-    res.setLocale(locale_);
+    res.setContentType("text/html; charset=" +  outputEncoding_) ;
+    res.setLocale(locale_) ;
+  }
+
+  public Orientation getOrientation() {
+    return orientation;
+  }
+
+  public void setOrientation(Orientation orientation) {
+    this.orientation = orientation;
   }
 }

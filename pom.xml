@@ -26,6 +26,7 @@
     <module>component/xml-processing</module>
     <module>component/resources/api</module>
     <module>component/script/groovy</module>
+    <module>component/gifbackport</module>
   </modules>
 
   <dependencies>

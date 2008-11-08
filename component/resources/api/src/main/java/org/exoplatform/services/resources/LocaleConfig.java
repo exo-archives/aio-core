@@ -62,4 +62,19 @@ public interface LocaleConfig {
   public void setInput(HttpServletRequest req) throws java.io.UnsupportedEncodingException;
 
   public void setOutput(HttpServletResponse res);
+
+  /**
+   * Returns the orientation of the locale config.
+   *
+   * @return the orientation
+   */
+  public Orientation getOrientation();
+
+  /**
+   * Updates the orientation of the locale config.
+   *
+   * @param orientation the new orientation
+   */
+  public void setOrientation(Orientation orientation);
+
 }

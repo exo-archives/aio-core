@@ -23,6 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Properties;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 
@@ -36,6 +38,9 @@ import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.resources.Query;
 import org.exoplatform.services.resources.ResourceBundleData;
 import org.exoplatform.services.resources.ResourceBundleService;
+import org.exoplatform.services.resources.IdentityResourceBundle;
+import org.exoplatform.services.resources.ResourceBundleLoader;
+import org.exoplatform.services.resources.XMLResourceBundleParser;
 
 /**
  * Created by The eXo Platform SAS Mar 9, 2007
@@ -112,19 +117,44 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
       for (Iterator<LocaleConfig> iter = localeConfigs.iterator(); iter.hasNext();) {
         LocaleConfig localeConfig = iter.next();
         String language = localeConfig.getLanguage();
-        fileName = name + "_" + language + ".properties";
+        String content = null;
+
+        //
+        fileName = name + "_" + language + ".xml";
         URL url = cl.getResource(fileName);
-        if (url == null && defaultLang.equals(language)) cl.getResource(name + ".properties") ;
         if (url != null) {
-          InputStream is = url.openStream();
-          byte buf[] = IOUtil.getStreamContentAsBytes(is);
+          Properties props = XMLResourceBundleParser.asProperties(url.openStream());
+          StringBuilder sb = new StringBuilder();
+          for (Map.Entry<Object, Object> entry : props.entrySet()) {
+            sb.append(entry.getKey());
+            sb.append('=');
+            sb.append(entry.getValue());
+            sb.append('\n');
+          }
+          content = sb.toString();
+        }
+
+        //
+        if (content == null) {
+          fileName = name + "_" + language + ".properties";
+          url = cl.getResource(fileName);
+          if (url == null && defaultLang.equals(language)) cl.getResource(name + ".properties") ;
+          if (url != null) {
+            InputStream is = url.openStream();
+            byte[] buf = IOUtil.getStreamContentAsBytes(is);
+            content = new String(buf, "UTF-8");
+            is.close();
+          }
+        }
+
+        //
+        if (content != null) {
           ResourceBundleData data = new ResourceBundleData();
           data.setId(baseName + "_" + language);
           data.setName(baseName);
           data.setLanguage(language);
-          data.setData(new String(buf, "UTF-8"));
+          data.setData(content);
           saveResourceBundle(data);
-          is.close();
         }
       }
     } catch (Exception ex) {
@@ -133,8 +163,11 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
   }
 
   public ResourceBundle getResourceBundle(String name, Locale locale, ClassLoader cl) {
+    if (IdentityResourceBundle.MAGIC_LANGUAGE.equals(locale.getLanguage())) {
+      return IdentityResourceBundle.getInstance();
+    }
     if (isClasspathResource(name))
-      return ResourceBundle.getBundle(name, locale, cl);
+      return ResourceBundleLoader.load(name, locale, cl);
     String id = name + "_" + locale.getLanguage();
     try {
       Object obj = cache_.get(id);
@@ -161,6 +194,9 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
   }
 
   public ResourceBundle getResourceBundle(String[] name, Locale locale, ClassLoader cl) {
+    if (IdentityResourceBundle.MAGIC_LANGUAGE.equals(locale.getLanguage())) {
+      return IdentityResourceBundle.getInstance();
+    }
     StringBuilder idBuf = new StringBuilder("merge:");
     for (String n : name)
       idBuf.append(n).append("_");

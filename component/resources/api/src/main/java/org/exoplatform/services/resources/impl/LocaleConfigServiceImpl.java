@@ -32,6 +32,9 @@ import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
+import org.exoplatform.services.resources.Orientation;
+import org.exoplatform.services.log.ExoLogger;
+import org.apache.commons.logging.Log;
 
 /**
  * @author Benjamin Mestrallet benjamin.mestrallet@exoplatform.com This Service
@@ -39,10 +42,21 @@ import org.exoplatform.services.resources.LocaleConfigService;
  */
 public class LocaleConfigServiceImpl implements LocaleConfigService {
 
-  private LocaleConfig              defaultConfig_;
+  private static Log log = ExoLogger.getLogger(LocaleConfigServiceImpl.class);
+  private LocaleConfig defaultConfig_ ;
 
-  private Map<String, LocaleConfig> configs_;
+  private Map<String, LocaleConfig> configs_ ;
 
+  private static final Map<String, Orientation> orientations = new HashMap<String, Orientation>();
+
+  static
+  {
+    orientations.put("lt", Orientation.LT);
+    orientations.put("rt", Orientation.RT);
+    orientations.put("tl", Orientation.TL);
+    orientations.put("tr", Orientation.TR);
+  }
+  
   public LocaleConfigServiceImpl(InitParams params, ConfigurationManager cmanager) throws Exception {
     configs_ = new HashMap<String, LocaleConfig>(10);
     String confResource = params.getValueParam("locale.config.file").getValue();
@@ -98,8 +112,24 @@ public class LocaleConfigServiceImpl implements LocaleConfigService {
           config.setInputEncoding(element.getFirstChild().getNodeValue());
         } else if ("description".equals(element.getNodeName())) {
           config.setDescription(element.getFirstChild().getNodeValue());
+        } else if ("orientation".equals(element.getNodeName())) {
+          String s = element.getFirstChild().getNodeValue();
+          Orientation orientation = orientations.get(s);
+          if (orientation == null) {
+            log.error("Wrong orientation value " + s);
+          }
+          else {
+            config.setOrientation(orientation);
+          }
         }
       }
+
+      //
+      if (config.getOrientation() == null) {
+        log.debug("No orientation found on the locale config, use the LT default");
+        config.setOrientation(Orientation.LT);
+      }
+
       configs_.put(config.getLanguage(), config);
       if (i == 0)
         defaultConfig_ = config;
