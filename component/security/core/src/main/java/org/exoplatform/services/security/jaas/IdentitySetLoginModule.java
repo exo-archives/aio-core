@@ -47,6 +47,14 @@ import org.exoplatform.services.security.IdentityRegistry;
 public class IdentitySetLoginModule implements LoginModule {
 
   /**
+   * The name of the option to use in order to specify the name of the portal container
+   */
+  private static final String OPTION_PORTAL_CONTAINER_NAME = "portalContainerName";
+  /**
+   * The default name of the portal container
+   */
+  private static final String DEFAULT_PORTAL_CONTAINER_NAME = "portal";
+  /**
    * Login.
    */
   protected Log     log         = ExoLogger.getLogger("core.IdentitySetLoginModule");
@@ -68,13 +76,17 @@ public class IdentitySetLoginModule implements LoginModule {
   protected boolean singleLogin = false;
 
   /**
+   * The name of the portal container.
+   */
+  private String portalContainerName;
+
+  /**
    * {@inheritDoc}
    */
   public boolean abort() throws LoginException {
     if (log.isDebugEnabled()) {
       log.debug("in abort");
     }
-    log.info("in abort");
 
     return true;
   }
@@ -86,7 +98,6 @@ public class IdentitySetLoginModule implements LoginModule {
     if (log.isDebugEnabled()) {
       log.debug("in commit");
     }
-    log.info("in commit");
 
     String userId = (String) sharedState.get("javax.security.auth.login.name");
     try {
@@ -122,10 +133,10 @@ public class IdentitySetLoginModule implements LoginModule {
     if (log.isDebugEnabled()) {
       log.debug("in initialize");
     }
-    log.info("in initialize");
 
     this.subject = subject;
     this.sharedState = sharedState;
+    this.portalContainerName = getPortalContainerName(options);
 
     String sl = (String) options.get("singleLogin");
     if (sl != null && (sl.equalsIgnoreCase("yes") || sl.equalsIgnoreCase("true"))) {
@@ -140,8 +151,6 @@ public class IdentitySetLoginModule implements LoginModule {
     if (log.isDebugEnabled()) {
       log.debug("in login");
     }
-    log.info("in login");
-
     return true;
   }
 
@@ -152,8 +161,6 @@ public class IdentitySetLoginModule implements LoginModule {
     if (log.isDebugEnabled()) {
       log.debug("in logout");
     }
-    log.info("in logout");
-
     return true;
   }
 
@@ -164,9 +171,20 @@ public class IdentitySetLoginModule implements LoginModule {
     // TODO set correct current container
     ExoContainer container = ExoContainerContext.getCurrentContainer();
     if (container instanceof RootContainer) {
-      container = RootContainer.getInstance().getPortalContainer("portal");
+      container = RootContainer.getInstance().getPortalContainer(portalContainerName);
     }
     return container;
   }
 
+
+  private String getPortalContainerName(Map options) {
+    if (options != null) {
+      String optionValue = (String) options.get(OPTION_PORTAL_CONTAINER_NAME);
+      if (optionValue != null && optionValue.length() > 0) {
+        if (log.isDebugEnabled()) log.debug("The IdentitySetLoginModule will use the portal container " + optionValue);
+        return optionValue;
+      }
+    }
+    return DEFAULT_PORTAL_CONTAINER_NAME;
+  }
 }
