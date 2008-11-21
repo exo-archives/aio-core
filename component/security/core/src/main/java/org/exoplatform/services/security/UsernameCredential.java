@@ -26,10 +26,20 @@ package org.exoplatform.services.security;
 
 public class UsernameCredential implements Credential {
 
+  /**
+   * Serial version UID.
+   */
   private static final long serialVersionUID = -7447343070156524211L;
 
+  /**
+   * User name.
+   */
   private String            username;
 
+  /**
+   * Create new UsernameCredential.
+   * @param username user name
+   */
   public UsernameCredential(String username) {
     this.username = username;
   }

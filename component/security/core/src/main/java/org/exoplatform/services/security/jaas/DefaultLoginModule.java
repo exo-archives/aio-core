@@ -80,6 +80,7 @@ public class DefaultLoginModule implements LoginModule {
   /**
    * Shared state.
    */
+  @SuppressWarnings("unchecked")
   protected Map sharedState;
 
   /**
@@ -102,6 +103,7 @@ public class DefaultLoginModule implements LoginModule {
   /**
    * {@inheritDoc} 
    */
+  @SuppressWarnings("unchecked")
   public void initialize(Subject subject, CallbackHandler callbackHandler, Map sharedState, Map options) {
     this.subject = subject;
     this.callbackHandler = callbackHandler;
@@ -118,6 +120,7 @@ public class DefaultLoginModule implements LoginModule {
   /**
    * {@inheritDoc} 
    */
+  @SuppressWarnings("unchecked")
   public boolean login() throws LoginException {
     if (log.isDebugEnabled())
       log.debug("In login of DefaultLoginModule.");
@@ -215,6 +218,7 @@ public class DefaultLoginModule implements LoginModule {
    * @param options
    * @return
    */
+  @SuppressWarnings("unchecked")
   private String getPortalContainerName(Map options) {
     if (options != null) {
       String optionValue = (String) options.get(OPTION_PORTAL_CONTAINER_NAME);

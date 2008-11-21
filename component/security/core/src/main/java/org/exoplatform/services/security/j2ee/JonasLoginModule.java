@@ -37,6 +37,10 @@ import org.exoplatform.services.security.jaas.UserPrincipal;
 
 public class JonasLoginModule extends DefaultLoginModule {
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public boolean commit() throws LoginException {
 
     if (super.commit()) {

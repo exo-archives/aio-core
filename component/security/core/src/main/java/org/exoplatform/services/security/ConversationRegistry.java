@@ -22,8 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.logging.Log;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.listener.ListenerService;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * Created by The eXo Platform SAS .<br/> In-memory registry of user's sessions
@@ -36,40 +38,70 @@ public final class ConversationRegistry {
   /**
    * "concurrency-level".
    */
-  public static final String INIT_PARAM_CONCURRENCY_LEVEL = "concurrency-level";
-  
+  public static final String                                 INIT_PARAM_CONCURRENCY_LEVEL = "concurrency-level";
+
+  /**
+   * Logger.
+   */
+  private static final Log                                   LOG                          = ExoLogger.getLogger(ConversationRegistry.class.getName());
+
+  /**
+   * Default concurrency level.
+   */
+  private static final int                                   DEFAULT_CONCURRENCY_LEVEL    = 16;
+
   /**
    * Storage for ConversationStates.
    */
-  private final ConcurrentHashMap<Object, ConversationState> states ;
+  private final ConcurrentHashMap<Object, ConversationState> states;
 
   /**
    * @see {@link IdentityRegistry}
    */
-  private final IdentityRegistry                   identityRegistry;
+  private final IdentityRegistry                             identityRegistry;
 
   /**
    * @see {@link ListenerService}
    */
-  private final ListenerService                    listenerService;
+  private final ListenerService                              listenerService;
 
   /**
    * @param params
    * @param identityRegistry @see {@link IdentityRegistry}
    * @param listenerService @see {@link ListenerService}
    */
-  public ConversationRegistry(InitParams params, IdentityRegistry identityRegistry, ListenerService listenerService) {
-    this(params == null ? 16 : Integer.valueOf(params.getValueParam(INIT_PARAM_CONCURRENCY_LEVEL).getValue()), identityRegistry, listenerService);
+  public ConversationRegistry(InitParams params,
+                              IdentityRegistry identityRegistry,
+                              ListenerService listenerService) {
+    this(parse(params), identityRegistry, listenerService);
+  }
+
+  private static int parse(InitParams ip) {
+    try {
+      return Integer.valueOf(ip.getValueParam(INIT_PARAM_CONCURRENCY_LEVEL).getValue());
+    } catch (NullPointerException e) {
+      LOG.warn("Parameter " + INIT_PARAM_CONCURRENCY_LEVEL
+          + " was not found in configuration, default " + DEFAULT_CONCURRENCY_LEVEL
+          + " will be used.");
+      return DEFAULT_CONCURRENCY_LEVEL;
+    } catch (Exception e) {
+      LOG.error("Can't parse parameter " + INIT_PARAM_CONCURRENCY_LEVEL, e);
+      return DEFAULT_CONCURRENCY_LEVEL;
+    }
   }
 
   /**
-   * @param concurrencyLevel the estimated number of concurrently
-   * updating threads. The implementation performs internal sizing
+   * @param concurrencyLevel the estimated number of concurrently updating
+   *          threads. The implementation performs internal sizing
    * @param identityRegistry @see {@link IdentityRegistry}
    * @param listenerService @see {@link ListenerService}
    */
-  public ConversationRegistry(int concurrencyLevel, IdentityRegistry identityRegistry, ListenerService listenerService) {
-    this.states = new ConcurrentHashMap<Object, ConversationState>(concurrencyLevel, 0.75f, concurrencyLevel);
+  private ConversationRegistry(int concurrencyLevel,
+                               IdentityRegistry identityRegistry,
+                               ListenerService listenerService) {
+    this.states = new ConcurrentHashMap<Object, ConversationState>(concurrencyLevel,
+                                                                   0.75f,
+                                                                   concurrencyLevel);
     this.identityRegistry = identityRegistry;
     this.listenerService = listenerService;
   }
@@ -104,7 +136,7 @@ public final class ConversationRegistry {
     try {
       listenerService.broadcast("exo.core.security.ConversationRegistry.register", this, state);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error("Broadcast message filed ", e);
     }
   }
 
@@ -136,7 +168,7 @@ public final class ConversationRegistry {
     try {
       listenerService.broadcast("exo.core.security.ConversationRegistry.unregister", this, state);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error("Broadcast message filed ", e);
     }
 
     return state;

@@ -26,15 +26,29 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 public class BasicCallbackHandler implements CallbackHandler {
+  
+  /**
+   * Name. 
+   */
   private String login;
 
+  /**
+   * Password.
+   */
   private char[] password;
 
+  /**
+   * @param login name
+   * @param password password
+   */
   public BasicCallbackHandler(String login, char[] password) {
     this.login = login;
     this.password = password;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
     for (int i = 0; i < callbacks.length; i++) {
       if (callbacks[i] instanceof NameCallback) {

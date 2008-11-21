@@ -151,6 +151,7 @@ public class WebsphereJAASLoginModule extends DefaultLoginModule {
    * @param user String user name
    * @param roleGroupList ArrayList<String> list of role groups
    */
+  @SuppressWarnings("unchecked")
   private void websphereLogin(String user, ArrayList<String> roleGroupList) {
     Hashtable hashtable = new Hashtable();
     String uniqueid = user;

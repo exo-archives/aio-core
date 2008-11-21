@@ -29,12 +29,24 @@ import java.util.Set;
 
 public class ConversationState {
 
+  /**
+   * "subject".
+   */
   public static final String                    SUBJECT = "subject";
 
+  /**
+   * ThreadLocal keeper for ConversationState.
+   */
   private static ThreadLocal<ConversationState> current = new ThreadLocal<ConversationState>();
 
+  /**
+   * See {@link Identity}.
+   */
   private Identity                              identity;
 
+  /**
+   * Additions attributes of ConversationState.
+   */
   private HashMap<String, Object>               attributes;
 
   public ConversationState(Identity identity) {
@@ -42,20 +54,31 @@ public class ConversationState {
     this.attributes = new HashMap<String, Object>();
   }
 
+  /**
+   * @return current ConversationState or null if it was not preset
+   */
   public static ConversationState getCurrent() {
     return current.get();
   }
 
+  /**
+   * Preset current ConversationState.
+   * 
+   * @param state ConversationState
+   */
   public static void setCurrent(ConversationState state) {
     current.set(state);
   }
 
+  /**
+   * @return Identity
+   */
   public Identity getIdentity() {
     return identity;
   }
 
   /**
-   * sets attribute
+   * sets attribute.
    * 
    * @param key
    * @param value
@@ -80,7 +103,7 @@ public class ConversationState {
   }
 
   /**
-   * removes attribute
+   * removes attribute.
    * 
    * @param key
    */

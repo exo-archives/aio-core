@@ -56,11 +56,8 @@ public class DefaultRolesExtractorImpl implements RolesExtractor {
     this.userRoleParentGroup = userRoleParentGroup;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see
-   * org.exoplatform.services.security.RolesExtractor#extractRoles(java.util
-   * .Set)
+  /**
+   * {@inheritDoc}
    */
   public Set<String> extractRoles(String userId, Set<MembershipEntry> memberships) {
 

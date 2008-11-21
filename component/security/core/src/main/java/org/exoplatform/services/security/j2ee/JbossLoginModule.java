@@ -37,6 +37,9 @@ import org.exoplatform.services.security.jaas.UserPrincipal;
 
 public class JbossLoginModule extends DefaultLoginModule {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean commit() throws LoginException {
 

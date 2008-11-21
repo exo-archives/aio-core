@@ -67,6 +67,7 @@ public class IdentitySetLoginModule implements LoginModule {
   /**
    * Shared state.
    */
+  @SuppressWarnings("unchecked")
   protected Map     sharedState;
 
   /**
@@ -126,6 +127,7 @@ public class IdentitySetLoginModule implements LoginModule {
   /**
    * {@inheritDoc}
    */
+  @SuppressWarnings("unchecked")
   public void initialize(Subject subject,
                          CallbackHandler callbackHandler,
                          Map sharedState,
@@ -177,6 +179,7 @@ public class IdentitySetLoginModule implements LoginModule {
   }
 
 
+  @SuppressWarnings("unchecked")
   private String getPortalContainerName(Map options) {
     if (options != null) {
       String optionValue = (String) options.get(OPTION_PORTAL_CONTAINER_NAME);

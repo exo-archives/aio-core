@@ -26,23 +26,24 @@ public class UserPrincipal implements Principal, Serializable {
 
   private static final long serialVersionUID = -8915147646892501932L;
 
+  /**
+   * user principal name.
+   */
   private String            name;
 
   public UserPrincipal(String name) {
     this.name = name;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see java.security.Principal#getName()
+  /**
+   * {@inheritDoc}
    */
   public String getName() {
     return name;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see java.lang.Object#toString()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public String toString() {

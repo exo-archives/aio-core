@@ -26,10 +26,20 @@ package org.exoplatform.services.security;
 
 public class PasswordCredential implements Credential {
 
+  /**
+   * Serial version UID.
+   */
   private static final long serialVersionUID = -5754701608445078686L;
 
+  /**
+   * Password.
+   */
   private String            password;
 
+  /**
+   * Create new PasswordCredential.
+   * @param password password
+   */
   public PasswordCredential(String password) {
     this.password = password;
   }

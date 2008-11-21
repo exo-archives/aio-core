@@ -66,6 +66,9 @@ public final class MembershipEntry {
     return group;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean equals(Object obj) {
     if (obj == null || !(obj instanceof MembershipEntry))

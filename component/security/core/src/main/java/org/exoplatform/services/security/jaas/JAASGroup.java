@@ -35,21 +35,34 @@ public class JAASGroup implements Group, Serializable {
 
   private String             name             = null;
 
+  @SuppressWarnings("unchecked")
   private HashSet            members          = null;
 
+  @SuppressWarnings("unchecked")
   public JAASGroup(String n) {
     this.name = n;
     this.members = new HashSet();
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @SuppressWarnings("unchecked")
   public synchronized boolean addMember(Principal principal) {
     return members.add(principal);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public synchronized boolean removeMember(Principal principal) {
     return members.remove(principal);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @SuppressWarnings("unchecked")
   public boolean isMember(Principal principal) {
     Enumeration en = members();
     while (en.hasMoreElements()) {
@@ -60,6 +73,10 @@ public class JAASGroup implements Group, Serializable {
     return false;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @SuppressWarnings("unchecked")
   public Enumeration members() {
     class MembersEnumeration implements Enumeration {
       private Iterator itor;
@@ -79,18 +96,16 @@ public class JAASGroup implements Group, Serializable {
     return new MembersEnumeration(members.iterator());
   }
 
-  /*
-   * (non-Javadoc)
-   * @see java.lang.Object#hashCode()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public int hashCode() {
     return getName().hashCode();
   }
 
-  /*
-   * (non-Javadoc)
-   * @see java.lang.Object#equals(java.lang.Object)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public boolean equals(Object object) {
@@ -99,18 +114,16 @@ public class JAASGroup implements Group, Serializable {
     return ((Group) object).getName().equals(getName());
   }
 
-  /*
-   * (non-Javadoc)
-   * @see java.lang.Object#toString()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public String toString() {
     return getName();
   }
 
-  /*
-   * (non-Javadoc)
-   * @see java.security.Principal#getName()
+  /**
+   * {@inheritDoc}
    */
   public String getName() {
     return name;

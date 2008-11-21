@@ -35,6 +35,9 @@ import org.exoplatform.services.security.jaas.UserPrincipal;
 
 public class TomcatLoginModule extends DefaultLoginModule {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean commit() throws LoginException {
 
