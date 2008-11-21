@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<configuration>
+  <component>
+    <key>org.exoplatform.services.security.ntlm.NTLMAuthenticator</key>
+    <type>org.exoplatform.services.security.ntlm.NTLMAuthenticator</type>
+    <init-params>
+      <properties-param>
+        <name>ntlm-configuration</name>
+        <property name="domain" value="win-srv1.exoua-int"/> 
+      </properties-param>
+    </init-params>
+  </component>
+</configuration>
