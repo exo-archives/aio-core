@@ -39,8 +39,14 @@ import org.exoplatform.container.ExoContainerContext;
  */
 public class GroovyScriptInstantiator {
 
+  /**
+   * eXo Container. 
+   */
   private ExoContainer container;
 
+  /**
+   * @param containerContext container context
+   */
   public GroovyScriptInstantiator(ExoContainerContext containerContext) {
     this.container = containerContext.getContainer();
   }
@@ -95,9 +101,11 @@ public class GroovyScriptInstantiator {
     }
   }
 
-  /*
+  /**
    * Created object from given class, if class has parameters in constructor,
    * then this parameters will be searched in container.
+   * 
+   * @param clazz java-groovy class
    */
   private Object createObject(Class<?> clazz) throws Exception {
 
@@ -131,14 +139,13 @@ public class GroovyScriptInstantiator {
 
   private static final ConstructorsComparator COMPARATOR = new ConstructorsComparator();
 
-  /*
+  /**
    * Sorts array of constructors by number of parameters.
    */
   private static class ConstructorsComparator implements Comparator<Constructor<?>> {
 
-    /*
-     * (non-Javadoc)
-     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+    /**
+     * {@inheritDoc}
      */
     public int compare(Constructor<?> constructor1, Constructor<?> constructor2) {
       int c1 = constructor1.getParameterTypes().length;

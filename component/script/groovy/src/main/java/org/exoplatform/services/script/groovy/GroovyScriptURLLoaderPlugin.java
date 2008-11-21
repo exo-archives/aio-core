@@ -49,7 +49,7 @@ public class GroovyScriptURLLoaderPlugin extends BaseComponentPlugin {
     return urls;
   }
 
-  /*
+  /**
    * Should be used in configuration as object parameter.
    */
   public static class GroovyScriptURLs {
