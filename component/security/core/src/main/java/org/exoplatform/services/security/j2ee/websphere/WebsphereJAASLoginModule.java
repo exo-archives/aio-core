@@ -31,18 +31,32 @@ import org.exoplatform.services.security.jaas.RolePrincipal;
 import org.exoplatform.services.security.jaas.UserPrincipal;
 
 /**
- * Created y the eXo platform team User: Tuan Nguyen Date: May 6th, 2007
+ * Created by The eXo Platform SAS.
  * 
+ * WebSphere JAAS login module for provide security credential.
+ * 
+ * @author <a href="mailto:alexey.zavizionov@exoplatform.com.ua">Alexey
+ *         Zavizionov</a>
  * @version $Id: WebsphereJAASLoginModule.java 8478 2007-12-03 10:45:34Z rainf0x
  *          $
  */
 public class WebsphereJAASLoginModule extends DefaultLoginModule {
 
+  /**
+   * Exo logger.
+   */
   private Log log = ExoLogger.getLogger("core.ExoWebsphereJAASLoginModule");
 
+  
+  /**
+   * Default constructor.
+   */
   public WebsphereJAASLoginModule() {
   }
 
+  /**
+   * {@inheritDoc} 
+   */
   @Override
   public boolean login() throws LoginException {
     if (log.isDebugEnabled())
@@ -53,10 +67,8 @@ public class WebsphereJAASLoginModule extends DefaultLoginModule {
       for (String role : identity.getRoles()) {
         roleGroupList.add(role);
       }
-
       // username principal
       // Principal usernamePrincipal = new UserPrincipal(identity_.getUserId());
-
       websphereLogin(identity.getUserId(), roleGroupList);
 
       return true;
@@ -65,6 +77,9 @@ public class WebsphereJAASLoginModule extends DefaultLoginModule {
     }
   }
 
+  /**
+   * {@inheritDoc} 
+   */
   @Override
   public boolean commit() throws LoginException {
 
@@ -84,6 +99,9 @@ public class WebsphereJAASLoginModule extends DefaultLoginModule {
     }
   }
 
+  /**
+   * {@inheritDoc} 
+   */
   @Override
   public boolean abort() throws LoginException {
     if (log.isDebugEnabled())
@@ -91,6 +109,9 @@ public class WebsphereJAASLoginModule extends DefaultLoginModule {
     return super.abort();
   }
 
+  /**
+   * {@inheritDoc} 
+   */
   @Override
   public boolean logout() throws LoginException {
     if (log.isDebugEnabled())
@@ -99,16 +120,37 @@ public class WebsphereJAASLoginModule extends DefaultLoginModule {
     return super.logout();
   }
 
+  /**
+   * WebSphere security credential constant name for propertiesObject.
+   */
   final public static String WSCREDENTIAL_PROPERTIES_KEY = "com.ibm.wsspi.security.cred.propertiesObject";
 
+  /**
+   * WebSphere security credential constant name for uniqueId.
+   */
   final public static String WSCREDENTIAL_UNIQUEID       = "com.ibm.wsspi.security.cred.uniqueId";
 
+  /**
+   * WebSphere security credential constant name for securityName.
+   */
   final public static String WSCREDENTIAL_SECURITYNAME   = "com.ibm.wsspi.security.cred.securityName";
 
+  /**
+   * WebSphere security credential constant name for groups.
+   */
   final public static String WSCREDENTIAL_GROUPS         = "com.ibm.wsspi.security.cred.groups";
 
+  /**
+   * WebSphere security credential constant name for cacheKey.
+   */
   final public static String WSCREDENTIAL_CACHE_KEY      = "com.ibm.wsspi.security.cred.cacheKey";
 
+  /**
+   * Create and set map of public credentials into subject. 
+   * 
+   * @param user String user name
+   * @param roleGroupList ArrayList<String> list of role groups
+   */
   private void websphereLogin(String user, ArrayList<String> roleGroupList) {
     Hashtable hashtable = new Hashtable();
     String uniqueid = user;

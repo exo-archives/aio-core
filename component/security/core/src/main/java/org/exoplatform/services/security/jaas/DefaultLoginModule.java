@@ -51,10 +51,12 @@ public class DefaultLoginModule implements LoginModule {
    * The name of the option to use in order to specify the name of the portal container
    */
   private static final String OPTION_PORTAL_CONTAINER_NAME = "portalContainerName";
+  
   /**
    * The default name of the portal container
    */
   private static final String DEFAULT_PORTAL_CONTAINER_NAME = "portal";
+  
   /**
    * Logger.
    */
@@ -91,6 +93,9 @@ public class DefaultLoginModule implements LoginModule {
    */
   protected boolean singleLogin = false;
 
+  /**
+   * Default constructor.
+   */
   public DefaultLoginModule() {
   }
 
@@ -205,6 +210,11 @@ public class DefaultLoginModule implements LoginModule {
     return container;
   }
 
+  /**
+   * Return portal container name if it provide with options, DEFAULT_PORTAL_CONTAINER_NAME otherwise. 
+   * @param options
+   * @return
+   */
   private String getPortalContainerName(Map options) {
     if (options != null) {
       String optionValue = (String) options.get(OPTION_PORTAL_CONTAINER_NAME);
@@ -215,4 +225,5 @@ public class DefaultLoginModule implements LoginModule {
     }
     return DEFAULT_PORTAL_CONTAINER_NAME;
   }
+  
 }

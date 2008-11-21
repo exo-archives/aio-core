@@ -32,7 +32,9 @@ import org.apache.commons.logging.Log;
 import org.exoplatform.services.log.ExoLogger;
 
 /**
- * Created by The eXo Platform SAS .
+ * Created by The eXo Platform SAS.
+ * 
+ * WebsphereFilter for removing cookie when it necessary.
  * 
  * @author <a href="mailto:alexey.zavizionov@exoplatform.com.ua">Alexey
  *         Zavizionov</a>
@@ -40,15 +42,30 @@ import org.exoplatform.services.log.ExoLogger;
  */
 public class WebsphereFilter implements Filter {
 
+  /**
+   * Exo logger.
+   */
   private Log                 log         = ExoLogger.getLogger(getClass().getName());
 
+  /**
+   * First ltpa cookie token name.
+   */
   private static final String cookieName  = "LtpaToken";
 
+  /**
+   * Second ltpa cookie token name.
+   */
   private static final String cookieName2 = "LtpaToken2";
 
+  /**
+   * Destroy.
+   */
   public void destroy() {
   }
 
+  /**
+   * Do filter. Remove ltpa token cookie when we are going on public context, nothing to do otherwise.
+   */
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
                                                                                            ServletException {
     HttpServletRequest httpRequest = (HttpServletRequest) request;
@@ -64,13 +81,20 @@ public class WebsphereFilter implements Filter {
     chain.doFilter(request, response);
   }
 
+  /**
+   * Initialization.
+   */
   public void init(FilterConfig filterConfig) throws ServletException {
   }
 
+  /**
+   * Remove ltpa token cookies.
+   * 
+   * @param req HttpServletRequest
+   * @param res HttpServletResponse
+   */
   private void removeLtpaTokenCookie(HttpServletRequest req, HttpServletResponse res) {
     Cookie[] cooks = req.getCookies();
-    if (log.isDebugEnabled())
-      log.debug("message");
     if (cooks != null) {
       for (Cookie cook : cooks) {
         if (log.isDebugEnabled())
