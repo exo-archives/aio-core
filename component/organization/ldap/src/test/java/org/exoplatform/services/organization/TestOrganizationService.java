@@ -23,8 +23,6 @@ import junit.framework.TestCase;
 
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.services.log.LogService;
-import org.exoplatform.services.log.LogUtil;
 
 /**
  * Created by The eXo Platform SAS Author : Hoa Pham
@@ -64,8 +62,6 @@ public class TestOrganizationService extends TestCase {
       return;
     PortalContainer manager = PortalContainer.getInstance();
     service_ = (OrganizationService) manager.getComponentInstanceOfType(OrganizationService.class);
-    LogUtil.setLevel("org.exoplatform.services.organization", LogService.DEBUG, true);
-    LogUtil.setLevel("org.exoplatform.services.database", LogService.DEBUG, true);
     userHandler_ = service_.getUserHandler();
     profileHandler_ = service_.getUserProfileHandler();
     groupHandler_ = service_.getGroupHandler();

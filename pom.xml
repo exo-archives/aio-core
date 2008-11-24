@@ -10,8 +10,13 @@
   <groupId>org.exoplatform.core</groupId>
   <artifactId>config</artifactId>
   <name>eXo Core Config</name>
-  <version>trunk</version>
+  <version>2.1.4-SNAPSHOT</version>
   <packaging>pom</packaging>
+
+  <scm>
+    <connection>scm:svn:http://svn.exoplatform.org/svnroot/exoplatform/projects/core/trunk</connection>
+    <developerConnection>scm:svn:http://svn.exoplatform.org/svnroot/exoplatform/projects/core/trunk</developerConnection>
+  </scm>
 
   <modules>
     <module>component/security/core</module>  
@@ -221,8 +226,8 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <org.exoplatform.kernel.version>trunk</org.exoplatform.kernel.version>
-        <org.exoplatform.core.version>trunk</org.exoplatform.core.version>
+        <org.exoplatform.kernel.version>2.0.5-SNAPSHOT</org.exoplatform.kernel.version>
+        <org.exoplatform.core.version>2.1.4-SNAPSHOT</org.exoplatform.core.version>
       </properties>
     </profile>
   </profiles>
