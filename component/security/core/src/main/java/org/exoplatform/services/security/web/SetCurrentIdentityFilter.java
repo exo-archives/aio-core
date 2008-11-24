@@ -21,7 +21,6 @@ import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -51,18 +50,20 @@ public class SetCurrentIdentityFilter implements Filter {
   /**
    * Logger.
    */
-  private static Log     log = ExoLogger.getLogger("core.security.SetCurrentIdentityFilter");
+  private static Log log = ExoLogger.getLogger("core.security.SetCurrentIdentityFilter");
 
   /**
-   * @see {@link ServletContext} .
+   * Portal Container name.
    */
-  private ServletContext servletContext;
+  private String     portalContainerName;
 
   /**
    * {@inheritDoc}
    */
   public void init(FilterConfig config) throws ServletException {
-    servletContext = config.getServletContext();
+    portalContainerName = config.getInitParameter("portalContainerName");
+    if (portalContainerName == null)
+      portalContainerName = config.getServletContext().getServletContextName();
   }
 
   /**
@@ -73,12 +74,11 @@ public class SetCurrentIdentityFilter implements Filter {
                                                                                            ServletException {
 
     HttpServletRequest httpRequest = (HttpServletRequest) request;
-    String contextName = servletContext.getServletContextName();
     // String contextName = "portal";
-    ExoContainer container = ExoContainerContext.getContainerByName(contextName);
+    ExoContainer container = ExoContainerContext.getContainerByName(portalContainerName);
     if (container == null) {
       if (log.isDebugEnabled()) {
-        log.debug("Container not found for the servlet context " + contextName);
+        log.debug("Container not found for the servlet context " + portalContainerName);
       }
 
       container = ExoContainerContext.getTopContainer();
