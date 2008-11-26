@@ -23,6 +23,7 @@ import java.sql.Statement;
 import javax.transaction.UserTransaction;
 
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.database.impl.XAPoolTxSupportDatabaseService;
 import org.exoplatform.services.database.table.ExoLongID;
 import org.exoplatform.services.database.table.IDGenerator;
 import org.exoplatform.services.transaction.TransactionService;
@@ -39,10 +40,11 @@ public class TestDatabaseService extends BasicTestCase {
 
   public void testDatabaseService() throws Exception {
     PortalContainer pcontainer = PortalContainer.getInstance();
-    DatabaseService service = (DatabaseService) pcontainer.getComponentInstance("XAPoolTxSupportDBConnectionService");
-    // assertConfiguration(service) ;
-    // assertDBTableManager(service);
-    // assertIDGenerator(service);
+    DatabaseService service = (DatabaseService) pcontainer.getComponentInstanceOfType(XAPoolTxSupportDatabaseService.class); 
+    assertNotNull(service);
+     assertConfiguration(service) ;
+     assertDBTableManager(service);
+     assertIDGenerator(service);
   }
 
   private void assertConfiguration(DatabaseService service) throws Exception {
@@ -54,15 +56,15 @@ public class TestDatabaseService extends BasicTestCase {
     Statement s = null;
     utx.begin();
     try {
-      System.err.println("\n\nConnection type: " + conn + "\n\n");
       s = conn.createStatement();
       s.addBatch("create table test (name varchar, data varchar)");
       s.addBatch("insert into test values('name1', 'value1')");
       s.executeBatch();
       s.close();
-      // Call conn.commit() will cause an exception since the connection is now
-      // part of
-      // a global transaction. You should call utx.commit() here
+      /*
+       * Call conn.commit() will cause an exception since the connection is now
+       * part of a global transaction. You should call utx.commit() here
+       */
       conn.commit();
       utx.commit();
     } catch (Exception ex) {
@@ -82,7 +84,7 @@ public class TestDatabaseService extends BasicTestCase {
   }
 
   private void assertDBTableManager(DatabaseService service) throws Exception {
-    System.err.println("\n\n===>ASERT DBTableManager\n");
+//    System.err.println("\n\n===>ASERT DBTableManager\n");
     ExoDatasource datasource = service.getDatasource();
     DBTableManager dbManager = datasource.getDBTableManager();
     assertEquals(dbManager.hasTable(Mock.class), false);
@@ -97,27 +99,18 @@ public class TestDatabaseService extends BasicTestCase {
     assertEquals(dbManager.hasTable(Mock.class), false);
 
     // Test metadata here
-    /*
-     * Connection conn = service.getConnection() ; Statement s =
-     * conn.createStatement() ; Table table =
-     * TestTable.class.getAnnotation(Table.class) ; ResultSet rs =
-     * s.executeQuery("SELECT * FROM " + table.name()); ResultSetMetaData
-     * metaData = rs.getMetaData(); for (int i = 1; i <=
-     * metaData.getColumnCount(); i++) {
-     * System.out.println("Information about column " +
-     * metaData.getColumnName(i) + ":\n" + "type: " +
-     * metaData.getColumnTypeName(i) + ", is nullable: " +
-     * metaData.isNullable(i) + "\n"); }
-     */
-    System.err.println("\n\n<===ASSERT DBTableManager\n");
-  }
-
-  private void assertExoLongIDDAO(DatabaseService service) throws Exception {
-    /*
-     * Connection connection = service.getConnection(); ExoLongIDDAO
-     * exoLongIDDAO = new ExoLongIDDAO(service.getDatasource()); ExoLongID
-     * exoLongIDDAO.save();
-     */
+    
+//    Connection conn = service.getConnection();
+//    Statement s = conn.createStatement();
+//    Table table = TestTable.class.getAnnotation(Table.class);
+//    ResultSet rs = s.executeQuery("SELECT * FROM " + table.name());
+//    ResultSetMetaData metaData = rs.getMetaData();
+//    for (int i = 1; i <= metaData.getColumnCount(); i++) {
+//      System.out.println("Information about column " + metaData.getColumnName(i) + ":\n" + "type: "
+//          + metaData.getColumnTypeName(i) + ", is nullable: " + metaData.isNullable(i) + "\n");
+//    }
+     
+//    System.err.println("\n\n<===ASSERT DBTableManager\n");
   }
 
   private void assertIDGenerator(DatabaseService service) throws Exception {

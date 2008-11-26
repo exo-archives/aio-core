@@ -38,7 +38,7 @@ import org.exoplatform.services.xml.resolving.XMLResolvingService;
 /**
  * Created by the Exo Development team. Base transformer test
  */
-public class BaseTest extends TestCase {
+public abstract class BaseTest extends TestCase {
   private final String DATE_PATTERN = "yy-MM-DD_HH-mm-ss";
 
   private DateFormat   dateFormat;

@@ -39,7 +39,7 @@
                   <object type="org.exoplatform.services.organization.OrganizationConfig$Group">
                     <field  name="name"><string>users</string></field>
                     <field  name="parentId"><string></string></field>
-                    <field  name="type"><string>hierachy</string></field>
+<!--                    <field  name="type"><string>hierachy</string></field>-->
                     <field  name="description"><string>the /users group</string></field>
                   </object>
                 </value>
