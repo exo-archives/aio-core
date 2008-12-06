@@ -24,8 +24,8 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.test.BasicTestCase;
 
 /**
- * Created by The eXo Platform SAS Author : Hoa Pham
- * hoapham@exoplatform.com,phamvuxuanhoa@yahoo.com Oct 27, 2005
+ * Created by The eXo Platform SAS Author : Hoa Pham hoapham@exoplatform.com,phamvuxuanhoa@yahoo.com
+ * Oct 27, 2005
  */
 
 public class TestOrganizationService extends BasicTestCase {
@@ -33,6 +33,8 @@ public class TestOrganizationService extends BasicTestCase {
   static String                     Group1          = "Group1";
 
   static String                     Group2          = "Group2";
+
+  static String                     Group3          = "Group3";
 
   static String                     Benj            = "Benj";
 
@@ -112,7 +114,17 @@ public class TestOrganizationService extends BasicTestCase {
     assertTrue("Found user instance ", user != null);
     assertEquals("Expect user name is: ", USER, user.getUserName());
     UserProfile userProfile = profileHandler_.findUserProfileByName(USER);
+	profileHandler_.removeUserProfile(USER, true);    
+	assertNull(profileHandler_.findUserProfileByName(USER));
+
+	profileHandler_.createUserProfileInstance(USER);
+	userProfile.getUserInfoMap().put("key", "value");
+	profileHandler_.saveUserProfile(userProfile, true);
+	userProfile = profileHandler_.findUserProfileByName(USER);
     assertTrue("Expect user profile is found: ", userProfile != null);
+    assertEquals(userProfile.getUserInfoMap().get("key"), "value");
+
+
     PageList users = userHandler_.findUsers(new Query());
     assertTrue("Expect 1 user found ", users.getAvailable() >= 1);
 
@@ -370,6 +382,51 @@ public class TestOrganizationService extends BasicTestCase {
                     m.getMembershipType().equalsIgnoreCase("testmembership"));
       }
     }
+  }
+
+  public void testRemoveMembershipByUser() throws Exception {
+    /* Create 2 user: benj and tuan */
+
+    String Benj = "B";
+    String Tuan = "T";
+    User userBenj = createUser(Benj);
+    User userTuan = createUser(Tuan);
+
+    /* Create "Group1" */
+    String Group1 = "G1";
+    String Group2 = "G2";
+    String Group3 = "G3";
+    Group group1 = groupHandler_.createGroupInstance();
+    group1.setGroupName(Group1);
+    groupHandler_.addChild(null, group1, true);
+    /* Create "Group2" */
+    Group group2 = groupHandler_.createGroupInstance();
+    group2.setGroupName(Group2);
+    groupHandler_.addChild(null, group2, true);
+    Group group3 = groupHandler_.createGroupInstance();
+    group3.setGroupName(Group3);
+    groupHandler_.addChild(null, group3, true);
+
+    /* Create membership1 and assign Benj to "Group1" with this membership */
+    MembershipType mt = mtHandler_.createMembershipTypeInstance();
+    mt.setName("testmembership_");
+    mtHandler_.createMembershipType(mt, true);
+
+    membershipHandler_.linkMembership(userBenj, group1, mt, true);
+    membershipHandler_.linkMembership(userBenj, group2, mt, true);
+    membershipHandler_.linkMembership(userBenj, group3, mt, true);
+    membershipHandler_.linkMembership(userTuan, group1, mt, true);
+
+    // include default membership
+    assertEquals(membershipHandler_.removeMembershipByUser(Tuan, true).size(), 2);
+    assertEquals(membershipHandler_.removeMembershipByUser(Benj, true).size(), 4);
+
+    mtHandler_.removeMembershipType("testmembership_", true);
+    userHandler_.removeUser(Tuan, true);
+    userHandler_.removeUser(Benj, true);
+    groupHandler_.removeGroup(group1, true);
+    groupHandler_.removeGroup(group2, true);
+    groupHandler_.removeGroup(group3, true);
   }
 
   public User createUser(String userName) throws Exception {
