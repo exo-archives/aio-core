@@ -385,21 +385,17 @@ public class TestOrganizationService extends BasicTestCase {
   }
 
   public void testRemoveMembershipByUser() throws Exception {
-    /* Create 2 user: benj and tuan */
-
     String Benj = "B";
     String Tuan = "T";
     User userBenj = createUser(Benj);
     User userTuan = createUser(Tuan);
 
-    /* Create "Group1" */
     String Group1 = "G1";
     String Group2 = "G2";
     String Group3 = "G3";
     Group group1 = groupHandler_.createGroupInstance();
     group1.setGroupName(Group1);
     groupHandler_.addChild(null, group1, true);
-    /* Create "Group2" */
     Group group2 = groupHandler_.createGroupInstance();
     group2.setGroupName(Group2);
     groupHandler_.addChild(null, group2, true);
@@ -407,7 +403,6 @@ public class TestOrganizationService extends BasicTestCase {
     group3.setGroupName(Group3);
     groupHandler_.addChild(null, group3, true);
 
-    /* Create membership1 and assign Benj to "Group1" with this membership */
     MembershipType mt = mtHandler_.createMembershipTypeInstance();
     mt.setName("testmembership_");
     mtHandler_.createMembershipType(mt, true);
@@ -417,7 +412,6 @@ public class TestOrganizationService extends BasicTestCase {
     membershipHandler_.linkMembership(userBenj, group3, mt, true);
     membershipHandler_.linkMembership(userTuan, group1, mt, true);
 
-    // include default membership
     assertEquals(membershipHandler_.removeMembershipByUser(Tuan, true).size(), 2);
     assertEquals(membershipHandler_.removeMembershipByUser(Benj, true).size(), 4);
 

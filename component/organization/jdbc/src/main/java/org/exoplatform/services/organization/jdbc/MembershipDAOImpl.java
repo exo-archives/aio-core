@@ -173,7 +173,7 @@ public class MembershipDAOImpl extends StandardSQLDAO<MembershipImpl> implements
     for (Membership member : members) {
       removeMembership(member.getId(), true);
     }
-    return null;
+    return members;
   }
 
   public Collection removeMemberships(DBObjectQuery<MembershipImpl> query, boolean broadcast) throws Exception {
