@@ -22,6 +22,7 @@ import java.util.Date;
 
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.DirContext;
@@ -30,7 +31,9 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 
+import org.apache.commons.logging.Log;
 import org.exoplatform.services.ldap.LDAPService;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.MembershipTypeHandler;
 import org.exoplatform.services.organization.impl.MembershipTypeImpl;
@@ -40,112 +43,201 @@ import org.exoplatform.services.organization.impl.MembershipTypeImpl;
  * tuan08@users.sourceforge.net Oct 14, 2005
  */
 public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHandler {
+  
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger(MembershipTypeDAOImpl.class.getName());
 
-  public MembershipTypeDAOImpl(LDAPAttributeMapping ldapAttrMapping, LDAPService ldapService) {
+  public MembershipTypeDAOImpl(LDAPAttributeMapping ldapAttrMapping, LDAPService ldapService) throws Exception {
     super(ldapAttrMapping, ldapService);
   }
 
-  final public MembershipType createMembershipTypeInstance() {
+  /**
+   * {@inheritDoc}
+   */
+  public final MembershipType createMembershipTypeInstance() {
     return new MembershipTypeImpl();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public MembershipType createMembershipType(MembershipType mt, boolean broadcast) throws Exception {
-    LdapContext ctx = ldapService_.getLdapContext();
-    String membershipTypeDN = ldapAttrMapping_.membershipTypeNameAttr + "=" + mt.getName() + ","
-        + ldapAttrMapping_.membershipTypeURL;
+    String membershipTypeDN = ldapAttrMapping.membershipTypeNameAttr + "=" + mt.getName() + ","
+        + ldapAttrMapping.membershipTypeURL;
+    LdapContext ctx = getLdapContext();
     try {
-      ctx.getAttributes(membershipTypeDN);
-    } catch (NameNotFoundException e) {
-      Date now = new Date();
-      mt.setCreatedDate(now);
-      mt.setModifiedDate(now);
-      ctx.createSubcontext(membershipTypeDN, ldapAttrMapping_.membershipTypeToAttributes(mt));
+      for (int err = 0;; err++) {
+        try {
+          try {
+            ctx.lookup(membershipTypeDN);
+          } catch (NameNotFoundException e) {
+            Date now = new Date();
+            mt.setCreatedDate(now);
+            mt.setModifiedDate(now);
+            ctx.createSubcontext(membershipTypeDN, ldapAttrMapping.membershipTypeToAttributes(mt));
+          }
+          return mt;
+        } catch (NamingException e1) {
+          if (isConnectionError(e1) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e1;
+        }
+      }
+    } finally {
+      release(ctx);
     }
-    return mt;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public MembershipType saveMembershipType(MembershipType mt, boolean broadcast) throws Exception {
-    LdapContext ctx = ldapService_.getLdapContext();
-    String membershipTypeDN = ldapAttrMapping_.membershipTypeNameAttr + "=" + mt.getName() + ","
-        + ldapAttrMapping_.membershipTypeURL;
-    Attributes attrs = ctx.getAttributes(membershipTypeDN);
-    if (attrs == null)
-      return mt;
-    ModificationItem[] mods = new ModificationItem[1];
-    String desc = mt.getDescription();
-    // TODO: http://jira.exoplatform.org/browse/COR-49
-    if (desc != null && desc.length() > 0) {
-      mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
-                                     new BasicAttribute("description", mt.getDescription()));
-    } else {
-      mods[0] = new ModificationItem(DirContext.REMOVE_ATTRIBUTE,
-                                     new BasicAttribute("description", mt.getDescription()));
-    }
-    ctx.modifyAttributes(membershipTypeDN, mods);
-    return mt;
-  }
-
-  public MembershipType removeMembershipType(String name, boolean broadcast) throws Exception {
-    MembershipType m = null;
-    LdapContext ctx = ldapService_.getLdapContext();
-    String membershipTypeDN = ldapAttrMapping_.membershipTypeNameAttr + "=" + name + ","
-        + ldapAttrMapping_.membershipTypeURL;
+    String membershipTypeDN = ldapAttrMapping.membershipTypeNameAttr + "=" + mt.getName() + ","
+        + ldapAttrMapping.membershipTypeURL;
+    LdapContext ctx = getLdapContext();
     try {
-      Attributes attrs = ctx.getAttributes(membershipTypeDN);
-      if (attrs == null)
-        return m;
-      m = ldapAttrMapping_.attributesToMembershipType(attrs);
-      removeMembership(name);
-      ctx.destroySubcontext(membershipTypeDN);
-    } catch (NameNotFoundException e) {
+      for (int err = 0;; err++) {
+        try {
+          Attributes attrs = ctx.getAttributes(membershipTypeDN);
+          
+          if (/*attrs == null || */attrs.size() == 0)
+            return mt;
+          ModificationItem[] mods = new ModificationItem[1];
+          String desc = mt.getDescription();
+          // TODO: http://jira.exoplatform.org/browse/COR-49
+          if (desc != null && desc.length() > 0) {
+            mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
+                                           new BasicAttribute("description", mt.getDescription()));
+          } else {
+            mods[0] = new ModificationItem(DirContext.REMOVE_ATTRIBUTE,
+                                           new BasicAttribute("description", mt.getDescription()));
+          }
+          ctx.modifyAttributes(membershipTypeDN, mods);
+          return mt;
+        } catch (NamingException e) {
+          if (isConnectionError(e) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e;
+        }
+      }
+    } finally {
+      release(ctx);
     }
-    return m;
   }
 
-  private void removeMembership(String name) throws Exception {
-    LdapContext ctx = ldapService_.getLdapContext();
+  /**
+   * {@inheritDoc}
+   */
+  public MembershipType removeMembershipType(String name, boolean broadcast) throws Exception {
+    String membershipTypeDN = ldapAttrMapping.membershipTypeNameAttr + "=" + name + ","
+        + ldapAttrMapping.membershipTypeURL;
+    LdapContext ctx = getLdapContext();
+    try {
+      for (int err = 0;; err++) {
+        try {
+          Attributes attrs = ctx.getAttributes(membershipTypeDN);
+          MembershipType m = ldapAttrMapping.attributesToMembershipType(attrs);
+          removeMembership(ctx, name);
+          ctx.destroySubcontext(membershipTypeDN);
+          return m;
+        } catch (NamingException e) {
+          if (isConnectionError(e) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e;
+        }
+      }
+    } catch (NameNotFoundException e) {
+      if (LOG.isDebugEnabled())
+        e.printStackTrace();
+      return null;
+    } finally {
+      release(ctx);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public MembershipType findMembershipType(String name) throws Exception {
+    String membershipTypeDN = ldapAttrMapping.membershipTypeNameAttr + "=" + name + ","
+        + ldapAttrMapping.membershipTypeURL;
+    LdapContext ctx = getLdapContext();
+    try {
+      for (int err = 0;; err++) {
+        try {
+          Attributes attrs = ctx.getAttributes(membershipTypeDN);
+          return ldapAttrMapping.attributesToMembershipType(attrs);
+        } catch (NamingException e) {
+          if (isConnectionError(e) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e;
+        }
+      }
+    } catch (NameNotFoundException e) {
+      if (LOG.isDebugEnabled())
+        e.printStackTrace();
+      return null;
+    } finally {
+      release(ctx);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @SuppressWarnings("unchecked")
+  public Collection findMembershipTypes() throws Exception {
+    Collection<MembershipType> memberships = new ArrayList<MembershipType>();
+    String filter = ldapAttrMapping.membershipTypeNameAttr + "=*";
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    String filter = ldapAttrMapping_.membershipTypeNameAttr + "=" + name;
-    NamingEnumeration<SearchResult> results = ctx.search(ldapAttrMapping_.groupsURL,
+
+    LdapContext ctx = getLdapContext();
+    try {
+      for (int err = 0;; err++) {
+        // clear if something was added in previous iteration
+        memberships.clear();
+        try {
+          NamingEnumeration<SearchResult> results = ctx.search(ldapAttrMapping.membershipTypeURL,
+                                                               filter,
+                                                               constraints);
+          while (results.hasMore()) {
+            SearchResult sr = results.next();
+            Attributes attrs = sr.getAttributes();
+            memberships.add(ldapAttrMapping.attributesToMembershipType(attrs));
+          }
+          return memberships;
+        } catch (NamingException e) {
+          if (isConnectionError(e) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e;
+        }
+      }
+    } finally {
+      release(ctx);
+    }
+  }
+
+  // helpers
+  
+  private void removeMembership(LdapContext ctx, String name) throws NamingException {
+    SearchControls constraints = new SearchControls();
+    constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+    String filter = ldapAttrMapping.membershipTypeNameAttr + "=" + name;
+    NamingEnumeration<SearchResult> results = ctx.search(ldapAttrMapping.groupsURL,
                                                          filter,
                                                          constraints);
-
     while (results.hasMore()) {
       SearchResult sr = results.next();
       ctx.destroySubcontext(sr.getNameInNamespace());
     }
   }
-
-  public MembershipType findMembershipType(String name) throws Exception {
-    MembershipType membershipType = null;
-    LdapContext ctx = ldapService_.getLdapContext();
-    String membershipTypeDN = ldapAttrMapping_.membershipTypeNameAttr + "=" + name + ","
-        + ldapAttrMapping_.membershipTypeURL;
-    try {
-      Attributes attrs = ctx.getAttributes(membershipTypeDN);
-      if (attrs == null)
-        return membershipType;
-      membershipType = ldapAttrMapping_.attributesToMembershipType(attrs);
-    } catch (NameNotFoundException e) {
-    }
-    return membershipType;
-  }
-
-  public Collection findMembershipTypes() throws Exception {
-    LdapContext ctx = ldapService_.getLdapContext();
-    Collection<MembershipType> memberships = new ArrayList<MembershipType>();
-    String filter = ldapAttrMapping_.membershipTypeNameAttr + "=*";
-    SearchControls constraints = new SearchControls();
-    constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    NamingEnumeration<SearchResult> results = ctx.search(ldapAttrMapping_.membershipTypeURL,
-                                                         filter,
-                                                         constraints);
-    while (results.hasMore()) {
-      SearchResult sr = results.next();
-      Attributes attrs = sr.getAttributes();
-      memberships.add(ldapAttrMapping_.attributesToMembershipType(attrs));
-    }
-    return memberships;
-  }
+  
 }

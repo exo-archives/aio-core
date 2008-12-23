@@ -40,7 +40,8 @@ public class OrganizationServiceImpl extends BaseOrganizationService {
 
     if (ldapService.getServerType() == LDAPService.ACTIVE_DIRECTORY_SERVER) {
       userDAO_ = new ADUserDAOImpl(ldapAttrMapping, ldapService);
-      ADSearchBySID adSearch = new ADSearchBySID(ldapAttrMapping, ldapService);
+//      ADSearchBySID adSearch = new ADSearchBySID(ldapAttrMapping, ldapService);
+      ADSearchBySID adSearch = new ADSearchBySID(ldapAttrMapping);
       groupDAO_ = new ADGroupDAOImpl(ldapAttrMapping, ldapService, adSearch);
       membershipDAO_ = new ADMembershipDAOImpl(ldapAttrMapping, ldapService, adSearch);
     } else {

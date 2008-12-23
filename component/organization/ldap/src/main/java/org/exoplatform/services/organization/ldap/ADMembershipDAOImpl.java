@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchControls;
@@ -41,61 +42,124 @@ public class ADMembershipDAOImpl extends MembershipDAOImpl {
 
   public ADMembershipDAOImpl(LDAPAttributeMapping ldapAttrMapping,
                              LDAPService ldapService,
-                             ADSearchBySID ad) {
+                             ADSearchBySID ad) throws Exception {
     super(ldapAttrMapping, ldapService);
     adSearch = ad;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @SuppressWarnings("unchecked")
+  @Override
   public Membership findMembershipByUserGroupAndType(String userName, String groupId, String type) throws Exception {
+    LdapContext ctx = getLdapContext(true);
     String groupDN = getGroupDNFromGroupId(groupId);
-    ArrayList memberships = (ArrayList) findMemberships(userName, groupDN, type);
-    if (memberships.size() > 0)
-      return (MembershipImpl) memberships.get(0);
-    return null;
+    try {
+      for (int err = 0;; err++) {
+        try {
+          Collection memberships = findMemberships(ctx, userName, groupDN, type);
+          if (memberships.size() > 0)
+            return (MembershipImpl) memberships.iterator().next();
+          return null;
+        } catch (NamingException e) {
+          if (isConnectionError(e) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e;
+        }
+      }
+    } finally {
+      release(ctx);
+    }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @SuppressWarnings("unchecked")
+  @Override
   public Collection findMembershipsByUser(String userName) throws Exception {
-    ArrayList<Membership> list = (ArrayList<Membership>) findMemberships(userName,
-                                                                         ldapAttrMapping_.groupsURL,
-                                                                         null);
-    return list;
+    LdapContext ctx = getLdapContext(true);
+    try {
+      for (int err = 0;; err++) {
+        try {
+          return findMemberships(ctx, userName, ldapAttrMapping.groupsURL, null);
+        } catch (NamingException e) {
+          if (isConnectionError(e) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e;
+        }
+      }
+    } finally {
+      release(ctx);
+    }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @SuppressWarnings("unchecked")
+  @Override
   public Collection findMembershipsByUserAndGroup(String userName, String groupId) throws Exception {
     String groupDN = getGroupDNFromGroupId(groupId);
-    return (ArrayList) findMemberships(userName, groupDN, null);
+    LdapContext ctx = getLdapContext(true);
+    try {
+      for (int err = 0;; err++) {
+        try {
+          return findMemberships(ctx, userName, groupDN, null);
+        } catch (NamingException e) {
+          if (isConnectionError(e) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e;
+        }
+      }
+    } finally {
+      release(ctx);
+    }
   }
 
-  private Collection findMemberships(String userName, String groupId, String type) throws Exception {
-    LdapContext ctx = ldapService_.getLdapContext();
+  @SuppressWarnings("unchecked")
+  private Collection findMemberships(LdapContext ctx, String userName, String groupId, String type) throws Exception {
     Collection<Membership> list = new ArrayList<Membership>();
-    String userDN = getDNFromUsername(userName);
+    String userDN = getDNFromUsername(ctx, userName);
     if (userDN == null)
       return list;
 
-    String filter = ldapAttrMapping_.userObjectClassFilter;
+    String filter = ldapAttrMapping.userObjectClassFilter;
     String retAttrs[] = { "tokenGroups" };
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.OBJECT_SCOPE);
     constraints.setReturningAttributes(retAttrs);
 
-    NamingEnumeration results = ctx.search(userDN, filter, constraints);
+    NamingEnumeration<SearchResult> results = ctx.search(userDN, filter, constraints);
     while (results.hasMore()) {
       SearchResult sr = (SearchResult) results.next();
       Attributes attrs = sr.getAttributes();
       Attribute attr = attrs.get("tokenGroups");
       for (int x = 0; x < attr.size(); x++) {
         byte[] SID = (byte[]) attr.get(x);
-        String membershipDN = adSearch.findMembershipDNBySID(SID, groupId, type);
+//        String membershipDN = adSearch.findMembershipDNBySID(SID, groupId, type);
+        String membershipDN = adSearch.findMembershipDNBySID(ctx, SID, groupId, type);
         if (membershipDN != null)
-          list.add(createMembershipObject(membershipDN, userName, type));
+          list.add(createMembershipObject(ctx, membershipDN, userName, type));
       }
     }
     return list;
   }
 
-  private Membership createMembershipObject(String dn, String user, String type) throws Exception {
-    Group group = getGroupFromMembershipDN(dn);
+  /**
+   * Create {@link Membership} instance
+   * 
+   * @param userName user name
+   * @param groupId group ID
+   * @param type membership type
+   * @return newly created instance of {@link Membership}
+   */
+  private Membership createMembershipObject(LdapContext ctx, String dn, String user, String type) throws Exception {
+    Group group = getGroupFromMembershipDN(ctx, dn);
     if (type == null)
       type = explodeDN(dn, true)[0];
     MembershipImpl membership = new MembershipImpl();

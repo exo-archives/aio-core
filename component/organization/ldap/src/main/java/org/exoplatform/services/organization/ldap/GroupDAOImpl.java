@@ -25,6 +25,7 @@ import javax.naming.Name;
 import javax.naming.NameNotFoundException;
 import javax.naming.NameParser;
 import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.DirContext;
@@ -48,27 +49,39 @@ import org.exoplatform.services.organization.impl.GroupImpl;
  */
 public class GroupDAOImpl extends BaseDAO implements GroupHandler {
 
-  private static Log                 log = ExoLogger.getLogger("core.GroupDAOImpl");
+  private static final Log           LOG = ExoLogger.getLogger(GroupDAOImpl.class.getName());
 
-  protected List<GroupEventListener> listeners_;
+  protected List<GroupEventListener> listeners;
 
-  public GroupDAOImpl(LDAPAttributeMapping ldapAttrMapping, LDAPService ldapService) {
+  public GroupDAOImpl(LDAPAttributeMapping ldapAttrMapping, LDAPService ldapService) throws Exception {
     super(ldapAttrMapping, ldapService);
-    listeners_ = new ArrayList<GroupEventListener>(3);
+    this.listeners = new ArrayList<GroupEventListener>(3);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void addGroupEventListener(GroupEventListener listener) {
-    listeners_.add(listener);
+    listeners.add(listener);
   }
 
-  final public Group createGroupInstance() {
+  /**
+   * {@inheritDoc}
+   */
+  public final Group createGroupInstance() {
     return new GroupImpl();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void createGroup(Group group, boolean broadcast) throws Exception {
     addChild(null, group, broadcast);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void addChild(Group parent, Group child, boolean broadcast) throws Exception {
     setId(parent, child);
     String searchBase = createSubDN(parent);
@@ -77,160 +90,298 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
 
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
-    LdapContext ctx = ldapService_.getLdapContext();
-
-    NamingEnumeration results = ctx.search(searchBase, filter, constraints);
-
-    if (results.hasMore())
-      return;
-    GroupImpl group = (GroupImpl) child;
-
-    if (broadcast)
-      preSave(group, true);
-    ctx.createSubcontext(groupDN, ldapAttrMapping_.groupToAttributes(child));
-    postSave(group, true);
+    LdapContext ctx = getLdapContext();
+    try {
+      for (int err = 0;; err++) {
+        try {
+          NamingEnumeration<SearchResult> results = ctx.search(searchBase, filter, constraints);
+          if (results.hasMore())
+            return;
+          GroupImpl group = (GroupImpl) child;
+          if (broadcast)
+            preSave(group, true);
+          ctx.createSubcontext(groupDN, ldapAttrMapping.groupToAttributes(child));
+          if (broadcast)
+            postSave(group, true);
+          return;
+        } catch (NamingException e) {
+          if (isConnectionError(e) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e;
+        }
+      }
+    } finally {
+      release(ctx);
+    }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void saveGroup(Group group, boolean broadcast) throws Exception {
-    LdapContext ctx = ldapService_.getLdapContext();
-    Group parent = findGroupById(group.getParentId());
-    setId(parent, group);
-    String groupDN = "ou=" + group.getGroupName() + "," + createSubDN(parent);
+    LdapContext ctx = getLdapContext();
+    try {
+      for (int err = 0;; err++) {
+        try {
+          Group parent = findGroupById(ctx, group.getParentId());
+          setId(parent, group);
+          String groupDN = "ou=" + group.getGroupName() + "," + createSubDN(parent);
 
-    ArrayList<ModificationItem> modifications = new ArrayList<ModificationItem>();
-    ModificationItem mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
-                                                new BasicAttribute(ldapAttrMapping_.ldapDescriptionAttr,
-                                                                   group.getDescription()));
-    modifications.add(mod);
+          ArrayList<ModificationItem> modifications = new ArrayList<ModificationItem>();
+          ModificationItem mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
+                                                      new BasicAttribute(ldapAttrMapping.ldapDescriptionAttr,
+                                                                         group.getDescription()));
+          modifications.add(mod);
 
-    mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("l",
-                                                                                group.getLabel()));
-    modifications.add(mod);
+          mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
+                                     new BasicAttribute("l", group.getLabel()));
+          modifications.add(mod);
 
-    ModificationItem[] mods = new ModificationItem[modifications.size()];
-    modifications.toArray(mods);
-    if (broadcast)
-      preSave(group, true);
-    NameParser parser = ctx.getNameParser("");
-    Name name = parser.parse(groupDN);
-    ctx.modifyAttributes(name, mods);
-    if (broadcast)
-      postSave(group, true);
+          ModificationItem[] mods = new ModificationItem[modifications.size()];
+          modifications.toArray(mods);
+          if (broadcast)
+            preSave(group, true);
+          ctx.modifyAttributes(groupDN, mods);
+          if (broadcast)
+            postSave(group, true);
+          return;
+        } catch (NamingException e) {
+          if (isConnectionError(e) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e;
+        }
+      }
+    } finally {
+      release(ctx);
+    }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public Group removeGroup(Group group, boolean broadcast) throws Exception {
-    LdapContext ctx = ldapService_.getLdapContext();
     String filter = "ou=" + group.getGroupName();
     String searchBase = this.createSubDN(group.getParentId());
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
-    NamingEnumeration<SearchResult> results = ctx.search(searchBase, filter, constraints);
+    LdapContext ctx = getLdapContext();
+    try {
+      for (int err = 0;; err++) {
+        try {
+          NamingEnumeration<SearchResult> results = ctx.search(searchBase, filter, constraints);
 
-    if (!results.hasMore())
-      return group;
-    SearchResult sr = results.next();
-    NameParser parser = ctx.getNameParser("");
-    Name entryName = parser.parse(new CompositeName(sr.getName()).get(0));
-    String groupDN = entryName + "," + searchBase;
+          if (!results.hasMoreElements())
+            return group;
+          SearchResult sr = results.next();
+          NameParser parser = ctx.getNameParser("");
+          Name entryName = parser.parse(new CompositeName(sr.getName()).get(0));
+          String groupDN = entryName + "," + searchBase;
 
-    group = getGroupByDN(groupDN);
-    if (group == null)
-      return group;
-    if (broadcast)
-      preDelete(group);
-    removeAllSubtree(ctx, groupDN);
-    if (broadcast)
-      postDelete(group);
-    return group;
+          group = getGroupByDN(ctx, groupDN);
+          if (group == null)
+            return group;
+          if (broadcast)
+            preDelete(group);
+          removeAllSubtree(ctx, groupDN);
+          if (broadcast)
+            postDelete(group);
+          return group;
+
+        } catch (NamingException e) {
+          if (isConnectionError(e) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e;
+        }
+      }
+    } finally {
+      release(ctx);
+    }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @SuppressWarnings("unchecked")
   public Collection findGroupByMembership(String userName, String membershipType) throws Exception {
     List<Group> groups = new ArrayList<Group>();
-    LdapContext ctx = ldapService_.getLdapContext();
-    String filter = "(&(" + ldapAttrMapping_.membershipTypeMemberValue + "="
-        + getDNFromUsername(userName) + ")(" + ldapAttrMapping_.membershipTypeRoleNameAttr + "="
-        + membershipType + "))";
+    LdapContext ctx = getLdapContext();
+    try {
+      for (int err = 0;; err++) {
+        groups.clear();
+        try {
+          String filter = "(&(" + ldapAttrMapping.membershipTypeMemberValue + "="
+              + getDNFromUsername(ctx, userName) + ")("
+              + ldapAttrMapping.membershipTypeRoleNameAttr + "=" + membershipType + "))";
 
-    SearchControls constraints = new SearchControls();
-    constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    NamingEnumeration<SearchResult> results = ctx.search(ldapAttrMapping_.groupsURL,
-                                                         filter,
-                                                         constraints);
-    while (results.hasMore()) {
-      SearchResult sr = results.next();
-      NameParser parser = ctx.getNameParser("");
-      Name entryName = parser.parse(new CompositeName(sr.getName()).get(0));
-      String entryName_ = String.valueOf(entryName).substring(entryName.getSuffix(1)
-                                                                       .toString()
-                                                                       .length() + 1);
-      String groupDN = entryName_ + "," + ldapAttrMapping_.groupsURL;
-      Group group = getGroupByDN(groupDN);
-      if (group != null)
-        addGroup(groups, group);
+          SearchControls constraints = new SearchControls();
+          constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+          NamingEnumeration<SearchResult> results = ctx.search(ldapAttrMapping.groupsURL,
+                                                               filter,
+                                                               constraints);
+          while (results.hasMoreElements()) {
+            SearchResult sr = results.next();
+            NameParser parser = ctx.getNameParser("");
+            Name entryNameName = parser.parse(new CompositeName(sr.getName()).get(0));
+            String entryName = String.valueOf(entryNameName).substring(entryNameName.getSuffix(1)
+                                                                                    .toString()
+                                                                                    .length() + 1);
+            String groupDN = entryName + "," + ldapAttrMapping.groupsURL;
+            Group group = getGroupByDN(ctx, groupDN);
+            if (group != null)
+              addGroup(groups, group);
+          }
+
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieved " + groups.size() + " groups from ldap for user " + userName
+                + " with membershiptype " + membershipType);
+          }
+          return groups;
+
+        } catch (NamingException e) {
+          if (isConnectionError(e) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e;
+        }
+      }
+    } finally {
+      release(ctx);
     }
 
-    if (log.isDebugEnabled()) {
-      log.debug("Retrieved " + groups.size() + " groups from ldap for user " + userName
-          + " with membershiptype " + membershipType);
-    }
-
-    return groups;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public Group findGroupById(String groupId) throws Exception {
     if (groupId == null)
       return null;
-    String parentId_ = null;
-    LdapContext ctx = ldapService_.getLdapContext();
+    String parentId = null;
     StringBuffer buffer = new StringBuffer();
     String groupIdParts[] = groupId.split("/");
     for (int x = 1; x < groupIdParts.length; x++) {
       buffer.append("/" + groupIdParts[x]);
       if (x == (groupIdParts.length - 2))
-        parentId_ = buffer.toString();
+        parentId = buffer.toString();
     }
     String groupDN = getGroupDNFromGroupId(groupId);
+    LdapContext ctx = getLdapContext();
+    try {
+      for (int err = 0;; err++) {
+        try {
+          Attributes attrs = ctx.getAttributes(groupDN);
+          Group group = ldapAttrMapping.attributesToGroup(attrs);
+          ((GroupImpl) group).setId(groupId);
+          ((GroupImpl) group).setParentId(parentId);
+          return group;
+        } catch (NamingException e) {
+          if (isConnectionError(e) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e;
+        }
+      }
+    } catch (NameNotFoundException e) {
+      return null;
+    } finally {
+      release(ctx);
+    }
+  }
 
+  /**
+   * Find group by group ID using supplied context.
+   * 
+   * @param ctx {@link LdapContext}
+   * @param groupId group ID
+   * @return Group or null if nothing found
+   * @throws Exception if any error occurs
+   */
+  private Group findGroupById(LdapContext ctx, String groupId) throws Exception {
+    if (groupId == null)
+      return null;
+    String parentId = null;
+    StringBuffer buffer = new StringBuffer();
+    String groupIdParts[] = groupId.split("/");
+    for (int x = 1; x < groupIdParts.length; x++) {
+      buffer.append("/" + groupIdParts[x]);
+      if (x == (groupIdParts.length - 2))
+        parentId = buffer.toString();
+    }
+    String groupDN = getGroupDNFromGroupId(groupId);
     try {
       Attributes attrs = ctx.getAttributes(groupDN);
-      Group group = ldapAttrMapping_.attributesToGroup(attrs);
+      Group group = ldapAttrMapping.attributesToGroup(attrs);
       ((GroupImpl) group).setId(groupId);
-      ((GroupImpl) group).setParentId(parentId_);
+      ((GroupImpl) group).setParentId(parentId);
       return group;
     } catch (NameNotFoundException e) {
+      if (LOG.isDebugEnabled())
+        e.printStackTrace();
     }
     return null;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @SuppressWarnings("unchecked")
   public Collection getAllGroups() throws Exception {
     List<Group> groups = new ArrayList<Group>();
-    LdapContext ctx = ldapService_.getLdapContext();
+
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    NamingEnumeration<SearchResult> results = null;
+
+    LdapContext ctx = getLdapContext();
     try {
-      results = ctx.search(ldapAttrMapping_.groupsURL, "(ou=*)", constraints);
-    } catch (Exception exp) {
-      return groups;
-    }
-    while (results.hasMore()) {
-      SearchResult sr = results.next();
-      NameParser parser = ctx.getNameParser("");
-      CompositeName name = new CompositeName(sr.getName());
-      if (name.size() > 0) {
-        Name entryName = parser.parse(name.get(0));
-        String groupDN = entryName + "," + ldapAttrMapping_.groupsURL;
-        Group group = this.getGroupByDN(groupDN);
-        if (group != null)
-          addGroup(groups, group);
+      for (int err = 0;; err++) {
+        groups.clear();
+        try {
+          NamingEnumeration<SearchResult> results = null;
+          try {
+            results = ctx.search(ldapAttrMapping.groupsURL, "(ou=*)", constraints);
+          } catch (NamingException e1) {
+            LOG.warn("Failed to get all groups. ", e1);
+            // if connection error let process it in common way
+            if (isConnectionError(e1))
+              throw e1;
+            return groups;
+          }
+          while (results.hasMoreElements()) {
+            SearchResult sr = results.next();
+            NameParser parser = ctx.getNameParser("");
+            CompositeName name = new CompositeName(sr.getName());
+            if (name.size() > 0) {
+              Name entryName = parser.parse(name.get(0));
+              String groupDN = entryName + "," + ldapAttrMapping.groupsURL;
+              Group group = this.getGroupByDN(ctx, groupDN);
+              if (group != null)
+                addGroup(groups, group);
+            }
+          }
+          return groups;
+
+        } catch (NamingException e2) {
+          if (isConnectionError(e2) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e2;
+        }
       }
+    } finally {
+      release(ctx);
     }
-    return groups;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @SuppressWarnings("unchecked")
   public Collection findGroups(Group parent) throws Exception {
     List<Group> groups = new ArrayList<Group>();
-    String groupsBaseDN = ldapAttrMapping_.groupsURL;
+    String groupsBaseDN = ldapAttrMapping.groupsURL;
     StringBuffer buffer = new StringBuffer();
 
     if (parent != null) {
@@ -241,75 +392,112 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
     }
     buffer.append(groupsBaseDN);
 
-    LdapContext ctx = ldapService_.getLdapContext();
+    LdapContext ctx = getLdapContext();
     String searchBase = buffer.toString();
-    String filter = ldapAttrMapping_.groupObjectClassFilter;
+    String filter = ldapAttrMapping.groupObjectClassFilter;
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
-    NamingEnumeration<SearchResult> results = null;
     try {
-      results = ctx.search(searchBase, filter, constraints);
-    } catch (Exception exp) {
-      return groups;
-    }
-    while (results.hasMore()) {
-      SearchResult sr = results.next();
-      NameParser parser = ctx.getNameParser("");
-      CompositeName name = new CompositeName(sr.getName());
-      if (name.size() > 0) {
-        Name entryName = parser.parse(name.get(0));
-        String groupDN = entryName + "," + searchBase;
-        Group group = this.getGroupByDN(groupDN);
-        if (group != null)
-          addGroup(groups, group);
+      for (int err = 0;; err++) {
+        groups.clear();
+        try {
+          NamingEnumeration<SearchResult> results = null;
+          try {
+            results = ctx.search(searchBase, filter, constraints);
+          } catch (NamingException e1) {
+            LOG.warn("Failed to get groups from parent " + parent.getId() + ". ", e1);
+            // if connection error let process it in common way
+            if (isConnectionError(e1))
+              throw e1;
+            return groups;
+          }
+          while (results.hasMoreElements()) {
+            SearchResult sr = results.next();
+            NameParser parser = ctx.getNameParser("");
+            CompositeName name = new CompositeName(sr.getName());
+            if (name.size() > 0) {
+              Name entryName = parser.parse(name.get(0));
+              String groupDN = entryName + "," + searchBase;
+              Group group = this.getGroupByDN(ctx, groupDN);
+              if (group != null)
+                addGroup(groups, group);
+            }
+          }
+          return groups;
+
+        } catch (NamingException e2) {
+          if (isConnectionError(e2) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e2;
+        }
       }
+    } finally {
+      release(ctx);
     }
-    return groups;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @SuppressWarnings("unchecked")
   public Collection findGroupsOfUser(String userName) throws Exception {
     List<Group> groups = new ArrayList<Group>();
 
-    // check if user exists
-    String userDN = getDNFromUsername(userName);
-    if (userDN == null)
-      return groups;
-    userDN = userDN.trim();
-
-    NamingEnumeration<SearchResult> results = null;
-    LdapContext ctx = ldapService_.getLdapContext();
+    LdapContext ctx = getLdapContext();
     try {
-      SearchControls constraints = new SearchControls();
-      constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-      String mbfilter = membershipClassFilter();
-      String userFilter = "(" + ldapAttrMapping_.membershipTypeMemberValue + "=" + userDN + ")";
-      String filter = "(&" + userFilter + mbfilter + ")";
-      results = ctx.search(ldapAttrMapping_.groupsURL, filter, constraints);
-    } catch (Exception exp) {
-      if (log.isWarnEnabled())
-        log.warn("Failed to retrieve memberships for user " + userName + ": " + exp.getMessage());
-    }
+      for (int err = 0;; err++) {
+        groups.clear();
+        try {
+          // check if user exists
+          String userDN = getDNFromUsername(ctx, userName);
+          if (userDN == null)
+            return groups;
+          userDN = userDN.trim();
 
-    // add groups for memberships matching user
-    int total = 0;
-    while (results.hasMore()) {
-      SearchResult sr = results.next();
-      total++;
-      NameParser parser = ctx.getNameParser("");
-      CompositeName name = new CompositeName(sr.getName());
-      if (name.size() < 1)
-        break;
-      Name entryName = parser.parse(name.get(0));
-      String membershipDN = entryName + "," + ldapAttrMapping_.groupsURL;
-      Group group = this.getGroupFromMembershipDN(membershipDN);
-      if (group != null)
-        addGroup(groups, group);
-    }
-    if (log.isDebugEnabled()) {
-      log.debug("Retrieved " + groups.size() + " groups from ldap for user " + userName);
-    }
+          NamingEnumeration<SearchResult> results = null;
+          try {
+            SearchControls constraints = new SearchControls();
+            constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+            String mbfilter = membershipClassFilter();
+            String userFilter = "(" + ldapAttrMapping.membershipTypeMemberValue + "=" + userDN
+                + ")";
+            String filter = "(&" + userFilter + mbfilter + ")";
+            results = ctx.search(ldapAttrMapping.groupsURL, filter, constraints);
+          } catch (NamingException exp) {
+            LOG.warn("Failed to retrieve memberships for user " + userName + ", ", exp);
+          }
 
-    return groups;
+          // add groups for memberships matching user
+          int total = 0;
+          while (results.hasMore()) {
+            SearchResult sr = results.next();
+            total++;
+            NameParser parser = ctx.getNameParser("");
+            CompositeName name = new CompositeName(sr.getName());
+            if (name.size() < 1)
+              break;
+            Name entryName = parser.parse(name.get(0));
+            String membershipDN = entryName + "," + ldapAttrMapping.groupsURL;
+            Group group = this.getGroupFromMembershipDN(ctx, membershipDN);
+            if (group != null)
+              addGroup(groups, group);
+          }
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Retrieved " + groups.size() + " groups from ldap for user " + userName);
+          }
+          return groups;
+
+        } catch (NamingException e2) {
+          if (isConnectionError(e2) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e2;
+        }
+      }
+    } finally {
+      release(ctx);
+    }
   }
 
   protected void addGroup(List<Group> groups, Group g) {
@@ -319,25 +507,29 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
     groups.add(g);
   }
 
+  // listeners
+
   protected void preSave(Group group, boolean isNew) throws Exception {
-    for (GroupEventListener listener : listeners_)
+    for (GroupEventListener listener : listeners)
       listener.preSave(group, isNew);
   }
 
   protected void postSave(Group group, boolean isNew) throws Exception {
-    for (GroupEventListener listener : listeners_)
+    for (GroupEventListener listener : listeners)
       listener.postSave(group, isNew);
   }
 
   protected void preDelete(Group group) throws Exception {
-    for (GroupEventListener listener : listeners_)
+    for (GroupEventListener listener : listeners)
       listener.preDelete(group);
   }
 
   protected void postDelete(Group group) throws Exception {
-    for (GroupEventListener listener : listeners_)
+    for (GroupEventListener listener : listeners)
       listener.postDelete(group);
   }
+
+  //
 
   protected String createSubDN(Group parent) {
     if (parent == null)
@@ -352,7 +544,7 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
       for (int x = (dnParts.length - 1); x > 0; x--)
         buffer.append("ou=" + dnParts[x] + ", ");
     }
-    buffer.append(ldapAttrMapping_.groupsURL);
+    buffer.append(ldapAttrMapping.groupsURL);
     return buffer.toString();
   }
 

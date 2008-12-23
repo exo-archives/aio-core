@@ -18,11 +18,13 @@
 package org.exoplatform.services.organization.ldap;
 
 import javax.naming.Context;
+import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 import javax.naming.ldap.Control;
+import javax.naming.ldap.LdapContext;
 
 import org.exoplatform.services.ldap.LDAPService;
 import org.exoplatform.services.organization.User;
@@ -42,28 +44,51 @@ public class ADUserDAOImpl extends UserDAOImpl {
 
   int UF_PASSWORD_EXPIRED = 0x800000;
 
-  public ADUserDAOImpl(LDAPAttributeMapping ldapAttrMapping, LDAPService ldapService) {
+  public ADUserDAOImpl(LDAPAttributeMapping ldapAttrMapping, LDAPService ldapService) throws Exception {
     super(ldapAttrMapping, ldapService);
     LDAPUserPageList.SEARCH_CONTROL = Control.CRITICAL;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public void createUser(User user, boolean broadcast) throws Exception {
-    String userDN = "cn=" + user.getUserName() + "," + ldapAttrMapping_.userURL;
-    Attributes attrs = ldapAttrMapping_.userToAttributes(user);
+    String userDN = "cn=" + user.getUserName() + "," + ldapAttrMapping.userURL;
+    Attributes attrs = ldapAttrMapping.userToAttributes(user);
     attrs.put("userAccountControl", Integer.toString(UF_NORMAL_ACCOUNT + UF_PASSWD_NOTREQD
         + UF_PASSWORD_EXPIRED + UF_ACCOUNTDISABLE));
-    attrs.remove(ldapAttrMapping_.userPassword);
-    if (broadcast)
-      preSave(user, true);
-    ldapService_.getLdapContext().createSubcontext(userDN, attrs);
-    if (broadcast)
-      postSave(user, true);
+    attrs.remove(ldapAttrMapping.userPassword);
+    LdapContext ctx = getLdapContext();
+    try {
+      for (int err = 0;; err++) {
+        try {
+          if (broadcast)
+            preSave(user, true);
+          // see comments about saving password below
+          ctx.createSubcontext(userDN, attrs);
+          if (broadcast)
+            postSave(user, true);
+          break;
+        } catch (NamingException e) {
+          if (isConnectionError(e) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e;
+        }
+      }
+    } finally {
+      release(ctx);
+    }
+    // Really need do it separately ?
+    // Do it in method with new LdapContext to avoid NameAlreadyBoundException,
+    // if got connection error occurs when try to save password.
     saveUserPassword(user, userDN);
-
   }
 
+  @Override
   void saveUserPassword(User user, String userDN) throws Exception {
-    Object v = ldapService_.getLdapContext().getEnvironment().get(Context.SECURITY_PROTOCOL);
+    Object v = ldapService.getLdapContext().getEnvironment().get(Context.SECURITY_PROTOCOL);
     if (v == null)
       return;
     String security = String.valueOf(v);
@@ -73,12 +98,27 @@ public class ADUserDAOImpl extends UserDAOImpl {
     byte[] newUnicodePassword = newQuotedPassword.getBytes("UTF-16LE");
     ModificationItem[] mods = new ModificationItem[2];
     mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
-                                   new BasicAttribute(ldapAttrMapping_.userPassword,
+                                   new BasicAttribute(ldapAttrMapping.userPassword,
                                                       newUnicodePassword));
     mods[1] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
                                    new BasicAttribute("userAccountControl",
                                                       Integer.toString(UF_NORMAL_ACCOUNT
                                                           + UF_PASSWORD_EXPIRED)));
-    ldapService_.getLdapContext().modifyAttributes(userDN, mods);
+    LdapContext ctx = getLdapContext();
+    try {
+      for (int err = 0;; err++) {
+        try {
+          ctx.modifyAttributes(userDN, mods);
+          break;
+        } catch (NamingException e) {
+          if (isConnectionError(e) && err < getMaxConnectionError())
+            ctx = getLdapContext(true);
+          else
+            throw e;
+        }
+      }
+    } finally {
+      release(ctx);
+    }
   }
 }

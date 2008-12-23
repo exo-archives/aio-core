@@ -42,20 +42,20 @@ public class OrganizationLdapInitializer extends BaseComponentPlugin implements
 
   public void init(OrganizationService service) throws Exception {
     baseHandler = (BaseDAO) service.getUserHandler();
-    createSubContextNew(baseHandler.ldapAttrMapping_.baseURL,
-                        baseHandler.ldapAttrMapping_.groupsURL);
-    createSubContextNew(baseHandler.ldapAttrMapping_.baseURL, baseHandler.ldapAttrMapping_.userURL);
-    createSubContextNew(baseHandler.ldapAttrMapping_.baseURL,
-                        baseHandler.ldapAttrMapping_.membershipTypeURL);
-    createSubContextNew(baseHandler.ldapAttrMapping_.baseURL,
-                        baseHandler.ldapAttrMapping_.profileURL);
+    createSubContextNew(baseHandler.ldapAttrMapping.baseURL,
+                        baseHandler.ldapAttrMapping.groupsURL);
+    createSubContextNew(baseHandler.ldapAttrMapping.baseURL, baseHandler.ldapAttrMapping.userURL);
+    createSubContextNew(baseHandler.ldapAttrMapping.baseURL,
+                        baseHandler.ldapAttrMapping.membershipTypeURL);
+    createSubContextNew(baseHandler.ldapAttrMapping.baseURL,
+                        baseHandler.ldapAttrMapping.profileURL);
   }
 
   public void createSubContext(String dn) throws Exception {
     Pattern pattern = Pattern.compile("\\b\\p{Space}*=\\p{Space}*", Pattern.CASE_INSENSITIVE);
     Matcher matcher = pattern.matcher(dn);
     dn = matcher.replaceAll("=");
-    LdapContext context = baseHandler.ldapService_.getLdapContext();
+    LdapContext context = baseHandler.ldapService.getLdapContext();
     String[] explodeDN = baseHandler.explodeDN(dn, false);
     if (explodeDN.length < 1)
       return;
@@ -110,7 +110,7 @@ public class OrganizationLdapInitializer extends BaseComponentPlugin implements
     matcher = COMPACT_DN.matcher(basedn);
     basedn = matcher.replaceAll("=");
 
-    LdapContext context = baseHandler.ldapService_.getLdapContext();
+    LdapContext context = baseHandler.ldapService.getLdapContext();
 
     String[] edn = baseHandler.explodeDN(dn, false);
     String[] ebasedn = baseHandler.explodeDN(basedn, false);
