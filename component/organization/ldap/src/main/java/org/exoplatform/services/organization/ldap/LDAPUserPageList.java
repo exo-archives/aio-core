@@ -87,6 +87,7 @@ public class LDAPUserPageList extends PageList {
     LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
+        users.clear();
         try {
           ctx.setRequestControls(new Control[] { sctl, prc });
           SearchControls constraints = new SearchControls();
