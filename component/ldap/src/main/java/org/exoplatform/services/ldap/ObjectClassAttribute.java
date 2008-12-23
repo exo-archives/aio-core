@@ -23,6 +23,9 @@ import javax.naming.directory.BasicAttribute;
  * tuan08@users.sourceforge.net Oct 15, 2005
  */
 public class ObjectClassAttribute extends BasicAttribute {
+
+  private static final long serialVersionUID = -935051905143793907L;
+
   public ObjectClassAttribute(String[] classes) {
     super("objectClass");
     for (String clazz : classes)

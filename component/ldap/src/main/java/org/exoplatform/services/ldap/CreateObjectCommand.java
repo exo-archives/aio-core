@@ -24,7 +24,6 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
-import javax.naming.ldap.LdapContext;
 
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
@@ -35,10 +34,12 @@ import org.exoplatform.container.xml.PropertiesParam;
  * tuan08@users.sourceforge.net Oct 16, 2005
  */
 public class CreateObjectCommand extends BaseComponentPlugin {
-  private Map<String, BasicAttributes> objects_;
 
+  private Map<String, Attributes> objectsToCreate;
+
+  @SuppressWarnings("unchecked")
   public CreateObjectCommand(InitParams params) {
-    objects_ = new HashMap<String, BasicAttributes>();
+    objectsToCreate = new HashMap<String, Attributes>();
     Iterator i = params.getPropertiesParamIterator();
     while (i.hasNext()) {
       PropertiesParam param = (PropertiesParam) i.next();
@@ -55,21 +56,12 @@ public class CreateObjectCommand extends BaseComponentPlugin {
         else
           attr.add(value);
       }
-      objects_.put(param.getName(), attrs);
+      objectsToCreate.put(param.getName(), attrs);
     }
+  }
+  
+  public Map<String, Attributes> getObjectsToCreate() {
+    return objectsToCreate;
   }
 
-  public void addObjects(LdapContext context) {
-    Iterator i = objects_.entrySet().iterator();
-    while (i.hasNext()) {
-      Map.Entry entry = (Map.Entry) i.next();
-      String dn = (String) entry.getKey();
-      Attributes attrs = (Attributes) entry.getValue();
-      try {
-        context.createSubcontext(dn, attrs);
-      } catch (Exception ex) {
-        ex.printStackTrace();
-      }
-    }
-  }
 }

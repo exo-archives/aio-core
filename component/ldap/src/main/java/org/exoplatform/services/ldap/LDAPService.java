@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2003-2007 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
@@ -17,6 +17,7 @@
 package org.exoplatform.services.ldap;
 
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.naming.ldap.LdapContext;
 
 /**
@@ -29,18 +30,48 @@ public interface LDAPService {
 
   public static int ACTIVE_DIRECTORY_SERVER = 1;
 
-  // public static int OPEN_LDAP_SERVER = 2;
-  // public static int NETSCAPE_SERVER = 3;
-  // public static int REDHAT_SERVER = 4;
+//  public static int OPEN_LDAP_SERVER        = 2;
+//
+//  public static int NETSCAPE_SERVER         = 3;
+//
+//  public static int REDHAT_SERVER           = 4;
 
-  // Normal context for all directories
-  public LdapContext getLdapContext() throws Exception;
+  /**
+   * Normal context for all directories.
+   * 
+   * @return {@link LdapContext}
+   * @throws NamingException if errors occurs when try to get context
+   */
+  LdapContext getLdapContext() throws NamingException;
 
-  // LDAP booster pack context for v3 directories (except Active Directory)
-  public InitialContext getInitialContext() throws Exception;
+  /**
+   * Initialize new LDAP context.
+   * 
+   * @return newly created {@link LdapContext}
+   * @throws NamingException if errors occurs when try to initialize context
+   */
+  LdapContext newLdapContext() throws NamingException;
 
-  // LDAP bind authentication
-  public boolean authenticate(String userDN, String password) throws Exception;
+  /**
+   * LDAP booster pack context for v3 directories (except Active Directory).
+   * 
+   * @return {@link InitialContext}
+   * @throws NamingException if errors occurs when try to get context
+   */
+  InitialContext getInitialContext() throws NamingException;
 
-  public int getServerType();
+  /**
+   * LDAP bind authentication.
+   * 
+   * @param userDN userDN
+   * @param password user's password
+   * @return true is user authenticated false otherwise
+   * @throws NamingException if errors occurs when try to authenticate user
+   */
+  boolean authenticate(String userDN, String password) throws NamingException;
+
+  /**
+   * @return LDAP server type
+   */
+  int getServerType();
 }

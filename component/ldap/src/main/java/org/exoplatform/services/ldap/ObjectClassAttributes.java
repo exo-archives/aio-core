@@ -24,6 +24,9 @@ import javax.naming.directory.BasicAttributes;
  * tuan08@users.sourceforge.net Oct 16, 2005
  */
 public class ObjectClassAttributes extends BasicAttributes {
+
+  private static final long serialVersionUID = 188564309594273556L;
+
   public ObjectClassAttributes() {
 
   }

@@ -19,15 +19,24 @@ package org.exoplatform.services.ldap.impl;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.naming.CommunicationException;
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.ServiceUnavailableException;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 
+import org.apache.commons.logging.Log;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
@@ -35,6 +44,7 @@ import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.ldap.CreateObjectCommand;
 import org.exoplatform.services.ldap.DeleteObjectCommand;
 import org.exoplatform.services.ldap.LDAPService;
+import org.exoplatform.services.log.ExoLogger;
 
 /**
  * Created by The eXo Platform SAS . Author : James Chamberlain
@@ -42,13 +52,18 @@ import org.exoplatform.services.ldap.LDAPService;
  */
 public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
 
-  private ThreadLocal<LdapContext> tlocal_    = new ThreadLocal<LdapContext>();
+  private static final Log    LOG        = ExoLogger.getLogger(LDAPServiceImpl.class.getName());
 
-  private Map<String, String>      env        = null;
+  private Map<String, String> env        = new HashMap<String, String>();
 
-  private int                      serverType = DEFAULT_SERVER;
+  private int                 serverType = DEFAULT_SERVER;
 
-  public LDAPServiceImpl(InitParams params) throws Exception {
+  // TODO move it in configuration
+  private final long          timeout    = 60000;
+
+  private LdapContext         ldapContext;
+
+  public LDAPServiceImpl(InitParams params) throws NamingException {
     LDAPConnectionConfig config = (LDAPConnectionConfig) params.getObjectParam("ldap.config")
                                                                .getObject();
 
@@ -62,12 +77,11 @@ public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
       System.setProperty("javax.net.ssl.trustStore", keystore);
     }
 
-    env = new HashMap<String, String>();
     env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
     env.put(Context.SECURITY_AUTHENTICATION, config.getAuthenticationType());
     env.put(Context.SECURITY_PRINCIPAL, config.getRootDN());
     env.put(Context.SECURITY_CREDENTIALS, config.getPassword());
-    env.put("com.sun.jndi.ldap.connect.timeout", "60000");
+    env.put("com.sun.jndi.ldap.connect.timeout", Long.toString(timeout));
     env.put("com.sun.jndi.ldap.connect.pool", "true");
     env.put("java.naming.ldap.version", config.getVerion());
     env.put("java.naming.ldap.attributes.binary", "tokenGroups");
@@ -84,28 +98,57 @@ public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
 
     if (serverType == ACTIVE_DIRECTORY_SERVER && ssl)
       env.put(Context.SECURITY_PROTOCOL, "ssl");
+
+    // initialize context
+    newLdapContext();
   }
 
-  public LdapContext getLdapContext() throws Exception {
-    // new Exception("===================================").printStackTrace() ;
-    LdapContext context = tlocal_.get();
-    if (context == null) {
-      context = new InitialLdapContext(new Hashtable<String, String>(env), null);
-      tlocal_.set(context);
-    } else {
-      context.setRequestControls(null);
+  /**
+   * Get new instance existing {@link LdapContext}, this instance is
+   * thread-safe. Not need to synchronize with other threads. {@inheritDoc}
+   */
+  public LdapContext getLdapContext() throws NamingException {
+    try {
+      return ldapContext.newInstance(null);
+    } catch (NamingException e) {
+      if (LOG.isDebugEnabled())
+        e.printStackTrace();
+      return newLdapContext();
     }
-    return context;
   }
 
-  public InitialContext getInitialContext() throws Exception {
+  /**
+   * {@inheritDoc}
+   */
+  public LdapContext newLdapContext() throws NamingException {
+    // first try to close old context if exists
+    try {
+      // avoid NPE if connection not initialized yet
+      if (ldapContext != null) {
+        ldapContext.close();
+      }
+    } catch (NamingException e) {
+      LOG.warn("Exception occur when try close LDAP context. ", e);
+    }
+    // create new context
+    ldapContext = new InitialLdapContext(new Hashtable<String, String>(env), null);
+    return ldapContext.newInstance(null);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public InitialContext getInitialContext() throws NamingException {
     Hashtable<String, String> props = new Hashtable<String, String>(env);
     props.put(Context.OBJECT_FACTORIES, "com.sun.jndi.ldap.obj.LdapGroupFactory");
     props.put(Context.STATE_FACTORIES, "com.sun.jndi.ldap.obj.LdapGroupFactory");
     return new InitialLdapContext(props, null);
   }
 
-  public boolean authenticate(String userDN, String password) throws Exception {
+  /**
+   * {@inheritDoc}
+   */
+  public boolean authenticate(String userDN, String password) throws NamingException {
     Hashtable<String, String> props = new Hashtable<String, String>(env);
     props.put(Context.SECURITY_AUTHENTICATION, "simple");
     props.put(Context.SECURITY_PRINCIPAL, userDN);
@@ -115,31 +158,133 @@ public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
     return true;
   }
 
-  public void addDeleteObject(ComponentPlugin plugin) throws Exception {
-    DeleteObjectCommand command = (DeleteObjectCommand) plugin;
-    LdapContext ctx = getLdapContext();
-    command.deleteObjects(ctx);
+  /**
+   * {@inheritDoc}
+   */
+  public int getServerType() {
+    return serverType;
   }
 
-  public void addCreateObject(ComponentPlugin plugin) throws Exception {
-    CreateObjectCommand command = (CreateObjectCommand) plugin;
-    LdapContext ctx = getLdapContext();
-    command.addObjects(ctx);
+  /**
+   * Delete objects from context.
+   * 
+   * @param plugin see {@link DeleteObjectCommand} {@link ComponentPlugin}
+   * @throws NamingException if {@link NamingException} occurs
+   */
+  public void addDeleteObject(ComponentPlugin plugin) throws NamingException {
+    if (plugin instanceof DeleteObjectCommand) {
+      DeleteObjectCommand command = (DeleteObjectCommand) plugin;
+      List<String> objectsToDelete = command.getObjectsToDelete();
+      if (objectsToDelete == null || objectsToDelete.size() == 0)
+        return;
+      LdapContext ctx = getLdapContext();
+      for (String name : objectsToDelete) {
+        try {
+          try {
+            unbind(ctx, name);
+          } catch (CommunicationException e1) {
+            // create new LDAP context
+            ctx = newLdapContext();
+            // try repeat operation where communication error occurs
+            unbind(ctx, name);
+          } catch (ServiceUnavailableException e2) {
+            // do the same as for CommunicationException
+            ctx = newLdapContext();
+            unbind(ctx, name);
+          }
+        } catch (Exception e3) {
+          // Catch all exceptions here.
+          // Just inform about exception if it is not connection problem.
+          LOG.error("Remove object (" + name + ") failed. ", e3);
+        }
+      }
+      try {
+        // close context
+        ctx.close();
+      } catch (Exception e) {
+        LOG.warn("Exception occur when try close LDAP context. ", e);
+      }
+    }
   }
 
+  private void unbind(LdapContext ctx, String name) throws NamingException {
+    SearchControls constraints = new SearchControls();
+    constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
+    NamingEnumeration<SearchResult> results = ctx.search(name, "(objectclass=*)", constraints);
+    while (results.hasMore()) {
+      SearchResult sr = results.next();
+      unbind(ctx, sr.getNameInNamespace());
+    }
+    ctx.unbind(name);
+  }
+
+  /**
+   * Create objects in context.
+   * 
+   * @param plugin see {@link CreateObjectCommand} {@link ComponentPlugin}
+   * @throws NamingException if {@link NamingException} occurs
+   */
+  public void addCreateObject(ComponentPlugin plugin) throws NamingException {
+    if (plugin instanceof CreateObjectCommand) {
+      CreateObjectCommand command = (CreateObjectCommand) plugin;
+      Map<String, Attributes> objectsToCreate = command.getObjectsToCreate();
+      if (objectsToCreate == null || objectsToCreate.size() == 0)
+        return;
+      LdapContext ctx = getLdapContext();
+      for (Map.Entry<String, Attributes> e : objectsToCreate.entrySet()) {
+        String name = e.getKey();
+        Attributes attrs = e.getValue();
+        try {
+          try {
+            ctx.createSubcontext(name, attrs);
+          } catch (CommunicationException e1) {
+            // create new LDAP context
+            ctx = newLdapContext();
+            // try repeat operation where communication error occurs
+            ctx.createSubcontext(name, attrs);
+          } catch (ServiceUnavailableException e2) {
+            // do the same as for CommunicationException
+            ctx = newLdapContext();
+            ctx.createSubcontext(name, attrs);
+          }
+        } catch (Exception e3) {
+          // Catch all exceptions here.
+          // just inform about exception if it is not connection problem.
+          LOG.error("Create object (" + name + ") failed. ", e3);
+        }
+      }
+      try {
+        ctx.close();
+      } catch (Exception e) {
+        LOG.warn("Exception occur when try close LDAP context. ", e);
+      }
+    }
+    
+  }
+  
+  /**
+   * {@inheritDoc}
+   * 
+   * @deprecated Will be removed
+   */
   public void startRequest(ExoContainer container) {
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @deprecated Will be removed
+   */
   public void endRequest(ExoContainer container) {
-    LdapContext context = tlocal_.get();
-    if (context != null) {
-      try {
-        context.close();
-        tlocal_.set(null);
-      } catch (Exception ex) {
-        ex.printStackTrace();
-      }
-    }
+//     LdapContext context = tlocal_.get();
+//    if (context != null) {
+//      try {
+//        context.close();
+//        tlocal_.set(null);
+//      } catch (Exception ex) {
+//        ex.printStackTrace();
+//      }
+//    }
   }
 
   private int toServerType(String name) {
@@ -154,7 +299,4 @@ public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
     return DEFAULT_SERVER;
   }
 
-  public int getServerType() {
-    return serverType;
-  }
 }
