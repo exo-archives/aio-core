@@ -30,11 +30,11 @@ public interface LDAPService {
 
   public static int ACTIVE_DIRECTORY_SERVER = 1;
 
-//  public static int OPEN_LDAP_SERVER        = 2;
-//
-//  public static int NETSCAPE_SERVER         = 3;
-//
-//  public static int REDHAT_SERVER           = 4;
+  // public static int OPEN_LDAP_SERVER = 2;
+  //
+  // public static int NETSCAPE_SERVER = 3;
+  //
+  // public static int REDHAT_SERVER = 4;
 
   /**
    * Normal context for all directories.
@@ -45,12 +45,22 @@ public interface LDAPService {
   LdapContext getLdapContext() throws NamingException;
 
   /**
-   * Initialize new LDAP context.
+   * Get new LdapContext. Force create new context.
    * 
-   * @return newly created {@link LdapContext}
-   * @throws NamingException if errors occurs when try to initialize context
+   * @param renew should be created new LdapContext
+   * @return {@link LdapContext}
+   * @throws NamingException if errors occurs when try to get context
+   * @see {@link #getLdapContext()}
    */
-  LdapContext newLdapContext() throws NamingException;
+  LdapContext getLdapContext(boolean renew) throws NamingException;
+
+  /**
+   * Release LdapContext, so that it can be recycled.
+   * 
+   * @param ctx {@link LdapContext}
+   * @throws NamingException if errors occurs when release context
+   */
+  void release(LdapContext ctx) throws NamingException;
 
   /**
    * LDAP booster pack context for v3 directories (except Active Directory).
@@ -74,4 +84,5 @@ public interface LDAPService {
    * @return LDAP server type
    */
   int getServerType();
+  
 }

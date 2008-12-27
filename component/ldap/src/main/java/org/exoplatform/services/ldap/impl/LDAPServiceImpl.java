@@ -58,12 +58,10 @@ public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
 
   private int                 serverType = DEFAULT_SERVER;
 
-  // TODO move it in configuration
-  private final long          timeout    = 60000;
-
-  private LdapContext         ldapContext;
-
-  public LDAPServiceImpl(InitParams params) throws NamingException {
+  /**
+   * @param params See {@link InitParams}
+   */
+  public LDAPServiceImpl(InitParams params) {
     LDAPConnectionConfig config = (LDAPConnectionConfig) params.getObjectParam("ldap.config")
                                                                .getObject();
 
@@ -81,7 +79,9 @@ public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
     env.put(Context.SECURITY_AUTHENTICATION, config.getAuthenticationType());
     env.put(Context.SECURITY_PRINCIPAL, config.getRootDN());
     env.put(Context.SECURITY_CREDENTIALS, config.getPassword());
-    env.put("com.sun.jndi.ldap.connect.timeout", Long.toString(timeout));
+    // TODO move it in configuration ?
+    env.put("com.sun.jndi.ldap.connect.timeout", "60000");
+    
     env.put("com.sun.jndi.ldap.connect.pool", "true");
     env.put("java.naming.ldap.version", config.getVerion());
     env.put("java.naming.ldap.attributes.binary", "tokenGroups");
@@ -98,41 +98,39 @@ public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
 
     if (serverType == ACTIVE_DIRECTORY_SERVER && ssl)
       env.put(Context.SECURITY_PROTOCOL, "ssl");
-
-    // initialize context
-    newLdapContext();
-  }
-
-  /**
-   * Get new instance existing {@link LdapContext}, this instance is
-   * thread-safe. Not need to synchronize with other threads. {@inheritDoc}
-   */
-  public LdapContext getLdapContext() throws NamingException {
-    try {
-      return ldapContext.newInstance(null);
-    } catch (NamingException e) {
-      if (LOG.isDebugEnabled())
-        e.printStackTrace();
-      return newLdapContext();
-    }
   }
 
   /**
    * {@inheritDoc}
    */
-  public LdapContext newLdapContext() throws NamingException {
-    // first try to close old context if exists
+  public LdapContext getLdapContext() throws NamingException {
+    // This method can be used for getting context from thread-local variables,
+    // etc. instead create new instance of LdapContext. Currently just create
+    // new one (use from pool if 'com.sun.jndi.ldap.connect.pool' is 'true').
+    // Override this method if need other behavior.
+    return getLdapContext(true);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public LdapContext getLdapContext(boolean renew) throws NamingException {
+    // Force create new context.  
+    return new InitialLdapContext(new Hashtable<String, String>(env), null);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public void release(LdapContext ctx) {
+    // Just close since we are not pooling anything by self.
+    // Override this method if need other behavior.
     try {
-      // avoid NPE if connection not initialized yet
-      if (ldapContext != null) {
-        ldapContext.close();
-      }
+      if (ctx != null)
+        ctx.close();
     } catch (NamingException e) {
       LOG.warn("Exception occur when try close LDAP context. ", e);
     }
-    // create new context
-    ldapContext = new InitialLdapContext(new Hashtable<String, String>(env), null);
-    return ldapContext.newInstance(null);
   }
 
   /**
@@ -154,8 +152,14 @@ public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
     props.put(Context.SECURITY_PRINCIPAL, userDN);
     props.put(Context.SECURITY_CREDENTIALS, password);
     props.put("com.sun.jndi.ldap.connect.pool", "false");
-    new InitialLdapContext(props, null);
-    return true;
+    try {
+      new InitialLdapContext(props, null);
+      return true;
+    } catch (NamingException e) {
+      if (LOG.isDebugEnabled())
+        e.printStackTrace();
+      return false;
+    }
   }
 
   /**
@@ -172,7 +176,7 @@ public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
    * @throws NamingException if {@link NamingException} occurs
    */
   public void addDeleteObject(ComponentPlugin plugin) throws NamingException {
-    if (plugin instanceof DeleteObjectCommand) {
+    if (false&&plugin instanceof DeleteObjectCommand) {
       DeleteObjectCommand command = (DeleteObjectCommand) plugin;
       List<String> objectsToDelete = command.getObjectsToDelete();
       if (objectsToDelete == null || objectsToDelete.size() == 0)
@@ -184,12 +188,13 @@ public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
             unbind(ctx, name);
           } catch (CommunicationException e1) {
             // create new LDAP context
-            ctx = newLdapContext();
+            ctx = getLdapContext(true);
             // try repeat operation where communication error occurs
             unbind(ctx, name);
           } catch (ServiceUnavailableException e2) {
             // do the same as for CommunicationException
-            ctx = newLdapContext();
+            ctx = getLdapContext(true);
+            //
             unbind(ctx, name);
           }
         } catch (Exception e3) {
@@ -198,12 +203,8 @@ public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
           LOG.error("Remove object (" + name + ") failed. ", e3);
         }
       }
-      try {
-        // close context
-        ctx.close();
-      } catch (Exception e) {
-        LOG.warn("Exception occur when try close LDAP context. ", e);
-      }
+      // close context
+      release(ctx);
     }
   }
 
@@ -215,6 +216,8 @@ public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
       SearchResult sr = results.next();
       unbind(ctx, sr.getNameInNamespace());
     }
+    // close search results enumeration
+    results.close();
     ctx.unbind(name);
   }
 
@@ -239,12 +242,13 @@ public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
             ctx.createSubcontext(name, attrs);
           } catch (CommunicationException e1) {
             // create new LDAP context
-            ctx = newLdapContext();
+            ctx = getLdapContext(true);
             // try repeat operation where communication error occurs
             ctx.createSubcontext(name, attrs);
           } catch (ServiceUnavailableException e2) {
             // do the same as for CommunicationException
-            ctx = newLdapContext();
+            ctx = getLdapContext(true);
+            //
             ctx.createSubcontext(name, attrs);
           }
         } catch (Exception e3) {
@@ -253,13 +257,8 @@ public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
           LOG.error("Create object (" + name + ") failed. ", e3);
         }
       }
-      try {
-        ctx.close();
-      } catch (Exception e) {
-        LOG.warn("Exception occur when try close LDAP context. ", e);
-      }
+      release(ctx);
     }
-    
   }
   
   /**
