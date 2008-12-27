@@ -81,7 +81,7 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
    */
   @SuppressWarnings("unchecked")
   public void createMembership(Membership m, boolean broadcast) throws Exception {
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
@@ -125,13 +125,13 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
 
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -165,7 +165,7 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
     m.setMembershipType(membershipType);
     m.setUserName(username);
 
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
@@ -207,16 +207,17 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
           return m;
         } catch (NamingException e1) {
           if (isConnectionError(e1) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e1;
         }
       }
     } catch (NameNotFoundException e2) {
-      e2.printStackTrace();
+      if (LOG.isDebugEnabled())
+        e2.printStackTrace();
       return null;
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -226,8 +227,9 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
   @SuppressWarnings("unchecked")
   public Collection removeMembershipByUser(String username, boolean broadcast) throws Exception {
     ArrayList<Membership> memberships = new ArrayList<Membership>();
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
+      NamingEnumeration<SearchResult> results = null;
       for (int err = 0;; err++) {
         memberships.clear();
         try {
@@ -235,9 +237,7 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
           String filter = ldapAttrMapping.membershipTypeMemberValue + "=" + escapeDN(userDN);
           SearchControls constraints = new SearchControls();
           constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-          NamingEnumeration<SearchResult> results = ctx.search(ldapAttrMapping.groupsURL,
-                                                               filter,
-                                                               constraints);
+          results = ctx.search(ldapAttrMapping.groupsURL, filter, constraints);
           while (results.hasMoreElements()) {
             SearchResult sr = results.next();
             try {
@@ -264,13 +264,16 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
           return memberships;
         } catch (NamingException e2) {
           if (isConnectionError(e2) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e2;
+        } finally {
+          if (results != null)
+            results.close();
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -290,7 +293,7 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
    */
   public Membership findMembershipByUserGroupAndType(String userName, String groupId, String type) throws Exception {
     // TODO try to optimize with better filter
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         Membership membership = null;
@@ -315,13 +318,13 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
           return membership;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -331,8 +334,9 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
   @SuppressWarnings("unchecked")
   public Collection findMembershipsByUserAndGroup(String userName, String groupId) throws Exception {
     ArrayList<Membership> memberships = new ArrayList<Membership>();
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
+      NamingEnumeration<SearchResult> results = null;
       for (int err = 0;; err++) {
         // remove all items that can be added in previous iteration
         memberships.clear();
@@ -347,7 +351,7 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
           String mbfilter = membershipClassFilter();
           String filter = "(&" + userFilter + mbfilter + ")";
 
-          NamingEnumeration<SearchResult> results = findMembershipsInGroup(ctx, groupId, filter);
+          results = findMembershipsInGroup(ctx, groupId, filter);
           // add memberships matching user
           while (results.hasMoreElements()) {
             SearchResult sr = results.next();
@@ -362,13 +366,16 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
           return memberships;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
+        } finally {
+          if (results != null)
+            results.close();
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -397,16 +404,20 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
     ArrayList<Membership> memberships = new ArrayList<Membership>();
     String mbfilter = membershipClassFilter();
 
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
+      NamingEnumeration<SearchResult> results = null; 
       for (int err = 0;; err++) {
         // remove all items that can be added in previous iteration
         memberships.clear();
         try {
           // check if user exists
           String userDN = getDNFromUsername(ctx, userName);
-          if (userDN == null)
+          if (userDN == null) {
+            if (LOG.isDebugEnabled())
+              LOG.debug("User " + userName + " not found. ");
             return memberships;
+          }
 
           userDN = userDN.trim();
           String userFilter = "(" + ldapAttrMapping.membershipTypeMemberValue + "=" + userDN + ")";
@@ -415,9 +426,7 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
           SearchControls constraints = new SearchControls();
           constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
-          NamingEnumeration<SearchResult> results = ctx.search(ldapAttrMapping.groupsURL,
-                                                               filter,
-                                                               constraints);
+          results = ctx.search(ldapAttrMapping.groupsURL, filter, constraints);
           // add memberships matching user
           while (results.hasMoreElements()) {
             SearchResult sr = results.next();
@@ -434,13 +443,16 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
           return memberships;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
+        } finally {
+          if (results != null)
+            results.close();
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -450,8 +462,9 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
   @SuppressWarnings("unchecked")
   public Collection findMembershipsByGroup(Group group) throws Exception {
     ArrayList<Membership> memberships = new ArrayList<Membership>();
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
+      NamingEnumeration<SearchResult> results = null; 
       for (int err = 0;; err++) {
         memberships.clear();
         try {
@@ -460,9 +473,7 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
           String groupDN = this.getGroupDNFromGroupId(group.getId());
           SearchControls constraints = new SearchControls();
           constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
-          NamingEnumeration<SearchResult> results = ctx.search(groupDN,
-                                                               ldapAttrMapping.membershipObjectClassFilter,
-                                                               constraints);
+          results = ctx.search(groupDN, ldapAttrMapping.membershipObjectClassFilter, constraints);
           while (results.hasMoreElements()) {
             SearchResult sr = results.next();
             String membershipType = explodeDN(sr.getNameInNamespace(), true)[0];
@@ -485,13 +496,16 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
           return memberships;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
+        } finally {
+          if (results != null)
+            results.close();
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
   

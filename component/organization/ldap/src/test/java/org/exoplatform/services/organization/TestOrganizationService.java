@@ -18,11 +18,18 @@ package org.exoplatform.services.organization;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
+import javax.naming.NamingEnumeration;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
+import javax.naming.ldap.LdapContext;
 
 import junit.framework.TestCase;
 
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.ldap.LDAPService;
 
 /**
  * Created by The eXo Platform SAS Author : Hoa Pham
@@ -72,13 +79,13 @@ public class TestOrganizationService extends TestCase {
   public void tearDown() throws Exception {
     if (!runtest)
       return;
-    System.err.println("##############################################################");
+    System.out.println("##############################################################");
   }
 
   protected String getDescription() {
     if (!runtest)
       return "";
-    return "test hibernate organization service";
+    return "test LDAP organization service";
   }
 
   public void testUserPageSize() throws Exception {
@@ -88,54 +95,89 @@ public class TestOrganizationService extends TestCase {
     String USER = "test";
     int s = 15;
 
-    try {
-      for (int i = 0; i < s; i++)
-        userHandler_.removeUser(USER + "_" + String.valueOf(i), true);
-    } catch (Exception exp) {
-    }
-
     for (int i = 0; i < s; i++)
       createUser(USER + "_" + String.valueOf(i));
+    
     Query query = new Query();
     PageList users = userHandler_.findUsers(query);
-    System.out.println("\n\n\n\n\n\n size: " + users.getAvailablePage());
+    System.out.println("size: " + users.getAvailablePage());
 
     List list = users.getPage(1);
     for (Object ele : list) {
       User u = (User) ele;
       System.out.println(u.getUserName() + " and " + u.getEmail());
     }
-    System.out.println("\n\n\n\n page 2:");
-    list = users.getPage(4);
+    System.out.println("\npage 2:");
+    list = users.getPage(1);
     System.out.println("size : " + list.size());
     for (Object ele : list) {
       User u = (User) ele;
       System.out.println(u.getUserName() + " and " + u.getEmail());
     }
-    System.out.println("\n\n\n\n");
+    System.out.println("\n\n");
+    try {
+      for (int i = 0; i < s; i++)
+        userHandler_.removeUser(USER + "_" + String.valueOf(i), true);
+    } catch (Exception exp) {
+      exp.printStackTrace();
+    }
+    
   }
 
+  public void testUserConcurr() throws Exception {
+    int threads = 50;
+    final CountDownLatch c = new CountDownLatch(threads);
+    for (int i = 0; i < threads; i++) {
+      new Thread() {
+        public void run() {
+          try {
+            Query query = new Query();
+            PageList users = userHandler_.findUsers(query);
+            users.setPageSize(10);
+            assertTrue("Expect 1 user found ", users.getAvailable() >= 1);
+            int p = users.getAvailablePage();
+            long ti = Thread.currentThread().getId();
+            System.out.println("AVAILABLE PUSERS: " + ti + " : " + users.getAvailable());
+            for (int j = 1; j <= p; j++) {
+              int i = 0;
+              for (Object o : users.getPage(j)) {
+                System.out.println(ti + "." + ++i + " : " + ((User) o).getUserName());
+              }
+              System.out.println("----- page " + ti + " : " + j + "------");
+            }
+          } catch (Exception e) {
+            e.printStackTrace();
+          } finally {
+            c.countDown();
+          }
+        }
+      }.start();
+    }
+    c.await();
+  }
+  
   public void testUser() throws Exception {
-    if (!runtest)
-      return;
     /* Create an user with UserName: test */
     String USER = "test";
-
-    createUser(USER);
+    User user = createUser(USER);
+    
+    // authentication
+    user.setPassword("test");
+    userHandler_.saveUser(user, true);
+    assertTrue("Authentication failed ", userHandler_.authenticate(USER, "test"));
 
     User u = userHandler_.findUserByName(USER);
     assertTrue("Found user instance", u != null);
     assertEquals("Expect user name is: ", USER, u.getUserName());
 
-    UserProfile up = profileHandler_.findUserProfileByName(USER);
-    assertTrue("Expect user profile is found: ", up != null);
+    UserProfile up = profileHandler_.createUserProfileInstance(USER);
+    profileHandler_.saveUserProfile(up, true);
 
-    Query query = new Query();
-    PageList users = userHandler_.findUsers(query);
-    assertTrue("Expect 1 user found ", users.getAvailable() >= 1);
-    System.out.println("AVAILABLE PUSERS: " + users.getAvailable());
+    up = profileHandler_.findUserProfileByName(USER);
+    assertTrue("Expect user profile is found: ",
+               profileHandler_.findUserProfileByName(USER) != null);
 
-    /* Update user's information */
+    // Update user's information
     u.setFirstName("Exo(Update)");
     userHandler_.saveUser(u, false);
     up.getUserInfoMap().put("user.gender", "male");
@@ -145,18 +187,12 @@ public class TestOrganizationService extends TestCase {
     assertEquals("Expect profile is updated: user.gender is ", "male", up.getUserInfoMap()
                                                                          .get("user.gender"));
 
-    PageList piterator = userHandler_.getUserPageList(10);
-    // assertTrue (piterator.currentPage().size() == 2) ;
-    assertEquals(1, piterator.currentPage().size()); // [PN] was 2, but from
-    // where?
-
-    /*
-     * Remove a user: Expect result: user and it's profile will be removed
-     */
+    // Remove a user: Expect result: user and it's profile will be removed
+    // NOTE >>>> FIX without listeners remove profile manually
     userHandler_.removeUser(USER, true);
-    assertEquals("User: USER is removed: ", null, userHandler_.findUserByName(USER));
-    assertTrue(" user's profile of USER was removed:",
-               profileHandler_.findUserProfileByName(USER) == null);
+    profileHandler_.removeUserProfile(USER, true);
+    assertEquals(null, userHandler_.findUserByName(USER));
+    assertTrue(profileHandler_.findUserProfileByName(USER) == null);
   }
 
   public void testGroup() throws Exception {
@@ -167,7 +203,7 @@ public class TestOrganizationService extends TestCase {
     Group groupParent = groupHandler_.createGroupInstance();
     groupParent.setGroupName(parentName);
     groupParent.setDescription("This is description");
-    groupHandler_.createGroup(groupParent, true);
+    groupHandler_.addChild(null, groupParent, true);
     assertTrue(((Group) groupParent).getId() != null); // [PN] was GroupImpl of
     // jdbc, caused a class
     // cast exc.
@@ -203,8 +239,8 @@ public class TestOrganizationService extends TestCase {
     Collection groups = groupHandler_.findGroups(groupParent);
     assertEquals("Expect number of child group in parent group is: ", 2, groups.size());
     Object arraygroups[] = groups.toArray();
-    assertEquals("Expect child group's name is: ", Group1, ((Group) arraygroups[0]).getGroupName());
-    assertEquals("Expect child group's name is: ", Group2, ((Group) arraygroups[1]).getGroupName());
+    assertTrue(((Group) arraygroups[0]).getGroupName().equals(Group1) || ((Group) arraygroups[1]).getGroupName().equals(Group1));
+    assertTrue(((Group) arraygroups[0]).getGroupName().equals(Group2) || ((Group) arraygroups[1]).getGroupName().equals(Group2));
 
     /* Remove a groupchild */
     groupHandler_.removeGroup(groupHandler_.findGroupById("/" + parentName + "/" + Group1), true);
@@ -221,9 +257,11 @@ public class TestOrganizationService extends TestCase {
                  groupHandler_.findGroupById(groupParent.getId()));
     assertEquals("Expect all child group is removed: ", 0, groupHandler_.findGroups(groupParent)
                                                                         .size());
+    groupHandler_.getAllGroups();
   }
 
   public void testMembershipType() throws Exception {
+    int bmn = mtHandler_.findMembershipTypes().size();
     if (!runtest)
       return;
     /* Create a membershipType */
@@ -255,13 +293,13 @@ public class TestOrganizationService extends TestCase {
      * "testmembership", "anothertype" and "member"(default membership type)
      */
     Collection ms = mtHandler_.findMembershipTypes();
-    assertEquals("Expect 3 membership in collection: ", 3, ms.size());
+    assertEquals("Expect 3 membership in collection: ", bmn+2, ms.size());
 
     /* remove "testmembership" */
     mtHandler_.removeMembershipType(testType, true);
     assertEquals("Membership type has been removed:", null, mtHandler_.findMembershipType(testType));
     assertEquals("Expect 2 membership in collection(1 is default): ",
-                 2,
+                 bmn+1,
                  mtHandler_.findMembershipTypes().size());
 
     /* remove "anothertype" */
@@ -270,7 +308,7 @@ public class TestOrganizationService extends TestCase {
                  null,
                  mtHandler_.findMembershipType("anothertype"));
     assertEquals("Expect 1 membership in collection(default type): ",
-                 1,
+                 bmn,
                  mtHandler_.findMembershipTypes().size());
     /* All membershipType was removed(except default membership) */
   }
@@ -285,11 +323,11 @@ public class TestOrganizationService extends TestCase {
     /* Create "Group1" */
     Group group = groupHandler_.createGroupInstance();
     group.setGroupName(Group1);
-    groupHandler_.createGroup(group, true);
+    groupHandler_.addChild(null, group, true);
     /* Create "Group2" */
     group = groupHandler_.createGroupInstance();
     group.setGroupName(Group2);
-    groupHandler_.createGroup(group, true);
+    groupHandler_.addChild(null, group, true);
 
     /* Create membership1 and assign Benj to "Group1" with this membership */
     String testType = "testmembership";
@@ -308,10 +346,7 @@ public class TestOrganizationService extends TestCase {
 
     mt = mtHandler_.createMembershipTypeInstance();
     mt.setName("membershipType3");
-    Membership membership3 = membershipHandler_.createMembershipInstance();
-    membership3.setMembershipType(mt.getName());
     membershipHandler_.linkMembership(user, groupHandler_.findGroupById("/" + Group2), mt, true);
-
     /*
      * find all memberships in group2 Expect result: 4 membership: 3 for
      * Benj(testmebership, membershipType2, membershipType3) : 1 for
@@ -321,6 +356,9 @@ public class TestOrganizationService extends TestCase {
     Collection<Membership> mems = membershipHandler_.findMembershipsByGroup(groupHandler_.findGroupById("/"
         + Group2));
     assertEquals("Expect number of membership in group 2 is: ", 4, mems.size());
+    for (Membership m : mems) {
+      System.out.println(m);
+    }
 
     /*
      * find all memberships in "Group2" relate with Benj Expect result: 3
@@ -331,15 +369,24 @@ public class TestOrganizationService extends TestCase {
     assertEquals("Expect number of membership in " + Group2 + " relate with benj is: ",
                  3,
                  mems.size());
+    for (Membership m : mems) {
+      System.out.println(m);
+    }
 
     /*
      * find all memberships of Benj in all group Expect result: 5 membership: 3
      * memberships in "Group2", 1 membership in "Users" (default) : 1 membership
-     * in "group1"
+     * in "group1".
+     * --------------------
+     * NOTE >>> FIX without listeners default membership does not
+     * exists, so will be only four memberships
      */
     System.out.println(" --------- find memberships by user-------------");
     mems = membershipHandler_.findMembershipsByUser(Benj);
-    assertEquals("expect membership is: ", 5, mems.size());
+    assertEquals("expect membership is: ", 4, mems.size());
+    for (Membership m : mems) {
+      System.out.println(m);
+    }
 
     /*
      * find memberships of Benj in "Group2" with membership type: testType
@@ -361,7 +408,10 @@ public class TestOrganizationService extends TestCase {
      */
     System.out.println(" --------- find groups by user -------------");
     Collection<Group> groups = groupHandler_.findGroupsOfUser(Benj);
-    assertEquals("expect group is: ", 3, groups.size());
+    assertEquals("expect group is: ", 2, groups.size());
+    for (Group g : groups) {
+      System.out.println(g);
+    }
 
     /*
      * find all groups has membership type "TYPE" relate with Benj expect
@@ -370,17 +420,26 @@ public class TestOrganizationService extends TestCase {
     System.out.println("---------- find group of a user by membership-----------");
     groups = groupHandler_.findGroupByMembership(Benj, testType);
     assertEquals("expect group is: ", 2, groups.size());
+    for (Group g : groups) {
+      System.out.println(g);
+    }
 
     /* remove a membership */
     System.out.println("----------------- removed a membership ---------------------");
     String memId = membershipHandler_.findMembershipByUserGroupAndType(Benj,
                                                                        "/" + Group2,
                                                                        "membershipType3").getId();
+    for (Group g : groups) {
+      System.out.println(g);
+    }
     membershipHandler_.removeMembership(memId, true);
     assertTrue("Membership was removed: ",
                membershipHandler_.findMembershipByUserGroupAndType(Benj,
                                                                    "/" + Group2,
                                                                    "membershipType3") == null);
+    for (Group g : groups) {
+      System.out.println(g);
+    }
 
     /*
      * remove a user Expect result: all membership related with user will be
@@ -421,8 +480,10 @@ public class TestOrganizationService extends TestCase {
   }
 
   public User createUser(String userName) throws Exception {
-    User user = userHandler_.createUserInstance();
-    user.setUserName(userName);
+    User user = userHandler_.findUserByName(userName);
+    if (user != null)
+      return user;
+    user = userHandler_.createUserInstance(userName);
     user.setPassword("default");
     user.setFirstName("default");
     user.setLastName("default");

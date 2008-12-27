@@ -85,7 +85,7 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
     String dnKeyValue = getDNKeyValue(user);
     String userDN = ldapAttrMapping.userDNKey + "=" + dnKeyValue + "," + ldapAttrMapping.userURL;
     Attributes attrs = ldapAttrMapping.userToAttributes(user);
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
@@ -97,13 +97,13 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
           break;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -111,7 +111,7 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
    * {@inheritDoc}
    */
   public void saveUser(User user, boolean broadcast) throws Exception {
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     String userDN = null;
     try {
       for (int err = 0;; err++) {
@@ -129,13 +129,13 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
           break;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
     // TODO really need this ?
     if (!user.getPassword().equals("PASSWORD"))
@@ -146,7 +146,7 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
     ModificationItem[] mods = new ModificationItem[] { new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
                                                                             new BasicAttribute(ldapAttrMapping.userPassword,
                                                                                                user.getPassword())) };
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
@@ -154,13 +154,13 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
           break;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -168,7 +168,7 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
    * {@inheritDoc}
    */
   public User removeUser(String userName, boolean broadcast) throws Exception {
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
@@ -186,13 +186,13 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
           return user;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -200,20 +200,20 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
    * {@inheritDoc}
    */
   public User findUserByName(String userName) throws Exception {
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;;err++) {
         try {
           return getUserFromUsername(ctx, userName);
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -224,8 +224,9 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
     ArrayList<User> users = new ArrayList<User>();
     TreeMap<String, User> map = new TreeMap<String, User>();
 
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
+      NamingEnumeration<SearchResult> results = null;
       for (int err = 0;; err++) {
         map.clear();
         try {
@@ -233,7 +234,7 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
           String filter = ldapAttrMapping.membershipObjectClassFilter;
           SearchControls constraints = new SearchControls();
           constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
-          NamingEnumeration<SearchResult> results = ctx.search(searchBase, filter, constraints);
+          results = ctx.search(searchBase, filter, constraints);
           while (results.hasMoreElements()) {
             SearchResult sr = results.next();
             Attributes attrs = sr.getAttributes();
@@ -248,13 +249,16 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
           break;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else 
             throw e;
+        } finally {
+          if (results != null)
+            results.close();
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
 
     for (Iterator<String> i = map.keySet().iterator(); i.hasNext();)

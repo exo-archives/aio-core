@@ -66,7 +66,7 @@ public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHand
   public MembershipType createMembershipType(MembershipType mt, boolean broadcast) throws Exception {
     String membershipTypeDN = ldapAttrMapping.membershipTypeNameAttr + "=" + mt.getName() + ","
         + ldapAttrMapping.membershipTypeURL;
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
@@ -81,13 +81,13 @@ public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHand
           return mt;
         } catch (NamingException e1) {
           if (isConnectionError(e1) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e1;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -97,7 +97,7 @@ public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHand
   public MembershipType saveMembershipType(MembershipType mt, boolean broadcast) throws Exception {
     String membershipTypeDN = ldapAttrMapping.membershipTypeNameAttr + "=" + mt.getName() + ","
         + ldapAttrMapping.membershipTypeURL;
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
@@ -119,13 +119,13 @@ public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHand
           return mt;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -135,7 +135,7 @@ public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHand
   public MembershipType removeMembershipType(String name, boolean broadcast) throws Exception {
     String membershipTypeDN = ldapAttrMapping.membershipTypeNameAttr + "=" + name + ","
         + ldapAttrMapping.membershipTypeURL;
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
@@ -146,7 +146,7 @@ public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHand
           return m;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
@@ -156,7 +156,7 @@ public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHand
         e.printStackTrace();
       return null;
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -166,7 +166,7 @@ public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHand
   public MembershipType findMembershipType(String name) throws Exception {
     String membershipTypeDN = ldapAttrMapping.membershipTypeNameAttr + "=" + name + ","
         + ldapAttrMapping.membershipTypeURL;
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
@@ -174,7 +174,7 @@ public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHand
           return ldapAttrMapping.attributesToMembershipType(attrs);
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
@@ -184,7 +184,7 @@ public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHand
         e.printStackTrace();
       return null;
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -198,15 +198,14 @@ public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHand
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
+      NamingEnumeration<SearchResult> results = null;
       for (int err = 0;; err++) {
         // clear if something was added in previous iteration
         memberships.clear();
         try {
-          NamingEnumeration<SearchResult> results = ctx.search(ldapAttrMapping.membershipTypeURL,
-                                                               filter,
-                                                               constraints);
+          results = ctx.search(ldapAttrMapping.membershipTypeURL, filter, constraints);
           while (results.hasMore()) {
             SearchResult sr = results.next();
             Attributes attrs = sr.getAttributes();
@@ -215,28 +214,35 @@ public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHand
           return memberships;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
+        } finally {
+          if (results != null)
+            results.close();
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
   // helpers
   
   private void removeMembership(LdapContext ctx, String name) throws NamingException {
-    SearchControls constraints = new SearchControls();
-    constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    String filter = ldapAttrMapping.membershipTypeNameAttr + "=" + name;
-    NamingEnumeration<SearchResult> results = ctx.search(ldapAttrMapping.groupsURL,
-                                                         filter,
-                                                         constraints);
-    while (results.hasMore()) {
-      SearchResult sr = results.next();
-      ctx.destroySubcontext(sr.getNameInNamespace());
+    NamingEnumeration<SearchResult> results = null;
+    try {
+      SearchControls constraints = new SearchControls();
+      constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+      String filter = ldapAttrMapping.membershipTypeNameAttr + "=" + name;
+      results = ctx.search(ldapAttrMapping.groupsURL, filter, constraints);
+      while (results.hasMore()) {
+        SearchResult sr = results.next();
+        ctx.destroySubcontext(sr.getNameInNamespace());
+      }
+    } finally {
+      if (results != null)
+        results.close();
     }
   }
   

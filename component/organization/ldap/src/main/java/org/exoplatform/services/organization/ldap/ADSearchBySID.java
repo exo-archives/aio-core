@@ -73,18 +73,13 @@ public class ADSearchBySID {
           return findMembershipDNBySID(ctx, sid, baseDN, scopedRole);
         } catch (NamingException e) {
           if (BaseDAO.isConnectionError(e) && err < BaseDAO.getMaxConnectionError())
-            ctx = ldapService.newLdapContext();
+            ctx = ldapService.getLdapContext();
           else
             throw e;
         }
       }
     } finally {
-      try {
-        ctx.close();
-      } catch (NamingException e) {
-        LOG.warn("Exception occur when try close LDAP context. ", e);
-      }
-      ctx = null;
+      ldapService.release(ctx);
     }
   }
 
@@ -95,22 +90,27 @@ public class ADSearchBySID {
     constraints.setDerefLinkFlag(true);
 
     NamingEnumeration<SearchResult> answer = null;
-    if (scopedRole == null) {
-      answer = ctx.search(baseDN, "objectSid={0}", new Object[] { sid }, constraints);
-    } else {
-      answer = ctx.search(baseDN,
-                          "(& (objectSid={0}) (" + ldapAttrMapping.membershipTypeRoleNameAttr
-                              + "={1}))",
-                          new Object[] { sid, scopedRole },
-                          constraints);
+    try {
+      if (scopedRole == null) {
+        answer = ctx.search(baseDN, "objectSid={0}", new Object[] { sid }, constraints);
+      } else {
+        answer = ctx.search(baseDN,
+                            "(& (objectSid={0}) (" + ldapAttrMapping.membershipTypeRoleNameAttr
+                                + "={1}))",
+                            new Object[] { sid, scopedRole },
+                            constraints);
+      }
+      while (answer.hasMoreElements()) {
+        SearchResult sr = answer.next();
+        NameParser parser = ctx.getNameParser("");
+        Name entryName = parser.parse(new CompositeName(sr.getName()).get(0));
+        return entryName + "," + baseDN;
+      }
+      return null;
+    } finally {
+      if (answer != null)
+        answer.close();
     }
-    while (answer.hasMoreElements()) {
-      SearchResult sr = answer.next();
-      NameParser parser = ctx.getNameParser("");
-      Name entryName = parser.parse(new CompositeName(sr.getName()).get(0));
-      return entryName + "," + baseDN;
-    }
-    return null;
   }
 
 }

@@ -53,7 +53,7 @@ public class ADMembershipDAOImpl extends MembershipDAOImpl {
   @SuppressWarnings("unchecked")
   @Override
   public Membership findMembershipByUserGroupAndType(String userName, String groupId, String type) throws Exception {
-    LdapContext ctx = getLdapContext(true);
+    LdapContext ctx = ldapService.getLdapContext(true);
     String groupDN = getGroupDNFromGroupId(groupId);
     try {
       for (int err = 0;; err++) {
@@ -64,13 +64,13 @@ public class ADMembershipDAOImpl extends MembershipDAOImpl {
           return null;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -80,20 +80,20 @@ public class ADMembershipDAOImpl extends MembershipDAOImpl {
   @SuppressWarnings("unchecked")
   @Override
   public Collection findMembershipsByUser(String userName) throws Exception {
-    LdapContext ctx = getLdapContext(true);
+    LdapContext ctx = ldapService.getLdapContext(true);
     try {
       for (int err = 0;; err++) {
         try {
           return findMemberships(ctx, userName, ldapAttrMapping.groupsURL, null);
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -104,20 +104,20 @@ public class ADMembershipDAOImpl extends MembershipDAOImpl {
   @Override
   public Collection findMembershipsByUserAndGroup(String userName, String groupId) throws Exception {
     String groupDN = getGroupDNFromGroupId(groupId);
-    LdapContext ctx = getLdapContext(true);
+    LdapContext ctx = ldapService.getLdapContext(true);
     try {
       for (int err = 0;; err++) {
         try {
           return findMemberships(ctx, userName, groupDN, null);
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -134,24 +134,30 @@ public class ADMembershipDAOImpl extends MembershipDAOImpl {
     constraints.setSearchScope(SearchControls.OBJECT_SCOPE);
     constraints.setReturningAttributes(retAttrs);
 
-    NamingEnumeration<SearchResult> results = ctx.search(userDN, filter, constraints);
-    while (results.hasMore()) {
-      SearchResult sr = (SearchResult) results.next();
-      Attributes attrs = sr.getAttributes();
-      Attribute attr = attrs.get("tokenGroups");
-      for (int x = 0; x < attr.size(); x++) {
-        byte[] SID = (byte[]) attr.get(x);
-//        String membershipDN = adSearch.findMembershipDNBySID(SID, groupId, type);
-        String membershipDN = adSearch.findMembershipDNBySID(ctx, SID, groupId, type);
-        if (membershipDN != null)
-          list.add(createMembershipObject(ctx, membershipDN, userName, type));
+    NamingEnumeration<SearchResult> results = null;
+    try {
+      results = ctx.search(userDN, filter, constraints);
+      while (results.hasMore()) {
+        SearchResult sr = (SearchResult) results.next();
+        Attributes attrs = sr.getAttributes();
+        Attribute attr = attrs.get("tokenGroups");
+        for (int x = 0; x < attr.size(); x++) {
+          byte[] SID = (byte[]) attr.get(x);
+//          String membershipDN = adSearch.findMembershipDNBySID(SID, groupId, type);
+          String membershipDN = adSearch.findMembershipDNBySID(ctx, SID, groupId, type);
+          if (membershipDN != null)
+            list.add(createMembershipObject(ctx, membershipDN, userName, type));
+        }
       }
+      return list;
+    } finally {
+      if (results != null)
+        results.close();
     }
-    return list;
   }
 
   /**
-   * Create {@link Membership} instance
+   * Create {@link Membership} instance.
    * 
    * @param userName user name
    * @param groupId group ID

@@ -90,13 +90,19 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
 
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
+      NamingEnumeration<SearchResult> results = null;
       for (int err = 0;; err++) {
         try {
-          NamingEnumeration<SearchResult> results = ctx.search(searchBase, filter, constraints);
-          if (results.hasMore())
+          results = ctx.search(searchBase, filter, constraints);
+          
+          if (results.hasMore()) {
+            if (LOG.isDebugEnabled())
+              LOG.debug("Group " + child + ", parent  " + parent + " already exists. ");
             return;
+          }
+          
           GroupImpl group = (GroupImpl) child;
           if (broadcast)
             preSave(group, true);
@@ -106,13 +112,16 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
           return;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
+        } finally {
+          if (results != null)
+            results.close();
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -120,7 +129,7 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
    * {@inheritDoc}
    */
   public void saveGroup(Group group, boolean broadcast) throws Exception {
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
@@ -148,13 +157,13 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
           return;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -166,22 +175,32 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
     String searchBase = this.createSubDN(group.getParentId());
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
+      NamingEnumeration<SearchResult> results = null;
       for (int err = 0;; err++) {
         try {
-          NamingEnumeration<SearchResult> results = ctx.search(searchBase, filter, constraints);
+          results = ctx.search(searchBase, filter, constraints);
 
-          if (!results.hasMoreElements())
+          if (!results.hasMoreElements()) {
+            if (LOG.isDebugEnabled())
+              LOG.debug("Nothing for removing, group " + group);
             return group;
+          }
+          
           SearchResult sr = results.next();
-          NameParser parser = ctx.getNameParser("");
-          Name entryName = parser.parse(new CompositeName(sr.getName()).get(0));
-          String groupDN = entryName + "," + searchBase;
+//          NameParser parser = ctx.getNameParser("");
+//          Name entryName = parser.parse(new CompositeName(sr.getName()).get(0));
+//          String groupDN = entryName + "," + searchBase;
+          String groupDN = sr.getNameInNamespace();
 
           group = getGroupByDN(ctx, groupDN);
-          if (group == null)
+          if (group == null) {
+            if (LOG.isDebugEnabled())
+              LOG.debug("Nothing for removing, group " + group);
             return group;
+          }
+          
           if (broadcast)
             preDelete(group);
           removeAllSubtree(ctx, groupDN);
@@ -191,13 +210,16 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
 
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
+        } finally {
+          if (results != null)
+            results.close();
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -207,20 +229,19 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
   @SuppressWarnings("unchecked")
   public Collection findGroupByMembership(String userName, String membershipType) throws Exception {
     List<Group> groups = new ArrayList<Group>();
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
+      NamingEnumeration<SearchResult> results = null;
       for (int err = 0;; err++) {
         groups.clear();
         try {
           String filter = "(&(" + ldapAttrMapping.membershipTypeMemberValue + "="
               + getDNFromUsername(ctx, userName) + ")("
               + ldapAttrMapping.membershipTypeRoleNameAttr + "=" + membershipType + "))";
-
           SearchControls constraints = new SearchControls();
           constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-          NamingEnumeration<SearchResult> results = ctx.search(ldapAttrMapping.groupsURL,
-                                                               filter,
-                                                               constraints);
+
+          results = ctx.search(ldapAttrMapping.groupsURL, filter, constraints);
           while (results.hasMoreElements()) {
             SearchResult sr = results.next();
             NameParser parser = ctx.getNameParser("");
@@ -239,18 +260,19 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
                 + " with membershiptype " + membershipType);
           }
           return groups;
-
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
+        } finally {
+          if (results != null)
+            results.close();
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
-
   }
 
   /**
@@ -268,7 +290,7 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
         parentId = buffer.toString();
     }
     String groupDN = getGroupDNFromGroupId(groupId);
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
@@ -279,7 +301,7 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
           return group;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
@@ -287,7 +309,7 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
     } catch (NameNotFoundException e) {
       return null;
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -334,19 +356,20 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
+      NamingEnumeration<SearchResult> results = null;
       for (int err = 0;; err++) {
         groups.clear();
         try {
-          NamingEnumeration<SearchResult> results = null;
           try {
             results = ctx.search(ldapAttrMapping.groupsURL, "(ou=*)", constraints);
           } catch (NamingException e1) {
-            LOG.warn("Failed to get all groups. ", e1);
             // if connection error let process it in common way
             if (isConnectionError(e1))
               throw e1;
+            if (LOG.isDebugEnabled())
+              LOG.debug("Failed to get all groups. ", e1);
             return groups;
           }
           while (results.hasMoreElements()) {
@@ -362,16 +385,18 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
             }
           }
           return groups;
-
         } catch (NamingException e2) {
           if (isConnectionError(e2) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e2;
+        } finally {
+          if (results != null)
+            results.close();
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -392,23 +417,24 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
     }
     buffer.append(groupsBaseDN);
 
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     String searchBase = buffer.toString();
     String filter = ldapAttrMapping.groupObjectClassFilter;
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
     try {
+      NamingEnumeration<SearchResult> results = null;
       for (int err = 0;; err++) {
         groups.clear();
         try {
-          NamingEnumeration<SearchResult> results = null;
           try {
             results = ctx.search(searchBase, filter, constraints);
           } catch (NamingException e1) {
-            LOG.warn("Failed to get groups from parent " + parent.getId() + ". ", e1);
             // if connection error let process it in common way
             if (isConnectionError(e1))
               throw e1;
+            if (LOG.isDebugEnabled())
+              LOG.debug("Failed to get groups from parent " + parent.getId() + ". ", e1);
             return groups;
           }
           while (results.hasMoreElements()) {
@@ -424,16 +450,18 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
             }
           }
           return groups;
-
         } catch (NamingException e2) {
           if (isConnectionError(e2) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e2;
+        } finally {
+          if (results != null)
+            results.close();
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -444,10 +472,11 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
   public Collection findGroupsOfUser(String userName) throws Exception {
     List<Group> groups = new ArrayList<Group>();
 
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         groups.clear();
+        NamingEnumeration<SearchResult> results = null;
         try {
           // check if user exists
           String userDN = getDNFromUsername(ctx, userName);
@@ -455,24 +484,18 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
             return groups;
           userDN = userDN.trim();
 
-          NamingEnumeration<SearchResult> results = null;
-          try {
-            SearchControls constraints = new SearchControls();
-            constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            String mbfilter = membershipClassFilter();
-            String userFilter = "(" + ldapAttrMapping.membershipTypeMemberValue + "=" + userDN
-                + ")";
-            String filter = "(&" + userFilter + mbfilter + ")";
-            results = ctx.search(ldapAttrMapping.groupsURL, filter, constraints);
-          } catch (NamingException exp) {
-            LOG.warn("Failed to retrieve memberships for user " + userName + ", ", exp);
-          }
+          SearchControls constraints = new SearchControls();
+          constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+          String mbfilter = membershipClassFilter();
+          String userFilter = "(" + ldapAttrMapping.membershipTypeMemberValue + "=" + userDN + ")";
+          String filter = "(&" + userFilter + mbfilter + ")";
+          results = ctx.search(ldapAttrMapping.groupsURL, filter, constraints);
 
           // add groups for memberships matching user
-          int total = 0;
-          while (results.hasMore()) {
+//          int total = 0;
+          while (results != null && results.hasMore()) {
             SearchResult sr = results.next();
-            total++;
+//            total++;
             NameParser parser = ctx.getNameParser("");
             CompositeName name = new CompositeName(sr.getName());
             if (name.size() < 1)
@@ -487,16 +510,18 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
             LOG.debug("Retrieved " + groups.size() + " groups from ldap for user " + userName);
           }
           return groups;
-
         } catch (NamingException e2) {
           if (isConnectionError(e2) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e2;
+        } finally {
+          if (results != null)
+            results.close();
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 

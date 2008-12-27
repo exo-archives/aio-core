@@ -64,9 +64,10 @@ public class ADGroupDAOImpl extends GroupDAOImpl {
 
   @SuppressWarnings("unchecked")
   private Collection findGroups(String userName, String type) throws Exception {
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     List<Group> groups = new ArrayList<Group>();
     try {
+      NamingEnumeration<SearchResult> results = null;
       for (int err = 0;; err++) {
         groups.clear();
         try {
@@ -80,7 +81,7 @@ public class ADGroupDAOImpl extends GroupDAOImpl {
           constraints.setSearchScope(SearchControls.OBJECT_SCOPE);
           constraints.setReturningAttributes(retAttrs);
 
-          NamingEnumeration<SearchResult> results = ctx.search(userDN, filter, constraints);
+          results = ctx.search(userDN, filter, constraints);
           while (results.hasMore()) {
             SearchResult sr = results.next();
             Attributes attrs = sr.getAttributes();
@@ -101,13 +102,16 @@ public class ADGroupDAOImpl extends GroupDAOImpl {
           return groups;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
+        } finally {
+          if (results != null)
+            results.close();
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 

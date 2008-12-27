@@ -31,10 +31,8 @@ import javax.naming.ldap.PagedResultsControl;
 import javax.naming.ldap.PagedResultsResponseControl;
 import javax.naming.ldap.SortControl;
 
-import org.apache.commons.logging.Log;
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.services.ldap.LDAPService;
-import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.User;
 
 /**
@@ -43,8 +41,6 @@ import org.exoplatform.services.organization.User;
  */
 public class LDAPUserPageList extends PageList {
 
-  private static final Log     LOG            = ExoLogger.getLogger(LDAPUserPageList.class.getName());
-
   private String               searchBase;
 
   private String               filter;
@@ -52,6 +48,8 @@ public class LDAPUserPageList extends PageList {
   private LDAPService          ldapService;
 
   private LDAPAttributeMapping ldapAttrMapping;
+
+  private List<User>           usersAll;
 
   static boolean               SEARCH_CONTROL = Control.NONCRITICAL;
 
@@ -69,8 +67,10 @@ public class LDAPUserPageList extends PageList {
       int size = this.getResultSize();
       setAvailablePage(size);
     } catch (NameNotFoundException exp) {
+      exp.printStackTrace();
       setAvailablePage(0);
     } catch (OperationNotSupportedException exp) {
+      exp.printStackTrace();
       setAvailablePage(0);
     }
   }
@@ -80,12 +80,13 @@ public class LDAPUserPageList extends PageList {
    */
   protected void populateCurrentPage(int page) throws Exception {
     List<User> users = new ArrayList<User>();
-    PagedResultsControl prc = new PagedResultsControl(getPageSize(), Control.CRITICAL);
+    PagedResultsControl prc = new PagedResultsControl(getPageSize(), Control.NONCRITICAL);
     String keys[] = { ldapAttrMapping.userUsernameAttr };
     SortControl sctl = new SortControl(keys, SEARCH_CONTROL);
 
     LdapContext ctx = ldapService.getLdapContext();
     try {
+      NamingEnumeration<SearchResult> results = null;
       for (int err = 0;; err++) {
         users.clear();
         try {
@@ -98,14 +99,14 @@ public class LDAPUserPageList extends PageList {
 
           do {
             counter++;
-            NamingEnumeration<SearchResult> results = ctx.search(searchBase, filter, constraints);
-            if (results == null)
-              break;
-            while (results.hasMore()) {
+            results = ctx.search(searchBase, filter, constraints);
+
+            while (results != null && results.hasMore()) {
               SearchResult result = results.next();
               if (counter == page)
                 users.add(ldapAttrMapping.attributesToUser(result.getAttributes()));
             }
+
             Control[] responseControls = ctx.getResponseControls();
             if (responseControls != null) {
               for (int z = 0; z < responseControls.length; z++) {
@@ -121,74 +122,21 @@ public class LDAPUserPageList extends PageList {
           return;
         } catch (NamingException e) {
           if (BaseDAO.isConnectionError(e) && err < BaseDAO.getMaxConnectionError())
-            ctx = ldapService.newLdapContext();
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
+        } finally {
+          if (results != null)
+            results.close();
         }
       }
     } finally {
-      try {
-        ctx.close();
-      } catch (NamingException e) {
-        LOG.warn("Exception occur when try close LDAP context. ", e);
-      }
+      ldapService.release(ctx);
     }
   }
 
   private int getResultSize() throws Exception {
-    PagedResultsControl prc = new PagedResultsControl(getPageSize(), Control.CRITICAL);
-    String keys[] = { ldapAttrMapping.userUsernameAttr };
-    SortControl sctl = new SortControl(keys, SEARCH_CONTROL);
-
-    LdapContext ctx = ldapService.getLdapContext();
-    try {
-      for (int err = 0;; err++) {
-        try {
-          ctx.setRequestControls(new Control[] { sctl, prc });
-          SearchControls constraints = new SearchControls();
-          String returnedAtts[] = { ldapAttrMapping.userUsernameAttr };
-          constraints.setReturningAttributes(returnedAtts);
-          constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-
-          byte[] cookie = null;
-          int counter = -1;
-
-          do {
-            NamingEnumeration<SearchResult> results = ctx.search(searchBase, filter, constraints);
-            if (results == null)
-              break;
-            while (results.hasMore()) {
-              counter++;
-              results.next();
-            }
-
-            Control[] responseControls = ctx.getResponseControls();
-            if (responseControls != null) {
-              for (int z = 0; z < responseControls.length; z++) {
-                if (responseControls[z] instanceof PagedResultsResponseControl)
-                  cookie = ((PagedResultsResponseControl) responseControls[z]).getCookie();
-              }
-              ctx.setRequestControls(new Control[] { new PagedResultsControl(getPageSize(),
-                                                                             cookie,
-                                                                             Control.NONCRITICAL) });
-            }
-          } while (cookie != null);
-
-          return counter + 1;
-        } catch (NamingException e) {
-          if (BaseDAO.isConnectionError(e) && err < 1)
-            ctx = ldapService.newLdapContext();
-          else
-            throw e;
-        }
-      }
-    } finally {
-      try {
-        ctx.close();
-      } catch (NamingException e) {
-        LOG.warn("Exception occur when try close LDAP context. ", e);
-      }
-    }
+    return getAll().size();
   }
 
   /**
@@ -196,8 +144,42 @@ public class LDAPUserPageList extends PageList {
    */
   @SuppressWarnings("unchecked")
   public List getAll() throws Exception {
-    // TODO fix if this method is useful
-    return null;
+    if (usersAll != null)
+      return usersAll;
+    
+    LdapContext ctx = ldapService.getLdapContext();
+    List<User> users = new ArrayList<User>();
+    try {
+      NamingEnumeration<SearchResult> results = null;
+      for (int err = 0;; err++) {
+        users.clear();
+        try {
+          SearchControls constraints = new SearchControls();
+          String returnedAtts[] = { ldapAttrMapping.userUsernameAttr };
+          constraints.setReturningAttributes(returnedAtts);
+          constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+
+          results = ctx.search(searchBase, filter, constraints);
+
+          while (results != null && results.hasMore()) {
+            SearchResult result = results.next();
+            users.add(ldapAttrMapping.attributesToUser(result.getAttributes()));
+          }
+
+          return usersAll = users;
+        } catch (NamingException e) {
+          if (BaseDAO.isConnectionError(e) && err < 1)
+            ctx = ldapService.getLdapContext(true);
+          else
+            throw e;
+        } finally {
+          if (results != null)
+            results.close();
+        }
+      }
+    } finally {
+      ldapService.release(ctx);
+    }
   }
 
 }

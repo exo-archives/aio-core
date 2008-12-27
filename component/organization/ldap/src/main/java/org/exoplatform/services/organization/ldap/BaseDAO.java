@@ -88,51 +88,6 @@ public class BaseDAO {
   }
   
   /**
-   * Get {@link LdapContext}, see {@link #getLdapContext(boolean)}.
-   * 
-   * @return {@link LdapContext} never null
-   * @throws NamingException if error occurred while getting context
-   */
-  protected LdapContext getLdapContext() throws NamingException {
-    return getLdapContext(false);
-  }
-  
-  /**
-   * @param renew should context be renewed, if true then new context will be
-   *          created.
-   * @return {@link LdapContext} never null
-   * @throws NamingException if error occurred while getting context
-   */
-  protected LdapContext getLdapContext(boolean renew) throws NamingException {
-    if (renew)
-      return ldapService.newLdapContext();
-    return ldapService.getLdapContext();
-  }
-  
-  /**
-   * Release {@link LdapContext}.
-   */
-  protected void release(LdapContext ctx) {
-    if (ctx != null) {
-      close(ctx);
-      ctx = null;
-    }
-  }
-  
-  /**
-   * Close supplied {@link LdapContext}, see {@link LdapContext#close()}.
-   * 
-   * @param ctx LdapContext to be closed
-   */
-  protected void close(LdapContext ctx) {
-    try {
-      ctx.close();
-    } catch (NamingException e) {
-      LOG.warn("Exception occur when try close LDAP context. ", e);
-    }
-  }
-  
-  /**
    * Check is supplied Exception thrown in consequence connection error.
    * 
    * @param e exception
@@ -238,23 +193,23 @@ public class BaseDAO {
    */
   @Deprecated
   protected Group getGroupByDN(String groupDN) throws Exception {
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     // process situation when connection to LDAP server was closed by timeout , etc
     try {
       for (int err = 0;; err++) {
         try {
           return getGroupByDN(ctx, groupDN);
-        } catch (NamingException e1) {
+        } catch (NamingException e) {
           // check is allowed to try one more time
-          if (isConnectionError(e1) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+          if (isConnectionError(e) && err < getMaxConnectionError())
+            ctx = ldapService.getLdapContext(true);
           else
             // not connection exception or error occurs more than MAX_CONNECTION_ERROR
-            throw e1;
+            throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -332,20 +287,20 @@ public class BaseDAO {
    */
   @Deprecated
   protected User getUserFromUsername(String username) throws Exception {
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
           return getUserFromUsername(ctx, username);
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -357,13 +312,19 @@ public class BaseDAO {
    * @throws Exception if any error occurs
    */
   protected User getUserFromUsername(LdapContext ctx, String username) throws Exception {
-    NamingEnumeration<SearchResult> answer = findUser(ctx, username, true);
-    while (answer.hasMoreElements()) {
-      String userDN = answer.next().getNameInNamespace();
-      Attributes attrs = ctx.getAttributes(userDN);
-      return ldapAttrMapping.attributesToUser(attrs);
+    NamingEnumeration<SearchResult> answer = null;
+    try {
+      answer = findUser(ctx, username, true);
+      while (answer.hasMoreElements()) {
+        String userDN = answer.next().getNameInNamespace();
+        Attributes attrs = ctx.getAttributes(userDN);
+        return ldapAttrMapping.attributesToUser(attrs);
+      }
+      return null;
+    } finally {
+      if (answer != null)
+        answer.close();
     }
-    return null;
   }
 
   /**
@@ -374,10 +335,16 @@ public class BaseDAO {
    * @throws NamingException if any {@link NamingException} occurs
    */
   protected String getDNFromUsername(String username) throws NamingException {
-    NamingEnumeration<SearchResult> answer = findUser(username, false);
-    if (answer.hasMoreElements())
-      return answer.next().getNameInNamespace();
-    return null;
+    NamingEnumeration<SearchResult> answer = null;
+    try {
+      answer = findUser(username, false);
+      if (answer.hasMoreElements())
+        return answer.next().getNameInNamespace();
+      return null;
+    } finally {
+      if (answer != null)
+        answer.close();
+    }
   }
 
   /**
@@ -389,10 +356,16 @@ public class BaseDAO {
    * @throws NamingException if any {@link NamingException} occurs
    */
   protected String getDNFromUsername(LdapContext ctx, String username) throws NamingException {
-    NamingEnumeration<SearchResult> answer = findUser(ctx, username, false);
-    if (answer.hasMoreElements())
-      return answer.next().getNameInNamespace();
-    return null;
+    NamingEnumeration<SearchResult> answer = null;
+    try {
+      answer = findUser(ctx, username, false);
+      if (answer.hasMoreElements())
+        return answer.next().getNameInNamespace();
+      return null;
+    } finally {
+      if (answer != null)
+        answer.close();
+    }
   }
 
   /**
@@ -405,20 +378,20 @@ public class BaseDAO {
    * @throws NamingException if any {@link NamingException} occurs
    */
   private NamingEnumeration<SearchResult> findUser(String username, boolean hasAttribute) throws NamingException {
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
           return findUser(ctx, username, hasAttribute);
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -455,14 +428,20 @@ public class BaseDAO {
    * @throws NamingException if any {@link NamingException} occurs
    */
   protected void removeAllSubtree(LdapContext ctx, String dn) throws NamingException {
-    SearchControls constraints = new SearchControls();
-    constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
-    NamingEnumeration<SearchResult> results = ctx.search(dn, "(objectclass=*)", constraints);
-    while (results.hasMoreElements()) {
-      SearchResult sr = results.next();
-      removeAllSubtree(ctx, sr.getNameInNamespace());
+    NamingEnumeration<SearchResult> answer = null;
+    try {
+      SearchControls constraints = new SearchControls();
+      constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
+      answer = ctx.search(dn, "(objectclass=*)", constraints);
+      while (answer.hasMoreElements()) {
+        SearchResult sr = answer.next();
+        removeAllSubtree(ctx, sr.getNameInNamespace());
+      }
+      ctx.destroySubcontext(dn);
+    } finally {
+      if (answer != null)
+        answer.close();
     }
-    ctx.destroySubcontext(dn);
   }
 
   public static String escapeDN(String dn) {
@@ -549,18 +528,18 @@ public class BaseDAO {
    * @throws NamingException in error occurs during parser initializing
    */
   private void initializeNameParser() throws NamingException {
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     // process situation when connection to LDAP server was closed by timeout, etc
     try {
       for (int err = 0;; err++) {
         try {
           parser = ctx.getNameParser("");
-          break;
+          return;
         } catch (NamingException e) {
           // check is allowed to try one more time
           if (isConnectionError(e) && err < getMaxConnectionError())
             // update LdapContext
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             // not connection exception or error occurs more than
             // MAX_CONNECTION_ERROR times
@@ -568,7 +547,7 @@ public class BaseDAO {
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 

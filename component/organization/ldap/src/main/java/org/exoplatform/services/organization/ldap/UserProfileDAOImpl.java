@@ -86,7 +86,7 @@ public class UserProfileDAOImpl extends BaseDAO implements UserProfileHandler {
   public void createUser(UserProfile profile, boolean broadcast) throws Exception {
     String profileDN = ldapAttrMapping.membershipTypeNameAttr + "=" + profile.getUserName() + ","
         + ldapAttrMapping.profileURL;
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
@@ -94,13 +94,13 @@ public class UserProfileDAOImpl extends BaseDAO implements UserProfileHandler {
           return;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -110,7 +110,7 @@ public class UserProfileDAOImpl extends BaseDAO implements UserProfileHandler {
   public void saveUserProfile(UserProfile profile, boolean broadcast) throws Exception {
     String profileDN = ldapAttrMapping.membershipTypeNameAttr + "=" + profile.getUserName() + ","
         + ldapAttrMapping.profileURL;
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
@@ -129,7 +129,7 @@ public class UserProfileDAOImpl extends BaseDAO implements UserProfileHandler {
           ctx.modifyAttributes(profileDN, mods);
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
@@ -137,7 +137,7 @@ public class UserProfileDAOImpl extends BaseDAO implements UserProfileHandler {
     } catch (InvalidAttributeValueException invalid) {
       invalid.printStackTrace();
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -147,7 +147,7 @@ public class UserProfileDAOImpl extends BaseDAO implements UserProfileHandler {
   public UserProfile removeUserProfile(String userName, boolean broadcast) throws Exception {
     String profileDN = ldapAttrMapping.membershipTypeNameAttr + "=" + userName + ","
         + ldapAttrMapping.profileURL;
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
@@ -158,7 +158,7 @@ public class UserProfileDAOImpl extends BaseDAO implements UserProfileHandler {
           return profile;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
@@ -168,7 +168,7 @@ public class UserProfileDAOImpl extends BaseDAO implements UserProfileHandler {
         e.printStackTrace();
       return null;
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 
@@ -178,7 +178,7 @@ public class UserProfileDAOImpl extends BaseDAO implements UserProfileHandler {
   public UserProfile findUserProfileByName(String userName) throws Exception {
     String profileDN = ldapAttrMapping.membershipTypeNameAttr + "=" + userName + ","
         + ldapAttrMapping.profileURL;
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
@@ -187,7 +187,7 @@ public class UserProfileDAOImpl extends BaseDAO implements UserProfileHandler {
           return ldapAttrMapping.attributesToProfile(attrs).getUserProfile();
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
@@ -196,6 +196,8 @@ public class UserProfileDAOImpl extends BaseDAO implements UserProfileHandler {
       if (LOG.isDebugEnabled())
         e.printStackTrace();
       return null;
+    } finally {
+      ldapService.release(ctx);
     }
   }
 

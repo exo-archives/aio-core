@@ -59,7 +59,7 @@ public class ADUserDAOImpl extends UserDAOImpl {
     attrs.put("userAccountControl", Integer.toString(UF_NORMAL_ACCOUNT + UF_PASSWD_NOTREQD
         + UF_PASSWORD_EXPIRED + UF_ACCOUNTDISABLE));
     attrs.remove(ldapAttrMapping.userPassword);
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
@@ -72,13 +72,13 @@ public class ADUserDAOImpl extends UserDAOImpl {
           break;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
     // Really need do it separately ?
     // Do it in method with new LdapContext to avoid NameAlreadyBoundException,
@@ -104,7 +104,7 @@ public class ADUserDAOImpl extends UserDAOImpl {
                                    new BasicAttribute("userAccountControl",
                                                       Integer.toString(UF_NORMAL_ACCOUNT
                                                           + UF_PASSWORD_EXPIRED)));
-    LdapContext ctx = getLdapContext();
+    LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
         try {
@@ -112,13 +112,13 @@ public class ADUserDAOImpl extends UserDAOImpl {
           break;
         } catch (NamingException e) {
           if (isConnectionError(e) && err < getMaxConnectionError())
-            ctx = getLdapContext(true);
+            ctx = ldapService.getLdapContext(true);
           else
             throw e;
         }
       }
     } finally {
-      release(ctx);
+      ldapService.release(ctx);
     }
   }
 }
