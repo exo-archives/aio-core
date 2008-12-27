@@ -40,7 +40,7 @@ import org.exoplatform.services.organization.impl.MembershipTypeImpl;
 
 /**
  * Created by The eXo Platform SAS Author : Tuan Nguyen
- * tuan08@users.sourceforge.net Oct 14, 2005
+ * tuan08@users.sourceforge.net Oct 14, 2005. @version andrew00x $
  */
 public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHandler {
   
@@ -49,6 +49,12 @@ public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHand
    */
   private static final Log LOG = ExoLogger.getLogger(MembershipTypeDAOImpl.class.getName());
 
+  /**
+   * @param ldapAttrMapping mapping LDAP attributes to eXo organization service
+   *          items (users, groups, etc)
+   * @param ldapService {@link LDAPService}
+   * @throws Exception if any errors occurs
+   */
   public MembershipTypeDAOImpl(LDAPAttributeMapping ldapAttrMapping, LDAPService ldapService) throws Exception {
     super(ldapAttrMapping, ldapService);
   }
@@ -107,7 +113,7 @@ public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHand
             return mt;
           ModificationItem[] mods = new ModificationItem[1];
           String desc = mt.getDescription();
-          // TODO: http://jira.exoplatform.org/browse/COR-49
+          // TODO http://jira.exoplatform.org/browse/COR-49
           if (desc != null && desc.length() > 0) {
             mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
                                            new BasicAttribute("description", mt.getDescription()));

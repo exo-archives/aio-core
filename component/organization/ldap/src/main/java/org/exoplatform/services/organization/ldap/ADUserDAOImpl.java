@@ -36,14 +36,31 @@ import org.exoplatform.services.organization.User;
 
 public class ADUserDAOImpl extends UserDAOImpl {
 
+  /**
+   * AD user's account controls attribute.
+   */
   int UF_ACCOUNTDISABLE   = 0x0002;
 
+  /**
+   * AD user's account controls attribute.
+   */
   int UF_PASSWD_NOTREQD   = 0x0020;
 
+  /**
+   * AD user's account controls attribute.
+   */
   int UF_NORMAL_ACCOUNT   = 0x0200;
 
+  /**
+   * AD user's account controls attribute.
+   */
   int UF_PASSWORD_EXPIRED = 0x800000;
 
+  /**
+   * @param ldapAttrMapping {@link LDAPAttributeMapping}
+   * @param ldapService {@link LDAPService}
+   * @throws Exception if any errors occurs
+   */
   public ADUserDAOImpl(LDAPAttributeMapping ldapAttrMapping, LDAPService ldapService) throws Exception {
     super(ldapAttrMapping, ldapService);
     LDAPUserPageList.SEARCH_CONTROL = Control.CRITICAL;
@@ -86,6 +103,9 @@ public class ADUserDAOImpl extends UserDAOImpl {
     saveUserPassword(user, userDN);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   void saveUserPassword(User user, String userDN) throws Exception {
     Object v = ldapService.getLdapContext().getEnvironment().get(Context.SECURITY_PROTOCOL);

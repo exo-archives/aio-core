@@ -38,8 +38,14 @@ public class OrganizationLdapInitializer extends BaseComponentPlugin implements
   protected static Pattern COMPACT_DN = Pattern.compile("\\b\\p{Space}*=\\p{Space}*",
                                                         Pattern.CASE_INSENSITIVE);
 
+  /**
+   * See {@link BaseDAO}.
+   */
   private BaseDAO          baseHandler;
 
+  /**
+   * Create basic LDAP structure. {@inheritDoc}
+   */
   public void init(OrganizationService service) throws Exception {
     baseHandler = (BaseDAO) service.getUserHandler();
     createSubContextNew(baseHandler.ldapAttrMapping.baseURL,
@@ -51,6 +57,10 @@ public class OrganizationLdapInitializer extends BaseComponentPlugin implements
                         baseHandler.ldapAttrMapping.profileURL);
   }
 
+  /**
+   * @param dn Distinguished Name of sub-context to be created
+   * @throws Exception if any errors occurs
+   */
   public void createSubContext(String dn) throws Exception {
     Pattern pattern = Pattern.compile("\\b\\p{Space}*=\\p{Space}*", Pattern.CASE_INSENSITIVE);
     Matcher matcher = pattern.matcher(dn);
@@ -83,19 +93,19 @@ public class OrganizationLdapInitializer extends BaseComponentPlugin implements
     String nameValue = dn.substring(dn.indexOf("=") + 1, dn.indexOf(","));
     BasicAttributes attrs = new BasicAttributes();
     if (dn.toLowerCase().startsWith("ou=")) {
-      attrs.put(new ObjectClassAttribute(new String[] { "top", "organizationalUnit" }));
+      attrs.put(new ObjectClassAttribute(new String[] {"top", "organizationalUnit"}));
       attrs.put("ou", nameValue);
     } else if (dn.toLowerCase().startsWith("cn=")) {
-      attrs.put(new ObjectClassAttribute(new String[] { "top", "organizationalRole" }));
+      attrs.put(new ObjectClassAttribute(new String[] {"top", "organizationalRole"}));
       attrs.put("cn", nameValue);
     } else if (dn.toLowerCase().startsWith("c=")) {
-      attrs.put(new ObjectClassAttribute(new String[] { "country" }));
+      attrs.put(new ObjectClassAttribute(new String[] {"country"}));
       attrs.put("c", nameValue);
     } else if (dn.toLowerCase().startsWith("o=")) {
-      attrs.put(new ObjectClassAttribute(new String[] { "organization" }));
+      attrs.put(new ObjectClassAttribute(new String[] {"organization"}));
       attrs.put("o", nameValue);
     } else if (dn.toLowerCase().startsWith("dc=")) {
-      attrs.put(new ObjectClassAttribute(new String[] { "top", "dcObject", "organization" }));
+      attrs.put(new ObjectClassAttribute(new String[] {"top", "dcObject", "organization"}));
       attrs.put("dc", nameValue);
       attrs.put("o", nameValue);
     }

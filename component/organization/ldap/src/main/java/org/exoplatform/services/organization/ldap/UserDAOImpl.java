@@ -42,7 +42,7 @@ import org.exoplatform.services.organization.impl.UserImpl;
 
 /**
  * Created by The eXo Platform SAS Author : Tuan Nguyen
- * tuan08@users.sourceforge.net Oct 14, 2005
+ * tuan08@users.sourceforge.net Oct 14, 2005. @version andrew00x $
  */
 public class UserDAOImpl extends BaseDAO implements UserHandler {
 
@@ -53,6 +53,12 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
    */
   private List<UserEventListener> listeners = new ArrayList<UserEventListener>(5);
 
+  /**
+   * @param ldapAttrMapping mapping LDAP attributes to eXo organization service
+   *          items (users, groups, etc)
+   * @param ldapService {@link LDAPService}
+   * @throws Exception if any errors occurs
+   */
   public UserDAOImpl(LDAPAttributeMapping ldapAttrMapping, LDAPService ldapService) throws Exception {
     super(ldapAttrMapping, ldapService);
   }
@@ -142,10 +148,17 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
       saveUserPassword(user, userDN);
   }
 
+  /**
+   * Change user password.
+   * 
+   * @param user User
+   * @param userDN Distinguished Name
+   * @throws Exception if any errors occurs
+   */
   void saveUserPassword(User user, String userDN) throws Exception {
-    ModificationItem[] mods = new ModificationItem[] { new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
-                                                                            new BasicAttribute(ldapAttrMapping.userPassword,
-                                                                                               user.getPassword())) };
+    ModificationItem[] mods = new ModificationItem[] {new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
+                                                                           new BasicAttribute(ldapAttrMapping.userPassword,
+                                                                                               user.getPassword()))};
     LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
@@ -202,7 +215,7 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
   public User findUserByName(String userName) throws Exception {
     LdapContext ctx = ldapService.getLdapContext();
     try {
-      for (int err = 0;;err++) {
+      for (int err = 0;; err++) {
         try {
           return getUserFromUsername(ctx, userName);
         } catch (NamingException e) {
@@ -400,21 +413,47 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
 
   // listeners
   
+  /**
+   * For details see {@link UserEventListener#preSave(User, boolean)}.
+   * 
+   * @param user User
+   * @param isNew is newly created
+   * @throws Exception if any errors occurs
+   */
   protected void preSave(User user, boolean isNew) throws Exception {
     for (UserEventListener listener : listeners)
       listener.preSave(user, isNew);
   }
 
+  /**
+   * For details see {@link UserEventListener#postSave(User, boolean)}.
+   * 
+   * @param user User
+   * @param isNew is newly created
+   * @throws Exception if any errors occurs
+   */
   protected void postSave(User user, boolean isNew) throws Exception {
     for (UserEventListener listener : listeners)
       listener.postSave(user, isNew);
   }
 
+  /**
+   * For details see {@link UserEventListener#preDelete(User)}.
+   * 
+   * @param user User
+   * @throws Exception if any errors occurs
+   */
   protected void preDelete(User user) throws Exception {
     for (UserEventListener listener : listeners)
       listener.preDelete(user);
   }
 
+  /**
+   * For details see {@link UserEventListener#postDelete(User)}.
+   * 
+   * @param user User
+   * @throws Exception if any errors occurs
+   */
   protected void postDelete(User user) throws Exception {
     for (UserEventListener listener : listeners)
       listener.postDelete(user);

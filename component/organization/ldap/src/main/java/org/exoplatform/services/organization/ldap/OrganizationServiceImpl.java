@@ -26,10 +26,17 @@ import org.exoplatform.services.organization.hibernate.UserProfileDAOImpl;
 
 /**
  * Created by The eXo Platform SAS Author : Tuan Nguyen
- * tuan08@users.sourceforge.net Oct 14, 2005
+ * tuan08@users.sourceforge.net Oct 14, 2005. @version andrew00x $
  */
 public class OrganizationServiceImpl extends BaseOrganizationService {
 
+  /**
+   * @param params see {@link InitParams}
+   * @param ldapService see {@link LDAPService}
+   * @param hservice see {@link HibernateService}
+   * @param cservice see {@link CacheService}
+   * @throws Exception if any errors occurs
+   */
   public OrganizationServiceImpl(InitParams params,
                                  LDAPService ldapService,
                                  HibernateService hservice,

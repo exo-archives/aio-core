@@ -33,13 +33,20 @@ import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.impl.MembershipImpl;
 
 /**
- * Created by The eXo Platform SAS Author : James Chamberlain
+ * Created by The eXo Platform SAS Author : James Chamberlain.
  * james.chamberlain@gmail.com Feb 22, 2006
  */
 public class ADMembershipDAOImpl extends MembershipDAOImpl {
 
   private ADSearchBySID adSearch;
 
+  /**
+   * @param ldapAttrMapping mapping LDAP attributes to eXo organization service
+   *          items
+   * @param ldapService {@link LDAPService}
+   * @param ad See {@link ADSearchBySID}
+   * @throws Exception if any errors occurs
+   */
   public ADMembershipDAOImpl(LDAPAttributeMapping ldapAttrMapping,
                              LDAPService ldapService,
                              ADSearchBySID ad) throws Exception {
@@ -121,6 +128,15 @@ public class ADMembershipDAOImpl extends MembershipDAOImpl {
     }
   }
 
+  /**
+   * @param ctx {@link LdapContext}
+   * @param userName user name
+   * @param groupId group id
+   * @param type membership type
+   * @return collection of {@link Membership} if nothing found collection will
+   *         be empty
+   * @throws Exception if any errors occurs
+   */
   @SuppressWarnings("unchecked")
   private Collection findMemberships(LdapContext ctx, String userName, String groupId, String type) throws Exception {
     Collection<Membership> list = new ArrayList<Membership>();
@@ -129,7 +145,7 @@ public class ADMembershipDAOImpl extends MembershipDAOImpl {
       return list;
 
     String filter = ldapAttrMapping.userObjectClassFilter;
-    String retAttrs[] = { "tokenGroups" };
+    String[] retAttrs = {"tokenGroups"};
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.OBJECT_SCOPE);
     constraints.setReturningAttributes(retAttrs);
@@ -143,7 +159,8 @@ public class ADMembershipDAOImpl extends MembershipDAOImpl {
         Attribute attr = attrs.get("tokenGroups");
         for (int x = 0; x < attr.size(); x++) {
           byte[] SID = (byte[]) attr.get(x);
-//          String membershipDN = adSearch.findMembershipDNBySID(SID, groupId, type);
+          // String membershipDN = adSearch.findMembershipDNBySID(SID, groupId,
+          // type);
           String membershipDN = adSearch.findMembershipDNBySID(ctx, SID, groupId, type);
           if (membershipDN != null)
             list.add(createMembershipObject(ctx, membershipDN, userName, type));
@@ -159,10 +176,12 @@ public class ADMembershipDAOImpl extends MembershipDAOImpl {
   /**
    * Create {@link Membership} instance.
    * 
-   * @param userName user name
-   * @param groupId group ID
+   * @param ctx {@link LdapContext}
+   * @param dn Distinguished Name
+   * @param user user name
    * @param type membership type
    * @return newly created instance of {@link Membership}
+   * @throws Exception if any errors occurs
    */
   private Membership createMembershipObject(LdapContext ctx, String dn, String user, String type) throws Exception {
     Group group = getGroupFromMembershipDN(ctx, dn);

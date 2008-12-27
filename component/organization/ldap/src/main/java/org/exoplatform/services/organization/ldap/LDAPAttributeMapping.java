@@ -95,12 +95,18 @@ public class LDAPAttributeMapping {
 
   String          ldapCreatedTimeStampAttr, ldapModifiedTimeStampAttr, ldapDescriptionAttr;
 
-  final public Attributes userToAttributes(User user) {
+  /**
+   * Create LDAP attributes that represents user in LDAP context.
+   * 
+   * @param user User
+   * @return LDAP Attributes
+   */
+  public final Attributes userToAttributes(User user) {
     BasicAttributes attrs = new BasicAttributes();
     if (USER_LDAP_CLASSES == null)
       USER_LDAP_CLASSES = userLDAPClasses.split(",");
     attrs.put(new ObjectClassAttribute(USER_LDAP_CLASSES));
-    // TODO : user ldn.dn.key instead of hardcoded cn
+    // TODO user ldn.dn.key instead of hardcoded cn
     attrs.put("cn", user.getUserName());
     attrs.put(userDisplayNameAttr, user.getFullName());
     attrs.put(userUsernameAttr, user.getUserName());
@@ -112,7 +118,13 @@ public class LDAPAttributeMapping {
     return attrs;
   }
 
-  final public User attributesToUser(Attributes attrs) throws Exception {
+  /**
+   * Create User from LDAP attributes.
+   * 
+   * @param attrs {@link Attributes}
+   * @return User
+   */
+  public final User attributesToUser(Attributes attrs) {
     if (attrs == null || attrs.size() == 0)
       return null;
     UserImpl user = new UserImpl();
@@ -127,14 +139,20 @@ public class LDAPAttributeMapping {
     return user;
   }
 
-  final public Attributes groupToAttributes(Group group) {
+  /**
+   * Create LDAP attributes that represents group in LDAP context.
+   * 
+   * @param group Group
+   * @return LDAP attributes
+   */
+  public final Attributes groupToAttributes(Group group) {
     BasicAttributes attrs = new BasicAttributes();
     if (GROUP_LDAP_CLASSES == null)
       GROUP_LDAP_CLASSES = groupLDAPClasses.split(",");
     attrs.put(new ObjectClassAttribute(GROUP_LDAP_CLASSES));
     attrs.put("ou", group.getGroupName());
     String desc = group.getDescription();
-    // TODO : http://jira.exoplatform.org/browse/COR-49
+    // TODO http://jira.exoplatform.org/browse/COR-49
     if (desc != null && desc.length() > 0)
       attrs.put("description", desc);
     String lbl = group.getLabel();
@@ -143,35 +161,54 @@ public class LDAPAttributeMapping {
     return attrs;
   }
 
-  final public Group attributesToGroup(Attributes attrs) throws Exception {
+  /**
+   * Create group from LDAP attributes.
+   * 
+   * @param attrs {@link Attributes}
+   * @return Group
+   */
+  public final Group attributesToGroup(Attributes attrs) {
     if (attrs == null || attrs.size() == 0)
       return null;
     Group group = new GroupImpl();
-    // TODO : http://jira.exoplatform.org/browse/COR-49
+    // TODO http://jira.exoplatform.org/browse/COR-49
     group.setGroupName(getAttributeValueAsString(attrs, "ou"));
     group.setDescription(getAttributeValueAsString(attrs, "description"));
     group.setLabel(getAttributeValueAsString(attrs, "l"));
     return group;
   }
 
-  final public Attributes membershipTypeToAttributes(MembershipType mt) {
+  /**
+   * Create LDAP attributes that represents {@link MembershipType} in LDAP
+   * context.
+   * 
+   * @param mt MemebrshipType
+   * @return LDAP attributes
+   */
+  public final Attributes membershipTypeToAttributes(MembershipType mt) {
     BasicAttributes attrs = new BasicAttributes();
     if (MEMBERSHIPTYPE_LDAP_CLASSES == null)
       MEMBERSHIPTYPE_LDAP_CLASSES = membershipTypeLDAPClasses.split(",");
     attrs.put(new ObjectClassAttribute(MEMBERSHIPTYPE_LDAP_CLASSES));
     attrs.put(membershipTypeNameAttr, mt.getName());
     String desc = mt.getDescription();
-    // TODO: http://jira.exoplatform.org/browse/COR-49
+    // TODO http://jira.exoplatform.org/browse/COR-49
     if (desc != null && desc.length() > 0)
       attrs.put("description", desc);
     return attrs;
   }
 
-  final public MembershipType attributesToMembershipType(Attributes attrs) {
+  /**
+   * Create MembershipType from LDAP attributes.
+   * 
+   * @param attrs {@link Attributes}
+   * @return MemebrshipType
+   */
+  public final MembershipType attributesToMembershipType(Attributes attrs) {
     if (attrs == null || attrs.size() == 0)
       return null;
     MembershipType m = new MembershipTypeImpl();
-    // TODO : http://jira.exoplatform.org/browse/COR-49
+    // TODO http://jira.exoplatform.org/browse/COR-49
     m.setName(getAttributeValueAsString(attrs, membershipTypeNameAttr));
     m.setDescription(getAttributeValueAsString(attrs, "description"));
     m.setCreatedDate(new Date());
@@ -179,7 +216,14 @@ public class LDAPAttributeMapping {
     return m;
   }
 
-  final public Attributes membershipToAttributes(Membership m, String userDN) {
+  /**
+   * Create LDAP attributes that represents user Membership in LDAP context.
+   * 
+   * @param m Membership
+   * @param userDN user Distinguished Name
+   * @return DAP attributes
+   */
+  public final Attributes membershipToAttributes(Membership m, String userDN) {
     BasicAttributes attrs = new BasicAttributes();
     if (MEMBERSHIP_LDAP_CLASSES == null)
       MEMBERSHIP_LDAP_CLASSES = membershipLDAPClasses.split(",");
@@ -189,12 +233,18 @@ public class LDAPAttributeMapping {
     return attrs;
   }
 
-  final public Attributes profileToAttributes(UserProfile profile) {
+  /**
+   * Create LDAP attributes that represents UserProfile in LDAP context.
+   * 
+   * @param profile UserProfile
+   * @return LDAP attributes.
+   */
+  public final Attributes profileToAttributes(UserProfile profile) {
     BasicAttributes attrs = new BasicAttributes();
     if (PROFILE_LDAP_CLASSES == null)
       PROFILE_LDAP_CLASSES = profileLDAPClasses.split(",");
     attrs.put(new ObjectClassAttribute(PROFILE_LDAP_CLASSES));
-    // TODO: http://jira.exoplatform.org/browse/COR-49
+    // TODO http://jira.exoplatform.org/browse/COR-49
     attrs.put("sn", profile.getUserName());
     UserProfileData upd = new UserProfileData();
     upd.setUserProfile(profile);
@@ -202,7 +252,13 @@ public class LDAPAttributeMapping {
     return attrs;
   }
 
-  final public UserProfileData attributesToProfile(Attributes attrs) {
+  /**
+   * Create UserProfileData from LDAP attributes.
+   * 
+   * @param attrs {@link Attributes}
+   * @return {@link UserProfileData}
+   */
+  public final UserProfileData attributesToProfile(Attributes attrs) {
     if (attrs == null || attrs.size() == 0)
       return null;
     UserProfileData upd = new UserProfileData();
@@ -210,7 +266,14 @@ public class LDAPAttributeMapping {
     return upd;
   }
 
-  final public String getAttributeValueAsString(Attributes attributes, String name) {
+  /**
+   * Get LDAP attribute as String with specified name from {@link Attributes}.
+   * 
+   * @param attributes {@link Attributes}
+   * @param name attribute name
+   * @return attribute as string
+   */
+  public final String getAttributeValueAsString(Attributes attributes, String name) {
     if (attributes == null)
       return "";
     Attribute attr = attributes.get(name);

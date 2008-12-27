@@ -46,7 +46,7 @@ import org.exoplatform.services.organization.impl.MembershipImpl;
 
 /**
  * Created by The eXo Platform SAS Author : Tuan Nguyen
- * tuan08@users.sourceforge.net Oct 14, 2005
+ * tuan08@users.sourceforge.net Oct 14, 2005.  @version andrew00x $
  */
 public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
 
@@ -55,8 +55,17 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
    */
   private static final Log                LOG = ExoLogger.getLogger(MembershipDAOImpl.class.getName());
 
+  /**
+   * See {@link MembershipEventListener}.
+   */
   protected List<MembershipEventListener> listeners;
 
+  /**
+   * @param ldapAttrMapping mapping LDAP attributes to eXo organization service
+   *          items (users, groups, etc)
+   * @param ldapService {@link LDAPService}
+   * @throws Exception if any errors occurs
+   */
   public MembershipDAOImpl(LDAPAttributeMapping ldapAttrMapping, LDAPService ldapService) throws Exception {
     super(ldapAttrMapping, ldapService);
     this.listeners = new ArrayList<MembershipEventListener>(3);
@@ -152,7 +161,7 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
    * {@inheritDoc}
    */
   public Membership removeMembership(String id, boolean broadcast) throws Exception {
-    String membershipParts[] = id.split(",");
+    String[] membershipParts = id.split(",");
     if (membershipParts.length < 3)
       return null;
     String username = membershipParts[0];
@@ -281,7 +290,7 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
    * {@inheritDoc}
    */
   public Membership findMembership(String id) throws Exception {
-    String membershipParts[] = id.split(",");
+    String[] membershipParts = id.split(",");
     Membership membership = findMembershipByUserGroupAndType(membershipParts[0],
                                                              membershipParts[2],
                                                              membershipParts[1]);
@@ -382,6 +391,7 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
   /**
    * List memberships of a group by applying the membershipObjectFilter.
    * 
+   * @param ctx {@link LdapContext}
    * @param groupId id of the group to retrieve
    * @param filter filter to apply to search
    * @return search results
@@ -512,7 +522,7 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
   //
 
   /**
-   * Create {@link Membership} instance
+   * Create {@link Membership} instance.
    * 
    * @param userName user name
    * @param groupId group ID
@@ -530,23 +540,52 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
   
   // listeners
 
+  /**
+   * For details see {@link MembershipEventListener#postDelete(Membership)}.
+   * 
+   * @param membership Membership
+   * @throws Exception if any errors occurs
+   */
   private void postDelete(Membership membership) throws Exception {
     for (MembershipEventListener listener : listeners)
       listener.postDelete(membership);
   }
 
+  /**
+   * For details see {@link MembershipEventListener#preDelete(Membership))}.
+   * 
+   * @param membership Membership
+   * @throws Exception if any errors occurs
+   */
   private void preDelete(Membership membership) throws Exception {
     for (MembershipEventListener listener : listeners)
       listener.preDelete(membership);
   }
 
+  /**
+   * For details see
+   * {@link MembershipEventListener#postSave(Membership, boolean)}.
+   * 
+   * @param membership Membership
+   * @param isNew is newly created membership
+   * @throws Exception if any errors occurs
+   */
   private void postSave(Membership membership, boolean isNew) throws Exception {
     for (MembershipEventListener listener : listeners)
       listener.postSave(membership, isNew);
   }
 
+  /**
+   * For details see
+   * {@link MembershipEventListener#preSave(Membership, boolean)}.
+   * 
+   * @param membership Membership
+   * @param isNew is newly created membership
+   * @throws Exception if any errors occurs
+   */
   private void preSave(Membership membership, boolean isNew) throws Exception {
     for (MembershipEventListener listener : listeners)
       listener.preSave(membership, isNew);
   }
+  
 }

@@ -32,13 +32,21 @@ import org.exoplatform.services.ldap.LDAPService;
 import org.exoplatform.services.organization.Group;
 
 /**
- * Created by The eXo Platform SAS Author : James Chamberlain
+ * Created by The eXo Platform SAS Author : James Chamberlain.
  * james.chamberlain@gmail.com Feb 22, 2006
+ * @version andrew00x $
  */
 public class ADGroupDAOImpl extends GroupDAOImpl {
 
   private ADSearchBySID adSearch;
 
+  /**
+   * @param ldapAttrMapping mapping LDAP attributes to eXo organization service
+   *          items
+   * @param ldapService {@link LDAPService}
+   * @param ad See {@link ADSearchBySID}
+   * @throws Exception if any errors occurs
+   */
   public ADGroupDAOImpl(LDAPAttributeMapping ldapAttrMapping,
                         LDAPService ldapService,
                         ADSearchBySID ad) throws Exception {
@@ -62,6 +70,12 @@ public class ADGroupDAOImpl extends GroupDAOImpl {
     return findGroups(userName, null);
   }
 
+  /**
+   * @param userName user name
+   * @param type membership type
+   * @return collection of groups
+   * @throws Exception if any errors occurs
+   */
   @SuppressWarnings("unchecked")
   private Collection findGroups(String userName, String type) throws Exception {
     LdapContext ctx = ldapService.getLdapContext();
@@ -76,7 +90,7 @@ public class ADGroupDAOImpl extends GroupDAOImpl {
             return groups;
 
           String filter = ldapAttrMapping.userObjectClassFilter;
-          String retAttrs[] = { "tokenGroups" };
+          String[] retAttrs = {"tokenGroups"};
           SearchControls constraints = new SearchControls();
           constraints.setSearchScope(SearchControls.OBJECT_SCOPE);
           constraints.setReturningAttributes(retAttrs);
@@ -115,6 +129,13 @@ public class ADGroupDAOImpl extends GroupDAOImpl {
     }
   }
 
+  /**
+   * Check is supplied group presents in groups collection.
+   * 
+   * @param group {@link Group}
+   * @param list collection on Groups
+   * @return true if collection contains group false otherwise
+   */
   private boolean checkExist(Group group, List<Group> list) {
     for (Group ele : list) {
       if (ele.getId().equals(group.getId()))

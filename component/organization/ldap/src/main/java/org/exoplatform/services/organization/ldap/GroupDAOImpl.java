@@ -44,15 +44,29 @@ import org.exoplatform.services.organization.GroupHandler;
 import org.exoplatform.services.organization.impl.GroupImpl;
 
 /**
- * Created by The eXo Platform SAS Author : Tuan Nguyen
+ * Created by The eXo Platform SAS Author : Tuan Nguyen.
  * tuan08@users.sourceforge.net Oct 14, 2005
+ * 
+ * @version andrew00x $
  */
 public class GroupDAOImpl extends BaseDAO implements GroupHandler {
 
+  /**
+   * Logger.
+   */
   private static final Log           LOG = ExoLogger.getLogger(GroupDAOImpl.class.getName());
 
+  /**
+   * See {@link GroupEventListener}.
+   */
   protected List<GroupEventListener> listeners;
 
+  /**
+   * @param ldapAttrMapping mapping LDAP attributes to eXo organization service
+   *          items (users, groups, etc)
+   * @param ldapService {@link LDAPService}
+   * @throws Exception if any errors occurs
+   */
   public GroupDAOImpl(LDAPAttributeMapping ldapAttrMapping, LDAPService ldapService) throws Exception {
     super(ldapAttrMapping, ldapService);
     this.listeners = new ArrayList<GroupEventListener>(3);
@@ -96,13 +110,13 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
       for (int err = 0;; err++) {
         try {
           results = ctx.search(searchBase, filter, constraints);
-          
+
           if (results.hasMore()) {
             if (LOG.isDebugEnabled())
               LOG.debug("Group " + child + ", parent  " + parent + " already exists. ");
             return;
           }
-          
+
           GroupImpl group = (GroupImpl) child;
           if (broadcast)
             preSave(group, true);
@@ -187,11 +201,12 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
               LOG.debug("Nothing for removing, group " + group);
             return group;
           }
-          
+
           SearchResult sr = results.next();
-//          NameParser parser = ctx.getNameParser("");
-//          Name entryName = parser.parse(new CompositeName(sr.getName()).get(0));
-//          String groupDN = entryName + "," + searchBase;
+          // NameParser parser = ctx.getNameParser("");
+          // Name entryName = parser.parse(new
+          // CompositeName(sr.getName()).get(0));
+          // String groupDN = entryName + "," + searchBase;
           String groupDN = sr.getNameInNamespace();
 
           group = getGroupByDN(ctx, groupDN);
@@ -200,7 +215,7 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
               LOG.debug("Nothing for removing, group " + group);
             return group;
           }
-          
+
           if (broadcast)
             preDelete(group);
           removeAllSubtree(ctx, groupDN);
@@ -283,7 +298,7 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
       return null;
     String parentId = null;
     StringBuffer buffer = new StringBuffer();
-    String groupIdParts[] = groupId.split("/");
+    String[] groupIdParts = groupId.split("/");
     for (int x = 1; x < groupIdParts.length; x++) {
       buffer.append("/" + groupIdParts[x]);
       if (x == (groupIdParts.length - 2))
@@ -326,7 +341,7 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
       return null;
     String parentId = null;
     StringBuffer buffer = new StringBuffer();
-    String groupIdParts[] = groupId.split("/");
+    String[] groupIdParts = groupId.split("/");
     for (int x = 1; x < groupIdParts.length; x++) {
       buffer.append("/" + groupIdParts[x]);
       if (x == (groupIdParts.length - 2))
@@ -410,7 +425,7 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
     StringBuffer buffer = new StringBuffer();
 
     if (parent != null) {
-      String dnParts[] = parent.getId().split("/");
+      String[] dnParts = parent.getId().split("/");
       for (int x = (dnParts.length - 1); x > 0; x--) {
         buffer.append("ou=" + dnParts[x] + ", ");
       }
@@ -492,10 +507,10 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
           results = ctx.search(ldapAttrMapping.groupsURL, filter, constraints);
 
           // add groups for memberships matching user
-//          int total = 0;
+          // int total = 0;
           while (results != null && results.hasMore()) {
             SearchResult sr = results.next();
-//            total++;
+            // total++;
             NameParser parser = ctx.getNameParser("");
             CompositeName name = new CompositeName(sr.getName());
             if (name.size() < 1)
@@ -525,6 +540,12 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
     }
   }
 
+  /**
+   * Add group in list if list does not contains it yet.
+   * 
+   * @param groups list of groups
+   * @param g group to be added in list
+   */
   protected void addGroup(List<Group> groups, Group g) {
     for (int i = 0; i < groups.size(); i++)
       if (groups.get(i).getId().equals(g.getId()))
@@ -534,21 +555,47 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
 
   // listeners
 
+  /**
+   * For details, see {@link GroupEventListener#preSave(Group, boolean)}.
+   * 
+   * @param group group
+   * @param isNew is group newly created
+   * @throws Exception if any errors occurs
+   */
   protected void preSave(Group group, boolean isNew) throws Exception {
     for (GroupEventListener listener : listeners)
       listener.preSave(group, isNew);
   }
 
+  /**
+   * For details, see {@link GroupEventListener#postSave(Group, boolean)}.
+   * 
+   * @param group group
+   * @param isNew is group newly created
+   * @throws Exception if any errors occurs
+   */
   protected void postSave(Group group, boolean isNew) throws Exception {
     for (GroupEventListener listener : listeners)
       listener.postSave(group, isNew);
   }
 
+  /**
+   * For details, see {@link GroupEventListener#preDelete(Group)}.
+   * 
+   * @param group group
+   * @throws Exception if any errors occurs
+   */
   protected void preDelete(Group group) throws Exception {
     for (GroupEventListener listener : listeners)
       listener.preDelete(group);
   }
 
+  /**
+   * For details, see {@link GroupEventListener#postDelete(Group)}.
+   * 
+   * @param group group
+   * @throws Exception if any errors occurs
+   */
   protected void postDelete(Group group) throws Exception {
     for (GroupEventListener listener : listeners)
       listener.postDelete(group);
@@ -565,7 +612,7 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
   protected String createSubDN(String parentId) {
     StringBuffer buffer = new StringBuffer();
     if (parentId != null && parentId.length() > 0) {
-      String dnParts[] = parentId.split("/");
+      String[] dnParts = parentId.split("/");
       for (int x = (dnParts.length - 1); x > 0; x--)
         buffer.append("ou=" + dnParts[x] + ", ");
     }

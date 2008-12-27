@@ -40,7 +40,7 @@ import org.exoplatform.services.organization.impl.UserProfileImpl;
 
 /**
  * Created by The eXo Platform SAS Author : Tuan Nguyen
- * tuan08@users.sourceforge.net Oct 14, 2005
+ * tuan08@users.sourceforge.net Oct 14, 2005. @version andrew00x $
  */
 public class UserProfileDAOImpl extends BaseDAO implements UserProfileHandler {
 
@@ -206,6 +206,7 @@ public class UserProfileDAOImpl extends BaseDAO implements UserProfileHandler {
    */
   @SuppressWarnings("unchecked")
   public Collection findUserProfiles() throws Exception {
+    // currently profile stored in database
     return null;
   }
 

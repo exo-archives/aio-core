@@ -20,16 +20,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import javax.naming.NamingEnumeration;
-import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
-import javax.naming.ldap.LdapContext;
-
 import junit.framework.TestCase;
 
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.services.ldap.LDAPService;
 
 /**
  * Created by The eXo Platform SAS Author : Hoa Pham
@@ -125,6 +119,8 @@ public class TestOrganizationService extends TestCase {
   }
 
   public void testUserConcurr() throws Exception {
+    // For checking 'Invalid Cookie Error' when concurrent access to
+    // LDAPUserPageList.
     int threads = 50;
     final CountDownLatch c = new CountDownLatch(threads);
     for (int i = 0; i < threads; i++) {

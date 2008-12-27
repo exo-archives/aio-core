@@ -25,21 +25,17 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 
-import org.apache.commons.logging.Log;
 import org.exoplatform.services.ldap.LDAPService;
-import org.exoplatform.services.log.ExoLogger;
 
 /**
  * Created by The eXo Platform SAS Author : Thuannd nhudinhthuan@yahoo.com Feb
- * 22, 2006
+ * 22, 2006. @version andrew00x $
  */
 public class ADSearchBySID {
 
   /**
-   * Logger.
+   * Mapping LDAP attributes to eXo organization service items.
    */
-  private static final Log       LOG = ExoLogger.getLogger(ADSearchBySID.class.getName());
-
   protected LDAPAttributeMapping ldapAttrMapping;
 
   /**
@@ -60,6 +56,10 @@ public class ADSearchBySID {
     this.ldapService = ldapService;
   }
 
+  /**
+   * @param ldapAttrMapping mapping LDAP attributes to eXo organization service
+   *          items
+   */
   public ADSearchBySID(LDAPAttributeMapping ldapAttrMapping) {
     this.ldapAttrMapping = ldapAttrMapping;
   }
@@ -86,18 +86,18 @@ public class ADSearchBySID {
   public String findMembershipDNBySID(LdapContext ctx, byte[] sid, String baseDN, String scopedRole) throws NamingException {
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    constraints.setReturningAttributes(new String[] { "" });
+    constraints.setReturningAttributes(new String[] {""});
     constraints.setDerefLinkFlag(true);
 
     NamingEnumeration<SearchResult> answer = null;
     try {
       if (scopedRole == null) {
-        answer = ctx.search(baseDN, "objectSid={0}", new Object[] { sid }, constraints);
+        answer = ctx.search(baseDN, "objectSid={0}", new Object[] {sid}, constraints);
       } else {
         answer = ctx.search(baseDN,
                             "(& (objectSid={0}) (" + ldapAttrMapping.membershipTypeRoleNameAttr
                                 + "={1}))",
-                            new Object[] { sid, scopedRole },
+                            new Object[] {sid, scopedRole},
                             constraints);
       }
       while (answer.hasMoreElements()) {

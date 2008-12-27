@@ -42,11 +42,15 @@ import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.impl.GroupImpl;
 
 /**
- * Created by The eXo Platform SAS Author : Tuan Nguyen
+ * Created by The eXo Platform SAS Author : Tuan Nguyen.
  * tuan08@users.sourceforge.net Oct 14, 2005
+ * @version andrew00x $
  */
 public class BaseDAO {
   
+  /**
+   * Default max allowed number of connection errors.  
+   */
   public static final int        DEFAULT_MAX_CONNECTION_ERROR = 1;
 
   /**
@@ -54,10 +58,19 @@ public class BaseDAO {
    */
   private static final Log       LOG                          = ExoLogger.getLogger("core.BaseAO");
 
+  /**
+   * Mapping LDAP attributes to eXo organization service items (users, groups, etc). 
+   */
   protected LDAPAttributeMapping ldapAttrMapping;
 
+  /**
+   * LDAP service.
+   */
   protected LDAPService          ldapService;
 
+  /**
+   * See {@link NameParser}.
+   */
   private NameParser             parser;
 
   /**
@@ -66,6 +79,11 @@ public class BaseDAO {
    */
   private static int             maxConnectionError           = -1;
 
+  /**
+   * @param ldapAttrMapping {@link LDAPAttributeMapping}
+   * @param ldapService {@link LDAPService}
+   * @throws Exception if any error occurs
+   */
   public BaseDAO(LDAPAttributeMapping ldapAttrMapping, LDAPService ldapService) throws Exception {
     this.ldapAttrMapping = ldapAttrMapping;
     this.ldapService = ldapService;
@@ -106,7 +124,7 @@ public class BaseDAO {
    */
   protected String getGroupDNFromGroupId(String groupId) {
     StringBuilder buffer = new StringBuilder();
-    String groupParts[] = groupId.split("/");
+    String[] groupParts = groupId.split("/");
     // TODO : http://jira.exoplatform.org/browse/COR-49
     for (int x = (groupParts.length - 1); x > 0; x--) {
       buffer.append("ou=" + groupParts[x] + ", ");
@@ -147,7 +165,7 @@ public class BaseDAO {
    */
   @Deprecated
   protected Group getGroupFromMembershipDN(String membershipDN) throws Exception {
-    String membershipParts[] = explodeDN(membershipDN, false);
+    String[] membershipParts = explodeDN(membershipDN, false);
     StringBuffer buffer = new StringBuffer();
     for (int x = 1; x < membershipParts.length; x++) {
       if (x == membershipParts.length - 1) {
@@ -166,10 +184,10 @@ public class BaseDAO {
    * @param ctx {@link LdapContext}
    * @param membershipDN membership Distinguished Name
    * @return Group
-   * @throws Exception if any error occurs
+   * @throws NamingException if any naming errors occurs
    */
   protected Group getGroupFromMembershipDN(LdapContext ctx, String membershipDN) throws NamingException {
-    String membershipParts[] = explodeDN(membershipDN, false);
+    String[] membershipParts = explodeDN(membershipDN, false);
     StringBuffer buffer = new StringBuffer();
     for (int x = 1; x < membershipParts.length; x++) {
       if (x == membershipParts.length - 1) {
@@ -219,13 +237,13 @@ public class BaseDAO {
    * @param ctx {@link LdapContext}
    * @param groupDN group Distinguished Name
    * @return Group or null it nothing found
-   * @throws Exception if any error occurs
+   * @throws NamingException if any naming errors occurs
    */
   protected Group getGroupByDN(LdapContext ctx, String groupDN) throws NamingException {
     StringBuffer idBuffer = new StringBuffer();
     String parentId = null;
-    String baseParts[] = explodeDN(ldapAttrMapping.groupsURL, true);
-    String membershipParts[] = explodeDN(groupDN, true);
+    String[] baseParts = explodeDN(ldapAttrMapping.groupsURL, true);
+    String[] membershipParts = explodeDN(groupDN, true);
     for (int x = (membershipParts.length - baseParts.length - 1); x > -1; x--) {
       idBuffer.append("/" + membershipParts[x]);
       if (x == 1)
@@ -272,7 +290,7 @@ public class BaseDAO {
       } else
         list.add(0, ldap);
     }
-    String explodedDN[] = new String[list.size()];
+    String[] explodedDN = new String[list.size()];
     list.toArray(explodedDN);
     return explodedDN;
   }
@@ -281,7 +299,7 @@ public class BaseDAO {
   /**
    * Find user with supplied name.
    * 
-   * @param username
+   * @param username user name
    * @return User or null if nothing found
    * @throws Exception if any error occurs
    */
@@ -307,7 +325,8 @@ public class BaseDAO {
   /**
    * Find user with supplied name.
    * 
-   * @param username
+   * @param ctx {@link LdapContext}
+   * @param username user name
    * @return User or null if nothing found
    * @throws Exception if any error occurs
    */
@@ -411,7 +430,7 @@ public class BaseDAO {
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
     if (!hasAttribute) {
-      constraints.setReturningAttributes(new String[] { "" });
+      constraints.setReturningAttributes(new String[] {""});
       constraints.setDerefLinkFlag(true);
     }
     String filter = "(&(" + ldapAttrMapping.userUsernameAttr + "=" + username + ")" + "("
@@ -444,6 +463,10 @@ public class BaseDAO {
     }
   }
 
+  /**
+   * @param dn escape special characters for DN
+   * @return DN string after escaping
+   */
   public static String escapeDN(String dn) {
     if (dn == null)
       return dn;
@@ -479,7 +502,8 @@ public class BaseDAO {
    * 
    * @param ctx {@link LdapContext}
    * @param userDN user DN
-   * @throws NamingException if any {@link NamingException} occurs
+   * @return {@link User}
+   * @throws Exception if any errors occurs
    */
   protected User findUserByDN(LdapContext ctx, String userDN) throws Exception {
     if (userDN == null)
@@ -513,6 +537,9 @@ public class BaseDAO {
     return false;
   }
 
+  /**
+   * @return LDAP search filter
+   */
   protected String membershipClassFilter() {
     String mbfilter = ldapAttrMapping.membershipObjectClassFilter;
     if (mbfilter == null)

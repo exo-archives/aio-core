@@ -37,7 +37,7 @@ import org.exoplatform.services.organization.User;
 
 /**
  * Created by VietSpider Studio Author : Nhu Dinh Thuan nhudinhthuan@yahoo.com
- * Dec 7, 2005
+ * Dec 7, 2005, @version andrew00x $
  */
 public class LDAPUserPageList extends PageList {
 
@@ -81,7 +81,7 @@ public class LDAPUserPageList extends PageList {
   protected void populateCurrentPage(int page) throws Exception {
     List<User> users = new ArrayList<User>();
     PagedResultsControl prc = new PagedResultsControl(getPageSize(), Control.NONCRITICAL);
-    String keys[] = { ldapAttrMapping.userUsernameAttr };
+    String[] keys = {ldapAttrMapping.userUsernameAttr};
     SortControl sctl = new SortControl(keys, SEARCH_CONTROL);
 
     LdapContext ctx = ldapService.getLdapContext();
@@ -90,7 +90,7 @@ public class LDAPUserPageList extends PageList {
       for (int err = 0;; err++) {
         users.clear();
         try {
-          ctx.setRequestControls(new Control[] { sctl, prc });
+          ctx.setRequestControls(new Control[] {sctl, prc});
           SearchControls constraints = new SearchControls();
           constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
@@ -114,9 +114,9 @@ public class LDAPUserPageList extends PageList {
                   cookie = ((PagedResultsResponseControl) responseControls[z]).getCookie();
               }
             }
-            ctx.setRequestControls(new Control[] { new PagedResultsControl(getPageSize(),
-                                                                           cookie,
-                                                                           Control.CRITICAL) });
+            ctx.setRequestControls(new Control[] {new PagedResultsControl(getPageSize(),
+                                                                          cookie,
+                                                                          Control.CRITICAL)});
           } while (cookie != null);
           this.currentListPage_ = users;
           return;
@@ -155,7 +155,7 @@ public class LDAPUserPageList extends PageList {
         users.clear();
         try {
           SearchControls constraints = new SearchControls();
-          String returnedAtts[] = { ldapAttrMapping.userUsernameAttr };
+          String[] returnedAtts = {ldapAttrMapping.userUsernameAttr};
           constraints.setReturningAttributes(returnedAtts);
           constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
