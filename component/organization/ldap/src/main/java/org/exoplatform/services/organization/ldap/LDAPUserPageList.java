@@ -49,8 +49,6 @@ public class LDAPUserPageList extends PageList {
 
   private LDAPAttributeMapping ldapAttrMapping;
 
-  private List<User>           usersAll;
-
   static boolean               SEARCH_CONTROL = Control.NONCRITICAL;
 
   public LDAPUserPageList(LDAPAttributeMapping ldapAttrMapping,
@@ -144,9 +142,6 @@ public class LDAPUserPageList extends PageList {
    */
   @SuppressWarnings("unchecked")
   public List getAll() throws Exception {
-    if (usersAll != null)
-      return usersAll;
-    
     LdapContext ctx = ldapService.getLdapContext();
     List<User> users = new ArrayList<User>();
     try {
@@ -166,7 +161,7 @@ public class LDAPUserPageList extends PageList {
             users.add(ldapAttrMapping.attributesToUser(result.getAttributes()));
           }
 
-          return usersAll = users;
+          return users;
         } catch (NamingException e) {
           if (BaseDAO.isConnectionError(e) && err < 1)
             ctx = ldapService.getLdapContext(true);
