@@ -27,6 +27,8 @@ import junit.framework.TestCase;
 
 import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.services.listener.ListenerService;
+import org.exoplatform.services.listener.Listener;
+import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.security.impl.DefaultRolesExtractorImpl;
 
 /**
@@ -68,6 +70,11 @@ public class TestSessionRegistry extends TestCase {
 
   }
 
+  public void testConversationStateListener() {
+  }
+
+  AssertionError assertionError = null;
+
   public void testRegistry() throws Exception {
     Credential[] cred = new Credential[] { new UsernameCredential("exo") };
 
@@ -81,19 +88,66 @@ public class TestSessionRegistry extends TestCase {
     } catch (LoginException e) {
     }
 
+    //
     Identity id = authenticator.createIdentity(userId);
-    ConversationState s = new ConversationState(id);
+    final ConversationState s = new ConversationState(id);
+
+    //
+    final Object payload = new Object();
+    listenerService.addListener("exo.core.security.ConversationRegistry.register", new Listener() {
+      @Override
+      public void onEvent(Event event) throws Exception {
+        try {
+          assertNotNull(event);
+          assertEquals("exo.core.security.ConversationRegistry.register", event.getEventName());
+          assertTrue(event.getData() instanceof ConversationState);
+          ConversationState cs = (ConversationState)event.getData();
+          assertSame(s, cs);
+          cs.setAttribute("payload", payload);
+        }
+        catch (AssertionError error) {
+          assertionError = error;
+        }
+      }
+    });
+    listenerService.addListener("exo.core.security.ConversationRegistry.unregister", new Listener() {
+      @Override
+      public void onEvent(Event event) throws Exception {
+        try {
+          assertNotNull(event);
+          assertEquals("exo.core.security.ConversationRegistry.unregister", event.getEventName());
+          assertTrue(event.getData() instanceof ConversationState);
+          ConversationState cs = (ConversationState)event.getData();
+          assertSame(s, cs);
+        }
+        catch (AssertionError error) {
+          if (assertionError == null) {
+            assertionError = error;
+          }
+        }
+      }
+    });
+
+    //
     ConversationState.setCurrent(s);
     assertEquals(s, ConversationState.getCurrent());
 
+    //
     registry.register("key", s);
     assertNotNull(registry.getState("key"));
     assertEquals(id, registry.getState("key").getIdentity());
+    assertSame(payload, s.getAttribute("payload"));
 
+    //
     registry.unregister("key");
 
-    assertNull(registry.getState("key"));
+    // Rethrow any junit error that could have been thrown in the listener
+    if (assertionError != null) {
+      throw assertionError;
+    }
 
+    //
+    assertNull(registry.getState("key"));
   }
 
   public void testMemberships() throws Exception {
