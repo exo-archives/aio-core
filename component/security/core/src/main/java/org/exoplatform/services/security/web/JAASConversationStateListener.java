@@ -19,6 +19,7 @@ package org.exoplatform.services.security.web;
 
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 
 import org.exoplatform.services.security.ConversationRegistry;
@@ -35,9 +36,10 @@ public class JAASConversationStateListener extends ConversationStateListener {
    */
   @Override
   public void sessionDestroyed(HttpSessionEvent event) {
-    String sesionId = event.getSession().getId();
+    HttpSession ses = event.getSession();
+    String sesionId = ses.getId();
     try {
-      ConversationRegistry conversationRegistry = (ConversationRegistry) getContainer().getComponentInstanceOfType(ConversationRegistry.class);
+      ConversationRegistry conversationRegistry = (ConversationRegistry) getContainer(ses.getServletContext()).getComponentInstanceOfType(ConversationRegistry.class);
 
       ConversationState conversationState = conversationRegistry.unregister(sesionId);
 

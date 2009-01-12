@@ -17,6 +17,8 @@
 
 package org.exoplatform.services.security.web;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
@@ -51,23 +53,46 @@ public class ConversationStateListener implements HttpSessionListener {
    * Remove {@link ConversationState}. {@inheritDoc}
    */
   public void sessionDestroyed(HttpSessionEvent event) {
-    String sesionId = event.getSession().getId();
-    ConversationRegistry conversationRegistry = (ConversationRegistry) getContainer().getComponentInstanceOfType(ConversationRegistry.class);
+    HttpSession ses = event.getSession();
+    ConversationRegistry conversationRegistry = (ConversationRegistry) getContainer(ses.getServletContext()).getComponentInstanceOfType(ConversationRegistry.class);
 
+    String sesionId = ses.getId();
     ConversationState conversationState = conversationRegistry.unregister(sesionId);
 
     if (conversationState != null)
-      log.info("Remove conversation state " + sesionId);
+      if (log.isDebugEnabled())
+        log.debug("Remove conversation state " + sesionId);
 
   }
 
   /**
    * @return actual ExoContainer instance.
+   * @deprecated use {@link #getContainer(ServletContext)} instead
    */
   protected ExoContainer getContainer() {
     ExoContainer container = ExoContainerContext.getCurrentContainer();
     if (container instanceof RootContainer) {
       container = RootContainer.getInstance().getPortalContainer("portal");
+    }
+    return container;
+  }
+  
+  /**
+   * @param sctx {@link ServletContext}
+   * @return actual ExoContainer instance
+   */
+  protected ExoContainer getContainer(ServletContext sctx) {
+    ExoContainer container = ExoContainerContext.getCurrentContainer();
+    if (container instanceof RootContainer) {
+      String containerName = null;
+      // check attribute in servlet context first
+      if (sctx.getAttribute(SetCurrentIdentityFilter.PORTAL_CONTAINER_NAME) != null)
+        containerName = (String) sctx.getAttribute(SetCurrentIdentityFilter.PORTAL_CONTAINER_NAME);
+
+      // if not set then use default name.
+      if (containerName == null)
+        containerName = "portal";
+      container = RootContainer.getInstance().getPortalContainer(containerName);
     }
     return container;
   }

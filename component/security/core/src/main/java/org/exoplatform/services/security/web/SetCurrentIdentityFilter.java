@@ -46,6 +46,13 @@ import org.exoplatform.services.security.IdentityRegistry;
  *          07:30:39Z peterit $
  */
 public class SetCurrentIdentityFilter implements Filter {
+  
+  /**
+   * Under this name can be set portal container name, as filter
+   * <tt>init-param</tt> or application <tt>context-param</tt>. If both of
+   * parameters not set then application context-name used as container name.
+   */
+  public static final String PORTAL_CONTAINER_NAME = "portalContainerName"; 
 
   /**
    * Logger.
@@ -61,9 +68,25 @@ public class SetCurrentIdentityFilter implements Filter {
    * {@inheritDoc}
    */
   public void init(FilterConfig config) throws ServletException {
-    portalContainerName = config.getInitParameter("portalContainerName");
+    // It is not possible to use application context name everywhere cause to
+    // problem with access to resources (CSS). Try to find container name in
+    // filter init-param or in application context-param. And only if both of
+    // parameters are not specified then use application conetxt name.
+
+    // Check filter init-param first
+    portalContainerName = config.getInitParameter(PORTAL_CONTAINER_NAME);
+
+    // check application context-param
+    if (portalContainerName == null)
+      portalContainerName = config.getServletContext().getInitParameter(PORTAL_CONTAINER_NAME);
+
+    // if nothing set then use application context name, 'display-name' in
+    // web.xml
     if (portalContainerName == null)
       portalContainerName = config.getServletContext().getServletContextName();
+
+    // save container name as attribute
+    config.getServletContext().setAttribute(PORTAL_CONTAINER_NAME, portalContainerName);
   }
 
   /**
@@ -78,7 +101,7 @@ public class SetCurrentIdentityFilter implements Filter {
     ExoContainer container = ExoContainerContext.getContainerByName(portalContainerName);
     if (container == null) {
       if (log.isDebugEnabled()) {
-        log.debug("Container not found for the servlet context " + portalContainerName);
+        log.debug("Container " + portalContainerName + " not found.");
       }
 
       container = ExoContainerContext.getTopContainer();
