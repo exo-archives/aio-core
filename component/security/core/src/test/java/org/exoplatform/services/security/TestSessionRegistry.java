@@ -23,6 +23,7 @@ import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 
+import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 import org.exoplatform.container.StandaloneContainer;
@@ -73,8 +74,9 @@ public class TestSessionRegistry extends TestCase {
   public void testConversationStateListener() {
   }
 
-  AssertionError assertionError = null;
+  AssertionFailedError assertionError = null;
 
+  @SuppressWarnings("unchecked")
   public void testRegistry() throws Exception {
     Credential[] cred = new Credential[] { new UsernameCredential("exo") };
 
@@ -94,7 +96,7 @@ public class TestSessionRegistry extends TestCase {
 
     //
     final Object payload = new Object();
-    listenerService.addListener("exo.core.security.ConversationRegistry.register", new Listener() {
+    listenerService.addListener(new Listener() {
       @Override
       public void onEvent(Event event) throws Exception {
         try {
@@ -105,12 +107,16 @@ public class TestSessionRegistry extends TestCase {
           assertSame(s, cs);
           cs.setAttribute("payload", payload);
         }
-        catch (AssertionError error) {
+        catch (AssertionFailedError error) {
           assertionError = error;
         }
       }
+      @Override
+      public String getName() {
+        return "exo.core.security.ConversationRegistry.register";
+      }
     });
-    listenerService.addListener("exo.core.security.ConversationRegistry.unregister", new Listener() {
+    listenerService.addListener(new Listener() {
       @Override
       public void onEvent(Event event) throws Exception {
         try {
@@ -120,11 +126,16 @@ public class TestSessionRegistry extends TestCase {
           ConversationState cs = (ConversationState)event.getData();
           assertSame(s, cs);
         }
-        catch (AssertionError error) {
+        catch (AssertionFailedError error) {
           if (assertionError == null) {
             assertionError = error;
           }
         }
+      }
+      
+      @Override
+      public String getName() {
+        return "exo.core.security.ConversationRegistry.unregister";
       }
     });
 
