@@ -23,13 +23,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.tool.hbm2ddl.SchemaUpdate;
-
 import org.apache.commons.logging.Log;
-
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.component.ComponentPlugin;
@@ -40,7 +34,11 @@ import org.exoplatform.container.xml.Property;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.database.HibernateService;
 import org.exoplatform.services.database.ObjectQuery;
-import org.exoplatform.services.log.LogService;
+import org.exoplatform.services.log.ExoLogger;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 
 /**
  * Created by The eXo Platform SAS .
@@ -52,7 +50,7 @@ import org.exoplatform.services.log.LogService;
 public class HibernateServiceImpl implements HibernateService, ComponentRequestLifecycle {
   private ThreadLocal<Session>       threadLocal_;
 
-  private Log                        log_;
+  private static Log                        log_ = ExoLogger.getLogger(HibernateServiceImpl.class);
 
   private HibernateConfigurationImpl conf_;
 
@@ -60,8 +58,7 @@ public class HibernateServiceImpl implements HibernateService, ComponentRequestL
 
   private HashSet<String>            mappings_ = new HashSet<String>();
 
-  public HibernateServiceImpl(InitParams initParams, LogService lservice, CacheService cacheService) {
-    log_ = lservice.getLog(getClass());
+  public HibernateServiceImpl(InitParams initParams, CacheService cacheService) {
     threadLocal_ = new ThreadLocal<Session>();
     PropertiesParam param = initParams.getPropertiesParam("hibernate.properties");
     HibernateSettingsFactory settingsFactory = new HibernateSettingsFactory(new ExoCacheProvider(cacheService));
@@ -92,7 +89,7 @@ public class HibernateServiceImpl implements HibernateService, ComponentRequestL
           if (!mappings_.contains(relativePath)) {
             mappings_.add(relativePath);
             URL url = cl.getResource(relativePath);
-            System.err.println("Add  Hibernate Mapping: " + relativePath);
+            log_.info("Adding  Hibernate Mapping: " + relativePath);
             conf_.addURL(url);
           }
         }
@@ -128,7 +125,7 @@ public class HibernateServiceImpl implements HibernateService, ComponentRequestL
   public Session openSession() {
     Session currentSession = threadLocal_.get();
     if (currentSession == null) {
-      log_.debug("open new hibernate session in openSession()");
+      if (log_.isDebugEnabled()) log_.debug("open new hibernate session in openSession()");
       currentSession = getSessionFactory().openSession();
       threadLocal_.set(currentSession);
     }
@@ -150,9 +147,10 @@ public class HibernateServiceImpl implements HibernateService, ComponentRequestL
       return;
     try {
       session.close();
-      log_.debug("close hibernate session in openSession(Session session)");
+      if (log_.isDebugEnabled())
+        log_.debug("close hibernate session in openSession(Session session)");
     } catch (Throwable t) {
-      log_.error("Error: ", t);
+      log_.error("Error closing hibernate session : " + t.getMessage(), t);
     }
     threadLocal_.set(null);
   }
