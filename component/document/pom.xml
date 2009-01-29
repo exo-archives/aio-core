@@ -34,8 +34,8 @@
     </dependency>
 
     <dependency>
-      <groupId>html-parser</groupId>
-      <artifactId>html-parser</artifactId>
+      <groupId>org.htmlparser</groupId>
+      <artifactId>htmlparser</artifactId>
       <version>1.6</version>
       <scope>compile</scope>
     </dependency>
