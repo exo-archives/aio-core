@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.dialect.Dialect;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 
@@ -50,6 +51,7 @@ import org.exoplatform.services.log.LogService;
  *         tuan08 Exp $
  */
 public class HibernateServiceImpl implements HibernateService, ComponentRequestLifecycle {
+
   private ThreadLocal<Session>       threadLocal_;
 
   private Log                        log_;
@@ -69,7 +71,21 @@ public class HibernateServiceImpl implements HibernateService, ComponentRequestL
     Iterator properties = param.getPropertyIterator();
     while (properties.hasNext()) {
       Property p = (Property) properties.next();
-      conf_.setProperty(p.getName(), p.getValue());
+
+      //
+      String name = p.getName();
+      String value = p.getValue();
+
+      // Julien: Don't remove that unless you know what you are doing
+      if (name.equals("hibernate.dialect")) {
+        Package pkg = Dialect.class.getPackage();
+        String dialect = value.substring(22);
+        value = pkg.getName() + "." + dialect; // 22 is the length of "org.hibernate.dialect"
+        log_.info("Using dialect " + dialect);
+      }
+
+      //
+      conf_.setProperty(name, value);
     }
 
     // Replace the potential "java.io.tmpdir" variable in the connection URL
