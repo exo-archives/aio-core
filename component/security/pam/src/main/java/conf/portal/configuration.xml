@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<configuration>
+  <component>
+    <key>org.exoplatform.services.security.pam.JPamAuthenticator</key>
+    <type>org.exoplatform.services.security.pam.JPamAuthenticator</type>
+    <init-params>
+      <properties-param>
+        <name>jpam-configuration</name>
+        <property name="service-name" value="exo-jpam"/> 
+      </properties-param>
+    </init-params>
+  </component>
+</configuration>
