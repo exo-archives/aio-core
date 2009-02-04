@@ -36,6 +36,7 @@ import org.exoplatform.services.security.ConversationRegistry;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.IdentityRegistry;
+import org.exoplatform.services.security.StateKey;
 
 /**
  * Created by The eXo Platform SAS .
@@ -46,23 +47,23 @@ import org.exoplatform.services.security.IdentityRegistry;
  *          07:30:39Z peterit $
  */
 public class SetCurrentIdentityFilter implements Filter {
-  
+
   /**
    * Under this name can be set portal container name, as filter
    * <tt>init-param</tt> or application <tt>context-param</tt>. If both of
    * parameters not set then application context-name used as container name.
    */
-  public static final String PORTAL_CONTAINER_NAME = "portalContainerName"; 
+  public static final String PORTAL_CONTAINER_NAME = "portalContainerName";
 
   /**
    * Logger.
    */
-  private static Log log = ExoLogger.getLogger("core.security.SetCurrentIdentityFilter");
+  private static Log         log                   = ExoLogger.getLogger("core.security.SetCurrentIdentityFilter");
 
   /**
    * Portal Container name.
    */
-  private String     portalContainerName;
+  private String             portalContainerName;
 
   /**
    * {@inheritDoc}
@@ -70,8 +71,8 @@ public class SetCurrentIdentityFilter implements Filter {
   public void init(FilterConfig config) throws ServletException {
     // It is not possible to use application context name everywhere cause to
     // problem with access to resources (CSS). Try to find container name in
-    // filter init-param or in application context-param. And only if both of
-    // parameters are not specified then use application conetxt name.
+    // filter 'init-param' or in application 'context-param'. And only if both of
+    // parameters are not specified then use application context name.
 
     // Check filter init-param first
     portalContainerName = config.getInitParameter(PORTAL_CONTAINER_NAME);
@@ -97,7 +98,6 @@ public class SetCurrentIdentityFilter implements Filter {
                                                                                            ServletException {
 
     HttpServletRequest httpRequest = (HttpServletRequest) request;
-    // String contextName = "portal";
     ExoContainer container = ExoContainerContext.getContainerByName(portalContainerName);
     if (container == null) {
       if (log.isDebugEnabled()) {
@@ -128,29 +128,26 @@ public class SetCurrentIdentityFilter implements Filter {
   }
 
   /**
-   * Gives the current state 
+   * Gives the current state
    */
   private ConversationState getCurrentState(ExoContainer container, HttpServletRequest httpRequest) {
     ConversationRegistry conversationRegistry = (ConversationRegistry) container.getComponentInstanceOfType(ConversationRegistry.class);
 
     IdentityRegistry identityRegistry = (IdentityRegistry) container.getComponentInstanceOfType(IdentityRegistry.class);
 
-    String sessionId = null;
     ConversationState state = null;
-
     String userId = httpRequest.getRemoteUser();
+
+    // only if user authenticated, otherwise there is no reason to do anythings
     if (userId != null) {
-      // only if user authenticated, otherwise there is no reason to do
-      // anythings
       HttpSession httpSession = httpRequest.getSession();
-      sessionId = httpSession.getId();
-    }
-    if (sessionId != null) {
+      StateKey stateKey = new HttpSessionStateKey(httpSession);
+
       if (log.isDebugEnabled()) {
-        log.debug("Looking for Conversation State " + sessionId);
+        log.debug("Looking for Conversation State " + httpSession.getId());
       }
 
-      state = conversationRegistry.getState(sessionId);
+      state = conversationRegistry.getState(stateKey);
 
       if (state == null) {
         if (log.isDebugEnabled()) {
@@ -167,9 +164,9 @@ public class SetCurrentIdentityFilter implements Filter {
               + ", check Login Module.");
 
         if (state != null) {
-          conversationRegistry.register(sessionId, state);
+          conversationRegistry.register(stateKey, state);
           if (log.isDebugEnabled()) {
-            log.debug("Register Conversation state " + sessionId);
+            log.debug("Register Conversation state " + httpSession.getId());
           }
 
         }

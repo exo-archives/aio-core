@@ -53,7 +53,7 @@ public final class ConversationRegistry {
   /**
    * Storage for ConversationStates.
    */
-  private final ConcurrentHashMap<Object, ConversationState> states;
+  private final ConcurrentHashMap<StateKey, ConversationState> states;
 
   /**
    * @see {@link IdentityRegistry}
@@ -99,7 +99,7 @@ public final class ConversationRegistry {
   private ConversationRegistry(int concurrencyLevel,
                                IdentityRegistry identityRegistry,
                                ListenerService listenerService) {
-    this.states = new ConcurrentHashMap<Object, ConversationState>(concurrencyLevel,
+    this.states = new ConcurrentHashMap<StateKey, ConversationState>(concurrencyLevel,
                                                                    0.75f,
                                                                    concurrencyLevel);
     this.identityRegistry = identityRegistry;
@@ -112,7 +112,7 @@ public final class ConversationRegistry {
    * @param key the key.
    * @return ConversationState.
    */
-  public ConversationState getState(Object key) {
+  public ConversationState getState(StateKey key) {
     return states.get(key);
   }
 
@@ -124,7 +124,7 @@ public final class ConversationRegistry {
    * @param session the session.
    * @param makeCurrent the store or not the session into thread local.
    */
-  public void register(Object key, ConversationState state) {
+  public void register(StateKey key, ConversationState state) {
     // supposed that "old" stored value (if any) is no more useful in registry
     // so we "push" it
     // for example - we have to do "login" register with username as a key
@@ -147,7 +147,7 @@ public final class ConversationRegistry {
    * @param key the key.
    * @return removed ConversationState or null.
    */
-  public ConversationState unregister(Object key) {
+  public ConversationState unregister(StateKey key) {
     ConversationState state = states.remove(key);
 
     if (state == null)
@@ -160,7 +160,7 @@ public final class ConversationRegistry {
     // key userId.
     // This state created by method broadcastAuthentication in
     // AuthenticationService
-    List<Object> keys = getStateKeys(userId);
+    List<StateKey> keys = getStateKeys(userId);
     if (keys.size() == 0 || (keys.size() == 1 && keys.get(0).equals(userId))) {
       identityRegistry.unregister(userId);
     }
@@ -178,9 +178,9 @@ public final class ConversationRegistry {
    * @param userId the user identifier.
    * @return list of users ConversationState.
    */
-  public List<Object> getStateKeys(String userId) {
-    ArrayList<Object> s = new ArrayList<Object>();
-    for (Map.Entry<Object, ConversationState> a : states.entrySet()) {
+  public List<StateKey> getStateKeys(String userId) {
+    ArrayList<StateKey> s = new ArrayList<StateKey>();
+    for (Map.Entry<StateKey, ConversationState> a : states.entrySet()) {
       if (a.getValue().getIdentity().getUserId().equals(userId))
         s.add(a.getKey());
     }

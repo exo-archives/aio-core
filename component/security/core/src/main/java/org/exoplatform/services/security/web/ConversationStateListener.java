@@ -30,6 +30,7 @@ import org.exoplatform.container.RootContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.security.ConversationRegistry;
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.StateKey;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -53,15 +54,16 @@ public class ConversationStateListener implements HttpSessionListener {
    * Remove {@link ConversationState}. {@inheritDoc}
    */
   public void sessionDestroyed(HttpSessionEvent event) {
-    HttpSession ses = event.getSession();
-    ConversationRegistry conversationRegistry = (ConversationRegistry) getContainer(ses.getServletContext()).getComponentInstanceOfType(ConversationRegistry.class);
+    HttpSession httpSession = event.getSession();
+    StateKey stateKey = new HttpSessionStateKey(httpSession);
 
-    String sesionId = ses.getId();
-    ConversationState conversationState = conversationRegistry.unregister(sesionId);
+    ConversationRegistry conversationRegistry = (ConversationRegistry) getContainer(httpSession.getServletContext()).getComponentInstanceOfType(ConversationRegistry.class);
+
+    ConversationState conversationState = conversationRegistry.unregister(stateKey);
 
     if (conversationState != null)
       if (log.isDebugEnabled())
-        log.debug("Remove conversation state " + sesionId);
+        log.debug("Remove conversation state " + httpSession.getId());
 
   }
 
@@ -76,7 +78,7 @@ public class ConversationStateListener implements HttpSessionListener {
     }
     return container;
   }
-  
+
   /**
    * @param sctx {@link ServletContext}
    * @return actual ExoContainer instance

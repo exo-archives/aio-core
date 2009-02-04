@@ -21,10 +21,10 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.logging.Log;
+//import org.apache.commons.logging.Log;
 
 import org.exoplatform.container.StandaloneContainer;
-import org.exoplatform.services.log.ExoLogger;
+//import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.security.impl.DefaultRolesExtractorImpl;
 
 /**
@@ -36,7 +36,7 @@ import org.exoplatform.services.security.impl.DefaultRolesExtractorImpl;
  */
 public class TestRolesExtractor extends TestCase {
 
-  private static Log       log = ExoLogger.getLogger("pc.TestRolesExtractor");
+//  private static Log       log = ExoLogger.getLogger("pc.TestRolesExtractor");
 
   protected RolesExtractor rolesExtractor;
 

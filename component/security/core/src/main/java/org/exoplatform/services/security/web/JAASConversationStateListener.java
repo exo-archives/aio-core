@@ -24,6 +24,7 @@ import javax.servlet.http.HttpSessionEvent;
 
 import org.exoplatform.services.security.ConversationRegistry;
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.StateKey;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -36,15 +37,16 @@ public class JAASConversationStateListener extends ConversationStateListener {
    */
   @Override
   public void sessionDestroyed(HttpSessionEvent event) {
-    HttpSession ses = event.getSession();
-    String sesionId = ses.getId();
+    HttpSession httpSession = event.getSession();
+    StateKey stateKey = new HttpSessionStateKey(httpSession);
     try {
-      ConversationRegistry conversationRegistry = (ConversationRegistry) getContainer(ses.getServletContext()).getComponentInstanceOfType(ConversationRegistry.class);
+      ConversationRegistry conversationRegistry = (ConversationRegistry) getContainer(httpSession.getServletContext()).getComponentInstanceOfType(ConversationRegistry.class);
 
-      ConversationState conversationState = conversationRegistry.unregister(sesionId);
+      ConversationState conversationState = conversationRegistry.unregister(stateKey);
 
       if (conversationState != null) {
-        log.info("Remove conversation state " + sesionId);
+        if (log.isDebugEnabled())
+          log.debug("Remove conversation state " + httpSession.getId());
         if (conversationState.getAttribute(ConversationState.SUBJECT) != null) {
           Subject subject = (Subject) conversationState.getAttribute(ConversationState.SUBJECT);
           LoginContext ctx = new LoginContext("exo-domain", subject);
@@ -55,7 +57,7 @@ public class JAASConversationStateListener extends ConversationStateListener {
       }
 
     } catch (Exception e) {
-      log.error("Can't remove conversation state " + sesionId);
+      log.error("Can't remove conversation state " + httpSession.getId());
     }
   }
 

@@ -143,14 +143,15 @@ public class TestSessionRegistry extends TestCase {
     ConversationState.setCurrent(s);
     assertEquals(s, ConversationState.getCurrent());
 
+    StateKey key = new SimpleStateKey("key");
     //
-    registry.register("key", s);
-    assertNotNull(registry.getState("key"));
-    assertEquals(id, registry.getState("key").getIdentity());
+    registry.register(key, s);
+    assertNotNull(registry.getState(key));
+    assertEquals(id, registry.getState(key).getIdentity());
     assertSame(payload, s.getAttribute("payload"));
 
     //
-    registry.unregister("key");
+    registry.unregister(key);
 
     // Rethrow any junit error that could have been thrown in the listener
     if (assertionError != null) {
@@ -158,7 +159,7 @@ public class TestSessionRegistry extends TestCase {
     }
 
     //
-    assertNull(registry.getState("key"));
+    assertNull(registry.getState(key));
   }
 
   public void testMemberships() throws Exception {

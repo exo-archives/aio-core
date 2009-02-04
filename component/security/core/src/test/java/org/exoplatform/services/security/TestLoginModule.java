@@ -78,37 +78,9 @@ public class TestLoginModule extends TestCase {
 
     assertEquals(1, identityRegistry.getIdentity("exo").getGroups().size());
 
-    conversationRegistry.register("exo", new ConversationState(identityRegistry.getIdentity("exo")));
-    assertNotNull(conversationRegistry.getState("exo"));
-
-  }
-
-  // public void testRepeatLoginSameCredentials() throws Exception {
-  //
-  // BasicCallbackHandler handler = new BasicCallbackHandler("exo",
-  // "exo".toCharArray());
-  // LoginContext loginContext = new LoginContext("exo", handler);
-  // loginContext.login();
-  //
-  // Identity id = identityRegistry.getIdentity("exo");
-  //    
-  // handler = new BasicCallbackHandler("exo", "exo".toCharArray());
-  // loginContext = new LoginContext("exo", handler);
-  // loginContext.login();
-  // assertSame(id, identityRegistry.getIdentity("exo"));
-  //    
-  // }
-
-  public void testRepeatLoginLogoutSameCredentials() throws Exception {
-    BasicCallbackHandler handler = new BasicCallbackHandler("exo", "exo".toCharArray());
-    LoginContext loginContext = new LoginContext("exo", handler);
-    loginContext.login();
-    Identity id = identityRegistry.getIdentity("exo");
-    ConversationState s1 = new ConversationState(id);
-    conversationRegistry.register("exo1", s1);
-    ConversationState.setCurrent(s1);
-    assertNotNull(conversationRegistry.getState("exo1"));
-    loginContext.logout();
+    StateKey key = new SimpleStateKey("exo");
+    conversationRegistry.register(key, new ConversationState(identityRegistry.getIdentity("exo")));
+    assertNotNull(conversationRegistry.getState(key));
 
   }
 
