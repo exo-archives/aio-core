@@ -82,11 +82,19 @@ public class UserProfileDAOImpl implements UserProfileHandler {
     if (upd == null) {
       upd = new UserProfileData();
       upd.setUserProfile(profile);
+      if (broadcast)
+        preSave(profile, true);
       session.save(profile.getUserName(), upd);
+      if (broadcast)
+        postSave(profile, true);
       session.flush();
     } else {
       upd.setUserProfile(profile);
+      if (broadcast)
+        preSave(profile, false);
       session.update(upd);
+      if (broadcast)
+        postSave(profile, false);
       session.flush();
     }
     cache_.put(profile.getUserName(), profile);
@@ -98,10 +106,15 @@ public class UserProfileDAOImpl implements UserProfileHandler {
       UserProfileData upd = (UserProfileData) service_.findExactOne(session,
                                                                     queryFindUserProfileByName,
                                                                     userName);
+      UserProfile profile = upd.getUserProfile();
+      if (broadcast)
+        preDelete(profile);
       session.delete(upd);
+      if (broadcast)
+        postDelete(profile);
       session.flush();
       cache_.remove(userName);
-      return upd.getUserProfile();
+      return profile;
     } catch (Exception exp) {
       return null;
     }
@@ -143,6 +156,26 @@ public class UserProfileDAOImpl implements UserProfileHandler {
 
   public Collection findUserProfiles() throws Exception {
     return null;
+  }
+  
+  private void preSave(UserProfile profile, boolean isNew) throws Exception {
+    for (UserProfileEventListener listener : listeners_) 
+      listener.preSave(profile, isNew);
+  }
+  
+  private void postSave(UserProfile profile, boolean isNew) throws Exception {
+    for (UserProfileEventListener listener : listeners_)
+      listener.postSave(profile, isNew);
+  }
+  
+  private void preDelete(UserProfile profile) throws Exception {
+    for (UserProfileEventListener listener : listeners_)
+      listener.preDelete(profile);
+  }
+  
+  private void postDelete(UserProfile profile) throws Exception {
+    for (UserProfileEventListener listener : listeners_)
+      listener.postDelete(profile);
   }
 
 }

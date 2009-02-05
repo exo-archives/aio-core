@@ -39,7 +39,8 @@
       </properties-param>
     </init-params>
   </component>
-  <import>classpath:/conf/portal/jdbc-organization-configuration.xml</import>
+  <import>classpath:/conf/portal/hibernate-organization-configuration.xml</import>
+<!--  <import>classpath:/conf/portal/jdbc-organization-configuration.xml</import>-->
   <import>classpath:/conf/portal/test-organization-configuration.xml</import>
-  <remove-configuration>org.exoplatform.services.database.HibernateService</remove-configuration>
+<!--  <remove-configuration>org.exoplatform.services.database.HibernateService</remove-configuration>-->
 </configuration>

@@ -422,6 +422,54 @@ public class TestOrganizationService extends BasicTestCase {
     groupHandler_.removeGroup(group2, true);
     groupHandler_.removeGroup(group3, true);
   }
+  
+  public void testUserProfileListener() throws Exception {
+    UserProfileListener l = new UserProfileListener();
+    profileHandler_.addUserProfileEventListener(l);
+    User user = createUser(USER);
+    assertNotNull(user);
+    UserProfile profile = profileHandler_.createUserProfileInstance(user.getUserName());
+    profileHandler_.saveUserProfile(profile, true);
+    assertTrue(l.preSave && l.postSave);
+    profileHandler_.removeUserProfile(user.getUserName(), true);
+    assertTrue(l.preDelete && l.postDelete);
+  }
+  
+  private static class UserProfileListener extends UserProfileEventListener {
+
+    boolean preSave;
+
+    boolean postSave;
+
+    boolean preDelete;
+
+    boolean postDelete;
+
+    @Override
+    public void postDelete(UserProfile profile) throws Exception {
+      assertEquals(USER, profile.getUserName());
+      postDelete = true;
+    }
+
+    @Override
+    public void postSave(UserProfile profile, boolean isNew) throws Exception {
+      assertEquals(USER, profile.getUserName());
+      postSave = true;
+    }
+
+    @Override
+    public void preDelete(UserProfile profile) throws Exception {
+      assertEquals(USER, profile.getUserName());
+      preDelete = true;
+    }
+
+    @Override
+    public void preSave(UserProfile profile, boolean isNew) throws Exception {
+      assertEquals(USER, profile.getUserName());
+      preSave = true;
+    }
+
+  }
 
   public User createUser(String userName) throws Exception {
     User user = userHandler_.createUserInstance(userName);
