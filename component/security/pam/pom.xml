@@ -6,7 +6,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.core.component.security.pam</artifactId>
-  <version>${org.exoplatform.core.version}</version>
+  <version>2.2-SNAPSHOT</version>
   <name>JPam Authenticator</name>
   <description></description>
 
@@ -19,7 +19,7 @@
     <dependency>
       <groupId>org.exoplatform.core</groupId>
       <artifactId>exo.core.component.organization.api</artifactId>
-      <version>${org.exoplatform.core.version}</version>
+      <version>2.2-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
