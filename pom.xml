@@ -32,6 +32,7 @@
     <module>component/resources/api</module>
     <module>component/script/groovy</module>
     <module>component/gifbackport</module>
+    <module>component/web/css</module>
   </modules>
 
   <dependencies>
@@ -155,8 +156,8 @@
                 <taskdef resource="emma_ant.properties" classpathref="maven.dependency.classpath" />
                 <emma enabled="true">
                   <!-- merged file will be rewritted by last project -->
-                  <merge outfile="${exo.projects.directory.src}/core/trunk/target/coverage.es">
-                    <fileset dir="${exo.projects.directory.src}/core/trunk/">
+                  <merge outfile="${exo.projects.directory.src}/core/tags/2.2/target/coverage.es">
+                    <fileset dir="${exo.projects.directory.src}/core/tags/2.2/">
                       <include name="**/target/emma/*.e*" />
                       <include name="**/target/emma/*.e*" />
                     </fileset>
@@ -165,15 +166,15 @@
                   </merge>
                   <report>
                     <sourcepath>
-                      <dirset dir="${exo.projects.directory.src}/core/trunk/">
+                      <dirset dir="${exo.projects.directory.src}/core/tags/2.2/">
                         <include name="**/src/**/java" />
                       </dirset>
                     </sourcepath>
-                    <fileset dir="${exo.projects.directory.src}/core/trunk/target/">
+                    <fileset dir="${exo.projects.directory.src}/core/tags/2.2/target/">
                       <include name="*.es" />
                     </fileset>
-                    <html outfile="${exo.projects.directory.src}/core/trunk/target/coverage.html" />
-                    <xml outfile="${exo.projects.directory.src}/core/trunk/target/coverage.xml" />
+                    <html outfile="${exo.projects.directory.src}/core/tags/2.2/target/coverage.html" />
+                    <xml outfile="${exo.projects.directory.src}/core/tags/2.2/target/coverage.xml" />
                   </report>
                 </emma>
               </tasks>
