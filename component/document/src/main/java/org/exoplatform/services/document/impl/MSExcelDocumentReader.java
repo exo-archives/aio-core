@@ -56,6 +56,9 @@ public class MSExcelDocumentReader extends BaseDocumentReader {
    * @throws Exception
    */
   public String getContentAsText(InputStream is) throws Exception {
+    if(is==null){
+      throw new NullPointerException("InputStream is null.");
+    }
     String text = "";
     try {
       HSSFWorkbook wb = new HSSFWorkbook(is);

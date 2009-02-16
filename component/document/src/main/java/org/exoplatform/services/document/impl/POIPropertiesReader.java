@@ -46,6 +46,9 @@ public class POIPropertiesReader {
   }
 
   public Properties readDCProperties(InputStream is) throws Exception {
+    if(is==null){
+      throw new NullPointerException("InputStream is null.");
+    }
 
     POIFSReaderListener readerListener = new POIFSReaderListener() {
       public void processPOIFSReaderEvent(final POIFSReaderEvent event) {

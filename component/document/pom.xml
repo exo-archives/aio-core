@@ -78,6 +78,21 @@
         </includes>
       </testResource>
      </testResources>
+     <plugins>
+           <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <testFailureIgnore>${exo.test.failure.ignore}</testFailureIgnore>
+          <includes>
+            <include>**/Test*.java</include>
+                       
+          </includes>
+          <excludes>
+          </excludes>
+        </configuration>
+      </plugin>
+     </plugins>
   </build>
 
 </project>

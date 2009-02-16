@@ -62,6 +62,9 @@ public class OpenOfficeDocumentReader extends BaseDocumentReader {
    * io.InputStream)
    */
   public String getContentAsText(InputStream is) throws Exception {
+    if(is==null){
+      throw new NullPointerException("InputStream is null.");
+    }
     try {
       SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
       saxParserFactory.setValidating(false);
@@ -72,6 +75,9 @@ public class OpenOfficeDocumentReader extends BaseDocumentReader {
 
       ZipInputStream zis = new ZipInputStream(is);
       ZipEntry ze = zis.getNextEntry();
+      if(ze==null){
+        return "";
+      }
       while (!ze.getName().equals("content.xml")) {
         ze = zis.getNextEntry();
       }

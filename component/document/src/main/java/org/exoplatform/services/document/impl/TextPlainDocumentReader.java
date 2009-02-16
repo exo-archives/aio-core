@@ -69,23 +69,16 @@ public class TextPlainDocumentReader extends BaseDocumentReader {
    * @throws Exception
    */
   public String getContentAsText(InputStream is) throws Exception {
-
-    byte[] buffer = new byte[2048];
-    int len;
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    while ((len = is.read(buffer)) > 0)
-      bos.write(buffer, 0, len);
-    bos.close();
-
     if (this.defaultEncoding != null) {
-      return new String(bos.toByteArray(), defaultEncoding);
+      return getContentAsText(is, defaultEncoding);
     } else {
-      return new String(bos.toByteArray()); // system encoding will be used
+      return getContentAsText(is, null); // system encoding will be used
     }
   }
 
   /**
-   * Returns a text from file content.
+   * Returns a text from file content. If encoding parameter is null - system
+   * encoding will be used.
    * 
    * @param is an input stream with a file content.
    * @param encoding file content encoding.
@@ -93,20 +86,31 @@ public class TextPlainDocumentReader extends BaseDocumentReader {
    * @throws Exception
    */
   public String getContentAsText(InputStream is, String encoding) throws Exception {
+    if (is == null) {
+      throw new NullPointerException("InputStream is null.");
+    }
+
     byte[] buffer = new byte[2048];
     int len;
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     while ((len = is.read(buffer)) > 0)
       bos.write(buffer, 0, len);
     bos.close();
-    return new String(bos.toByteArray(), encoding);
+
+    if (bos.size() == 0)
+      return "";
+    else if (encoding != null)
+      return new String(bos.toByteArray(), encoding);
+    else
+      return new String(bos.toByteArray());
+
   }
 
   /*
    * (non-Javadoc)
-   * @see
-   * org.exoplatform.services.document.DocumentReader#getProperties(java.io.
-   * InputStream)
+   * 
+   * @see org.exoplatform.services.document.DocumentReader#getProperties(java.io.
+   *      InputStream)
    */
   public Properties getProperties(InputStream is) throws Exception {
     return new Properties();

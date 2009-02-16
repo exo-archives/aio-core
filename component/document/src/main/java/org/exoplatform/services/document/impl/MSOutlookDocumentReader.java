@@ -48,6 +48,9 @@ public class MSOutlookDocumentReader extends BaseDocumentReader {
   }
 
   public String getContentAsText(InputStream is) throws Exception {
+    if(is==null){
+      throw new NullPointerException("InputStream is null.");
+    }
     try {
       MAPIMessage message = new MAPIMessage(is);
       StringBuffer buffer = new StringBuffer();

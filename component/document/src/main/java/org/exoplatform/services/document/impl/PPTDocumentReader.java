@@ -48,6 +48,10 @@ public class PPTDocumentReader extends BaseDocumentReader {
    * @throws Exception
    */
   public String getContentAsText(InputStream is) throws Exception {
+    if(is==null){
+      throw new NullPointerException("InputStream is null.");
+    }
+    
     PowerPointExtractor ppe = new PowerPointExtractor(is);
     return ppe.getText(true, true);
   }

@@ -69,6 +69,9 @@ public class PDFDocumentReader extends BaseDocumentReader {
    * @throws Exception
    */
   public String getContentAsText(InputStream is) throws Exception {
+    if(is==null){
+      throw new NullPointerException("InputStream is null.");
+    }
     PDDocument pdDocument = PDDocument.load(is);
     StringWriter sw = new StringWriter();
     try {
