@@ -16,10 +16,12 @@
  */
 package org.exoplatform.services.document.impl;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.poi.hslf.extractor.PowerPointExtractor;
+import org.exoplatform.services.document.DocumentReadException;
 
 /**
  * Created by The eXo Platform SAS A parser of Microsoft PowerPoint files.
@@ -45,29 +47,41 @@ public class PPTDocumentReader extends BaseDocumentReader {
    * 
    * @param is an input stream with .ppt file content.
    * @return The string only with text from file content.
-   * @throws Exception
    */
-  public String getContentAsText(InputStream is) throws Exception {
-    if(is==null){
+  public String getContentAsText(InputStream is) throws IOException, DocumentReadException {
+    if (is == null) {
       throw new NullPointerException("InputStream is null.");
     }
-    
-    PowerPointExtractor ppe = new PowerPointExtractor(is);
-    return ppe.getText(true, true);
+    try {
+      PowerPointExtractor ppe;
+      try{
+         ppe = new PowerPointExtractor(is);
+      }catch(IOException e){
+        return "";
+      }
+      return ppe.getText(true, true);
+    } finally {
+      if (is != null)
+        try {
+          is.close();
+        } catch (IOException e) {
+        }
+    }
   }
 
-  public String getContentAsText(InputStream is, String encoding) throws Exception {
+  public String getContentAsText(InputStream is, String encoding) throws IOException,
+                                                                 DocumentReadException {
     // Ignore encoding
     return getContentAsText(is);
   }
 
   /*
    * (non-Javadoc)
-   * @see
-   * org.exoplatform.services.document.DocumentReader#getProperties(java.io.
-   * InputStream)
+   * 
+   * @see org.exoplatform.services.document.DocumentReader#getProperties(java.io.
+   *      InputStream)
    */
-  public Properties getProperties(InputStream is) throws Exception {
+  public Properties getProperties(InputStream is) throws IOException, DocumentReadException {
     POIPropertiesReader reader = new POIPropertiesReader();
     reader.readDCProperties(is);
     return reader.getProperties();

@@ -17,11 +17,14 @@
 package org.exoplatform.services.document.impl;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import org.exoplatform.services.document.DocumentReadException;
 
 /**
  * Created by The eXo Platform SAS A parser of XML files.
@@ -30,13 +33,6 @@ import java.util.regex.PatternSyntaxException;
  * @version March 07, 2006
  */
 public class XMLDocumentReader extends BaseDocumentReader {
-
-  // /**
-  // * Initializes a newly created object for text/xml files type parsing.
-  // * @param params the container parameters.
-  // */
-  // public XMLDocumentReader(InitParams params) {
-  // }
 
   /**
    * Get the text/xml mime type.
@@ -53,33 +49,45 @@ public class XMLDocumentReader extends BaseDocumentReader {
    * @param is an input stream with html file content.
    * @return The string only with text from file content.
    */
-  public String getContentAsText(InputStream is) throws Exception {
+  public String getContentAsText(InputStream is) throws IOException, DocumentReadException {
     if (is == null) {
       throw new NullPointerException("InputStream is null.");
     }
-    
-    byte[] buffer = new byte[2048];
-    int len;
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    while ((len = is.read(buffer)) > 0)
-      bos.write(buffer, 0, len);
-    bos.close();
-    String xml = new String(bos.toByteArray());
-    return delete(xml);
+    try {
+      byte[] buffer = new byte[2048];
+      int len;
+      ByteArrayOutputStream bos = new ByteArrayOutputStream();
+      while ((len = is.read(buffer)) > 0)
+        bos.write(buffer, 0, len);
+      bos.close();
+      String xml = new String(bos.toByteArray());
+      return delete(xml);
+    } finally {
+      if (is != null)
+        try {
+          is.close();
+        } catch (IOException e) {
+        }
+    }
   }
 
-  public String getContentAsText(InputStream is, String encoding) throws Exception {
+  public String getContentAsText(InputStream is, String encoding) throws IOException,
+                                                                 DocumentReadException {
     // Ignore encoding
     return getContentAsText(is);
   }
 
   /*
    * (non-Javadoc)
-   * @see
-   * org.exoplatform.services.document.DocumentReader#getProperties(java.io.
-   * InputStream)
+   * 
+   * @see org.exoplatform.services.document.DocumentReader#getProperties(java.io.
+   *      InputStream)
    */
-  public Properties getProperties(InputStream is) throws Exception {
+  public Properties getProperties(InputStream is) throws IOException, DocumentReadException {
+    try {
+      is.close();
+    } catch (IOException e) {
+    }
     return new Properties();
   }
 

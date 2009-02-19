@@ -16,6 +16,7 @@
  */
 package org.exoplatform.services.document;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -35,23 +36,27 @@ public interface DocumentReader {
   /**
    * @param is
    * @return document content
-   * @throws Exception
+   * @throws IOException TODO
+   * @throws DocumentReadException TODO
    */
-  String getContentAsText(InputStream is) throws Exception;
+  String getContentAsText(InputStream is) throws IOException, DocumentReadException;
 
   /**
    * @param is data input stream
    * @param encoding char set for input stream
    * @return document content
-   * @throws Exception
+   * @throws IOException TODO
+   * @throws DocumentReadException TODO
    */
-  String getContentAsText(InputStream is, String encoding) throws Exception;
+  String getContentAsText(InputStream is, String encoding) throws IOException, DocumentReadException;
 
   /**
    * @param mimeType
    * @return metainfo properties reduced to some supported metadata set (Dublin
    *         Core or other)
+   * @throws IOException TODO
+   * @throws DocumentReadException TODO
    */
-  Properties getProperties(InputStream is) throws Exception;
+  Properties getProperties(InputStream is) throws IOException, DocumentReadException;
 
 }

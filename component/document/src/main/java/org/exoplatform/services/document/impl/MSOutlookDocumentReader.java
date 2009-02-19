@@ -17,11 +17,13 @@
 
 package org.exoplatform.services.document.impl;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.poi.hsmf.MAPIMessage;
 import org.apache.poi.hsmf.exceptions.ChunkNotFoundException;
+import org.exoplatform.services.document.DocumentReadException;
 
 /**
  * Created by The eXo Platform SAS Author : Sergey Karpenko
@@ -47,12 +49,17 @@ public class MSOutlookDocumentReader extends BaseDocumentReader {
     MAPIMessage.class.getName();
   }
 
-  public String getContentAsText(InputStream is) throws Exception {
-    if(is==null){
+  public String getContentAsText(InputStream is) throws IOException, DocumentReadException {
+    if (is == null) {
       throw new NullPointerException("InputStream is null.");
     }
     try {
-      MAPIMessage message = new MAPIMessage(is);
+      MAPIMessage message;
+      try{
+        message = new MAPIMessage(is);
+      }catch(IOException e){
+        return "";
+      }
       StringBuffer buffer = new StringBuffer();
       try {
         buffer.append(message.getDisplayFrom()).append('\n');
@@ -69,23 +76,35 @@ public class MSOutlookDocumentReader extends BaseDocumentReader {
       } catch (ChunkNotFoundException e) {
         // "subject" is empty
       }
-      buffer.append(message.getTextBody());
+      try {
+        buffer.append(message.getTextBody());
+      } catch (ChunkNotFoundException e) {
+        // "textBody" is empty
+      }
       return buffer.toString();
-    } catch (Exception e) {
-      // e.printStackTrace();
-      return "";
+
     } finally {
-      is.close();
+      if (is != null) {
+        try {
+          is.close();
+        } catch (IOException e) {
+        }
+      }
     }
   }
 
-  public String getContentAsText(InputStream is, String encoding) throws Exception {
+  public String getContentAsText(InputStream is, String encoding) throws IOException,
+                                                                 DocumentReadException {
     // ignore encoding
     return getContentAsText(is);
   }
 
-  public Properties getProperties(InputStream is) throws Exception {
-    return null;
+  public Properties getProperties(InputStream is) throws IOException, DocumentReadException {
+    try {
+      is.close();
+    } catch (IOException e) {
+    }
+    return new Properties();
   }
 
 }

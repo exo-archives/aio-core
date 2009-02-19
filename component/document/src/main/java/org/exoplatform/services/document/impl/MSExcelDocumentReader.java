@@ -16,6 +16,7 @@
  */
 package org.exoplatform.services.document.impl;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -27,6 +28,7 @@ import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.exoplatform.services.document.DocumentReadException;
 
 /**
  * Created by The eXo Platform SAS A parser of Microsoft Excel files.
@@ -53,15 +55,21 @@ public class MSExcelDocumentReader extends BaseDocumentReader {
    * 
    * @param is an input stream with .xls file content.
    * @return The string only with text from file content.
-   * @throws Exception
    */
-  public String getContentAsText(InputStream is) throws Exception {
-    if(is==null){
+  public String getContentAsText(InputStream is) throws IOException, DocumentReadException {
+    if (is == null) {
       throw new NullPointerException("InputStream is null.");
     }
+
     String text = "";
+   
     try {
-      HSSFWorkbook wb = new HSSFWorkbook(is);
+      HSSFWorkbook wb;
+      try{
+        wb = new HSSFWorkbook(is);
+      }catch(IOException e){
+        return text;
+      }
       for (int sheetNum = 0; sheetNum < wb.getNumberOfSheets(); sheetNum++) {
         HSSFSheet sheet = wb.getSheetAt(sheetNum);
         if (sheet != null) {
@@ -106,24 +114,30 @@ public class MSExcelDocumentReader extends BaseDocumentReader {
           }
         }
       }
-    } catch (Exception e) {
-      // e.printStackTrace();
+    } finally {
+      if (is != null) {
+        try {
+          is.close();
+        } catch (IOException e) {
+        }
+      }
     }
     return text;
   }
 
-  public String getContentAsText(InputStream is, String encoding) throws Exception {
+  public String getContentAsText(InputStream is, String encoding) throws IOException,
+                                                                 DocumentReadException {
     // Ignore encoding
     return getContentAsText(is);
   }
 
   /*
    * (non-Javadoc)
-   * @see
-   * org.exoplatform.services.document.DocumentReader#getProperties(java.io.
-   * InputStream)
+   * 
+   * @see org.exoplatform.services.document.DocumentReader#getProperties(java.io.
+   *      InputStream)
    */
-  public Properties getProperties(InputStream is) throws Exception {
+  public Properties getProperties(InputStream is) throws IOException, DocumentReadException {
     POIPropertiesReader reader = new POIPropertiesReader();
     reader.readDCProperties(is);
     return reader.getProperties();

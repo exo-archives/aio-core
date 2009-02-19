@@ -20,15 +20,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.services.document.DocumentReadException;
 import org.htmlparser.Parser;
 import org.htmlparser.beans.StringBean;
 import org.htmlparser.util.ParserException;
-
-import org.exoplatform.container.xml.InitParams;
 
 /**
  * Created by The eXo Platform SAS A parser of HTML files.
@@ -46,10 +43,6 @@ public class HTMLDocumentReader extends BaseDocumentReader {
   public HTMLDocumentReader(InitParams params) {
   }
 
-  /*
-   * public HTMLDocumentReader() { }
-   */
-
   /**
    * Get the text/html mime type.
    * 
@@ -65,11 +58,11 @@ public class HTMLDocumentReader extends BaseDocumentReader {
    * @param is an input stream with html file content.
    * @return The string only with text from file content.
    */
-  public String getContentAsText(InputStream is) throws Exception {
-    if(is==null){
+  public String getContentAsText(InputStream is) throws IOException, DocumentReadException {
+    if (is == null) {
       throw new NullPointerException("InputStream is null.");
     }
-    
+
     String refined_text = new String();
     try {
       byte[] buffer = new byte[2048];
@@ -91,55 +84,39 @@ public class HTMLDocumentReader extends BaseDocumentReader {
       parser.visitAllNodesWith(sb);
 
       String text = sb.getStrings();
-
       refined_text = (text != null) ? text : ""; // delete(text);
 
-    } catch (IOException e) {
-      return new String("");
     } catch (ParserException e) {
-      return new String("");
+      throw new DocumentReadException(e.getMessage(), e);
+    } finally {
+      if (is != null) {
+        try {
+          is.close();
+        } catch (IOException e) {
+        }
+      }
     }
 
     return refined_text;
   }
 
-  public String getContentAsText(InputStream is, String encoding) throws Exception {
+  public String getContentAsText(InputStream is, String encoding) throws IOException,
+                                                                 DocumentReadException {
     // Ignore encoding
     return getContentAsText(is);
   }
 
   /*
    * (non-Javadoc)
-   * @see
-   * org.exoplatform.services.document.DocumentReader#getProperties(java.io.
-   * InputStream)
+   * 
+   * @see org.exoplatform.services.document.DocumentReader#getProperties(java.io.
+   *      InputStream)
    */
-  public Properties getProperties(InputStream is) throws Exception {
+  public Properties getProperties(InputStream is) throws IOException, DocumentReadException {
+    try {
+      is.close();
+    } catch (IOException e) {
+    }
     return new Properties();
   }
-
-  /**
-   * Cleans the string from users's tags and their bodies.
-   * 
-   * @param str the string which contain a text with user's tags.
-   * @return The string cleaned from user's tags and their bodies.
-   */
-  private String delete(String str) {
-    try {
-      StringBuffer input = new StringBuffer(str);
-      String patternString = "<+[^>]*>+";
-      Pattern pattern = Pattern.compile(patternString, Pattern.CASE_INSENSITIVE + Pattern.DOTALL);
-      Matcher matcher = pattern.matcher(input);
-      while (matcher.find()) {
-        int start = matcher.start();
-        int end = matcher.end();
-        input.delete(start, end);
-        matcher = pattern.matcher(input);
-      }
-      return input.substring(0, input.length());
-    } catch (PatternSyntaxException e) {
-    }
-    return "";
-  }
-
 }

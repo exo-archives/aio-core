@@ -17,22 +17,27 @@
 
 package org.exoplatform.services.document.impl;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 import org.exoplatform.commons.utils.QName;
 import org.exoplatform.services.document.DCMetaData;
+import org.exoplatform.services.document.DocumentReadException;
 
 /**
  * Created by The eXo Platform SAS .
@@ -45,6 +50,7 @@ public class OpenOfficeDocumentReader extends BaseDocumentReader {
 
   /*
    * (non-Javadoc)
+   * 
    * @see org.exoplatform.services.document.DocumentReader#getMimeTypes()
    */
   public String[] getMimeTypes() {
@@ -57,27 +63,32 @@ public class OpenOfficeDocumentReader extends BaseDocumentReader {
 
   /*
    * (non-Javadoc)
-   * @see
-   * org.exoplatform.services.document.DocumentReader#getContentAsText(java.
-   * io.InputStream)
+   * 
+   * @see org.exoplatform.services.document.DocumentReader#getContentAsText(java.
+   *      io.InputStream)
    */
-  public String getContentAsText(InputStream is) throws Exception {
-    if(is==null){
+  public String getContentAsText(InputStream is) throws IOException, DocumentReadException {
+    if (is == null) {
       throw new NullPointerException("InputStream is null.");
     }
     try {
       SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
       saxParserFactory.setValidating(false);
-      SAXParser saxParser = saxParserFactory.newSAXParser();
+      SAXParser saxParser;
+
+      saxParser = saxParserFactory.newSAXParser();
       XMLReader xmlReader = saxParser.getXMLReader();
       xmlReader.setFeature("http://xml.org/sax/features/validation", false);
+
       xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
       ZipInputStream zis = new ZipInputStream(is);
       ZipEntry ze = zis.getNextEntry();
-      if(ze==null){
+
+      if (ze == null) {
         return "";
       }
+
       while (!ze.getName().equals("content.xml")) {
         ze = zis.getNextEntry();
       }
@@ -87,36 +98,51 @@ public class OpenOfficeDocumentReader extends BaseDocumentReader {
       try {
         xmlReader.parse(new InputSource(zis));
       } finally {
-        zis.close();
+        try {
+          zis.close();
+        } catch (IOException e) {
+        }
       }
 
       return contentHandler.getContent();
-      // } catch (ParserConfigurationException e) {
-      // return "";
-      // } catch (SAXException e) {
-      // return "";
+    } catch (ParserConfigurationException e) {
+      throw new DocumentReadException(e.getMessage(), e);
+    } catch (SAXException e) {
+      throw new DocumentReadException(e.getMessage(), e);
     } finally {
-      is.close();
+      if (is != null)
+        try {
+          if (is != null)
+            try {
+              is.close();
+            } catch (IOException e) {
+            }
+          is.close();
+        } catch (IOException e) {
+        }
     }
   }
 
-  public String getContentAsText(InputStream is, String encoding) throws Exception {
+  public String getContentAsText(InputStream is, String encoding) throws IOException,
+                                                                 DocumentReadException {
     // Ignore encoding
     return getContentAsText(is);
   }
 
   /*
    * (non-Javadoc)
-   * @see
-   * org.exoplatform.services.document.DocumentReader#getProperties(java.io.
-   * InputStream)
+   * 
+   * @see org.exoplatform.services.document.DocumentReader#getProperties(java.io.
+   *      InputStream)
    */
-  public Properties getProperties(InputStream is) throws Exception {
+  public Properties getProperties(InputStream is) throws IOException, DocumentReadException {
     try {
       SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
       saxParserFactory.setValidating(false);
       SAXParser saxParser = saxParserFactory.newSAXParser();
+
       XMLReader xmlReader = saxParser.getXMLReader();
+
       xmlReader.setFeature("http://xml.org/sax/features/validation", false);
       xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
@@ -136,8 +162,16 @@ public class OpenOfficeDocumentReader extends BaseDocumentReader {
 
       return metaHandler.getProperties();
 
+    } catch (ParserConfigurationException e) {
+      throw new DocumentReadException(e.getMessage(), e);
+    } catch (SAXException e) {
+      throw new DocumentReadException(e.getMessage(), e);
     } finally {
-      is.close();
+      if (is != null)
+        try {
+          is.close();
+        } catch (IOException e) {
+        }
     }
   }
 

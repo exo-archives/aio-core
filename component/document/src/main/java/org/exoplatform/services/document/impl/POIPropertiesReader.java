@@ -19,16 +19,19 @@ package org.exoplatform.services.document.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
+import org.apache.poi.hpsf.MarkUnsupportedException;
+import org.apache.poi.hpsf.NoPropertySetStreamException;
 import org.apache.poi.hpsf.PropertySet;
 import org.apache.poi.hpsf.PropertySetFactory;
 import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.poifs.eventfilesystem.POIFSReader;
 import org.apache.poi.poifs.eventfilesystem.POIFSReaderEvent;
 import org.apache.poi.poifs.eventfilesystem.POIFSReaderListener;
-
 import org.exoplatform.services.document.DCMetaData;
+import org.exoplatform.services.document.DocumentReadException;
 
 /**
  * Created by The eXo Platform SAS .
@@ -45,15 +48,31 @@ public class POIPropertiesReader {
     return props;
   }
 
-  public Properties readDCProperties(InputStream is) throws Exception {
-    if(is==null){
+  public Properties readDCProperties(InputStream is) throws IOException, DocumentReadException {
+    if (is == null) {
       throw new NullPointerException("InputStream is null.");
+    }
+
+    @SuppressWarnings("serial")
+    class POIRuntimeException extends RuntimeException {
+      private Throwable ex;
+
+      public POIRuntimeException(Throwable ex) {
+        this.ex = ex;
+      }
+
+      public Throwable getException() {
+        return ex;
+      }
     }
 
     POIFSReaderListener readerListener = new POIFSReaderListener() {
       public void processPOIFSReaderEvent(final POIFSReaderEvent event) {
+
+        PropertySet ps;
         try {
-          PropertySet ps = PropertySetFactory.create(event.getStream());
+          ps = PropertySetFactory.create(event.getStream());
+
           if (ps instanceof SummaryInformation) {
             SummaryInformation si = (SummaryInformation) ps;
 
@@ -77,8 +96,14 @@ public class POIPropertiesReader {
               props.put(DCMetaData.TITLE, si.getTitle());
 
           }
-        } catch (Exception e) {
-          throw new RuntimeException(e);
+        } catch (NoPropertySetStreamException e) {
+          throw new POIRuntimeException(new DocumentReadException(e.getMessage(), e));
+        } catch (MarkUnsupportedException e) {
+          throw new POIRuntimeException(new DocumentReadException(e.getMessage(), e));
+        } catch (UnsupportedEncodingException e) {
+          throw new POIRuntimeException(new DocumentReadException(e.getMessage(), e));
+        } catch (IOException e) {
+          throw new POIRuntimeException(e);
         }
       }
     };
@@ -87,8 +112,13 @@ public class POIPropertiesReader {
       POIFSReader poiFSReader = new POIFSReader();
       poiFSReader.registerListener(readerListener, SummaryInformation.DEFAULT_STREAM_NAME);
       poiFSReader.read(is);
-    } catch (IOException ie) {
-      // This exception cause by POIFS
+    } catch (POIRuntimeException e) {
+      Throwable ex = e.getException();
+      if (ex instanceof IOException) {
+        throw (IOException) ex;
+      } else {
+        throw (DocumentReadException) ex;
+      }
     } finally {
       if (is != null) {
         try {

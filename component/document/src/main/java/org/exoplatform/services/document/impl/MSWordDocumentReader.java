@@ -22,6 +22,7 @@ import java.util.Properties;
 
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.usermodel.Range;
+import org.exoplatform.services.document.DocumentReadException;
 
 /**
  * Created by The eXo Platform SAS A parser of Microsoft Word files.
@@ -46,36 +47,45 @@ public class MSWordDocumentReader extends BaseDocumentReader {
    * 
    * @param is an input stream with .doc file content.
    * @return The string only with text from file content.
-   * @throws Exception
    */
-  public String getContentAsText(InputStream is) throws Exception {
-    if(is==null){
+  public String getContentAsText(InputStream is) throws IOException, DocumentReadException {
+    if (is == null) {
       throw new NullPointerException("InputStream is null.");
     }
     String text = "";
     try {
-      HWPFDocument doc = new HWPFDocument(is);
-      // WordExtractor extr = new WordExtractor(doc);
-
+      HWPFDocument doc;
+      try{
+        doc = new HWPFDocument(is);
+      }catch(IOException e){
+        return "";
+      }
+      
       Range range = doc.getRange();
       text = range.text();
-    } catch (IOException e) {
+    } finally {
+      if (is != null)
+        try {
+          is.close();
+        } catch (IOException e) {
+        }
     }
     return text.trim();
   }
 
-  public String getContentAsText(InputStream is, String encoding) throws Exception {
+  public String getContentAsText(InputStream is, String encoding) throws IOException,
+                                                                 DocumentReadException {
     // Ignore encoding
     return getContentAsText(is);
   }
 
   /*
    * (non-Javadoc)
-   * @see
-   * org.exoplatform.services.document.DocumentReader#getProperties(java.io.
-   * InputStream)
+   * 
+   * @see org.exoplatform.services.document.DocumentReader#getProperties(java.io.
+   *      InputStream)
    */
-  public Properties getProperties(InputStream is) throws Exception {
+  public Properties getProperties(InputStream is) throws IOException, DocumentReadException {
     POIPropertiesReader reader = new POIPropertiesReader();
     reader.readDCProperties(is);
     return reader.getProperties();

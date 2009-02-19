@@ -17,11 +17,13 @@
 package org.exoplatform.services.document.impl;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValuesParam;
+import org.exoplatform.services.document.DocumentReadException;
 
 /**
  * Created by The eXo Platform SAS A reader of text files.
@@ -66,9 +68,8 @@ public class TextPlainDocumentReader extends BaseDocumentReader {
    * 
    * @param is an input stream with a file content.
    * @return The string with text from file content.
-   * @throws Exception
    */
-  public String getContentAsText(InputStream is) throws Exception {
+  public String getContentAsText(InputStream is) throws IOException, DocumentReadException {
     if (this.defaultEncoding != null) {
       return getContentAsText(is, defaultEncoding);
     } else {
@@ -83,27 +84,34 @@ public class TextPlainDocumentReader extends BaseDocumentReader {
    * @param is an input stream with a file content.
    * @param encoding file content encoding.
    * @return The string with text from file content.
-   * @throws Exception
    */
-  public String getContentAsText(InputStream is, String encoding) throws Exception {
+  public String getContentAsText(InputStream is, String encoding) throws IOException,
+                                                                 DocumentReadException {
     if (is == null) {
       throw new NullPointerException("InputStream is null.");
     }
 
-    byte[] buffer = new byte[2048];
-    int len;
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    while ((len = is.read(buffer)) > 0)
-      bos.write(buffer, 0, len);
-    bos.close();
+    try {
+      byte[] buffer = new byte[2048];
+      int len;
+      ByteArrayOutputStream bos = new ByteArrayOutputStream();
+      while ((len = is.read(buffer)) > 0)
+        bos.write(buffer, 0, len);
+      bos.close();
 
-    if (bos.size() == 0)
-      return "";
-    else if (encoding != null)
-      return new String(bos.toByteArray(), encoding);
-    else
-      return new String(bos.toByteArray());
-
+      if (bos.size() == 0)
+        return "";
+      else if (encoding != null)
+        return new String(bos.toByteArray(), encoding);
+      else
+        return new String(bos.toByteArray());
+    } finally {
+      if (is != null)
+        try {
+          is.close();
+        } catch (IOException e) {
+        }
+    }
   }
 
   /*
@@ -112,7 +120,12 @@ public class TextPlainDocumentReader extends BaseDocumentReader {
    * @see org.exoplatform.services.document.DocumentReader#getProperties(java.io.
    *      InputStream)
    */
-  public Properties getProperties(InputStream is) throws Exception {
+  public Properties getProperties(InputStream is) throws IOException, DocumentReadException {
+
+    try {
+      is.close();
+    } catch (IOException e) {
+    }
     return new Properties();
   }
 
