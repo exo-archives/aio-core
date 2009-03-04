@@ -22,13 +22,12 @@
           <field  name="membershipTypeLDAPClasses"><string>top,group</string></field>
           <field  name="membershipLDAPClasses"><string>top,group</string></field>
           
-          <field  name="baseURL"><string>dc=exoplatform,dc=org</string></field>
-          <field  name="groupsURL"><string>ou=groups,ou=portal,dc=exoplatform,dc=org</string></field>
-          <field  name="membershipTypeURL"><string>ou=memberships,ou=portal,dc=exoplatform,dc=org</string></field>
-          <field  name="userURL"><string>ou=users,ou=portal,dc=exoplatform,dc=org</string></field>
-          <field  name="profileURL"><string>ou=profiles,ou=portal,dc=exoplatform,dc=org</string></field>
+          <field  name="baseURL"><string>DC=exoplatform,DC=org</string></field>
+          <field  name="groupsURL"><string>OU=groups,OU=portal,DC=exoplatform,DC=org</string></field>
+          <field  name="membershipTypeURL"><string>OU=memberships,OU=portal,DC=exoplatform,DC=org</string></field>
+          <field  name="userURL"><string>OU=users,OU=portal,DC=exoplatform,DC=org</string></field>
+          <field  name="profileURL"><string>OU=profiles,OU=portal,DC=exoplatform,DC=org</string></field>
           
-          <field  name="userAuthenticationAttr"><string>mail</string></field>
           <field  name="userUsernameAttr"><string>sAMAccountName</string></field>
           <field  name="userPassword"><string>unicodePwd</string></field> 
           <!--unicodePwd-->
