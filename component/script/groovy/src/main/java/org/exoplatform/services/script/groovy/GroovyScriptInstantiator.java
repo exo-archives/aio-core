@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import org.codehaus.groovy.control.CompilationFailedException;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 
@@ -40,7 +41,7 @@ import org.exoplatform.container.ExoContainerContext;
 public class GroovyScriptInstantiator {
 
   /**
-   * eXo Container. 
+   * eXo Container.
    */
   private ExoContainer container;
 
@@ -75,11 +76,8 @@ public class GroovyScriptInstantiator {
    * @see GroovyScriptInstantiator#instantiateScript(InputStream)
    */
   public Object instantiateScript(URL url) throws IOException {
-    try {
-      return instantiateScript(new BufferedInputStream(url.openStream()));
-    } catch (IOException e) {
-      throw new IOException("can't load Groovy script from " + url.toString());
-    }
+    String name = url.toString();
+    return instantiateScript(new BufferedInputStream(url.openStream()), name);
   }
 
   /**
@@ -90,12 +88,32 @@ public class GroovyScriptInstantiator {
    * @throws IOException if stream can't be parsed or object can't be created.
    */
   public Object instantiateScript(InputStream stream) throws IOException {
+    return instantiateScript(stream, null);
+  }
+
+  /**
+   * Parse given stream, the stream must represents groovy script.
+   * 
+   * @param stream the stream represented groovy script.
+   * @param name script name is null or empty string that groovy completer will
+   *          use default name
+   * @return the object created from groovy script.
+   * @throws IOException if stream can't be parsed or object can't be created.
+   */
+  public Object instantiateScript(InputStream stream, String name) throws IOException {
+    Class<?> clazz = null;
     try {
-      Class<?> clazz = new GroovyClassLoader().parseClass(stream);
+      if (name != null && name.length() > 0)
+        clazz = new GroovyClassLoader().parseClass(stream, name);
+      else
+        clazz = new GroovyClassLoader().parseClass(stream);
+    } catch (CompilationFailedException e) {
+      throw new IOException("Error occurs when parse stream, compiler error:\n " + e.getMessage());
+    }
+    try {
       return createObject(clazz);
     } catch (Exception e) {
-      e.printStackTrace();
-      throw new IOException("error parsing stream, not groovy script or contains error");
+      throw new RuntimeException("Can't instantiate groovy script: " + e.getMessage(), e);
     } finally {
       stream.close();
     }
