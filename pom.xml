@@ -10,7 +10,7 @@
   <groupId>org.exoplatform.core</groupId>
   <artifactId>config</artifactId>
   <name>eXo Core Config</name>
-  <version>2.1.4</version>
+  <version>2.1.5-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -154,8 +154,8 @@
                 <taskdef resource="emma_ant.properties" classpathref="maven.dependency.classpath" />
                 <emma enabled="true">
                   <!-- merged file will be rewritted by last project -->
-                  <merge outfile="${exo.projects.directory.src}/core/tags/2.1.4/target/coverage.es">
-                    <fileset dir="${exo.projects.directory.src}/core/tags/2.1.4/">
+                  <merge outfile="${exo.projects.directory.src}/core/branches/2.1.5/target/coverage.es">
+                    <fileset dir="${exo.projects.directory.src}/core/branches/2.1.5/">
                       <include name="**/target/emma/*.e*" />
                       <include name="**/target/emma/*.e*" />
                     </fileset>
@@ -164,15 +164,15 @@
                   </merge>
                   <report>
                     <sourcepath>
-                      <dirset dir="${exo.projects.directory.src}/core/tags/2.1.4">
+                      <dirset dir="${exo.projects.directory.src}/core/branches/2.1.5">
                         <include name="**/src/**/java" />
                       </dirset>
                     </sourcepath>
-                    <fileset dir="${exo.projects.directory.src}/core/tags/2.1.4/target/">
+                    <fileset dir="${exo.projects.directory.src}/core/branches/2.1.5/target/">
                       <include name="*.es" />
                     </fileset>
-                    <html outfile="${exo.projects.directory.src}/core/tags/2.1.4/target/coverage.html" />
-                    <xml outfile="${exo.projects.directory.src}/core/tags/2.1.4/target/coverage.xml" />
+                    <html outfile="${exo.projects.directory.src}/core/branches/2.1.5/target/coverage.html" />
+                    <xml outfile="${exo.projects.directory.src}/core/branches/2.1.5/target/coverage.xml" />
                   </report>
                 </emma>
               </tasks>
@@ -221,8 +221,8 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <org.exoplatform.kernel.version>2.0.6</org.exoplatform.kernel.version>
-        <org.exoplatform.core.version>2.1.4</org.exoplatform.core.version>
+        <org.exoplatform.kernel.version>2.0.7-SNAPSHOT</org.exoplatform.kernel.version>
+        <org.exoplatform.core.version>2.1.5-SNAPSHOT</org.exoplatform.core.version>
       </properties>
     </profile>
   </profiles>
