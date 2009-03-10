@@ -29,9 +29,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
 
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.component.ComponentPlugin;
+import org.exoplatform.services.script.groovy.jarjar.JarJarClassLoader;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.commons.utils.Safe;
+import org.apache.commons.logging.Log;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -44,11 +52,18 @@ public class GroovyScriptInstantiator {
    */
   private ExoContainer container;
 
+  /** The global mapping. */
+  private Map<String, String> mapping;
+
+  /** Our logger. */
+  private Log log = ExoLogger.getLogger(GroovyScriptInstantiator.class);
+
   /**
    * @param containerContext container context
    */
   public GroovyScriptInstantiator(ExoContainerContext containerContext) {
     this.container = containerContext.getContainer();
+    this.mapping = Collections.synchronizedMap(new HashMap<String, String>());
   }
 
   /**
@@ -91,13 +106,21 @@ public class GroovyScriptInstantiator {
    */
   public Object instantiateScript(InputStream stream) throws IOException {
     try {
-      Class<?> clazz = new GroovyClassLoader().parseClass(stream);
+      GroovyClassLoader loader;
+      if (mapping.size() > 0) {
+        JarJarClassLoader jarjarLoader = new JarJarClassLoader();
+        jarjarLoader.addMapping(mapping);
+        loader = jarjarLoader;
+      } else {
+        loader = new GroovyClassLoader();
+      }
+      Class<?> clazz = loader.parseClass(stream);
       return createObject(clazz);
     } catch (Exception e) {
       e.printStackTrace();
       throw new IOException("error parsing stream, not groovy script or contains error");
     } finally {
-      stream.close();
+      Safe.close(stream);
     }
   }
 
@@ -156,7 +179,13 @@ public class GroovyScriptInstantiator {
         return -1;
       return 0;
     }
-
   }
 
+  public void addPlugin(ComponentPlugin plugin) {
+    if (plugin instanceof GroovyScriptJarJarPlugin) {
+      GroovyScriptJarJarPlugin jarjarPlugin = (GroovyScriptJarJarPlugin)plugin;
+      log.debug("Add mapping to groovy instantiator:" + jarjarPlugin.getMapping());
+      mapping.putAll(jarjarPlugin.getMapping());
+    }
+  }
 }

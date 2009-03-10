@@ -33,4 +33,26 @@
     <type>org.exoplatform.services.script.groovy.GroovyScriptInstantiator</type>
   </component>
 
+  <component>
+    <type>org.exoplatform.services.script.groovy.GroovyScriptInstantiator</type>
+  </component>
+
+  <component>
+    <key>JarJarGroovyScriptInstantiator</key>
+    <type>org.exoplatform.services.script.groovy.GroovyScriptInstantiator</type>
+    <component-plugins>
+      <component-plugin>
+        <name>jarjar.mapping</name>
+        <set-method>addPlugin</set-method>
+        <type>org.exoplatform.services.script.groovy.GroovyScriptJarJarPlugin</type>
+        <init-params>
+          <values-param>
+            <name>mapping</name>
+            <value>a->b</value>
+          </values-param>
+        </init-params>
+      </component-plugin>
+    </component-plugins>
+  </component>
+
 </configuration>

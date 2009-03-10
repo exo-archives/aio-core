@@ -30,6 +30,7 @@ import org.codehaus.groovy.ast.ImportNode;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.security.CodeSource;
 
 /**
@@ -63,6 +64,12 @@ public class JarJarClassLoader extends GroovyClassLoader {
 
   public void addMapping(List<String> source, List<String> destination) {
     root.add(source, destination);
+  }
+
+  public void addMapping(Map<String, String> mapping) {
+    for (Map.Entry<String, String> entry : mapping.entrySet()) {
+      addMapping(entry.getKey(), entry.getValue());
+    }
   }
 
   public void addMapping(String source, String destination) {
