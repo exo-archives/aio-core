@@ -52,8 +52,8 @@ public class OrganizationServiceImpl extends BaseOrganizationService {
       groupDAO_ = new ADGroupDAOImpl(ldapAttrMapping, ldapService, adSearch);
       membershipDAO_ = new ADMembershipDAOImpl(ldapAttrMapping, ldapService, adSearch);
     } else {
-      ValueParam param = params.getValueParam("ldap.userDN.key");
-      ldapAttrMapping.userDNKey = param.getValue();
+//      ValueParam param = params.getValueParam("ldap.userDN.key");
+//      ldapAttrMapping.userDNKey = param.getValue();
       userDAO_ = new UserDAOImpl(ldapAttrMapping, ldapService);
       groupDAO_ = new GroupDAOImpl(ldapAttrMapping, ldapService);
       membershipDAO_ = new MembershipDAOImpl(ldapAttrMapping, ldapService);
@@ -62,6 +62,9 @@ public class OrganizationServiceImpl extends BaseOrganizationService {
     // ldapService) ;
     userProfileDAO_ = new UserProfileDAOImpl(hservice, cservice);
     membershipTypeDAO_ = new MembershipTypeDAOImpl(ldapAttrMapping, ldapService);
+
+    ValueParam param = params.getValueParam("ldap.userDN.key");
+    ldapAttrMapping.userDNKey = param.getValue();
 
   }
 
