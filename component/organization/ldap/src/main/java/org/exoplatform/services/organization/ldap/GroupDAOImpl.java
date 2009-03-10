@@ -72,7 +72,7 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
   public void addChild(Group parent, Group child, boolean broadcast) throws Exception {
     setId(parent, child);
     String searchBase = createSubDN(parent);
-    String groupDN = "ou=" + child.getGroupName() + "," + searchBase;
+    String groupDN = "OU=" + child.getGroupName() + "," + searchBase;
     String filter = "ou=" + child.getGroupName();
 
     SearchControls constraints = new SearchControls();
@@ -95,7 +95,7 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
     LdapContext ctx = ldapService_.getLdapContext();
     Group parent = findGroupById(group.getParentId());
     setId(parent, group);
-    String groupDN = "ou=" + group.getGroupName() + "," + createSubDN(parent);
+    String groupDN = "OU=" + group.getGroupName() + "," + createSubDN(parent);
 
     ArrayList<ModificationItem> modifications = new ArrayList<ModificationItem>();
     ModificationItem mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
@@ -236,7 +236,7 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
     if (parent != null) {
       String dnParts[] = parent.getId().split("/");
       for (int x = (dnParts.length - 1); x > 0; x--) {
-        buffer.append("ou=" + dnParts[x] + ", ");
+        buffer.append("OU=" + dnParts[x] + ", ");
       }
     }
     buffer.append(groupsBaseDN);
@@ -350,7 +350,7 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
     if (parentId != null && parentId.length() > 0) {
       String dnParts[] = parentId.split("/");
       for (int x = (dnParts.length - 1); x > 0; x--)
-        buffer.append("ou=" + dnParts[x] + ", ");
+        buffer.append("OU=" + dnParts[x] + ", ");
     }
     buffer.append(ldapAttrMapping_.groupsURL);
     return buffer.toString();

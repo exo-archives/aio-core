@@ -62,7 +62,7 @@ public class BaseDAO {
     String groupParts[] = groupId.split("/");
     // TODO : http://jira.exoplatform.org/browse/COR-49
     for (int x = (groupParts.length - 1); x > 0; x--) {
-      buffer.append("ou=" + groupParts[x] + ", ");
+      buffer.append("OU=" + groupParts[x] + ", ");
     }
     buffer.append(ldapAttrMapping_.groupsURL);
     return buffer.toString();

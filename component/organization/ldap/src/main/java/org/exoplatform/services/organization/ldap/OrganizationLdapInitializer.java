@@ -62,7 +62,7 @@ public class OrganizationLdapInitializer extends BaseComponentPlugin implements
     dn = explodeDN[explodeDN.length - 1];
     int i = explodeDN.length - 2;
     for (; i > -1; i--) {
-      if (!explodeDN[i].startsWith("dc="))
+      if (!explodeDN[i].toLowerCase().startsWith("dc="))
         break;
       dn = explodeDN[i] + "," + dn;
     }

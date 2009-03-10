@@ -48,7 +48,7 @@ public class ADUserDAOImpl extends UserDAOImpl {
   }
 
   public void createUser(User user, boolean broadcast) throws Exception {
-    String userDN = "cn=" + user.getUserName() + "," + ldapAttrMapping_.userURL;
+    String userDN = "CN=" + user.getUserName() + "," + ldapAttrMapping_.userURL;
     Attributes attrs = ldapAttrMapping_.userToAttributes(user);
     attrs.put("userAccountControl", Integer.toString(UF_NORMAL_ACCOUNT + UF_PASSWD_NOTREQD
         + UF_PASSWORD_EXPIRED + UF_ACCOUNTDISABLE));
