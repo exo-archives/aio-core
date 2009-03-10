@@ -43,6 +43,21 @@ abstract class PackageNameVisitor {
   /**
    * Visit a name from its groovy expression AST representation.
    *
+   * <p>
+   * The AST structure we are recognizing in that method is:
+   * <ul>
+   * <li>Expression -> VariableExpression</li>
+   * <li>Expression -> PropertyExpression[ObjectExpression,ConstantExpression]
+   * </ul>
+   * </p>
+   *
+   * <p>A VariableExpression is considered as a terminal that is the top left term. Its name
+   * value is obtained by calling the <code>getName()</code> method.</p>
+   *
+   * <p>A PropertyExpression is composed of an ObjectExpression and a Property. The ObjectExpression is evaluated
+   * recursively as an Expression. The Property must be a ConstantExpression and the name value is obtained
+   * by calling the <code>getValue()</code> method.</p>
+   *
    * @param expr the expression AST
    */
   public void visit(Expression expr) {
