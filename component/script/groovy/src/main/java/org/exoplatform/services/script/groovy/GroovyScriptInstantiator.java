@@ -27,12 +27,19 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.logging.Log;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.component.ComponentPlugin;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.script.groovy.jarjar.JarJarClassLoader;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -40,16 +47,23 @@ import org.exoplatform.container.ExoContainerContext;
  */
 public class GroovyScriptInstantiator {
 
+  /** Our logger. */
+  private static final Log    LOG = ExoLogger.getLogger(GroovyScriptInstantiator.class.getName());
+
   /**
    * eXo Container.
    */
-  private ExoContainer container;
+  private ExoContainer        container;
+
+  /** The global mapping. */
+  private Map<String, String> mapping;
 
   /**
    * @param containerContext container context
    */
   public GroovyScriptInstantiator(ExoContainerContext containerContext) {
     this.container = containerContext.getContainer();
+    this.mapping = Collections.synchronizedMap(new HashMap<String, String>());
   }
 
   /**
@@ -101,12 +115,20 @@ public class GroovyScriptInstantiator {
    * @throws IOException if stream can't be parsed or object can't be created.
    */
   public Object instantiateScript(InputStream stream, String name) throws IOException {
+    GroovyClassLoader loader;
+    if (mapping.size() > 0) {
+      JarJarClassLoader jarjarLoader = new JarJarClassLoader();
+      jarjarLoader.addMapping(mapping);
+      loader = jarjarLoader;
+    } else {
+      loader = new GroovyClassLoader();
+    }
     Class<?> clazz = null;
     try {
       if (name != null && name.length() > 0)
-        clazz = new GroovyClassLoader().parseClass(stream, name);
+        clazz = loader.parseClass(stream, name);
       else
-        clazz = new GroovyClassLoader().parseClass(stream);
+        clazz = loader.parseClass(stream);
     } catch (CompilationFailedException e) {
       throw new IOException("Error occurs when parse stream, compiler error:\n " + e.getMessage());
     }
@@ -175,6 +197,14 @@ public class GroovyScriptInstantiator {
       return 0;
     }
 
+  }
+
+  public void addPlugin(ComponentPlugin plugin) {
+    if (plugin instanceof GroovyScriptJarJarPlugin) {
+      GroovyScriptJarJarPlugin jarjarPlugin = (GroovyScriptJarJarPlugin) plugin;
+      LOG.debug("Add mapping to groovy instantiator:" + jarjarPlugin.getMapping());
+      mapping.putAll(jarjarPlugin.getMapping());
+    }
   }
 
 }

@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.StandaloneContainer;
+import b.ImportedClass;
 
 /**
  * @author <a href="mailto:andrew00x@gmail.com">Andrey Parfonov</a>
@@ -30,6 +31,7 @@ import org.exoplatform.container.StandaloneContainer;
 public class GroovyInstantiatorTest extends TestCase {
 
   private GroovyScriptInstantiator groovyScriptInstantiator;
+  private GroovyScriptInstantiator jarjarGroovyScriptInstantiator;
 
   /*
    * (non-Javadoc)
@@ -39,8 +41,10 @@ public class GroovyInstantiatorTest extends TestCase {
   public void setUp() throws Exception {
     StandaloneContainer.setConfigurationPath("src/test/java/conf/standalone/test-configuration.xml");
     ExoContainer container = StandaloneContainer.getInstance();
-    groovyScriptInstantiator = (GroovyScriptInstantiator) container.getComponentInstanceOfType(GroovyScriptInstantiator.class);
+    groovyScriptInstantiator = (GroovyScriptInstantiator) container.getComponentInstance(GroovyScriptInstantiator.class);
+    jarjarGroovyScriptInstantiator = (GroovyScriptInstantiator) container.getComponentInstance("JarJarGroovyScriptInstantiator");
     assertNotNull(groovyScriptInstantiator);
+    assertNotNull(jarjarGroovyScriptInstantiator);
   }
 
   public void testGroovyScriptInstantiatorSimple() throws Exception {
@@ -79,5 +83,17 @@ public class GroovyInstantiatorTest extends TestCase {
                        .toString();
     GroovyObject groovyObject = (GroovyObject) groovyScriptInstantiator.instantiateScript(url);
     groovyObject.invokeMethod("generateXML", new Object[] { new Book() });
+  }
+
+  public void testGroovyScriptJarJar() throws Exception {
+    String url = Thread.currentThread()
+                       .getContextClassLoader()
+                       .getResource("TestJarJar.groovy")
+                       .toString();
+    GroovyObject groovyObject = (GroovyObject) jarjarGroovyScriptInstantiator.instantiateScript(url);
+    Object field = groovyObject.getProperty("field");
+    assertNotNull(field);
+    assertTrue("Was expecting object " + field + " to be an instance of class " + ImportedClass.class.getName() +
+      "instead of class " + field.getClass().getName(), field instanceof ImportedClass);
   }
 }
