@@ -29,8 +29,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.usertype.UserType;
 
@@ -52,17 +50,6 @@ import org.hibernate.usertype.UserType;
  * @author tgregg
  */
 public class TextClobType implements UserType {
-  private static final Log    logger                      = LogFactory.getLog(TextClobType.class);
-
-  /**
-   * Name of the oracle driver -- used to support Oracle clobs as a special case
-   */
-  private static final String ORACLE_DRIVER_NAME          = "Oracle JDBC driver";
-
-  /** Version of the oracle driver being supported with clob. */
-  private static final int    ORACLE_DRIVER_MAJOR_VERSION = 9;
-
-  private static final int    ORACLE_DRIVER_MINOR_VERSION = 0;
 
   public TextClobType() {
   }
