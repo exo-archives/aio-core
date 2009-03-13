@@ -4,13 +4,9 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.services.database.jdbc.CreateDBSchemaPlugin;
 import org.exoplatform.services.database.jdbc.DBSchemaCreator;
-import org.exoplatform.test.BasicTestCase;
 
 /**
  * Created by The eXo Platform SAS .
