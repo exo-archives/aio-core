@@ -4,7 +4,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.exoplatform.container.StandaloneContainer;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.database.jdbc.CreateDBSchemaPlugin;
 import org.exoplatform.services.database.jdbc.DBSchemaCreator;
 
@@ -16,18 +16,20 @@ import org.exoplatform.services.database.jdbc.DBSchemaCreator;
  */
 public class DBCreatorTest extends TestCase {
 
-  private StandaloneContainer container;
+//  private StandaloneContainer container;
+  private DBSchemaCreator dbcreator;
 
   public void setUp() throws Exception {
-
-    StandaloneContainer.setConfigurationPath("src/java/conf/standalone/test-configuration.xml");
-
-    container = StandaloneContainer.getInstance();
+    // >>>>> to avoid  two top-level container exception  
+//  StandaloneContainer.setConfigurationPath("src/main/java/conf/standalone/test-configuration.xml");
+//  container = StandaloneContainer.getInstance();
+    PortalContainer container = PortalContainer.getInstance();
+    dbcreator = (DBSchemaCreator) container.getComponentInstanceOfType(DBSchemaCreator.class);
   }
 
   public void testConf() throws Exception {
-    DBSchemaCreator creator = (DBSchemaCreator) container.getComponentInstanceOfType(DBSchemaCreator.class);
-    List plugins = (List) creator.getPlugins();
+//    DBSchemaCreator creator = (DBSchemaCreator) container.getComponentInstanceOfType(DBSchemaCreator.class);
+    List plugins = (List) dbcreator.getPlugins();
     assertFalse(plugins.isEmpty());
 
     assertTrue(plugins.get(0) instanceof CreateDBSchemaPlugin);
@@ -38,6 +40,6 @@ public class DBCreatorTest extends TestCase {
   }
 
   public void tearDown() throws Exception {
-    container.stop();
+//    container.stop();
   }
 }

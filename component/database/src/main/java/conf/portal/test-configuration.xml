@@ -46,5 +46,6 @@
       </properties-param>
     </init-params>
   </component>
-
+  <!-- for portal container -->
+  <import>classpath:/conf/standalone/test-configuration.xml</import>
 </configuration>

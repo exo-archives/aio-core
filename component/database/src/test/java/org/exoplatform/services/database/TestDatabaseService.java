@@ -23,6 +23,7 @@ import java.sql.Statement;
 import javax.transaction.UserTransaction;
 
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.database.impl.XAPoolTxSupportDatabaseService;
 import org.exoplatform.services.database.table.ExoLongID;
 import org.exoplatform.services.database.table.IDGenerator;
 import org.exoplatform.services.transaction.TransactionService;
@@ -39,10 +40,12 @@ public class TestDatabaseService extends BasicTestCase {
 
   public void testDatabaseService() throws Exception {
     PortalContainer pcontainer = PortalContainer.getInstance();
-    DatabaseService service = (DatabaseService) pcontainer.getComponentInstance("XAPoolTxSupportDBConnectionService");
-    // assertConfiguration(service) ;
-    // assertDBTableManager(service);
-    // assertIDGenerator(service);
+    DatabaseService service = (DatabaseService) pcontainer.getComponentInstanceOfType(XAPoolTxSupportDatabaseService.class);
+
+    assertNotNull(service);
+    assertConfiguration(service);
+    assertDBTableManager(service);
+    assertIDGenerator(service);
   }
 
   private void assertConfiguration(DatabaseService service) throws Exception {

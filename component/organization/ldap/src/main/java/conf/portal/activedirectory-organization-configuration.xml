@@ -29,7 +29,7 @@
           
           <field  name="baseURL"><string>DC=exoplatform,DC=org</string></field>
           <field  name="groupsURL"><string>OU=groups,OU=portal,DC=exoplatform,DC=org</string></field>
-          <field  name="membershipTypeURL"><string>OU=memberships,DC=portal,DC=exoplatform,DC=org</string></field>
+          <field  name="membershipTypeURL"><string>OU=memberships,OU=portal,DC=exoplatform,DC=org</string></field>
           <field  name="userURL"><string>OU=users,OU=portal,DC=exoplatform,DC=org</string></field>
           <field  name="profileURL"><string>OU=profiles,OU=portal,DC=exoplatform,DC=org</string></field>
           

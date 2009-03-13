@@ -41,7 +41,7 @@
     </dependency>
 
     <dependency>
-      <groupId>poi</groupId>
+      <groupId>org.apache.poi</groupId>
       <artifactId>poi</artifactId>
       <!--version>3.0-FINAL</version-->
       <version>3.0.2-FINAL</version>
@@ -49,7 +49,7 @@
     </dependency>
 
     <dependency>
-      <groupId>poi</groupId>
+      <groupId>org.apache.poi</groupId>
       <artifactId>poi-scratchpad</artifactId>
       <version>3.0.2-FINAL</version>
       <scope>compile</scope>
