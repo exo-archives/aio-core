@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.exoplatform</groupId>
     <artifactId>parent</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -13,8 +13,19 @@
   <version>2.1.5-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <properties>
+     <exo.product.name>exo-core</exo.product.name>
+     <exo.product.specification>2.1.5</exo.product.specification>
+  </properties>
+
+  <scm>
+    <connection>scm:svn:http://svn.exoplatform.org/projects/core/branches/2.1.5</connection>
+    <developerConnection>scm:svn:http://svn.exoplatform.org/projects/core/branches/2.1.5</developerConnection>
+    <url>http://fisheye.exoplatform.org/browse/projects/core/branches/2.1.5</url>
+  </scm>
+
   <modules>
-    <module>component/security/core</module>  
+    <module>component/security/core</module>
     <module>component/security/pam</module>
     <module>component/security/ntlm</module>
     <module>component/database</module>

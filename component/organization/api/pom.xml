@@ -99,18 +99,18 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.3</version>
         <executions>
           <execution>
             <phase>compile</phase>
             <configuration>
               <tasks>
-                <taskdef name="hibernatedoclet" 
-                         classname="xdoclet.modules.hibernate.HibernateDocletTask" 
+                <taskdef name="hibernatedoclet"
+                         classname="xdoclet.modules.hibernate.HibernateDocletTask"
                          classpathref="maven.dependency.classpath" />
-                <hibernatedoclet destdir="${basedir}/target/classes" 
-                                 excludedtags="@version,@author,@todo" 
-                                 mergedir="target/classes" 
+                <hibernatedoclet destdir="${basedir}/target/classes"
+                                 excludedtags="@version,@author,@todo"
+                                 mergedir="target/classes"
                                  force="true"
                                  verbose="false">
                   <fileset dir="${basedir}/src/main/java">
