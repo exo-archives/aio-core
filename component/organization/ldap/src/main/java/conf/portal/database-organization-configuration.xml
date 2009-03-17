@@ -7,6 +7,7 @@
       <set-method>addListenerPlugin</set-method>
       <type>org.exoplatform.services.organization.OrganizationDatabaseInitializer</type>
       <description>this listener populate organization data for the first launch</description>
+      <priority>5</priority>
       <init-params>      
         <value-param>
           <name>checkDatabaseAlgorithm</name>
