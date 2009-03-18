@@ -61,13 +61,15 @@ abstract public class BaseOrganizationService implements OrganizationService, St
   }
 
   public void start() {
-    try {
-      for (int i = 0; i < listeners_.size(); i++) {
-        OrganizationServiceInitializer listener = listeners_.get(i);
+    for (OrganizationServiceInitializer listener : listeners_) {
+      try {
         listener.init(this);
+      } catch (Exception ex) {
+        String msg = "Failed start Organization Service " + getClass().getName()
+            + ", probably because of configuration error. Error occurs when initialize "
+            + listener.getClass().getName();
+        throw new RuntimeException(msg, ex);
       }
-    } catch (Exception ex) {
-      throw new RuntimeException(ex);
     }
   }
 
