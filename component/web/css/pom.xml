@@ -2,13 +2,13 @@
   <parent>
     <groupId>org.exoplatform.core</groupId>
     <artifactId>config</artifactId>
-    <version>2.1.5-SNAPSHOT</version>
+    <version>2.1.5</version>
   </parent> 
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.core.component.web.css</artifactId>
   <packaging>jar</packaging>
-  <version>2.1.5-SNAPSHOT</version>
+  <version>2.1.5</version>
   <name>eXo core web css component</name>
   <description>Stylesheet engine</description>
   <dependencies>
@@ -27,14 +27,12 @@
       <artifactId>batik-css</artifactId>
       <version>1.7</version>
     </dependency>
-    <!--
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.2</version>
       <scope>test</scope>
     </dependency>
-    -->
   </dependencies>
   
 </project>

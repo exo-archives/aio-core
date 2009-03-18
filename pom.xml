@@ -167,8 +167,8 @@
                 <taskdef resource="emma_ant.properties" classpathref="maven.dependency.classpath" />
                 <emma enabled="true">
                   <!-- merged file will be rewritted by last project -->
-                  <merge outfile="${exo.projects.directory.src}/core/branches/2.1.5/target/coverage.es">
-                    <fileset dir="${exo.projects.directory.src}/core/branches/2.1.5/">
+                  <merge outfile="${exo.projects.directory.src}/core/tags/2.1.5/target/coverage.es">
+                    <fileset dir="${exo.projects.directory.src}/core/tags/2.1.5/">
                       <include name="**/target/emma/*.e*" />
                       <include name="**/target/emma/*.e*" />
                     </fileset>
@@ -177,15 +177,15 @@
                   </merge>
                   <report>
                     <sourcepath>
-                      <dirset dir="${exo.projects.directory.src}/core/branches/2.1.5">
+                      <dirset dir="${exo.projects.directory.src}/core/tags/2.1.5">
                         <include name="**/src/**/java" />
                       </dirset>
                     </sourcepath>
-                    <fileset dir="${exo.projects.directory.src}/core/branches/2.1.5/target/">
+                    <fileset dir="${exo.projects.directory.src}/core/tags/2.1.5/target/">
                       <include name="*.es" />
                     </fileset>
-                    <html outfile="${exo.projects.directory.src}/core/branches/2.1.5/target/coverage.html" />
-                    <xml outfile="${exo.projects.directory.src}/core/branches/2.1.5/target/coverage.xml" />
+                    <html outfile="${exo.projects.directory.src}/core/tags/2.1.5/target/coverage.html" />
+                    <xml outfile="${exo.projects.directory.src}/core/tags/2.1.5/target/coverage.xml" />
                   </report>
                 </emma>
               </tasks>

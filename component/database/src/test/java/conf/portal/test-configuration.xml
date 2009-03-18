@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <configuration>
   <component>
-    <key>XAPoolTxSupportDBConnectionService</key>
+    <key>org.exoplatform.services.database.impl.XAPoolTxSupportDatabaseService</key>
     <type>org.exoplatform.services.database.impl.XAPoolTxSupportDatabaseService</type>
     <description>support the transaction  db connection pool implementation</description>
 
@@ -18,4 +18,14 @@
       </properties-param>
     </init-params>
   </component> 
+  <component>
+    <key>org.exoplatform.services.transaction.TransactionService</key>
+    <type>org.exoplatform.services.transaction.impl.jotm.TransactionServiceJotmImpl</type>
+    <init-params>
+      <value-param>
+        <name>timeout</name>
+        <value>5</value>
+      </value-param>
+    </init-params>
+  </component>  
 </configuration>
