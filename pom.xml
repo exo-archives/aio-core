@@ -19,9 +19,9 @@
   </properties>
 
   <scm>
-    <connection>scm:svn:http://svn.exoplatform.org/projects/core/tags/config-2.1.5</connection>
-    <developerConnection>scm:svn:http://svn.exoplatform.org/projects/core/tags/config-2.1.5</developerConnection>
-    <url>http://fisheye.exoplatform.org/browse/projects/core/tags/config-2.1.5</url>
+    <connection>scm:svn:http://svn.exoplatform.org/projects/core/tags/2.1.5</connection>
+    <developerConnection>scm:svn:http://svn.exoplatform.org/projects/core/tags/2.1.5</developerConnection>
+    <url>http://fisheye.exoplatform.org/browse/projects/core/tags/2.1.5</url>
   </scm>
 
   <modules>
@@ -235,7 +235,6 @@
       </activation>
       <properties>
         <org.exoplatform.kernel.version>2.0.7</org.exoplatform.kernel.version>
-        <org.exoplatform.core.version>2.1.5</org.exoplatform.core.version>
       </properties>
     </profile>
   </profiles>
