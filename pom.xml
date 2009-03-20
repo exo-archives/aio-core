@@ -15,13 +15,13 @@
 
   <properties>
      <exo.product.name>exo-core</exo.product.name>
-     <exo.product.specification>2.1.6</exo.product.specification>
+     <exo.product.specification>2.1.5</exo.product.specification>
   </properties>
 
   <scm>
-    <connection>scm:svn:http://svn.exoplatform.org/projects/core/branches/2.1.6</connection>
-    <developerConnection>scm:svn:http://svn.exoplatform.org/projects/core/branches/2.1.6</developerConnection>
-    <url>http://fisheye.exoplatform.org/browse/projects/core/branches/2.1.6</url>
+    <connection>scm:svn:http://svn.exoplatform.org/projects/core/branches/2.1.x</connection>
+    <developerConnection>scm:svn:http://svn.exoplatform.org/projects/core/branches/2.1.x</developerConnection>
+    <url>http://fisheye.exoplatform.org/browse/projects/core/branches/2.1.x</url>
   </scm>
 
   <modules>
@@ -167,8 +167,8 @@
                 <taskdef resource="emma_ant.properties" classpathref="maven.dependency.classpath" />
                 <emma enabled="true">
                   <!-- merged file will be rewritted by last project -->
-                  <merge outfile="${exo.projects.directory.src}/core/branches/2.1.6/target/coverage.es">
-                    <fileset dir="${exo.projects.directory.src}/core/branches/2.1.6/">
+                  <merge outfile="${exo.projects.directory.src}/core/branches/2.1.x/target/coverage.es">
+                    <fileset dir="${exo.projects.directory.src}/core/branches/2.1.x/">
                       <include name="**/target/emma/*.e*" />
                       <include name="**/target/emma/*.e*" />
                     </fileset>
@@ -177,15 +177,15 @@
                   </merge>
                   <report>
                     <sourcepath>
-                      <dirset dir="${exo.projects.directory.src}/core/branches/2.1.6">
+                      <dirset dir="${exo.projects.directory.src}/core/branches/2.1.x">
                         <include name="**/src/**/java" />
                       </dirset>
                     </sourcepath>
-                    <fileset dir="${exo.projects.directory.src}/core/branches/2.1.6/target/">
+                    <fileset dir="${exo.projects.directory.src}/core/branches/2.1.x/target/">
                       <include name="*.es" />
                     </fileset>
-                    <html outfile="${exo.projects.directory.src}/core/branches/2.1.6/target/coverage.html" />
-                    <xml outfile="${exo.projects.directory.src}/core/branches/2.1.6/target/coverage.xml" />
+                    <html outfile="${exo.projects.directory.src}/core/branches/2.1.x/target/coverage.html" />
+                    <xml outfile="${exo.projects.directory.src}/core/branches/2.1.x/target/coverage.xml" />
                   </report>
                 </emma>
               </tasks>
