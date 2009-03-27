@@ -301,7 +301,6 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
    * {@inheritDoc}
    */
   public Membership findMembershipByUserGroupAndType(String userName, String groupId, String type) throws Exception {
-    // TODO try to optimize with better filter
     LdapContext ctx = ldapService.getLdapContext();
     try {
       for (int err = 0;; err++) {
@@ -313,15 +312,18 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
 
           userDN = userDN.trim();
           String mbfilter = membershipClassFilter();
+//          String filter = "(&" + mbfilter + "(" + ldapAttrMapping.membershipTypeNameAttr + "="
+//              + type + "))";
           String filter = "(&" + mbfilter + "(" + ldapAttrMapping.membershipTypeNameAttr + "="
-              + type + "))";
+              + type + ")(" + ldapAttrMapping.membershipTypeMemberValue + "=" + userDN + "))";
 
           NamingEnumeration<SearchResult> results = findMembershipsInGroup(ctx, groupId, filter);
           if (results.hasMoreElements()) {
-            SearchResult sr = results.next();
-            if (haveUser(sr.getAttributes(), userDN)) {
-              membership = createMembershipObject(userName, groupId, type);
-            }
+//            SearchResult sr = results.next();
+//            if (haveUser(sr.getAttributes(), userDN)) {
+//              membership = createMembershipObject(userName, groupId, type);
+//            }
+            membership = createMembershipObject(userName, groupId, type);
           }
 
           return membership;

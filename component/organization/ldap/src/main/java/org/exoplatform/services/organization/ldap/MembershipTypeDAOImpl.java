@@ -113,13 +113,14 @@ public class MembershipTypeDAOImpl extends BaseDAO implements MembershipTypeHand
             return mt;
           ModificationItem[] mods = new ModificationItem[1];
           String desc = mt.getDescription();
-          // TODO http://jira.exoplatform.org/browse/COR-49
           if (desc != null && desc.length() > 0) {
             mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
-                                           new BasicAttribute("description", mt.getDescription()));
+                                           new BasicAttribute(ldapAttrMapping.ldapDescriptionAttr,
+                                                              mt.getDescription()));
           } else {
             mods[0] = new ModificationItem(DirContext.REMOVE_ATTRIBUTE,
-                                           new BasicAttribute("description", mt.getDescription()));
+                                           new BasicAttribute(ldapAttrMapping.ldapDescriptionAttr,
+                                                              mt.getDescription()));
           }
           ctx.modifyAttributes(membershipTypeDN, mods);
           return mt;

@@ -62,9 +62,16 @@ public class LDAPAttributeMapping {
 
   public String   baseURL, groupsURL, membershipTypeURL, userURL, profileURL;
 
-  String          userDNKey;
+  // TODO remove initialization in major release. It may be not initialized from
+  // for AD.
+  String          userDNKey      = "CN";
 
-  // String userAuthenticationAttr;
+  //TODO remove initialization in major release. Should be initialized from
+  // configuration.
+  String          groupDNKey     = "OU";
+  
+  //
+  
   String          userUsernameAttr;
 
   String          userPassword;
@@ -95,6 +102,12 @@ public class LDAPAttributeMapping {
 
   String          ldapCreatedTimeStampAttr, ldapModifiedTimeStampAttr, ldapDescriptionAttr;
 
+  // TODO remove initialization in major release. Should be initialized from
+  // configuration.
+  String          groupNameAttr  = "ou";
+
+  String          groupLabelAttr = "l";
+
   /**
    * Create LDAP attributes that represents user in LDAP context.
    * 
@@ -106,8 +119,7 @@ public class LDAPAttributeMapping {
     if (USER_LDAP_CLASSES == null)
       USER_LDAP_CLASSES = userLDAPClasses.split(",");
     attrs.put(new ObjectClassAttribute(USER_LDAP_CLASSES));
-    // TODO user ldn.dn.key instead of hardcoded cn
-    attrs.put("cn", user.getUserName());
+    attrs.put(userDNKey, user.getUserName());
     attrs.put(userDisplayNameAttr, user.getFullName());
     attrs.put(userUsernameAttr, user.getUserName());
     attrs.put(userPassword, user.getPassword());
@@ -150,14 +162,13 @@ public class LDAPAttributeMapping {
     if (GROUP_LDAP_CLASSES == null)
       GROUP_LDAP_CLASSES = groupLDAPClasses.split(",");
     attrs.put(new ObjectClassAttribute(GROUP_LDAP_CLASSES));
-    attrs.put("ou", group.getGroupName());
+    attrs.put(groupNameAttr, group.getGroupName());
     String desc = group.getDescription();
-    // TODO http://jira.exoplatform.org/browse/COR-49
     if (desc != null && desc.length() > 0)
-      attrs.put("description", desc);
+      attrs.put(ldapDescriptionAttr, desc);
     String lbl = group.getLabel();
     if (lbl != null && lbl.length() > 0)
-      attrs.put("l", lbl);
+      attrs.put(groupLabelAttr, lbl);
     return attrs;
   }
 
@@ -171,10 +182,9 @@ public class LDAPAttributeMapping {
     if (attrs == null || attrs.size() == 0)
       return null;
     Group group = new GroupImpl();
-    // TODO http://jira.exoplatform.org/browse/COR-49
-    group.setGroupName(getAttributeValueAsString(attrs, "ou"));
-    group.setDescription(getAttributeValueAsString(attrs, "description"));
-    group.setLabel(getAttributeValueAsString(attrs, "l"));
+    group.setGroupName(getAttributeValueAsString(attrs, groupNameAttr));
+    group.setDescription(getAttributeValueAsString(attrs, ldapDescriptionAttr));
+    group.setLabel(getAttributeValueAsString(attrs, groupLabelAttr));
     return group;
   }
 
@@ -192,9 +202,8 @@ public class LDAPAttributeMapping {
     attrs.put(new ObjectClassAttribute(MEMBERSHIPTYPE_LDAP_CLASSES));
     attrs.put(membershipTypeNameAttr, mt.getName());
     String desc = mt.getDescription();
-    // TODO http://jira.exoplatform.org/browse/COR-49
     if (desc != null && desc.length() > 0)
-      attrs.put("description", desc);
+      attrs.put(ldapDescriptionAttr, desc);
     return attrs;
   }
 
@@ -208,9 +217,8 @@ public class LDAPAttributeMapping {
     if (attrs == null || attrs.size() == 0)
       return null;
     MembershipType m = new MembershipTypeImpl();
-    // TODO http://jira.exoplatform.org/browse/COR-49
     m.setName(getAttributeValueAsString(attrs, membershipTypeNameAttr));
-    m.setDescription(getAttributeValueAsString(attrs, "description"));
+    m.setDescription(getAttributeValueAsString(attrs, ldapDescriptionAttr));
     m.setCreatedDate(new Date());
     m.setModifiedDate(new Date());
     return m;
@@ -245,6 +253,8 @@ public class LDAPAttributeMapping {
       PROFILE_LDAP_CLASSES = profileLDAPClasses.split(",");
     attrs.put(new ObjectClassAttribute(PROFILE_LDAP_CLASSES));
     // TODO http://jira.exoplatform.org/browse/COR-49
+    // Comment: at the time profiles are stored in bd.
+    // 27.03.2009
     attrs.put("sn", profile.getUserName());
     UserProfileData upd = new UserProfileData();
     upd.setUserProfile(profile);

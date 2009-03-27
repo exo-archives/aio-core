@@ -125,9 +125,8 @@ public class BaseDAO {
   protected String getGroupDNFromGroupId(String groupId) {
     StringBuilder buffer = new StringBuilder();
     String[] groupParts = groupId.split("/");
-    // TODO : http://jira.exoplatform.org/browse/COR-49
     for (int x = (groupParts.length - 1); x > 0; x--) {
-      buffer.append("OU=" + groupParts[x] + ", ");
+      buffer.append(ldapAttrMapping.groupDNKey + "=" + groupParts[x] + ", ");
     }
     buffer.append(ldapAttrMapping.groupsURL);
     return buffer.toString();
@@ -254,10 +253,10 @@ public class BaseDAO {
       GroupImpl group = new GroupImpl();
       group.setGroupName(membershipParts[0]);
       group.setId(idBuffer.toString());
-      // TODO needs to use mapping there :
-      // http://jira.exoplatform.org/browse/COR-49
-      group.setDescription(ldapAttrMapping.getAttributeValueAsString(attrs, "description"));
-      group.setLabel(ldapAttrMapping.getAttributeValueAsString(attrs, "l"));
+      group.setDescription(ldapAttrMapping.getAttributeValueAsString(attrs,
+                                                                     ldapAttrMapping.ldapDescriptionAttr));
+      group.setLabel(ldapAttrMapping.getAttributeValueAsString(attrs,
+                                                               ldapAttrMapping.groupLabelAttr));
       group.setParentId(parentId);
       return group;
     } catch (NameNotFoundException e) {

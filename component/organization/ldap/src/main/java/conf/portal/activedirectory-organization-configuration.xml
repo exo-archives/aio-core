@@ -17,6 +17,12 @@
         <description>The key used to compose user DN</description>
         <value>cn</value>
       </value-param>
+      <value-param>
+        <name>ldap.groupDN.key</name>
+        <description>The key used to compose group DN</description>
+        <value>ou</value>
+      </value-param>
+      
       <object-param>
         <name>ldap.attribute.mapping</name>
         <description>ldap attribute mapping</description>
@@ -48,6 +54,8 @@
           <field  name="membershipTypeObjectClassFilter"><string>objectClass=group</string></field>
           <field  name="membershiptypeObjectClass"><string>group</string></field>
           
+          <field  name="groupNameAttr"><string>ou</string></field>
+          <field  name="groupLabelAttr"><string>l</string></field>
           <field  name="groupObjectClass"><string>organizationalUnit</string></field>
           <field  name="groupObjectClassFilter"><string>objectClass=organizationalUnit</string></field>
           
