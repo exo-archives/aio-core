@@ -38,6 +38,7 @@ import org.exoplatform.services.organization.User;
 /**
  * Created by VietSpider Studio Author : Nhu Dinh Thuan nhudinhthuan@yahoo.com
  * Dec 7, 2005, @version andrew00x $
+ * @deprecated
  */
 public class LDAPUserPageList extends PageList {
 
