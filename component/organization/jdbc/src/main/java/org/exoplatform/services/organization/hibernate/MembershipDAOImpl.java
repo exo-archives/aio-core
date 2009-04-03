@@ -34,9 +34,8 @@ import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.impl.MembershipImpl;
 
 /**
- * Created by The eXo Platform SAS Author : Mestrallet Benjamin
- * benjmestrallet@users.sourceforge.net Author : Tuan Nguyen
- * tuan08@users.sourceforge.net Date: Aug 22, 2003 Time: 4:51:21 PM
+ * Created by The eXo Platform SAS Author : Mestrallet Benjamin benjmestrallet@users.sourceforge.net
+ * Author : Tuan Nguyen tuan08@users.sourceforge.net Date: Aug 22, 2003 Time: 4:51:21 PM
  */
 public class MembershipDAOImpl implements MembershipHandler {
 
@@ -95,6 +94,11 @@ public class MembershipDAOImpl implements MembershipHandler {
   // }
 
   public void linkMembership(User user, Group g, MembershipType mt, boolean broadcast) throws Exception {
+    if (g == null) {
+      throw new Exception("Can not create membership record for " + user.getUserName()
+          + " because group is null");
+    }
+
     Session session = service_.openSession();
     MembershipImpl membership = new MembershipImpl();
     // User user
