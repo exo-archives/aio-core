@@ -30,6 +30,8 @@ import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.MembershipEventListener;
 import org.exoplatform.services.organization.MembershipHandler;
 import org.exoplatform.services.organization.MembershipType;
+import org.exoplatform.services.organization.MembershipTypeNullException;
+import org.exoplatform.services.organization.NullGroupException;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.impl.MembershipImpl;
 
@@ -95,8 +97,13 @@ public class MembershipDAOImpl implements MembershipHandler {
 
   public void linkMembership(User user, Group g, MembershipType mt, boolean broadcast) throws Exception {
     if (g == null) {
-      throw new Exception("Can not create membership record for " + user.getUserName()
+      throw new NullGroupException("Can not create membership record for " + user.getUserName()
           + " because group is null");
+    }
+
+    if (mt == null) {
+      throw new MembershipTypeNullException("Can not create membership record for "
+          + user.getUserName() + " because membership type is null");
     }
 
     Session session = service_.openSession();
