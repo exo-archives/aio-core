@@ -41,12 +41,14 @@ import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.MembershipEventListener;
 import org.exoplatform.services.organization.MembershipHandler;
 import org.exoplatform.services.organization.MembershipType;
+import org.exoplatform.services.organization.NullGroupException;
+import org.exoplatform.services.organization.NullMembershipTypeException;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.impl.MembershipImpl;
 
 /**
- * Created by The eXo Platform SAS Author : Tuan Nguyen
- * tuan08@users.sourceforge.net Oct 14, 2005.  @version andrew00x $
+ * Created by The eXo Platform SAS Author : Tuan Nguyen tuan08@users.sourceforge.net Oct 14, 2005. @version
+ * andrew00x $
  */
 public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
 
@@ -61,10 +63,12 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
   protected List<MembershipEventListener> listeners;
 
   /**
-   * @param ldapAttrMapping mapping LDAP attributes to eXo organization service
-   *          items (users, groups, etc)
-   * @param ldapService {@link LDAPService}
-   * @throws Exception if any errors occurs
+   * @param ldapAttrMapping
+   *          mapping LDAP attributes to eXo organization service items (users, groups, etc)
+   * @param ldapService
+   *          {@link LDAPService}
+   * @throws Exception
+   *           if any errors occurs
    */
   public MembershipDAOImpl(LDAPAttributeMapping ldapAttrMapping, LDAPService ldapService) throws Exception {
     super(ldapAttrMapping, ldapService);
@@ -96,8 +100,8 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
         try {
           String userDN = getDNFromUsername(ctx, m.getUserName());
           String groupDN = getGroupDNFromGroupId(m.getGroupId());
-          String membershipDN = ldapAttrMapping.membershipTypeNameAttr + "=" + m.getMembershipType()
-              + "," + groupDN;
+          String membershipDN = ldapAttrMapping.membershipTypeNameAttr + "="
+              + m.getMembershipType() + "," + groupDN;
 
           Attributes attrs = null;
           try {
@@ -148,8 +152,16 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
    * {@inheritDoc}
    */
   public void linkMembership(User user, Group group, MembershipType mt, boolean broadcast) throws Exception {
-    if (mt == null || group == null)
-      return;
+    if (group == null) {
+      throw new NullGroupException("Can not create membership record for " + user.getUserName()
+          + " because group is null");
+    }
+
+    if (mt == null) {
+      throw new NullMembershipTypeException("Can not create membership record for "
+          + user.getUserName() + " because membership type is null");
+    }
+
     MembershipImpl membership = new MembershipImpl();
     membership.setMembershipType(mt.getName());
     membership.setUserName(user.getUserName());
@@ -180,8 +192,8 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
         try {
           String userDN = getDNFromUsername(ctx, username).trim();
           String groupDN = getGroupDNFromGroupId(groupId);
-          String membershipDN = ldapAttrMapping.membershipTypeNameAttr + "=" + membershipType + ", "
-              + groupDN;
+          String membershipDN = ldapAttrMapping.membershipTypeNameAttr + "=" + membershipType
+              + ", " + groupDN;
           Attributes attrs = ctx.getAttributes(membershipDN);
           // Group does exist, is userDN in it?
           List<Object> members = this.getAttributes(attrs,
@@ -193,14 +205,15 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
               break;
             }
           }
-          
+
           if (!remove)
             return m;
-          
+
           if (members.size() > 1) {
             ModificationItem[] mods = new ModificationItem[1];
             mods[0] = new ModificationItem(DirContext.REMOVE_ATTRIBUTE,
-                                           new BasicAttribute(ldapAttrMapping.membershipTypeMemberValue, userDN));
+                                           new BasicAttribute(ldapAttrMapping.membershipTypeMemberValue,
+                                                              userDN));
             if (broadcast)
               preSave(m, true);
             ctx.modifyAttributes(membershipDN, mods);
@@ -312,17 +325,17 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
 
           userDN = userDN.trim();
           String mbfilter = membershipClassFilter();
-//          String filter = "(&" + mbfilter + "(" + ldapAttrMapping.membershipTypeNameAttr + "="
-//              + type + "))";
+          // String filter = "(&" + mbfilter + "(" + ldapAttrMapping.membershipTypeNameAttr + "="
+          // + type + "))";
           String filter = "(&" + mbfilter + "(" + ldapAttrMapping.membershipTypeNameAttr + "="
               + type + ")(" + ldapAttrMapping.membershipTypeMemberValue + "=" + userDN + "))";
 
           NamingEnumeration<SearchResult> results = findMembershipsInGroup(ctx, groupId, filter);
           if (results.hasMoreElements()) {
-//            SearchResult sr = results.next();
-//            if (haveUser(sr.getAttributes(), userDN)) {
-//              membership = createMembershipObject(userName, groupId, type);
-//            }
+            // SearchResult sr = results.next();
+            // if (haveUser(sr.getAttributes(), userDN)) {
+            // membership = createMembershipObject(userName, groupId, type);
+            // }
             membership = createMembershipObject(userName, groupId, type);
           }
 
@@ -393,11 +406,15 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
   /**
    * List memberships of a group by applying the membershipObjectFilter.
    * 
-   * @param ctx {@link LdapContext}
-   * @param groupId id of the group to retrieve
-   * @param filter filter to apply to search
+   * @param ctx
+   *          {@link LdapContext}
+   * @param groupId
+   *          id of the group to retrieve
+   * @param filter
+   *          filter to apply to search
    * @return search results
-   * @throws NamingException if {@link NamingException} occurs
+   * @throws NamingException
+   *           if {@link NamingException} occurs
    */
   private NamingEnumeration<SearchResult> findMembershipsInGroup(LdapContext ctx,
                                                                  String groupId,
@@ -418,7 +435,7 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
 
     LdapContext ctx = ldapService.getLdapContext();
     try {
-      NamingEnumeration<SearchResult> results = null; 
+      NamingEnumeration<SearchResult> results = null;
       for (int err = 0;; err++) {
         // remove all items that can be added in previous iteration
         memberships.clear();
@@ -476,7 +493,7 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
     ArrayList<Membership> memberships = new ArrayList<Membership>();
     LdapContext ctx = ldapService.getLdapContext();
     try {
-      NamingEnumeration<SearchResult> results = null; 
+      NamingEnumeration<SearchResult> results = null;
       for (int err = 0;; err++) {
         memberships.clear();
         try {
@@ -499,7 +516,9 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
               } else {
                 userName = findUserByDN(ctx, userDN).getUserName();
               }
-              Membership membership = createMembershipObject(userName, group.getId(), membershipType);
+              Membership membership = createMembershipObject(userName,
+                                                             group.getId(),
+                                                             membershipType);
               if (LOG.isDebugEnabled())
                 LOG.debug("  found " + membership.toString());
               memberships.add(membership);
@@ -520,15 +539,18 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
       ldapService.release(ctx);
     }
   }
-  
+
   //
 
   /**
    * Create {@link Membership} instance.
    * 
-   * @param userName user name
-   * @param groupId group ID
-   * @param type membership type
+   * @param userName
+   *          user name
+   * @param groupId
+   *          group ID
+   * @param type
+   *          membership type
    * @return newly created instance of {@link Membership}
    */
   private MembershipImpl createMembershipObject(String userName, String groupId, String type) {
@@ -539,14 +561,16 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
     membership.setId(userName + "," + type + "," + groupId);
     return membership;
   }
-  
+
   // listeners
 
   /**
    * For details see {@link MembershipEventListener#postDelete(Membership)}.
    * 
-   * @param membership Membership
-   * @throws Exception if any errors occurs
+   * @param membership
+   *          Membership
+   * @throws Exception
+   *           if any errors occurs
    */
   private void postDelete(Membership membership) throws Exception {
     for (MembershipEventListener listener : listeners)
@@ -556,8 +580,10 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
   /**
    * For details see {@link MembershipEventListener#preDelete(Membership))}.
    * 
-   * @param membership Membership
-   * @throws Exception if any errors occurs
+   * @param membership
+   *          Membership
+   * @throws Exception
+   *           if any errors occurs
    */
   private void preDelete(Membership membership) throws Exception {
     for (MembershipEventListener listener : listeners)
@@ -565,12 +591,14 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
   }
 
   /**
-   * For details see
-   * {@link MembershipEventListener#postSave(Membership, boolean)}.
+   * For details see {@link MembershipEventListener#postSave(Membership, boolean)}.
    * 
-   * @param membership Membership
-   * @param isNew is newly created membership
-   * @throws Exception if any errors occurs
+   * @param membership
+   *          Membership
+   * @param isNew
+   *          is newly created membership
+   * @throws Exception
+   *           if any errors occurs
    */
   private void postSave(Membership membership, boolean isNew) throws Exception {
     for (MembershipEventListener listener : listeners)
@@ -578,16 +606,18 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
   }
 
   /**
-   * For details see
-   * {@link MembershipEventListener#preSave(Membership, boolean)}.
+   * For details see {@link MembershipEventListener#preSave(Membership, boolean)}.
    * 
-   * @param membership Membership
-   * @param isNew is newly created membership
-   * @throws Exception if any errors occurs
+   * @param membership
+   *          Membership
+   * @param isNew
+   *          is newly created membership
+   * @throws Exception
+   *           if any errors occurs
    */
   private void preSave(Membership membership, boolean isNew) throws Exception {
     for (MembershipEventListener listener : listeners)
       listener.preSave(membership, isNew);
   }
-  
+
 }
