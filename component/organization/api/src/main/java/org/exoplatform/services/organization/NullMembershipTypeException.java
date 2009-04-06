@@ -22,24 +22,24 @@ package org.exoplatform.services.organization;
  * @author <a href="mailto:anatoliy.bazko@exoplatform.com.ua">Anatoliy Bazko</a>
  * @version $Id: MembershipTypeNullException.java 111 2008-11-11 11:11:11Z $
  */
-public class MembershipTypeNullException extends Exception {
+public class NullMembershipTypeException extends Exception {
 
   /**
-   * MembershipTypeNullException constructor.
+   * NullMembershipTypeException constructor.
    * 
    * @param message
    * @param cause
    */
-  public MembershipTypeNullException(String message, Throwable cause) {
+  public NullMembershipTypeException(String message, Throwable cause) {
     super(message, cause);
   }
 
   /**
-   * MembershipTypeNullException constructor.
+   * NullMembershipTypeException constructor.
    * 
    * @param message
    */
-  public MembershipTypeNullException(String message) {
+  public NullMembershipTypeException(String message) {
     super(message);
   }
 
