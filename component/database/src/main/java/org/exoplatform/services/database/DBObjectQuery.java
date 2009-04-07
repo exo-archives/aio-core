@@ -124,6 +124,14 @@ public class DBObjectQuery<T extends DBObject> {
   }
 
   public String toQuery() {
+    return constuctQuery(false);
+  }
+
+  public String toQueryUseOR() {
+    return constuctQuery(true);
+  }
+
+  private String constuctQuery(boolean useOR) {
     StringBuilder builder = new StringBuilder("SELECT ");
     if (selectParameter_.size() > 0) {
       for (int i = 0; i < selectParameter_.size(); i++) {
@@ -141,7 +149,7 @@ public class DBObjectQuery<T extends DBObject> {
       builder.append(" WHERE ");
       for (int i = 0; i < parameters_.size(); i++) {
         if (i > 0)
-          builder.append(" AND ");
+          builder.append(useOR ? " OR " : " AND ");
         parameters_.get(i).build(builder);
       }
     }
@@ -151,6 +159,14 @@ public class DBObjectQuery<T extends DBObject> {
   }
 
   public String toCountQuery() {
+    return consturctCountQuery(false);
+  }
+
+  public String toCountQueryUseOR() {
+    return consturctCountQuery(true);
+  }
+
+  private String consturctCountQuery(boolean useOR) {
     StringBuilder builder = new StringBuilder();
     Table table = type_.getAnnotation(Table.class);
     builder.append("SELECT COUNT(*) FROM  ").append(table.name());
@@ -158,7 +174,7 @@ public class DBObjectQuery<T extends DBObject> {
       builder.append(" WHERE ");
       for (int i = 0; i < parameters_.size(); i++) {
         if (i > 0)
-          builder.append(" AND ");
+          builder.append(useOR ? " OR " : " AND ");
         parameters_.get(i).build(builder);
       }
     }
