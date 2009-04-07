@@ -1,6 +1,3 @@
-/**
- * 
- */
 /*
  * Copyright (C) 2003-2009 eXo Platform SAS.
  *
@@ -17,53 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.services.organization.hibernate;
+package org.exoplatform.services.organization.jdbc;
 
-import java.util.Iterator;
-import java.util.List;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
-
-import org.exoplatform.services.database.HibernateService;
+import org.exoplatform.services.database.DAO;
+import org.exoplatform.services.database.DBObject;
 import org.exoplatform.services.organization.User;
 
 /**
  * Created by The eXo Platform SAS.
  * 
  * @author <a href="mailto:anatoliy.bazko@exoplatform.com.ua">Anatoliy Bazko</a>
- * @version $Id: SimpliHibernateUserListAccess.java 111 2008-11-11 11:11:11Z $
+ * @version $Id: SimpleJDBCUserListAccess.java 111 2008-11-11 11:11:11Z $
  */
-public class SimpliHibernateUserListAccess extends HibernateUserListAccess {
+public class SimpleJDBCUserListAccess extends JDBCUserListAccess {
 
-  /**
-   * SimpliHibernateUserListAccess constructor.
-   * 
-   * @param service
-   *          The Hibernate Service.
-   * @param findQuery
-   *          Find query string
-   * @param countQuery
-   *          Count query string
-   */
-  public SimpliHibernateUserListAccess(HibernateService service, String findQuery, String countQuery) {
-    super(service, findQuery, countQuery);
+  public SimpleJDBCUserListAccess(DAO dao, String findQuery, String countQuery) {
+    super(dao, findQuery, countQuery);
   }
 
   /**
    * {@inheritDoc}
    */
-  protected int getSize(Session session) throws Exception {
-    List l = session.createQuery(countQuery).list();
-    Number count = (Number) l.get(0);
-
-    return count.intValue();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  protected User[] load(Session session, int index, int length) throws Exception {
+  protected User[] load(Connection connection, int index, int length) throws Exception {
     if (index < 0)
       throw new IllegalArgumentException("Illegal index: index must be a positive number");
 
@@ -72,21 +49,41 @@ public class SimpliHibernateUserListAccess extends HibernateUserListAccess {
 
     User[] users = new User[length];
 
-    Query query = session.createQuery(findQuery);
-    Iterator<Object> results = query.iterate();
+    Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                                     ResultSet.CONCUR_READ_ONLY);
+    ResultSet resultSet = statement.executeQuery(findQuery);
 
     for (int p = 0, counter = 0; counter < length; p++) {
-      if (!results.hasNext())
+      if (resultSet.isAfterLast())
         throw new IllegalArgumentException("Illegal index or length: sum of the index and the length cannot be greater than the list size");
 
-      Object result = results.next();
+      resultSet.next();
+
+      DBObject bean = dao.createInstance();
+      dao.getDBObjectMapper().mapResultSet(resultSet, bean);
 
       if (p >= index) {
-        users[counter++] = (User) result;
+        users[counter++] = (User) bean;
       }
     }
 
+    resultSet.close();
+    statement.close();
+
     return users;
+  }
+
+  @Override
+  protected int getSize(Connection connection) throws Exception {
+    Object retObj = dao.loadDBField(countQuery);
+
+    if (retObj instanceof Integer) {
+      return ((Integer) retObj).intValue();
+    } else if (retObj instanceof BigDecimal) {
+      return ((BigDecimal) retObj).intValue();
+    } else {
+      return ((Long) retObj).intValue();
+    }
   }
 
 }

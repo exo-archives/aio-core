@@ -135,7 +135,7 @@ public class UserDAOImpl implements UserHandler {
     String findQuery = "from o in class " + UserImpl.class.getName();
     String countQuery = "select count(o) from " + UserImpl.class.getName() + " o";
 
-    return new LazyPageList(new SimpliHibernateUserListAccess(service_, findQuery, countQuery), 20);
+    return new LazyPageList(new SimpleHibernateUserListAccess(service_, findQuery, countQuery), 20);
   }
 
   public boolean authenticate(String username, String password) throws Exception {
@@ -160,7 +160,7 @@ public class UserDAOImpl implements UserHandler {
     oq.addGT("lastLoginTime", q.getFromLoginDate());
     oq.addLT("lastLoginTime", q.getToLoginDate());
 
-    return new LazyPageList(new SimpliHibernateUserListAccess(service_,
+    return new LazyPageList(new SimpleHibernateUserListAccess(service_,
                                                               oq.getHibernateQuery(),
                                                               oq.getHibernateCountQuery()), 20);
   }
@@ -175,7 +175,7 @@ public class UserDAOImpl implements UserHandler {
         + "     m in class org.exoplatform.services.organization.impl.MembershipImpl "
         + "where m.userName = u.userName " + "  and m.groupId =  '" + groupId + "'";
 
-    return new LazyPageList(new SimpliHibernateUserListAccess(service_,
+    return new LazyPageList(new SimpleHibernateUserListAccess(service_,
                                                               queryFindUsersInGroup,
                                                               countUsersInGroup), 20);
   }

@@ -16,18 +16,16 @@
  */
 package org.exoplatform.services.organization.jdbc;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 
-import org.exoplatform.commons.utils.ObjectPageList;
+import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.database.DBObjectMapper;
 import org.exoplatform.services.database.DBObjectQuery;
-import org.exoplatform.services.database.DBPageList;
 import org.exoplatform.services.database.ExoDatasource;
 import org.exoplatform.services.database.StandardSQLDAO;
 import org.exoplatform.services.listener.ListenerService;
@@ -106,7 +104,7 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements UserHandler
   /**
    * Query( name = "" , standardSQL = "..." oracleSQL = "..." )
    */
-  public PageList findUsers(org.exoplatform.services.organization.Query orgQuery) throws Exception {
+  public LazyPageList findUsers(org.exoplatform.services.organization.Query orgQuery) throws Exception {
     DBObjectQuery dbQuery = new DBObjectQuery<UserImpl>(UserImpl.class);
     dbQuery.addLIKE("USER_NAME", orgQuery.getUserName());
     dbQuery.addLIKE("FIRST_NAME", orgQuery.getFirstName());
@@ -114,7 +112,10 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements UserHandler
     dbQuery.addLIKE("EMAIL", orgQuery.getEmail());
     dbQuery.addGT("LAST_LOGIN_TIME", orgQuery.getFromLoginDate());
     dbQuery.addLT("LAST_LOGIN_TIME", orgQuery.getToLoginDate());
-    return new DBPageList<UserImpl>(20, this, dbQuery.toQuery(), dbQuery.toCountQuery());
+
+    return new LazyPageList(new SimpleJDBCUserListAccess(this,
+                                                         dbQuery.toQuery(),
+                                                         dbQuery.toCountQuery()), 20);
   }
 
   @SuppressWarnings("unchecked")
@@ -127,17 +128,28 @@ public class UserDAOImpl extends StandardSQLDAO<UserImpl> implements UserHandler
     GroupHandler groupHandler = service.getGroupHandler();
     Group group = groupHandler.findGroupById(groupId);
     List<Membership> members = (List<Membership>) membershipHandler.findMembershipsByGroup(group);
-    List<User> users = new ArrayList<User>();
+
+    DBObjectQuery dbQuery = new DBObjectQuery<UserImpl>(UserImpl.class);
     for (Membership member : members) {
-      User g = findUserByName(member.getUserName());
-      if (g != null)
-        users.add(g);
+      dbQuery.addLIKE("USER_NAME", member.getUserName());
+      /*
+            User g = findUserByName(member.getUserName());
+            if (g != null)
+              users.add(g);
+      */
     }
-    return new ObjectPageList(users, 10);
+
+    return new LazyPageList(new SimpleJDBCUserListAccess(this,
+                                                         dbQuery.toQueryUseOR(),
+                                                         dbQuery.toCountQueryUseOR()), 20);
   }
 
-  public PageList getUserPageList(int pageSize) throws Exception {
-    return new DBPageList<UserImpl>(pageSize, this, new DBObjectQuery<UserImpl>(UserImpl.class));
+  public LazyPageList getUserPageList(int pageSize) throws Exception {
+    DBObjectQuery dbQuery = new DBObjectQuery<UserImpl>(UserImpl.class);
+
+    return new LazyPageList(new SimpleJDBCUserListAccess(this,
+                                                         dbQuery.toQuery(),
+                                                         dbQuery.toCountQuery()), pageSize);
   }
 
   public User removeUser(String userName, boolean broadcast) throws Exception {
