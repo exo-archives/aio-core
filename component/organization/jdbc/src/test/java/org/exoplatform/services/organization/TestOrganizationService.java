@@ -86,10 +86,14 @@ public class TestOrganizationService extends BasicTestCase {
     Query query = new Query();
     query.setUserName(USER + "*");
     PageList users = userHandler_.findUsers(query);
-    for (Object o : users.getAll()) {
-      String userName = ((User) o).getUserName();
+
+    List<User> allUsers = users.getAll();
+
+    for (int i = allUsers.size() - 1; i >= 0; i--) {
+      String userName = allUsers.get(i).getUserName();
       userHandler_.removeUser(userName, true);
     }
+
   }
 
   public void testUserPageSize() throws Exception {
@@ -114,16 +118,15 @@ public class TestOrganizationService extends BasicTestCase {
     assertTrue("Found user instance ", user != null);
     assertEquals("Expect user name is: ", USER, user.getUserName());
     UserProfile userProfile = profileHandler_.findUserProfileByName(USER);
-	profileHandler_.removeUserProfile(USER, true);    
-	assertNull(profileHandler_.findUserProfileByName(USER));
+    profileHandler_.removeUserProfile(USER, true);
+    assertNull(profileHandler_.findUserProfileByName(USER));
 
-	profileHandler_.createUserProfileInstance(USER);
-	userProfile.getUserInfoMap().put("key", "value");
-	profileHandler_.saveUserProfile(userProfile, true);
-	userProfile = profileHandler_.findUserProfileByName(USER);
+    profileHandler_.createUserProfileInstance(USER);
+    userProfile.getUserInfoMap().put("key", "value");
+    profileHandler_.saveUserProfile(userProfile, true);
+    userProfile = profileHandler_.findUserProfileByName(USER);
     assertTrue("Expect user profile is found: ", userProfile != null);
     assertEquals(userProfile.getUserInfoMap().get("key"), "value");
-
 
     PageList users = userHandler_.findUsers(new Query());
     assertTrue("Expect 1 user found ", users.getAvailable() >= 1);
@@ -422,7 +425,7 @@ public class TestOrganizationService extends BasicTestCase {
     groupHandler_.removeGroup(group2, true);
     groupHandler_.removeGroup(group3, true);
   }
-  
+
   public void testUserProfileListener() throws Exception {
     UserProfileListener l = new UserProfileListener();
     profileHandler_.addUserProfileEventListener(l);
@@ -434,7 +437,7 @@ public class TestOrganizationService extends BasicTestCase {
     profileHandler_.removeUserProfile(user.getUserName(), true);
     assertTrue(l.preDelete && l.postDelete);
   }
-  
+
   private static class UserProfileListener extends UserProfileEventListener {
 
     boolean preSave;
