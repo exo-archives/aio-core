@@ -20,6 +20,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.naming.InvalidNameException;
+
 import org.hibernate.Session;
 
 import org.exoplatform.commons.utils.IdentifierUtil;
@@ -30,8 +32,6 @@ import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.MembershipEventListener;
 import org.exoplatform.services.organization.MembershipHandler;
 import org.exoplatform.services.organization.MembershipType;
-import org.exoplatform.services.organization.NullMembershipTypeException;
-import org.exoplatform.services.organization.NullGroupException;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.impl.MembershipImpl;
 
@@ -97,13 +97,13 @@ public class MembershipDAOImpl implements MembershipHandler {
 
   public void linkMembership(User user, Group g, MembershipType mt, boolean broadcast) throws Exception {
     if (g == null) {
-      throw new NullGroupException("Can not create membership record for " + user.getUserName()
+      throw new InvalidNameException("Can not create membership record for " + user.getUserName()
           + " because group is null");
     }
 
     if (mt == null) {
-      throw new NullMembershipTypeException("Can not create membership record for "
-          + user.getUserName() + " because membership type is null");
+      throw new InvalidNameException("Can not create membership record for " + user.getUserName()
+          + " because membership type is null");
     }
 
     Session session = service_.openSession();

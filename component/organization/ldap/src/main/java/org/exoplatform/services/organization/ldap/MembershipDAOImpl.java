@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.naming.InvalidNameException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -41,8 +42,6 @@ import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.MembershipEventListener;
 import org.exoplatform.services.organization.MembershipHandler;
 import org.exoplatform.services.organization.MembershipType;
-import org.exoplatform.services.organization.NullGroupException;
-import org.exoplatform.services.organization.NullMembershipTypeException;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.impl.MembershipImpl;
 
@@ -153,13 +152,13 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
    */
   public void linkMembership(User user, Group group, MembershipType mt, boolean broadcast) throws Exception {
     if (group == null) {
-      throw new NullGroupException("Can not create membership record for " + user.getUserName()
+      throw new InvalidNameException("Can not create membership record for " + user.getUserName()
           + " because group is null");
     }
 
     if (mt == null) {
-      throw new NullMembershipTypeException("Can not create membership record for "
-          + user.getUserName() + " because membership type is null");
+      throw new InvalidNameException("Can not create membership record for " + user.getUserName()
+          + " because membership type is null");
     }
 
     MembershipImpl membership = new MembershipImpl();
