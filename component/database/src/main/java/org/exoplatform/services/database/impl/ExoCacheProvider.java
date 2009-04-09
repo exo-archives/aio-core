@@ -32,8 +32,9 @@ import org.exoplatform.services.cache.ExoCache;
  * 
  * @author <a href="mailto:gennady.azarenkov@exoplatform.com">Gennady Azarenkov
  *         </a>
- * @version $Id: ExoCacheProvider.java 5332 2006-04-29 18:32:44Z geaz $
+ * @version $Id$
  */
+@Deprecated
 public class ExoCacheProvider implements CacheProvider {
 
   private CacheService cacheService;

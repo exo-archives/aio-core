@@ -2,12 +2,8 @@
 <configuration  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.exoplaform.org/xml/ns/kernel_1_0.xsd http://www.exoplaform.org/xml/ns/kernel_1_0.xsd"
     xmlns="http://www.exoplaform.org/xml/ns/kernel_1_0.xsd">
-  <component> 
-    <key>org.exoplatform.services.database.impl.ExoCacheProvider</key>
-    <type>org.exoplatform.services.database.impl.ExoCacheProvider</type>
-  </component>
-
-  <component> 
+  
+  <!-- component> 
     <key>org.exoplatform.services.database.HibernateService</key>
     <jmx-name>exo-service:type=HibernateService</jmx-name>
     <type>org.exoplatform.services.database.impl.HibernateServiceImpl</type>
@@ -29,14 +25,19 @@
         <property name="hibernate.c3p0.max_statements" value="50"/>
       </properties-param>
     </init-params>
-  </component>
+  </component -->
 
-  <component>
+  <!-- component> 
+    <key>org.exoplatform.services.database.impl.ExoCacheProvider</key>
+    <type>org.exoplatform.services.database.impl.ExoCacheProvider</type>
+  </component -->
+
+  <!-- component>
     <key>org.exoplatform.services.database.jdbc.DBSchemaCreator</key>
     <type>org.exoplatform.services.database.jdbc.DBSchemaCreator</type>
-  </component>
+  </component -->
 
-  <component> 
+  <!-- component> 
     <key>org.exoplatform.services.database.DatabaseService</key>
     <type>org.exoplatform.services.database.impl.XAPoolTxSupportDatabaseService</type>
     <init-params>
@@ -61,5 +62,5 @@
         <property name='connection.max-size' value='5'/>
       </properties-param>
     </init-params>
-  </component>
+  </component -->
 </configuration>
