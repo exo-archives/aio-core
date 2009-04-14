@@ -2,11 +2,11 @@
   <parent>
     <groupId>org.exoplatform.core</groupId>
     <artifactId>config</artifactId>
-    <version>2.2.1</version>
+    <version>2.2.2-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.core.component.security.pam</artifactId>
-  <version>2.2.1</version>
+  <version>2.2.2-SNAPSHOT</version>
   <name>JPam Authenticator</name>
   <description />
 
@@ -19,7 +19,7 @@
     <dependency>
       <groupId>org.exoplatform.core</groupId>
       <artifactId>exo.core.component.organization.api</artifactId>
-      <version>2.2.1</version>
+      <version>2.2.2-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
