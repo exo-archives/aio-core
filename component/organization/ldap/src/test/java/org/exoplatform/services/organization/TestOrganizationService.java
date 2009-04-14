@@ -118,13 +118,13 @@ public class TestOrganizationService extends TestCase {
     PageList users = userHandler_.findUsers(query);
     System.out.println("size: " + users.getAvailablePage());
 
-    List list = users.getPage(1);
-    for (Object ele : list) {
-      User u = (User) ele;
-      System.out.println(u.getUserName() + " and " + u.getEmail());
-    }
+//    List list = users.getPage(1);
+//    for (Object ele : list) {
+//      User u = (User) ele;
+//      System.out.println(u.getUserName() + " and " + u.getEmail());
+//    }
     System.out.println("\npage 1:");
-    list = users.getPage(1);
+    List list = users.getPage(1);
     System.out.println("size : " + list.size());
     for (Object ele : list) {
       User u = (User) ele;
