@@ -93,6 +93,11 @@ public class DefaultLoginModule implements LoginModule {
    * If must set in LM options.
    */
   protected boolean singleLogin = false;
+  
+  /**
+   * Configurable option to use Username and Password from the SharedState
+   */
+  private boolean useSharedPasswd = false;
 
   /**
    * Default constructor.
@@ -115,6 +120,11 @@ public class DefaultLoginModule implements LoginModule {
         && (sl.equalsIgnoreCase("yes") || sl.equalsIgnoreCase("true"))) {
       this.singleLogin = true;
     }
+    
+    Object sharedPasswd = options.get("useSharedPasswd");
+    if(sharedPasswd != null && (sharedPasswd.equals("yes") || sharedPasswd.equals("true"))) {
+    	this.useSharedPasswd = true;
+    }
   }
 
   /**
@@ -130,11 +140,17 @@ public class DefaultLoginModule implements LoginModule {
     callbacks[1] = new PasswordCallback("Password", false);
 
     try {
-
-      callbackHandler.handle(callbacks);
-      String username = ((NameCallback) callbacks[0]).getName();
-      String password = new String(((PasswordCallback) callbacks[1]).getPassword());
-      ((PasswordCallback) callbacks[1]).clearPassword();
+    	String username ;
+    	String password ;
+    	if (this.useSharedPasswd) {
+    		username = (String) sharedState.get("javax.security.auth.login.name");
+    		password = (String) sharedState.get("javax.security.auth.login.password");
+    	} else {
+    		callbackHandler.handle(callbacks);
+    		username = ((NameCallback) callbacks[0]).getName();
+    		password = new String(((PasswordCallback) callbacks[1]).getPassword());
+    		((PasswordCallback) callbacks[1]).clearPassword();
+    	}
       if (username == null || password == null)
         return false;
 
@@ -229,5 +245,4 @@ public class DefaultLoginModule implements LoginModule {
     }
     return DEFAULT_PORTAL_CONTAINER_NAME;
   }
-  
 }
