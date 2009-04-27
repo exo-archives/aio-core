@@ -41,6 +41,7 @@ import org.exoplatform.services.security.UsernameCredential;
 
 /**
  * Created by The eXo Platform SAS .
+ * 
  * @author Gennady Azarenkov
  * @version $Id: $
  */
@@ -48,56 +49,52 @@ import org.exoplatform.services.security.UsernameCredential;
 public class DefaultLoginModule implements LoginModule {
 
   /**
-   * The name of the option to use in order to specify the name of the portal container
+   * The name of the option to use in order to specify the name of the portal
+   * container
    */
-  private static final String OPTION_PORTAL_CONTAINER_NAME = "portalContainerName";
-  
+  private static final String OPTION_PORTAL_CONTAINER_NAME  = "portalContainerName";
+
   /**
    * The default name of the portal container
    */
   private static final String DEFAULT_PORTAL_CONTAINER_NAME = "portal";
-  
+
   /**
    * Logger.
    */
-  protected Log log = ExoLogger.getLogger("core.DefaultLoginModule");
+  protected Log               log                           = ExoLogger.getLogger("core.DefaultLoginModule");
 
   /**
    * @see {@link Subject} .
    */
-  protected Subject subject;
-  
+  protected Subject           subject;
+
   /**
    * @see {@link CallbackHandler}
    */
-  private CallbackHandler callbackHandler;
-  
+  private CallbackHandler     callbackHandler;
+
   /**
    * encapsulates user's principals such as name, groups, etc .
    */
-  protected Identity identity;
-  
+  protected Identity          identity;
+
   /**
    * Shared state.
    */
   @SuppressWarnings("unchecked")
-  protected Map sharedState;
+  protected Map               sharedState;
 
   /**
    * The name of the portal container.
    */
-  private String portalContainerName;
+  private String              portalContainerName;
 
   /**
-   * Is allowed for one user login again if he already login.
-   * If must set in LM options.
+   * Is allowed for one user login again if he already login. If must set in LM
+   * options.
    */
-  protected boolean singleLogin = false;
-  
-  /**
-   * Configurable option to use Username and Password from the SharedState
-   */
-  private boolean useSharedPasswd = false;
+  protected boolean           singleLogin                   = false;
 
   /**
    * Default constructor.
@@ -106,86 +103,83 @@ public class DefaultLoginModule implements LoginModule {
   }
 
   /**
-   * {@inheritDoc} 
+   * {@inheritDoc}
    */
   @SuppressWarnings("unchecked")
-  public void initialize(Subject subject, CallbackHandler callbackHandler, Map sharedState, Map options) {
+  public void initialize(Subject subject,
+                         CallbackHandler callbackHandler,
+                         Map sharedState,
+                         Map options) {
     this.subject = subject;
     this.callbackHandler = callbackHandler;
     this.sharedState = sharedState;
     this.portalContainerName = getPortalContainerName(options);
 
     String sl = (String) options.get("singleLogin");
-    if (sl != null
-        && (sl.equalsIgnoreCase("yes") || sl.equalsIgnoreCase("true"))) {
+    if (sl != null && (sl.equalsIgnoreCase("yes") || sl.equalsIgnoreCase("true"))) {
       this.singleLogin = true;
-    }
-    
-    Object sharedPasswd = options.get("useSharedPasswd");
-    if(sharedPasswd != null && (sharedPasswd.equals("yes") || sharedPasswd.equals("true"))) {
-    	this.useSharedPasswd = true;
     }
   }
 
   /**
-   * {@inheritDoc} 
+   * {@inheritDoc}
    */
   @SuppressWarnings("unchecked")
   public boolean login() throws LoginException {
     if (log.isDebugEnabled())
       log.debug("In login of DefaultLoginModule.");
 
-    Callback[] callbacks = new Callback[2];
-    callbacks[0] = new NameCallback("Username");
-    callbacks[1] = new PasswordCallback("Password", false);
-
     try {
-    	String username ;
-    	String password ;
-    	if (this.useSharedPasswd) {
-    		username = (String) sharedState.get("javax.security.auth.login.name");
-    		password = (String) sharedState.get("javax.security.auth.login.password");
-    	} else {
-    		callbackHandler.handle(callbacks);
-    		username = ((NameCallback) callbacks[0]).getName();
-    		password = new String(((PasswordCallback) callbacks[1]).getPassword());
-    		((PasswordCallback) callbacks[1]).clearPassword();
-    	}
-      if (username == null || password == null)
-        return false;
+      if (sharedState.containsKey("exo.security.identity")) {
+        if (log.isDebugEnabled())
+          log.debug("Use Identity from previous LoginModule");
+        identity = (Identity) sharedState.get("exo.security.identity");
+      } else {
+        if (log.isDebugEnabled())
+          log.debug("Try create identity");
+        Callback[] callbacks = new Callback[2];
+        callbacks[0] = new NameCallback("Username");
+        callbacks[1] = new PasswordCallback("Password", false);
 
-      Authenticator authenticator = (Authenticator) getContainer().getComponentInstanceOfType(Authenticator.class);
+        callbackHandler.handle(callbacks);
+        String username = ((NameCallback) callbacks[0]).getName();
+        String password = new String(((PasswordCallback) callbacks[1]).getPassword());
+        ((PasswordCallback) callbacks[1]).clearPassword();
+        if (username == null || password == null)
+          return false;
 
-      if (authenticator == null)
-        throw new LoginException("No Authenticator component found, check your configuration");
+        Authenticator authenticator = (Authenticator) getContainer().getComponentInstanceOfType(Authenticator.class);
 
-      Credential[] credentials = new Credential[]{ new UsernameCredential(username), new PasswordCredential(password) };
+        if (authenticator == null)
+          throw new LoginException("No Authenticator component found, check your configuration");
 
-      String userId = authenticator.validateUser(credentials);
-      identity = authenticator.createIdentity(userId);
+        Credential[] credentials = new Credential[] { new UsernameCredential(username),
+            new PasswordCredential(password) };
 
-      sharedState.put("javax.security.auth.login.name", userId);
-      subject.getPrivateCredentials().add(password);
-      subject.getPublicCredentials().add(new UsernameCredential(username));
+        String userId = authenticator.validateUser(credentials);
+        identity = authenticator.createIdentity(userId);
+        sharedState.put("javax.security.auth.login.name", userId);
+        // TODO use PasswordCredential wrapper
+        subject.getPrivateCredentials().add(password);
+        subject.getPublicCredentials().add(new UsernameCredential(username));
+      }
       return true;
 
     } catch (final Throwable e) {
       log.error(e.getLocalizedMessage());
       throw new LoginException(e.getMessage());
-
     }
   }
 
   /**
-   * {@inheritDoc} 
+   * {@inheritDoc}
    */
   public boolean commit() throws LoginException {
     try {
 
-      IdentityRegistry identityRegistry = (IdentityRegistry) getContainer().getComponentInstanceOfType(
-          IdentityRegistry.class);
-      
-      if (singleLogin && identityRegistry.getIdentity(identity.getUserId()) != null) 
+      IdentityRegistry identityRegistry = (IdentityRegistry) getContainer().getComponentInstanceOfType(IdentityRegistry.class);
+
+      if (singleLogin && identityRegistry.getIdentity(identity.getUserId()) != null)
         throw new LoginException("User " + identity.getUserId() + " already logined.");
 
       identity.setSubject(subject);
@@ -199,7 +193,7 @@ public class DefaultLoginModule implements LoginModule {
   }
 
   /**
-   * {@inheritDoc} 
+   * {@inheritDoc}
    */
   public boolean abort() throws LoginException {
     if (log.isDebugEnabled())
@@ -208,7 +202,7 @@ public class DefaultLoginModule implements LoginModule {
   }
 
   /**
-   * {@inheritDoc} 
+   * {@inheritDoc}
    */
   public boolean logout() throws LoginException {
     if (log.isDebugEnabled())
@@ -221,7 +215,6 @@ public class DefaultLoginModule implements LoginModule {
    * @return actual ExoContainer instance.
    */
   protected ExoContainer getContainer() {
-    // TODO set correct current container
     ExoContainer container = ExoContainerContext.getCurrentContainer();
     if (container instanceof RootContainer) {
       container = RootContainer.getInstance().getPortalContainer(portalContainerName);
@@ -230,7 +223,9 @@ public class DefaultLoginModule implements LoginModule {
   }
 
   /**
-   * Return portal container name if it provide with options, DEFAULT_PORTAL_CONTAINER_NAME otherwise. 
+   * Return portal container name if it provide with options,
+   * DEFAULT_PORTAL_CONTAINER_NAME otherwise.
+   * 
    * @param options
    * @return
    */
@@ -239,7 +234,8 @@ public class DefaultLoginModule implements LoginModule {
     if (options != null) {
       String optionValue = (String) options.get(OPTION_PORTAL_CONTAINER_NAME);
       if (optionValue != null && optionValue.length() > 0) {
-        if (log.isDebugEnabled()) log.debug("The DefaultLoginModule will use the portal container " + optionValue);
+        if (log.isDebugEnabled())
+          log.debug("The DefaultLoginModule will use the portal container " + optionValue);
         return optionValue;
       }
     }
