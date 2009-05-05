@@ -64,8 +64,10 @@ public class LDAPUserPageList extends PageList {
       int size = this.getResultSize();
       setAvailablePage(size);
     } catch (NameNotFoundException exp) {
+      exp.printStackTrace();
       setAvailablePage(0);
     } catch (OperationNotSupportedException exp) {
+      exp.printStackTrace();
       setAvailablePage(0);
     }
   }
@@ -99,9 +101,9 @@ public class LDAPUserPageList extends PageList {
         if (responseControls[z] instanceof PagedResultsResponseControl)
           cookie = ((PagedResultsResponseControl) responseControls[z]).getCookie();
       }
-      ctx.setRequestControls(new Control[] { new PagedResultsControl(getPageSize(),
-                                                                     cookie,
-                                                                     Control.CRITICAL) });
+      ctx.setRequestControls(new Control[] { sctl, new PagedResultsControl(getPageSize(),
+                                                                           cookie,
+                                                                           Control.CRITICAL) });
     } while (cookie != null);
     this.currentListPage_ = users;
   }
@@ -136,9 +138,9 @@ public class LDAPUserPageList extends PageList {
           if (responseControls[z] instanceof PagedResultsResponseControl)
             cookie = ((PagedResultsResponseControl) responseControls[z]).getCookie();
         }
-        ctx.setRequestControls(new Control[] { new PagedResultsControl(getPageSize(),
-                                                                       cookie,
-                                                                       Control.NONCRITICAL) });
+        ctx.setRequestControls(new Control[] { sctl, new PagedResultsControl(getPageSize(),
+                                                                             cookie,
+                                                                             Control.NONCRITICAL) });
       }
     } while (cookie != null);
     return counter + 1;
