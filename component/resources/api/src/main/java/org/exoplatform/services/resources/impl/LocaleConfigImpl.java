@@ -140,4 +140,14 @@ public class LocaleConfigImpl implements LocaleConfig {
   public void setOrientation(Orientation orientation) {
     this.orientation = orientation;
   }
+
+  @Override
+  public String toString() {
+    return "LocaleConfig[" +
+      "localeName=" + localeName_ +
+      ",locale=" +  locale_ +
+      ",description=" + description_ +
+      ",inputEncoding=" + inputEncoding_ +
+      ",outputEncoding=" + outputEncoding_ +  "]";
+  }
 }

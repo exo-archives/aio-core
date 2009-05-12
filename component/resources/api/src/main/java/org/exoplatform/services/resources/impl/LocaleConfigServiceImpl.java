@@ -33,7 +33,9 @@ import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.resources.Orientation;
+import org.exoplatform.services.resources.IdentityResourceBundle;
 import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.commons.utils.PropertyManager;
 import org.apache.commons.logging.Log;
 
 /**
@@ -130,11 +132,26 @@ public class LocaleConfigServiceImpl implements LocaleConfigService {
         config.setOrientation(Orientation.LT);
       }
 
+      //
+      log.debug("Added locale config " + config + " to the set of locale configs");
+
+      //
       configs_.put(config.getLanguage(), config);
       if (i == 0)
         defaultConfig_ = config;
     }
 
+    //
+    if (PropertyManager.isDevelopping()) {
+      LocaleConfig magicConfig = new LocaleConfigImpl();
+      magicConfig.setLocale(IdentityResourceBundle.MAGIC_LOCALE);
+      magicConfig.setDescription("Magic locale");
+      magicConfig.setInputEncoding("UTF-8");
+      magicConfig.setOutputEncoding("UTF-8");
+      magicConfig.setDescription("Default configuration for the debugging locale");
+      magicConfig.setOrientation(Orientation.LT);
+      configs_.put(magicConfig.getLanguage(), magicConfig);
+      log.debug("Added magic locale for debugging bundle usage at runtime");
+    }
   }
-
 }

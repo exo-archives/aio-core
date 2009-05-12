@@ -19,6 +19,7 @@ package org.exoplatform.services.resources;
 import java.util.ResourceBundle;
 import java.util.Enumeration;
 import java.util.Vector;
+import java.util.Locale;
 
 /**
  * A resource bundle that returns the queried key. It returns an empty enumeration when the keys are queried.
@@ -29,6 +30,7 @@ import java.util.Vector;
 public class IdentityResourceBundle extends ResourceBundle {
 
   public static final String MAGIC_LANGUAGE = "ma".intern();
+  public static final Locale MAGIC_LOCALE = new Locale(MAGIC_LANGUAGE);
   private static final Vector<String> EMPTY_KEYS = new Vector<String>();
   private static final IdentityResourceBundle instance = new IdentityResourceBundle();
 
