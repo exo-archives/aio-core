@@ -64,14 +64,15 @@ public class LDAPUserPageList extends PageList {
       int size = this.getResultSize();
       setAvailablePage(size);
     } catch (NameNotFoundException exp) {
-      exp.printStackTrace();
       setAvailablePage(0);
     } catch (OperationNotSupportedException exp) {
-      exp.printStackTrace();
       setAvailablePage(0);
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   protected void populateCurrentPage(int page) throws Exception {
     List<User> users = new ArrayList<User>();
     PagedResultsControl prc = new PagedResultsControl(getPageSize(), Control.CRITICAL);
@@ -102,52 +103,52 @@ public class LDAPUserPageList extends PageList {
           cookie = ((PagedResultsResponseControl) responseControls[z]).getCookie();
       }
       ctx.setRequestControls(new Control[] { sctl, new PagedResultsControl(getPageSize(),
-                                                                           cookie,
-                                                                           Control.CRITICAL) });
+                                                                     cookie,
+                                                                     Control.CRITICAL) });
     } while (cookie != null);
     this.currentListPage_ = users;
   }
 
   private int getResultSize() throws Exception {
-    PagedResultsControl prc = new PagedResultsControl(getPageSize(), Control.CRITICAL);
-    String keys[] = { ldapAttrMapping_.userUsernameAttr };
-    SortControl sctl = new SortControl(keys, SEARCH_CONTROL);
-
     LdapContext ctx = ldapService_.getLdapContext();
-    ctx.setRequestControls(new Control[] { sctl, prc });
+    NamingEnumeration<SearchResult> results = null;
     SearchControls constraints = new SearchControls();
-    String returnedAtts[] = { ldapAttrMapping_.userUsernameAttr };
+    String[] returnedAtts = { ldapAttrMapping_.userUsernameAttr };
     constraints.setReturningAttributes(returnedAtts);
     constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
-    byte[] cookie = null;
-    int counter = -1;
+    results = ctx.search(searchBase_, filter_, constraints);
 
-    do {
-      NamingEnumeration<SearchResult> results = ctx.search(searchBase_, filter_, constraints);
-      if (results == null)
-        break;
-      while (results.hasMore()) {
-        counter++;
-        results.next();
-      }
+    int counter = 0;
+    while (results != null && results.hasMore()) {
+      results.next();
+      counter++;
+    }
 
-      Control[] responseControls = ctx.getResponseControls();
-      if (responseControls != null) {
-        for (int z = 0; z < responseControls.length; z++) {
-          if (responseControls[z] instanceof PagedResultsResponseControl)
-            cookie = ((PagedResultsResponseControl) responseControls[z]).getCookie();
-        }
-        ctx.setRequestControls(new Control[] { sctl, new PagedResultsControl(getPageSize(),
-                                                                             cookie,
-                                                                             Control.NONCRITICAL) });
-      }
-    } while (cookie != null);
-    return counter + 1;
+    return counter;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @SuppressWarnings("unchecked")
   public List getAll() throws Exception {
-    return null;
-  }
+    LdapContext ctx = ldapService_.getLdapContext();
+    List<User> users = new ArrayList<User>();
+    NamingEnumeration<SearchResult> results = null;
+    SearchControls constraints = new SearchControls();
+    String[] returnedAtts = { ldapAttrMapping_.userUsernameAttr };
+    constraints.setReturningAttributes(returnedAtts);
+    constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
+    results = ctx.search(searchBase_, filter_, constraints);
+
+    while (results != null && results.hasMore()) {
+      SearchResult result = results.next();
+      users.add(ldapAttrMapping_.attributesToUser(result.getAttributes()));
+    }
+
+    return users;
+  }
+  
 }
