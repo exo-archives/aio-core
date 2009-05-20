@@ -16,6 +16,7 @@
  */
 package org.exoplatform.services.resources.impl;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
@@ -23,24 +24,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.Properties;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
-
 import org.exoplatform.commons.utils.IOUtil;
 import org.exoplatform.commons.utils.MapResourceBundle;
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.cache.ExoCache;
+import org.exoplatform.services.resources.IdentityResourceBundle;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
+import org.exoplatform.services.resources.PropertiesClassLoader;
 import org.exoplatform.services.resources.Query;
 import org.exoplatform.services.resources.ResourceBundleData;
-import org.exoplatform.services.resources.ResourceBundleService;
-import org.exoplatform.services.resources.IdentityResourceBundle;
 import org.exoplatform.services.resources.ResourceBundleLoader;
-import org.exoplatform.services.resources.XMLResourceBundleParser;
+import org.exoplatform.services.resources.ResourceBundleService;
 
 /**
  * Created by The eXo Platform SAS Mar 9, 2007
@@ -49,7 +47,7 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
 
   protected Log                 log_;
 
-  protected List                classpathResources_;
+  protected List<String>        classpathResources_;
 
   protected String[]            portalResourceBundleNames_;
 
@@ -101,7 +99,7 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
     if (classpathResources_ == null)
       return false;
     for (int i = 0; i < classpathResources_.size(); i++) {
-      String pack = (String) classpathResources_.get(i);
+      String pack = classpathResources_.get(i);
       if (name.startsWith(pack))
         return true;
     }
@@ -110,45 +108,15 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
 
   protected void initResources(String baseName, ClassLoader cl) {
     String name = baseName.replace('.', '/');
-    String fileName = null;
     try {
       Collection<LocaleConfig> localeConfigs = localeService_.getLocalConfigs();
       String defaultLang = localeService_.getDefaultLocaleConfig().getLanguage();
       for (Iterator<LocaleConfig> iter = localeConfigs.iterator(); iter.hasNext();) {
         LocaleConfig localeConfig = iter.next();
         String language = localeConfig.getLanguage();
-        String content = null;
-
-        //
-        fileName = name + "_" + language + ".xml";
-        URL url = cl.getResource(fileName);
-        if (url != null) {
-          Properties props = XMLResourceBundleParser.asProperties(url.openStream());
-          StringBuilder sb = new StringBuilder();
-          for (Map.Entry<Object, Object> entry : props.entrySet()) {
-            sb.append(entry.getKey());
-            sb.append('=');
-            sb.append(entry.getValue());
-            sb.append('\n');
-          }
-          content = sb.toString();
-        }
-
-        //
-        if (content == null) {
-          fileName = name + "_" + language + ".properties";
-          url = cl.getResource(fileName);
-          if (url == null && defaultLang.equals(language)) cl.getResource(name + ".properties") ;
-          if (url != null) {
-            InputStream is = url.openStream();
-            byte[] buf = IOUtil.getStreamContentAsBytes(is);
-            content = new String(buf, "UTF-8");
-            is.close();
-          }
-        }
-
-        //
+        String content = getResourceBundleContent(name, language, defaultLang, cl);
         if (content != null) {
+          // save the content
           ResourceBundleData data = new ResourceBundleData();
           data.setId(baseName + "_" + language);
           data.setName(baseName);
@@ -158,10 +126,40 @@ abstract public class BaseResourceBundleService implements ResourceBundleService
         }
       }
     } catch (Exception ex) {
-      log_.error("Error while reading the file: " + fileName, ex);
+    	log_.error("Error while reading the resource bundle : " + baseName, ex);
     }
   }
 
+  protected String getResourceBundleContent(String name, String language,
+			String defaultLang, ClassLoader cl) throws Exception {
+		String fileName = null;
+		try {
+		    cl = new PropertiesClassLoader(cl, true);
+			fileName = name + "_" + language + ".properties";
+			URL url = cl.getResource(fileName);
+			if (url == null && defaultLang.equals(language)) {
+				url = cl.getResource(name + ".properties");
+			}
+			if (url != null) {
+				InputStream is = url.openStream();
+				try {
+					byte[] buf = IOUtil.getStreamContentAsBytes(is);
+					return new String(buf, "UTF-8");
+				} finally {
+					try {
+						is.close();
+					} catch (IOException e) {
+						// Do nothing
+					}
+				}
+			}
+		} catch (Exception e) {
+			throw new Exception("Error while reading the file: " + fileName, e);
+		}
+		return null;
+	}
+
+  
   public ResourceBundle getResourceBundle(String name, Locale locale, ClassLoader cl) {
     if (IdentityResourceBundle.MAGIC_LANGUAGE.equals(locale.getLanguage())) {
       return IdentityResourceBundle.getInstance();
