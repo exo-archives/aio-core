@@ -109,7 +109,7 @@ public class HibernateServiceImpl implements HibernateService, ComponentRequestL
           if (!mappings_.contains(relativePath)) {
             mappings_.add(relativePath);
             URL url = cl.getResource(relativePath);
-            System.err.println("Add  Hibernate Mapping: " + relativePath);
+            LOG.info("Add  Hibernate Mapping: " + relativePath);
             conf_.addURL(url);
           }
         }
