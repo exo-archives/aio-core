@@ -35,9 +35,7 @@
     <module>component/organization/jdbc</module>
     <module>component/organization/ldap</module>
     <module>component/xml-processing</module>
-    <module>component/resources/api</module>
     <module>component/script/groovy</module>
-    <module>component/gifbackport</module>
     <module>component/web/css</module>
   </modules>
 
