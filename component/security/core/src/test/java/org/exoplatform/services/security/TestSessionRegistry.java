@@ -19,6 +19,7 @@ package org.exoplatform.services.security;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.security.auth.login.LoginException;
@@ -160,6 +161,23 @@ public class TestSessionRegistry extends TestCase {
 
     //
     assertNull(registry.getState(key));
+  }
+  
+  public void testUnregisterByUserId() throws Exception {
+    Credential[] cred = new Credential[] { new UsernameCredential("exo") };
+    String userId = authenticator.validateUser(cred);
+    Identity id = authenticator.createIdentity(userId);
+    ConversationState state = new ConversationState(id);
+    StateKey key1 = new SimpleStateKey("key1"); 
+    StateKey key2 = new SimpleStateKey("key2"); 
+    StateKey key3 = new SimpleStateKey("key3"); 
+    registry.register(key1, state);
+    registry.register(key2, state);
+    registry.register(key3, state);
+    assertEquals(3, registry.getStateKeys(userId).size());
+    List<ConversationState> unregistered = registry.unregisterByUserId(userId);
+    assertEquals(3, unregistered.size());
+    assertEquals(0, registry.getStateKeys(userId).size());
   }
 
   public void testMemberships() throws Exception {

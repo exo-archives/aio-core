@@ -148,6 +148,20 @@ public final class ConversationRegistry {
    * @return removed ConversationState or null.
    */
   public ConversationState unregister(StateKey key) {
+    return unregister(key, true);
+  }
+  
+  /**
+   * Remove ConversationState with specified key. If there is no more
+   * ConversationState for user and <code>unregisterIdentity</code> is true then
+   * remove Identity from IdentityRegistry.
+   * 
+   * @param key the key.
+   * @param unregisterIdentity if true and no more ConversationStates for user
+   *          then unregister Identity
+   * @return removed ConversationState or null.
+   */
+  public ConversationState unregister(StateKey key, boolean unregisterIdentity) {
     ConversationState state = states.remove(key);
 
     if (state == null)
@@ -155,13 +169,8 @@ public final class ConversationRegistry {
 
     String userId = state.getIdentity().getUserId();
 
-    // if no more conversation then remove identity.
-    // TODO : temporary , now old code keeps one more conversation state with
-    // key userId.
-    // This state created by method broadcastAuthentication in
-    // AuthenticationService
     List<StateKey> keys = getStateKeys(userId);
-    if (keys.size() == 0 || (keys.size() == 1 && keys.get(0).equals(userId))) {
+    if (unregisterIdentity && keys.size() == 0) {
       identityRegistry.unregister(userId);
     }
 
@@ -172,6 +181,24 @@ public final class ConversationRegistry {
     }
 
     return state;
+  }
+  
+  
+  /**
+   * Unregister all conversation states for user with specified Id.
+   * 
+   * @param userId user Id
+   * @return set of unregistered conversation states
+   */
+  public List<ConversationState> unregisterByUserId(String userId) {
+    List<ConversationState> states = new ArrayList<ConversationState>();
+    for (StateKey key : getStateKeys(userId)) {
+      ConversationState state = unregister(key, false);
+      if (state != null) {
+        states.add(state);
+      }
+    }
+    return states;
   }
 
   /**
