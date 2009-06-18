@@ -90,4 +90,12 @@ public final class MembershipEntry {
     return null;
 
   }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString() {
+    return getMembershipType() + ":" + getGroup();
+  }
 }

@@ -112,6 +112,8 @@ public class SetCurrentIdentityFilter implements Filter {
       ConversationState state = getCurrentState(container, httpRequest);
       // NOTE may be set as null
       ConversationState.setCurrent(state);
+      if (state != null && log.isDebugEnabled())
+        log.debug(">>> Memberships " + state.getIdentity().getMemberships());
       chain.doFilter(request, response);
     } finally {
       try {
