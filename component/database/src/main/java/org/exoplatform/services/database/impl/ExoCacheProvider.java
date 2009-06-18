@@ -17,6 +17,7 @@
 
 package org.exoplatform.services.database.impl;
 
+import java.io.Serializable;
 import java.util.Properties;
 
 import org.hibernate.cache.Cache;
@@ -46,8 +47,9 @@ public class ExoCacheProvider implements CacheProvider {
 
   public Cache buildCache(String name, Properties properties) throws CacheException {
     try {
-      ExoCache cache = cacheService.getCacheInstance(name);
-      cache.setMaxSize(5000);
+      ExoCache<Serializable, Object> cache = cacheService.getCacheInstance(name);
+      cache.setMaxSize(5000); // TODO Do we really need override configuration
+                              // in this way ?
       return new ExoCachePlugin(cache);
     } catch (Exception ex) {
       ex.printStackTrace();

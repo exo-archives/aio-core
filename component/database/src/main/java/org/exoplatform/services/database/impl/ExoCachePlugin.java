@@ -34,15 +34,17 @@ import org.exoplatform.services.cache.ExoCache;
  *           Exp $
  */
 public class ExoCachePlugin implements Cache {
-  private ExoCache cache_;
 
-  public ExoCachePlugin(ExoCache cache) {
+  private ExoCache<Serializable, Object> cache_;
+
+  public ExoCachePlugin(ExoCache<Serializable, Object> cache) {
     cache_ = cache;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public Object get(Object key) throws CacheException {
-    // S ystem.out.println("::::::::::::::::::::::::::::: get() key = " +
-    // key) ;
     try {
       return cache_.get((Serializable) key);
     } catch (Exception ex) {
@@ -61,9 +63,10 @@ public class ExoCachePlugin implements Cache {
     return get(key);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void put(Object key, Object value) throws CacheException {
-    // S ystem.out.println("::::::::::::::::::::::::::::: put() key = " + key
-    // + " value " + value) ;
     try {
       cache_.put((Serializable) key, (Serializable) value);
     } catch (Exception ex) {
@@ -82,9 +85,10 @@ public class ExoCachePlugin implements Cache {
     put(key, value);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void remove(Object key) throws CacheException {
-    // S ystem.out.println("::::::::::::::::::::::::::::: remove() key = " +
-    // key) ;
     try {
       cache_.remove((Serializable) key);
     } catch (Exception ex) {
@@ -92,9 +96,10 @@ public class ExoCachePlugin implements Cache {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void clear() throws CacheException {
-    // S ystem.out.println(ExpceptionUtil.getExoStackTrace(new Exception()))
-    // ;
     try {
       cache_.clearCache();
     } catch (Exception ex) {
@@ -102,17 +107,27 @@ public class ExoCachePlugin implements Cache {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void destroy() throws CacheException {
-    // S ystem.out.println(ExpceptionUtil.getExoStackTrace(new Exception()))
-    // ;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void lock(Object key) throws CacheException {
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void unlock(Object key) throws CacheException {
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public long nextTimestamp() {
     return Timestamper.next();
   }
@@ -162,6 +177,7 @@ public class ExoCachePlugin implements Cache {
   /**
    * optional operation
    */
+  @SuppressWarnings("unchecked")
   public Map toMap() {
     return null;
   }
