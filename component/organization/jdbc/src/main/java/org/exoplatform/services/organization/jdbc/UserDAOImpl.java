@@ -19,7 +19,7 @@ package org.exoplatform.services.organization.jdbc;
 import java.util.Calendar;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.Log;
 
 import org.exoplatform.commons.utils.LazyPageList;
 import org.exoplatform.commons.utils.PageList;

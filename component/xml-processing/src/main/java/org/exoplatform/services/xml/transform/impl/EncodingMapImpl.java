@@ -19,8 +19,8 @@ package org.exoplatform.services.xml.transform.impl;
 
 import java.util.Hashtable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 import org.exoplatform.services.xml.transform.EncodingMap;
 
@@ -33,7 +33,7 @@ import org.exoplatform.services.xml.transform.EncodingMap;
  */
 
 public class EncodingMapImpl implements EncodingMap {
-  private static Log                               log          = LogFactory.getLog(EncodingMapImpl.class);
+  private static Log                               log          = ExoLogger.getLogger(EncodingMapImpl.class);
 
   protected final static Hashtable<String, String> IANA2JavaMap = new Hashtable<String, String>();
 

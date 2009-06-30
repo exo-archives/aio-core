@@ -21,7 +21,7 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-//import org.apache.commons.logging.Log;
+//import org.exoplatform.services.log.Log;
 
 import org.exoplatform.container.StandaloneContainer;
 //import org.exoplatform.services.log.ExoLogger;

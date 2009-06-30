@@ -19,7 +19,7 @@ package org.exoplatform.services.script.groovy;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.log.ExoLogger;
-import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.Log;
 
 import java.util.List;
 import java.util.Iterator;

@@ -23,7 +23,7 @@ import java.util.Set;
 
 import org.xml.sax.EntityResolver;
 
-import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.Log;
 
 import org.exoplatform.container.component.ComponentPlugin;
 import org.exoplatform.services.log.ExoLogger;

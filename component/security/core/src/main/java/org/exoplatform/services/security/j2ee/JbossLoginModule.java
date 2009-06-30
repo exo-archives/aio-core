@@ -38,7 +38,7 @@ import org.exoplatform.services.security.jaas.RolePrincipal;
 import org.exoplatform.services.security.jaas.UserPrincipal;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.container.monitor.jvm.J2EEServerInfo;
-import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.Log;
 
 /**
  * Created by The eXo Platform SAS .

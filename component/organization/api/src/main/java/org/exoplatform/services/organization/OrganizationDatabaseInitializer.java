@@ -18,7 +18,7 @@ package org.exoplatform.services.organization;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.Log;
 
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.component.BaseComponentPlugin;

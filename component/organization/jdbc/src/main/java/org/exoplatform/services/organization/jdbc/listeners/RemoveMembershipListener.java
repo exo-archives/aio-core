@@ -18,7 +18,7 @@ package org.exoplatform.services.organization.jdbc.listeners;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
+import org.exoplatform.services.log.Log;
 
 import org.exoplatform.services.database.DBObjectQuery;
 import org.exoplatform.services.listener.Event;
