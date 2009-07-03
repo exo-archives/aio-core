@@ -4,7 +4,7 @@
 export MAVEN_REPO=$HOME/exo/exo-dependencies/repository
 
 $JAVA_HOME/bin/java -cp $MAVEN_REPO/org/exoplatform/core/exo.core.component.security.core/2.2.2/exo.core.component.security.core-2.2.2.jar:\
-$MAVEN_REPO/org/exoplatform/kernel/exo.kernel.component.common/2.2.2/exo.kernel.component.common-2.2.2.jar:\
+$MAVEN_REPO/org/exoplatform/kernel/exo.kernel.component.common/2.1.2/exo.kernel.component.common-2.1.2.jar:\
 $MAVEN_REPO/commons-logging/commons-logging/1.1/commons-logging-1.1.jar:\
 $MAVEN_REPO/org/samba/jcifs/jcifs/1.2.19/jcifs-1.2.19.jar:\
 target/classes:\
