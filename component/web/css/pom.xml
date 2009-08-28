@@ -1,7 +1,7 @@
 <project>
   <parent>
     <groupId>org.exoplatform.core</groupId>
-    <artifactId>config</artifactId>
+    <artifactId>core-parent</artifactId>
     <version>2.1.6-SNAPSHOT</version>
   </parent> 
 
