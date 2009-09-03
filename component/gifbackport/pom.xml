@@ -2,13 +2,13 @@
   <parent>
     <groupId>org.exoplatform.core</groupId>
     <artifactId>core-parent</artifactId>
-    <version>2.1.6</version>
+    <version>2.1.7-SNAPSHOT</version>
   </parent> 
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.core.component.gifbackport</artifactId>
   <packaging>jar</packaging>
-  <version>2.1.6</version>
+  <version>2.1.7-SNAPSHOT</version>
   <name>eXo javax.imageio GIF plugin backport</name>
   <description>eXo GIF plugin backport</description>
   
