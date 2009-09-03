@@ -7,8 +7,8 @@
 
 
 :ok
-@set CLASSPATH=%CLASSPATH%%M2_REPO%\org\exoplatform\core\exo.core.component.security.core\2.1.6-SNAPSHOT\exo.core.component.security.core-2.1.6-SNAPSHOT.jar;
-@set CLASSPATH=%CLASSPATH%%M2_REPO%\org\exoplatform\kernel\exo.kernel.component.common\2.0.8-SNAPSHOT\exo.kernel.component.common-2.0.8-SNAPSHOT.jar;
+@set CLASSPATH=%CLASSPATH%%M2_REPO%\org\exoplatform\core\exo.core.component.security.core\2.1.6\exo.core.component.security.core-2.1.6.jar;
+@set CLASSPATH=%CLASSPATH%%M2_REPO%\org\exoplatform\kernel\exo.kernel.component.common\2.0.8\exo.kernel.component.common-2.0.8.jar;
 @set CLASSPATH=%CLASSPATH%%M2_REPO%\commons-logging\commons-logging\1.1\commons-logging-1.1.jar;
 @set CLASSPATH=%CLASSPATH%%M2_REPO%\jcifs\jcifs\1.2.17\jcifs-1.2.17.jar;
 
