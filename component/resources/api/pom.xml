@@ -2,13 +2,13 @@
   <parent>
     <groupId>org.exoplatform.core</groupId>
     <artifactId>core-parent</artifactId>
-    <version>2.1.6-SNAPSHOT</version>
+    <version>2.1.6</version>
   </parent> 
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.core.component.resources.api</artifactId>
   <packaging>jar</packaging>
-  <version>2.1.6-SNAPSHOT</version>
+  <version>2.1.6</version>
   <name>eXo Resources Service</name>
   <description>eXo Resources Service</description>
   
@@ -16,7 +16,7 @@
     <dependency>
       <groupId>org.exoplatform.core</groupId>
       <artifactId>exo.core.component.database</artifactId>
-      <version>2.1.6-SNAPSHOT</version>
+      <version>2.1.6</version>
     </dependency>
   </dependencies> 
 </project>
