@@ -80,7 +80,7 @@ public final class ConversationRegistry {
     try {
       return Integer.valueOf(ip.getValueParam(INIT_PARAM_CONCURRENCY_LEVEL).getValue());
     } catch (NullPointerException e) {
-      LOG.warn("Parameter " + INIT_PARAM_CONCURRENCY_LEVEL
+      LOG.info("Parameter " + INIT_PARAM_CONCURRENCY_LEVEL
           + " was not found in configuration, default " + DEFAULT_CONCURRENCY_LEVEL
           + " will be used.");
       return DEFAULT_CONCURRENCY_LEVEL;
