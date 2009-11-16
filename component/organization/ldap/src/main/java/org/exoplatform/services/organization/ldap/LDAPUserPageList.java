@@ -30,8 +30,10 @@ import javax.naming.ldap.PagedResultsControl;
 import javax.naming.ldap.PagedResultsResponseControl;
 import javax.naming.ldap.SortControl;
 
+import org.apache.commons.logging.Log;
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.services.ldap.LDAPService;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.User;
 
 /**
@@ -48,6 +50,8 @@ public class LDAPUserPageList extends PageList {
 
   private LDAPAttributeMapping ldapAttrMapping_;
 
+  private static Log           logger         = ExoLogger.getLogger(LDAPUserPageList.class);
+
   static boolean               SEARCH_CONTROL = Control.NONCRITICAL;
 
   public LDAPUserPageList(LDAPAttributeMapping ldapAttrMapping,
@@ -63,9 +67,13 @@ public class LDAPUserPageList extends PageList {
     try {
       int size = this.getResultSize();
       setAvailablePage(size);
-    } catch (NameNotFoundException exp) {
+    } catch (NameNotFoundException e) {
+      logger.warn("Cannot set the page size while creating a LDAPUserPageList, no page size will be used",
+                  e);
       setAvailablePage(0);
-    } catch (OperationNotSupportedException exp) {
+    } catch (OperationNotSupportedException e) {
+      logger.warn("Cannot set the page size while creating a LDAPUserPageList, no page size will be used",
+                  e);
       setAvailablePage(0);
     }
   }
@@ -102,9 +110,8 @@ public class LDAPUserPageList extends PageList {
         if (responseControls[z] instanceof PagedResultsResponseControl)
           cookie = ((PagedResultsResponseControl) responseControls[z]).getCookie();
       }
-      ctx.setRequestControls(new Control[] { sctl, new PagedResultsControl(getPageSize(),
-                                                                     cookie,
-                                                                     Control.CRITICAL) });
+      ctx.setRequestControls(new Control[] { sctl,
+          new PagedResultsControl(getPageSize(), cookie, Control.CRITICAL) });
     } while (cookie != null);
     this.currentListPage_ = users;
   }
@@ -150,5 +157,5 @@ public class LDAPUserPageList extends PageList {
 
     return users;
   }
-  
+
 }
