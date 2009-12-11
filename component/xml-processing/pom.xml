@@ -9,7 +9,7 @@
   <artifactId>exo.core.component.xml-processing</artifactId>
   <packaging>jar</packaging>
   <version>2.1.7-SNAPSHOT</version>
-  <name>eXo XML Processing Services</name>
+  <name>eXo Core XML Processing Services</name>
   <description>eXo XML Processing Services</description>
 
   <dependencies>

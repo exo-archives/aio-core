@@ -9,7 +9,7 @@
   <artifactId>exo.core.component.web.css</artifactId>
   <packaging>jar</packaging>
   <version>2.1.6-SNAPSHOT</version>
-  <name>eXo core web css component</name>
+  <name>eXo Core web css component</name>
   <description>Stylesheet engine</description>
   <dependencies>
     <dependency>

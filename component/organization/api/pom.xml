@@ -1,15 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>org.exoplatform.core</groupId>
-    <artifactId>core-parent</artifactId>
+    <artifactId>core-organization</artifactId>
     <version>2.1.7-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.core.component.organization.api</artifactId>
   <packaging>jar</packaging>
-  <version>2.1.7-SNAPSHOT</version>
-  <name>eXo Organization Service API</name>
+  <name>eXo Core Organization Service API</name>
   <description>eXo Organization Service API</description>
 
   <dependencies>
