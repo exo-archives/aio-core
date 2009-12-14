@@ -27,6 +27,7 @@
 
   <modules>
     <module>component</module>
+    <module>packaging</module>
   </modules>
 
   <build>
