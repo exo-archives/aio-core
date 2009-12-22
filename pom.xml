@@ -16,7 +16,7 @@
   <properties>
      <exo.product.name>exo-core</exo.product.name>
      <exo.product.specification>2.1</exo.product.specification>
-     <org.exoplatform.kernel.version>2.0.9-SNAPSHOT</org.exoplatform.kernel.version>
+     <org.exoplatform.kernel.version>2.0.9</org.exoplatform.kernel.version>
      <!-- A BIG CLEANUP MUST BE DONE IN TESTS -->
      <maven.test.skip>true</maven.test.skip>
   </properties>
