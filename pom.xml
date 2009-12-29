@@ -9,7 +9,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.exoplatform.core</groupId>
   <artifactId>core-parent</artifactId>
-  <name>eXo Core Config</name>
+  <name>eXo Core</name>
   <version>2.1.8-SNAPSHOT</version>
   <packaging>pom</packaging>
 
