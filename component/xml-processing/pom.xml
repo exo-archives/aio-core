@@ -1,31 +1,46 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2003-2010 eXo Platform SAS.
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Affero General Public License
+    as published by the Free Software Foundation; either version 3
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, see <http://www.gnu.org/licenses/>.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.exoplatform.core</groupId>
     <artifactId>core-parent</artifactId>
     <version>2.1.8-SNAPSHOT</version>
   </parent>
-
-  <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.core.component.xml-processing</artifactId>
-  <packaging>jar</packaging>
   <version>2.1.8-SNAPSHOT</version>
+  <packaging>jar</packaging>
   <name>eXo Core XML Processing Services</name>
   <description>eXo XML Processing Services</description>
-
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.component.common</artifactId>
       <version>${org.exoplatform.kernel.version}</version>
     </dependency>
-
     <dependency>
       <groupId>jtidy</groupId>
       <artifactId>jtidy</artifactId>
       <version>4aug2000r7-dev</version>
       <scope>compile</scope>
     </dependency>
-
     <dependency>
       <groupId>xml-resolver</groupId>
       <artifactId>xml-resolver</artifactId>
@@ -33,13 +48,7 @@
       <scope>compile</scope>
     </dependency>
   </dependencies>
-
   <build>
-    <sourceDirectory>src/main/java</sourceDirectory>
-    <outputDirectory>target/classes</outputDirectory>
-    <testSourceDirectory>src/test/java</testSourceDirectory>
-    <testOutputDirectory>target/test-classes</testOutputDirectory>
-
     <resources>
       <resource>
         <directory>src/main/java</directory>
@@ -63,30 +72,32 @@
           <include>**/*.xsd</include>
         </includes>
       </resource>
-
     </resources>
-
     <testResources>
-     <testResource>
-       <directory>src/test/resources</directory>
-       <includes>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <includes>
           <include>**/*.properties</include>
           <include>**/*.xml</include>
           <include>**/*.xhtml</include>
           <include>**/*.html</include>
           <include>**/*.xsl</include>
-       </includes>
-     </testResource>
-     <testResource>
-       <directory>src/test/java</directory>
-       <includes>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>src/test/java</directory>
+        <includes>
           <include>**/*.properties</include>
           <include>**/*.xml</include>
           <include>**/*.xhtml</include>
           <include>**/*.html</include>
           <include>**/*.xsl</include>
-       </includes>
-     </testResource>
+        </includes>
+      </testResource>
     </testResources>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <outputDirectory>target/classes</outputDirectory>
+    <testSourceDirectory>src/test/java</testSourceDirectory>
+    <testOutputDirectory>target/test-classes</testOutputDirectory>
   </build>
 </project>

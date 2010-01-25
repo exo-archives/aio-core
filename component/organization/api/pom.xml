@@ -1,80 +1,85 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2003-2010 eXo Platform SAS.
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Affero General Public License
+    as published by the Free Software Foundation; either version 3
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, see <http://www.gnu.org/licenses/>.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.exoplatform.core</groupId>
     <artifactId>core-organization</artifactId>
     <version>2.1.8-SNAPSHOT</version>
   </parent>
-
-  <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.core.component.organization.api</artifactId>
   <packaging>jar</packaging>
   <name>eXo Core Organization Service API</name>
   <description>eXo Organization Service API</description>
-
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.container</artifactId>
       <version>${org.exoplatform.kernel.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.component.common</artifactId>
       <version>${org.exoplatform.kernel.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.component.cache</artifactId>
       <version>${org.exoplatform.kernel.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.exoplatform.core</groupId>
       <artifactId>exo.core.component.security.core</artifactId>
       <version>2.1.8-SNAPSHOT</version>
     </dependency>
-
     <dependency>
       <groupId>javax.ejb</groupId>
       <artifactId>ejb</artifactId>
       <version>2.1</version>
     </dependency>
-
     <dependency>
       <groupId>xdoclet</groupId>
       <artifactId>xdoclet-hibernate-module</artifactId>
       <version>1.2.3</version>
       <scope>compile</scope>
     </dependency>
-
     <dependency>
       <groupId>xdoclet</groupId>
       <artifactId>xdoclet</artifactId>
       <version>1.2.3</version>
       <scope>compile</scope>
     </dependency>
-
     <dependency>
       <groupId>xdoclet</groupId>
       <artifactId>xdoclet-xdoclet-module</artifactId>
       <version>1.2</version>
       <scope>compile</scope>
     </dependency>
-
     <dependency>
       <groupId>xdoclet</groupId>
       <artifactId>xjavadoc</artifactId>
       <version>1.0.3</version>
       <scope>compile</scope>
     </dependency>
-
-
   </dependencies>
-
   <build>
-
     <testResources>
       <testResource>
         <directory>src/test/java</directory>
@@ -92,8 +97,6 @@
         </includes>
       </testResource>
     </testResources>
-
-
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -104,16 +107,16 @@
             <phase>compile</phase>
             <configuration>
               <tasks>
-                <taskdef name="hibernatedoclet" classname="xdoclet.modules.hibernate.HibernateDocletTask" classpathref="maven.dependency.classpath" />
+                <taskdef name="hibernatedoclet" classname="xdoclet.modules.hibernate.HibernateDocletTask" classpathref="maven.dependency.classpath"/>
                 <hibernatedoclet destdir="${basedir}/target/classes" excludedtags="@version,@author,@todo" mergedir="target/classes" force="true" verbose="false">
                   <fileset dir="${basedir}/src/main/java">
-                    <include name="org/exoplatform/services/organization/impl/UserImpl.java" />
-                    <include name="org/exoplatform/services/organization/impl/MembershipImpl.java" />
-                    <include name="org/exoplatform/services/organization/impl/GroupImpl.java" />
-                    <include name="org/exoplatform/services/organization/impl/MembershipTypeImpl.java" />
-                    <include name="org/exoplatform/services/organization/impl/UserProfileData.java" />
+                    <include name="org/exoplatform/services/organization/impl/UserImpl.java"/>
+                    <include name="org/exoplatform/services/organization/impl/MembershipImpl.java"/>
+                    <include name="org/exoplatform/services/organization/impl/GroupImpl.java"/>
+                    <include name="org/exoplatform/services/organization/impl/MembershipTypeImpl.java"/>
+                    <include name="org/exoplatform/services/organization/impl/UserProfileData.java"/>
                   </fileset>
-                  <hibernate version="3.0" />
+                  <hibernate version="3.0"/>
                 </hibernatedoclet>
               </tasks>
             </configuration>
@@ -123,11 +126,6 @@
           </execution>
         </executions>
       </plugin>
-
     </plugins>
-
-
   </build>
-
-
 </project>

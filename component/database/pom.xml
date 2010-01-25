@@ -1,104 +1,109 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2003-2010 eXo Platform SAS.
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Affero General Public License
+    as published by the Free Software Foundation; either version 3
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, see <http://www.gnu.org/licenses/>.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.exoplatform.core</groupId>
     <artifactId>core-component</artifactId>
     <version>2.1.8-SNAPSHOT</version>
-  </parent> 
-
-  <modelVersion>4.0.0</modelVersion>
+  </parent>
   <artifactId>exo.core.component.database</artifactId>
   <packaging>jar</packaging>
   <name>eXo Core Database service impl</name>
   <description>exoplatform database services implementation</description>
-
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.component.common</artifactId>
       <version>${org.exoplatform.kernel.version}</version>
     </dependency>
-    
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.component.cache</artifactId>
       <version>${org.exoplatform.kernel.version}</version>
     </dependency>
-
     <dependency>
       <groupId>javax.resource</groupId>
       <artifactId>connector-api</artifactId>
       <version>1.5</version>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
       <version>1.8.0.7</version>
       <scope>runtime</scope>
     </dependency>
-
     <dependency>
       <groupId>com.experlog</groupId>
       <artifactId>xapool</artifactId>
       <version>1.5.0</version>
       <scope>compile</scope>
     </dependency>
-
     <dependency>
       <groupId>c3p0</groupId>
       <artifactId>c3p0</artifactId>
       <version>0.9.1.2</version>
       <scope>runtime</scope>
     </dependency>
-
     <dependency>
       <groupId>commons-dbcp</groupId>
       <artifactId>commons-dbcp</artifactId>
       <version>1.2.2</version>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate</artifactId>
       <version>3.1.2</version>
       <scope>compile</scope>
     </dependency>
-    
     <dependency>
       <groupId>xdoclet</groupId>
       <artifactId>xdoclet-hibernate-module</artifactId>
       <version>1.2.3</version>
       <scope>compile</scope>
     </dependency>
-
     <dependency>
       <groupId>xdoclet</groupId>
       <artifactId>xdoclet</artifactId>
       <version>1.2.3</version>
       <scope>compile</scope>
     </dependency>
-
     <dependency>
       <groupId>xdoclet</groupId>
       <artifactId>xdoclet-xdoclet-module</artifactId>
       <version>1.2</version>
       <scope>compile</scope>
     </dependency>
-
     <dependency>
       <groupId>xdoclet</groupId>
       <artifactId>xjavadoc</artifactId>
       <version>1.0.3</version>
       <scope>compile</scope>
     </dependency>
-
     <dependency>
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
       <version>3.1</version>
       <scope>runtime</scope>
     </dependency>
-  </dependencies>   
+  </dependencies>
 </project>
