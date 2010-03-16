@@ -434,7 +434,7 @@ public class EncodingMapImpl implements EncodingMap {
     addIANA2JavaMapping("IBM-1149", "Cp1149");
     addIANA2JavaMapping("IBM-819", "ISO8859_1");
     addIANA2JavaMapping("IBM-367", "ASCII");
-    
+    // http://jira.exoplatform.org/browse/COR-163
     addIANA2JavaMapping("x-MacRoman", "MacRoman");
   }
 }
