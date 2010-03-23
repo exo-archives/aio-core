@@ -145,7 +145,7 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
     ldapService_.getLdapContext().modifyAttributes(userDN, mods);
     if (broadcast)
       postSave(user, false);
-    if (!user.getPassword().equals("PASSWORD"))
+    if (!user.getPassword().equals(existingUser.getPassword()))
       saveUserPassword(user, userDN);
   }
 
