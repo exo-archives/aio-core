@@ -14,15 +14,15 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program; if not, see <http://www.gnu.org/licenses/>.
+    along with this program; if not, see <http://www.gnu.org/licenses />.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.exoplatform.core</groupId>
     <artifactId>core-security</artifactId>
-    <version>2.1.8-SNAPSHOT</version>
+    <version>2.1.8</version>
   </parent>
   <artifactId>exo.core.component.security.pam</artifactId>
   <name>eXo Core JPam Authenticator</name>
@@ -35,7 +35,7 @@
     <dependency>
       <groupId>org.exoplatform.core</groupId>
       <artifactId>exo.core.component.organization.api</artifactId>
-      <version>2.1.8-SNAPSHOT</version>
+      <version>2.1.8</version>
     </dependency>
   </dependencies>
   <build>
@@ -83,26 +83,26 @@
         <configuration>
           <tasks>
             <exec executable="javah">
-              <arg value="-classpath"/>
-              <arg file="target/classes"/>
-              <arg value="-d"/>
-              <arg file="src/main/c"/>
-              <arg value="-force"/>
-              <arg value="org.exoplatform.services.security.pam.Pam"/>
+              <arg value="-classpath" />
+              <arg file="target/classes" />
+              <arg value="-d" />
+              <arg file="src/main/c" />
+              <arg value="-force" />
+              <arg value="org.exoplatform.services.security.pam.Pam" />
             </exec>
             <exec executable="make">
-              <arg value="--directory=src/main/c"/>
-              <arg value="libjpam.x86"/>
+              <arg value="--directory=src/main/c" />
+              <arg value="libjpam.x86" />
             </exec>
-            <mkdir dir="${basedir}/target/c"/>
+            <mkdir dir="${basedir}/target/c" />
             <copy todir="${basedir}/target/c">
               <fileset dir="src/main/c">
-                <include name="*.so"/>
+                <include name="*.so" />
               </fileset>
             </copy>
             <exec executable="make">
-              <arg value="--directory=src/main/c"/>
-              <arg value="clean"/>
+              <arg value="--directory=src/main/c" />
+              <arg value="clean" />
             </exec>
           </tasks>
         </configuration>
