@@ -127,7 +127,11 @@ public class ObjectQuery {
           b.append(" AND ");
         Parameter p = parameters_.get(i);
         if (p.value_ instanceof String) {
-          b.append(" o.").append(p.field_).append(p.op_).append("'").append(p.value_).append("'");
+          if (p.field_.startsWith("UPPER") || p.field_.startsWith("LOWER")) {
+            b.append(p.field_).append(p.op_).append("'").append(p.value_).append("'");
+          } else {
+            b.append(" o.").append(p.field_).append(p.op_).append("'").append(p.value_).append("'");
+          }
         } else if (p.value_ instanceof Date) {
           String value = ft_.format((Date) p.value_);
           b.append(" o.").append(p.field_).append(p.op_).append("'").append(value).append("'");
@@ -199,7 +203,11 @@ public class ObjectQuery {
           b.append(" AND ");
         Parameter p = parameters_.get(i);
         if (p.value_ instanceof String) {
-          b.append(" o.").append(p.field_).append(p.op_).append("'").append(p.value_).append("'");
+          if (p.field_.startsWith("UPPER") || p.field_.startsWith("LOWER")) {
+            b.append(p.field_).append(p.op_).append("'").append(p.value_).append("'");
+          } else {
+            b.append(" o.").append(p.field_).append(p.op_).append("'").append(p.value_).append("'");
+          }
         } else if (p.value_ instanceof Date) {
           String value = ft_.format((Date) p.value_);
           b.append(" o.").append(p.field_).append(p.op_).append("'").append(value).append("'");
