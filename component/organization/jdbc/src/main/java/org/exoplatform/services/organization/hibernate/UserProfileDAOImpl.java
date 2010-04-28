@@ -18,6 +18,7 @@ package org.exoplatform.services.organization.hibernate;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -25,8 +26,10 @@ import org.hibernate.Session;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.database.HibernateService;
+import org.exoplatform.services.organization.UserEventListener;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.UserProfileEventListener;
+import org.exoplatform.services.organization.UserProfileEventListenerHandler;
 import org.exoplatform.services.organization.UserProfileHandler;
 import org.exoplatform.services.organization.impl.UserProfileData;
 import org.exoplatform.services.organization.impl.UserProfileImpl;
@@ -36,7 +39,7 @@ import org.exoplatform.services.organization.impl.UserProfileImpl;
  * benjmestrallet@users.sourceforge.net Author : Tuan Nguyen
  * tuan08@users.sourceforge.net Date: Aug 22, 2003 Time: 4:51:21 PM
  */
-public class UserProfileDAOImpl implements UserProfileHandler {
+public class UserProfileDAOImpl implements UserProfileHandler, UserProfileEventListenerHandler {
   static private UserProfile             NOT_FOUND                  = new UserProfileImpl();
 
   private static final String            queryFindUserProfileByName = "from u in class org.exoplatform.services.organization.impl.UserProfileData "
@@ -157,25 +160,32 @@ public class UserProfileDAOImpl implements UserProfileHandler {
   public Collection findUserProfiles() throws Exception {
     return null;
   }
-  
+
   private void preSave(UserProfile profile, boolean isNew) throws Exception {
-    for (UserProfileEventListener listener : listeners_) 
+    for (UserProfileEventListener listener : listeners_)
       listener.preSave(profile, isNew);
   }
-  
+
   private void postSave(UserProfile profile, boolean isNew) throws Exception {
     for (UserProfileEventListener listener : listeners_)
       listener.postSave(profile, isNew);
   }
-  
+
   private void preDelete(UserProfile profile) throws Exception {
     for (UserProfileEventListener listener : listeners_)
       listener.preDelete(profile);
   }
-  
+
   private void postDelete(UserProfile profile) throws Exception {
     for (UserProfileEventListener listener : listeners_)
       listener.postDelete(profile);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public List<UserProfileEventListener> getUserProfileListeners() {
+    return Collections.unmodifiableList(listeners_);
   }
 
 }

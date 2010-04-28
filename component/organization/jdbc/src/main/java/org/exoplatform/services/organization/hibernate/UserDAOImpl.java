@@ -19,6 +19,7 @@ package org.exoplatform.services.organization.hibernate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -33,6 +34,7 @@ import org.exoplatform.services.database.ObjectQuery;
 import org.exoplatform.services.organization.Query;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserEventListener;
+import org.exoplatform.services.organization.UserEventListenerHandler;
 import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.organization.impl.UserImpl;
 
@@ -41,7 +43,7 @@ import org.exoplatform.services.organization.impl.UserImpl;
  * benjmestrallet@users.sourceforge.net Author : Tuan Nguyen
  * tuan08@users.sourceforge.net Date: Aug 22, 2003 Time: 4:51:21 PM
  */
-public class UserDAOImpl implements UserHandler {
+public class UserDAOImpl implements UserHandler, UserEventListenerHandler {
   public static final String      queryFindUserByName = "from u in class org.exoplatform.services.organization.impl.UserImpl "
                                                           + "where u.userName = ?";
 
@@ -152,9 +154,12 @@ public class UserDAOImpl implements UserHandler {
 
   public PageList findUsers(Query q) throws Exception {
     ObjectQuery oq = new ObjectQuery(UserImpl.class);
-   if (q.getUserName()!=null) oq.addLIKE("UPPER(userName)", q.getUserName().toUpperCase());    
-   if (q.getFirstName()!=null) oq.addLIKE("UPPER(firstName)", q.getFirstName().toUpperCase());
-   if(q.getLastName()!=null) oq.addLIKE("UPPER(lastName)", q.getLastName().toUpperCase());
+    if (q.getUserName() != null)
+      oq.addLIKE("UPPER(userName)", q.getUserName().toUpperCase());
+    if (q.getFirstName() != null)
+      oq.addLIKE("UPPER(firstName)", q.getFirstName().toUpperCase());
+    if (q.getLastName() != null)
+      oq.addLIKE("UPPER(lastName)", q.getLastName().toUpperCase());
     oq.addLIKE("email", q.getEmail());
     oq.addGT("lastLoginTime", q.getFromLoginDate());
     oq.addLT("lastLoginTime", q.getToLoginDate());
@@ -206,5 +211,12 @@ public class UserDAOImpl implements UserHandler {
   private void postDelete(User user) throws Exception {
     for (UserEventListener listener : listeners_)
       listener.postDelete(user);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public List<UserEventListener> getUserListeners() {
+    return Collections.unmodifiableList(listeners_);
   }
 }

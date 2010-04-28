@@ -18,6 +18,7 @@ package org.exoplatform.services.organization.ldap;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.naming.CompositeName;
@@ -39,6 +40,7 @@ import org.exoplatform.services.ldap.LDAPService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.GroupEventListener;
+import org.exoplatform.services.organization.GroupEventListenerHandler;
 import org.exoplatform.services.organization.GroupHandler;
 import org.exoplatform.services.organization.impl.GroupImpl;
 
@@ -46,7 +48,7 @@ import org.exoplatform.services.organization.impl.GroupImpl;
  * Created by The eXo Platform SAS Author : Tuan Nguyen
  * tuan08@users.sourceforge.net Oct 14, 2005
  */
-public class GroupDAOImpl extends BaseDAO implements GroupHandler {
+public class GroupDAOImpl extends BaseDAO implements GroupHandler, GroupEventListenerHandler {
 
   private static Log                 log = ExoLogger.getLogger("core.GroupDAOImpl");
 
@@ -365,4 +367,12 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler {
     group.setId(parent.getId() + "/" + group.getGroupName());
     group.setParentId(parent.getId());
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  public List<GroupEventListener> getGroupListeners() {
+    return Collections.unmodifiableList(listeners_);
+  }
+
 }

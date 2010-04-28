@@ -17,6 +17,7 @@
 package org.exoplatform.services.organization.ldap;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
@@ -36,6 +37,7 @@ import org.exoplatform.services.ldap.LDAPService;
 import org.exoplatform.services.organization.Query;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserEventListener;
+import org.exoplatform.services.organization.UserEventListenerHandler;
 import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.organization.impl.UserImpl;
 
@@ -43,7 +45,7 @@ import org.exoplatform.services.organization.impl.UserImpl;
  * Created by The eXo Platform SAS Author : Tuan Nguyen
  * tuan08@users.sourceforge.net Oct 14, 2005
  */
-public class UserDAOImpl extends BaseDAO implements UserHandler {
+public class UserDAOImpl extends BaseDAO implements UserHandler, UserEventListenerHandler {
 
   private List<UserEventListener> listeners_ = new ArrayList<UserEventListener>(5);
 
@@ -272,5 +274,12 @@ public class UserDAOImpl extends BaseDAO implements UserHandler {
   protected void postDelete(User user) throws Exception {
     for (UserEventListener listener : listeners_)
       listener.postDelete(user);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public List<UserEventListener> getUserListeners() {
+    return Collections.unmodifiableList(listeners_);
   }
 }

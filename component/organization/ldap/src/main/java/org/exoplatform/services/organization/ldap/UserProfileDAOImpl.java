@@ -18,6 +18,7 @@ package org.exoplatform.services.organization.ldap;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.naming.NameNotFoundException;
@@ -31,6 +32,7 @@ import javax.naming.ldap.LdapContext;
 import org.exoplatform.services.ldap.LDAPService;
 import org.exoplatform.services.organization.UserProfile;
 import org.exoplatform.services.organization.UserProfileEventListener;
+import org.exoplatform.services.organization.UserProfileEventListenerHandler;
 import org.exoplatform.services.organization.UserProfileHandler;
 import org.exoplatform.services.organization.impl.UserProfileData;
 import org.exoplatform.services.organization.impl.UserProfileImpl;
@@ -39,7 +41,8 @@ import org.exoplatform.services.organization.impl.UserProfileImpl;
  * Created by The eXo Platform SAS Author : Tuan Nguyen
  * tuan08@users.sourceforge.net Oct 14, 2005
  */
-public class UserProfileDAOImpl extends BaseDAO implements UserProfileHandler {
+public class UserProfileDAOImpl extends BaseDAO implements UserProfileHandler,
+    UserProfileEventListenerHandler {
 
   private List<UserProfileEventListener> listeners_;
 
@@ -125,4 +128,10 @@ public class UserProfileDAOImpl extends BaseDAO implements UserProfileHandler {
     listeners_.add(listener);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public List<UserProfileEventListener> getUserProfileListeners() {
+    return Collections.unmodifiableList(listeners_);
+  }
 }

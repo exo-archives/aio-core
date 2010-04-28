@@ -18,6 +18,7 @@ package org.exoplatform.services.organization.ldap;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.naming.Name;
@@ -40,6 +41,7 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.Membership;
 import org.exoplatform.services.organization.MembershipEventListener;
+import org.exoplatform.services.organization.MembershipEventListenerHandler;
 import org.exoplatform.services.organization.MembershipHandler;
 import org.exoplatform.services.organization.MembershipType;
 import org.exoplatform.services.organization.User;
@@ -49,7 +51,8 @@ import org.exoplatform.services.organization.impl.MembershipImpl;
  * Created by The eXo Platform SAS Author : Tuan Nguyen
  * tuan08@users.sourceforge.net Oct 14, 2005
  */
-public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
+public class MembershipDAOImpl extends BaseDAO implements MembershipHandler,
+    MembershipEventListenerHandler {
 
   private static Log                      log = ExoLogger.getLogger("core.MembershipDAOImpl");
 
@@ -411,5 +414,12 @@ public class MembershipDAOImpl extends BaseDAO implements MembershipHandler {
   private void preSave(Membership membership, boolean isNew) throws Exception {
     for (MembershipEventListener listener : listeners_)
       listener.preSave(membership, isNew);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public List<MembershipEventListener> getMembershipListeners() {
+    return Collections.unmodifiableList(listeners_);
   }
 }
