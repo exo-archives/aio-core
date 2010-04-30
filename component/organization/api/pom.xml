@@ -41,7 +41,7 @@
     </dependency>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
-      <artifactId>exo.kernel.component.cache</artifactId>
+      <artifactId>exo.kernel.commons</artifactId>
       <version>${org.exoplatform.kernel.version}</version>
     </dependency>
     <dependency>
@@ -50,19 +50,8 @@
       <version>2.1.9-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>javax.ejb</groupId>
-      <artifactId>ejb</artifactId>
-      <version>2.1</version>
-    </dependency>
-    <dependency>
       <groupId>xdoclet</groupId>
       <artifactId>xdoclet-hibernate-module</artifactId>
-      <version>1.2.3</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>xdoclet</groupId>
-      <artifactId>xdoclet</artifactId>
       <version>1.2.3</version>
       <scope>compile</scope>
     </dependency>
@@ -77,6 +66,31 @@
       <artifactId>xjavadoc</artifactId>
       <version>1.0.3</version>
       <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.kernel</groupId>
+      <artifactId>exo.kernel.commons</artifactId>
+      <version>${org.exoplatform.kernel.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+    </dependency>
+    <dependency>
+      <groupId>picocontainer</groupId>
+      <artifactId>picocontainer</artifactId>
+      <version>1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>xstream</groupId>
+      <artifactId>xstream</artifactId>
+      <version>1.0.2</version>
     </dependency>
   </dependencies>
   <build>

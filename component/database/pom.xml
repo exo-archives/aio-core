@@ -40,6 +40,16 @@
       <version>${org.exoplatform.kernel.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.exoplatform.kernel</groupId>
+      <artifactId>exo.kernel.container</artifactId>
+      <version>${org.exoplatform.kernel.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.kernel</groupId>
+      <artifactId>exo.kernel.commons</artifactId>
+      <version>${org.exoplatform.kernel.version}</version>
+    </dependency>   
+    <dependency>
       <groupId>javax.resource</groupId>
       <artifactId>connector-api</artifactId>
       <version>1.5</version>
@@ -64,12 +74,6 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>commons-dbcp</groupId>
-      <artifactId>commons-dbcp</artifactId>
-      <version>1.2.2</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate</artifactId>
       <version>3.1.2</version>
@@ -78,12 +82,6 @@
     <dependency>
       <groupId>xdoclet</groupId>
       <artifactId>xdoclet-hibernate-module</artifactId>
-      <version>1.2.3</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>xdoclet</groupId>
-      <artifactId>xdoclet</artifactId>
       <version>1.2.3</version>
       <scope>compile</scope>
     </dependency>
@@ -104,6 +102,26 @@
       <artifactId>commons-collections</artifactId>
       <version>3.1</version>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.transaction</groupId>
+      <artifactId>jta</artifactId>
+      <version>1.0.1B</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.0.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.tool</groupId>
+      <artifactId>exo.tool.framework.junit</artifactId>
+      <version>1.0.0</version>
     </dependency>
   </dependencies>
 </project>
