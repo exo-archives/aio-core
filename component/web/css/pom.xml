@@ -21,12 +21,10 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.exoplatform.core</groupId>
-    <artifactId>core-parent</artifactId>
-    <version>2.1.9-SNAPSHOT</version>
-    <relativePath>../../pom.xml</relativePath>
+    <artifactId>core-web</artifactId>
+    <version>2.1.10-SNAPSHOT</version>
   </parent>
   <artifactId>exo.core.component.web.css</artifactId>
-  <version>2.1.9-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>eXo Core web css component</name>
   <description>Stylesheet engine</description>
@@ -49,7 +47,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.2</version>
+      <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
