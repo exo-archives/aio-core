@@ -22,11 +22,11 @@
   <parent>
     <groupId>org.exoplatform.core</groupId>
     <artifactId>core-parent</artifactId>
-    <version>2.1.9-SNAPSHOT</version>
+    <version>2.1.9</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <artifactId>exo.core.component.web.css</artifactId>
-  <version>2.1.9-SNAPSHOT</version>
+  <version>2.1.9</version>
   <packaging>jar</packaging>
   <name>eXo Core web css component</name>
   <description>Stylesheet engine</description>
