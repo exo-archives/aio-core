@@ -16,16 +16,17 @@
  */
 package org.exoplatform.services.organization;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.test.BasicTestCase;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
 /**
- * Created by The eXo Platform SAS Author : Hoa Pham hoapham@exoplatform.com,phamvuxuanhoa@yahoo.com
- * Oct 27, 2005
+ * Created by The eXo Platform SAS Author : Hoa Pham
+ * hoapham@exoplatform.com,phamvuxuanhoa@yahoo.com Oct 27, 2005
  */
 
 public class TestOrganizationService extends BasicTestCase {
@@ -70,6 +71,7 @@ public class TestOrganizationService extends BasicTestCase {
     super(s);
   }
 
+  @Override
   public void setUp() throws Exception {
     if (!runtest)
       return;
@@ -82,6 +84,7 @@ public class TestOrganizationService extends BasicTestCase {
     membershipHandler_ = service_.getMembershipHandler();
   }
 
+  @Override
   public void tearDown() throws Exception {
     Query query = new Query();
     query.setUserName(USER + "*");
@@ -114,16 +117,15 @@ public class TestOrganizationService extends BasicTestCase {
     assertTrue("Found user instance ", user != null);
     assertEquals("Expect user name is: ", USER, user.getUserName());
     UserProfile userProfile = profileHandler_.findUserProfileByName(USER);
-	profileHandler_.removeUserProfile(USER, true);    
-	assertNull(profileHandler_.findUserProfileByName(USER));
+    profileHandler_.removeUserProfile(USER, true);
+    assertNull(profileHandler_.findUserProfileByName(USER));
 
-	profileHandler_.createUserProfileInstance(USER);
-	userProfile.getUserInfoMap().put("key", "value");
-	profileHandler_.saveUserProfile(userProfile, true);
-	userProfile = profileHandler_.findUserProfileByName(USER);
+    profileHandler_.createUserProfileInstance(USER);
+    userProfile.getUserInfoMap().put("key", "value");
+    profileHandler_.saveUserProfile(userProfile, true);
+    userProfile = profileHandler_.findUserProfileByName(USER);
     assertTrue("Expect user profile is found: ", userProfile != null);
     assertEquals(userProfile.getUserInfoMap().get("key"), "value");
-
 
     PageList users = userHandler_.findUsers(new Query());
     assertTrue("Expect 1 user found ", users.getAvailable() >= 1);
@@ -422,7 +424,7 @@ public class TestOrganizationService extends BasicTestCase {
     groupHandler_.removeGroup(group2, true);
     groupHandler_.removeGroup(group3, true);
   }
-  
+
   public void testUserProfileListener() throws Exception {
     UserProfileListener l = new UserProfileListener();
     profileHandler_.addUserProfileEventListener(l);
@@ -434,7 +436,7 @@ public class TestOrganizationService extends BasicTestCase {
     profileHandler_.removeUserProfile(user.getUserName(), true);
     assertTrue(l.preDelete && l.postDelete);
   }
-  
+
   private static class UserProfileListener extends UserProfileEventListener {
 
     boolean preSave;
@@ -471,7 +473,90 @@ public class TestOrganizationService extends BasicTestCase {
 
   }
 
-  public User createUser(String userName) throws Exception {
+  public void testSearchWithSpecialCharacter() throws Exception {
+    // create user
+    User user = userHandler_.createUserInstance("TestName");
+    user.setPassword("default");
+    user.setFirstName("L'test");
+    user.setLastName("default");
+    user.setEmail("exo@exoportal.org");
+    userHandler_.createUser(user, true);
+
+    // search user
+    Query query = new Query();
+    query.setFirstName("L'test");
+    PageList list = userHandler_.findUsers(query);
+    assertEquals(1, list.getAll().size());
+    assertEquals(1, list.getPage(1).size());
+  }
+
+  /**
+   * Find users using query and check it count.
+   */
+  public void testFindUsers() throws Exception {
+
+    Calendar calendar = Calendar.getInstance();
+    calendar.set(2008, 1, 1);
+
+    User u = userHandler_.createUserInstance("tolik");
+    u.setEmail("email@test");
+    u.setFirstName("first");
+    u.setLastName("last");
+    u.setPassword("pwd");
+    userHandler_.createUser(u, true);
+
+    try {
+      Query query = new Query();
+
+      query.setEmail("email@test");
+      assertEquals(userHandler_.findUsers(query).getAll().size(), 1);
+      query.setEmail(null);
+
+      query.setUserName("*tolik*");
+      assertEquals(userHandler_.findUsers(query).getAll().size(), 1);
+
+      query.setUserName("tolik*");
+      assertEquals(userHandler_.findUsers(query).getAll().size(), 1);
+
+      query.setUserName("tolik");
+      assertEquals(userHandler_.findUsers(query).getAll().size(), 1);
+
+      query.setFirstName("First");
+      query.setLastName("laSt");
+      assertEquals(userHandler_.findUsers(query).getAll().size(), 1);
+      query.setFirstName(null);
+      query.setLastName(null);
+
+      Calendar calc = Calendar.getInstance();
+      calc.set(2007, 1, 1);
+      query.setFromLoginDate(calc.getTime());
+      query.setUserName("*tolik*");
+      assertEquals(userHandler_.findUsers(query).getAll().size(), 1);
+
+      calc.set(2050, 1, 1);
+      query.setFromLoginDate(calc.getTime());
+      assertEquals(userHandler_.findUsers(query).getAll().size(), 0);
+      query.setFromLoginDate(null);
+
+      calc.set(2007, 1, 1);
+      query.setToLoginDate(calc.getTime());
+      assertEquals(userHandler_.findUsers(query).getAll().size(), 0);
+
+      calc.set(2050, 1, 1);
+      query.setToLoginDate(calc.getTime());
+      assertEquals(userHandler_.findUsers(query).getAll().size(), 1);
+      query.setUserName(null);
+      query.setToLoginDate(null);
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Exception should not be thrown.");
+    } finally {
+      userHandler_.removeUser("tolik", true);
+    }
+  }
+
+  private User createUser(String userName) throws Exception {
     User user = userHandler_.createUserInstance(userName);
     user.setPassword("default");
     user.setFirstName("default");

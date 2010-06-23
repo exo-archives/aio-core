@@ -16,12 +16,14 @@
  */
 package org.exoplatform.services.database;
 
-import java.util.List;
-
+import org.exoplatform.commons.utils.PageList;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import org.exoplatform.commons.utils.PageList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author Tuan Nguyen (tuan08@users.sourceforge.net)
@@ -30,11 +32,13 @@ import org.exoplatform.commons.utils.PageList;
  */
 public class DBObjectPageList extends PageList {
 
-  private String           findQuery_;
+  private String              findQuery_;
 
-  private String           countQuery_;
+  private String              countQuery_;
 
-  private HibernateService service_;
+  private Map<String, Object> binding = new HashMap<String, Object>();
+
+  private HibernateService    service_;
 
   public DBObjectPageList(HibernateService service, Class objectType) throws Exception {
     super(20);
@@ -50,10 +54,16 @@ public class DBObjectPageList extends PageList {
   public DBObjectPageList(HibernateService service, ObjectQuery oq) throws Exception {
     super(20);
     service_ = service;
-    findQuery_ = oq.getHibernateQuery();
-    countQuery_ = oq.getHibernateCountQuery();
+    findQuery_ = oq.getHibernateQueryWithBinding();
+    countQuery_ = oq.getHibernateCountQueryWithBinding();
+    binding = oq.getBindingFields();
+
     Session session = service_.openSession();
-    List l = session.createQuery(countQuery_).list();
+
+    Query countQuery = session.createQuery(countQuery_);
+    bindFields(countQuery);
+
+    List l = countQuery.list();
     Number count = (Number) l.get(0);
     setAvailablePage(count.intValue());
   }
@@ -69,19 +79,39 @@ public class DBObjectPageList extends PageList {
     setAvailablePage(count.intValue());
   }
 
+  @Override
   @SuppressWarnings("unused")
   protected void populateCurrentPage(int page) throws Exception {
     Session session = service_.openSession();
+
     Query query = session.createQuery(findQuery_);
+    bindFields(query);
+
     int from = getFrom();
     query.setFirstResult(from);
     query.setMaxResults(getTo() - from);
+
     currentListPage_ = query.list();
   }
 
+  @Override
   public List getAll() throws Exception {
     Session session = service_.openSession();
+
     Query query = session.createQuery(findQuery_);
+    bindFields(query);
+
     return query.list();
+  }
+
+  /**
+   * Bind a value to a named query parameter.
+   * 
+   * @param query
+   */
+  private void bindFields(Query query) {
+    for (Entry<String, Object> entry : binding.entrySet()) {
+      query.setParameter(entry.getKey(), entry.getValue());
+    }
   }
 }
