@@ -16,6 +16,16 @@
  */
 package org.exoplatform.services.ldap.impl;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.component.ComponentPlugin;
+import org.exoplatform.container.component.ComponentRequestLifecycle;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.services.ldap.CreateObjectCommand;
+import org.exoplatform.services.ldap.DeleteObjectCommand;
+import org.exoplatform.services.ldap.LDAPService;
+import org.exoplatform.services.log.ExoLogger;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -25,20 +35,13 @@ import java.util.regex.Pattern;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 
-import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.component.ComponentPlugin;
-import org.exoplatform.container.component.ComponentRequestLifecycle;
-import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.services.ldap.CreateObjectCommand;
-import org.exoplatform.services.ldap.DeleteObjectCommand;
-import org.exoplatform.services.ldap.LDAPService;
-
 /**
- * Created by The eXo Platform SAS . Author : James Chamberlain
- * james@echamberlains.com Date: 11/2/2005
+ * Created by The eXo Platform SAS . Author : James Chamberlain james@echamberlains.com Date:
+ * 11/2/2005
  */
 public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
 
@@ -47,6 +50,8 @@ public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
   private Map<String, String>      env        = null;
 
   private int                      serverType = DEFAULT_SERVER;
+
+  private static final Log         LOG        = ExoLogger.getLogger(LDAPServiceImpl.class.getName());
 
   public LDAPServiceImpl(InitParams params) throws Exception {
     LDAPConnectionConfig config = (LDAPConnectionConfig) params.getObjectParam("ldap.config")
@@ -111,8 +116,20 @@ public class LDAPServiceImpl implements LDAPService, ComponentRequestLifecycle {
     props.put(Context.SECURITY_PRINCIPAL, userDN);
     props.put(Context.SECURITY_CREDENTIALS, password);
     props.put("com.sun.jndi.ldap.connect.pool", "false");
-    new InitialLdapContext(props, null);
-    return true;
+
+    InitialContext ctx = null;
+    try {
+      ctx = new InitialLdapContext(props, null);
+      return true;
+    } finally {
+      if (ctx != null) {
+        try {
+          ctx.close();
+        } catch (NamingException ne) {
+          LOG.debug("Can't close LDAP context", ne);
+        }
+      }
+    }
   }
 
   public void addDeleteObject(ComponentPlugin plugin) throws Exception {
