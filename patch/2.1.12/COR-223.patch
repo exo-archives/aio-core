@@ -1,0 +1,19 @@
+Index: component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/LDAPUserPageList.java
+===================================================================
+--- component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/LDAPUserPageList.java	(revision 65292)
++++ component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/LDAPUserPageList.java	(working copy)
+@@ -106,9 +106,11 @@
+           users.add(ldapAttrMapping_.attributesToUser(result.getAttributes()));
+       }
+       Control[] responseControls = ctx.getResponseControls();
+-      for (int z = 0; z < responseControls.length; z++) {
+-        if (responseControls[z] instanceof PagedResultsResponseControl)
+-          cookie = ((PagedResultsResponseControl) responseControls[z]).getCookie();
++      if(responseControls!=null){
++        for (int z = 0; z < responseControls.length; z++) {
++          if (responseControls[z] instanceof PagedResultsResponseControl)
++            cookie = ((PagedResultsResponseControl) responseControls[z]).getCookie();
++        }
+       }
+       ctx.setRequestControls(new Control[] { sctl,
+           new PagedResultsControl(getPageSize(), cookie, Control.CRITICAL) });
