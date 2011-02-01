@@ -2,11 +2,10 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/B
 ===================================================================
 --- component/document/src/main/java/org/exoplatform/services/document/impl/BaseDocumentReader.java	(revision 65754)
 +++ component/document/src/main/java/org/exoplatform/services/document/impl/BaseDocumentReader.java	(working copy)
-@@ -19,10 +19,39 @@
+@@ -19,10 +19,35 @@
  import org.exoplatform.container.component.BaseComponentPlugin;
  import org.exoplatform.services.document.DocumentReader;
  
-+import java.io.BufferedInputStream;
 +import java.io.IOException;
 +import java.io.InputStream;
 +
@@ -23,30 +22,27 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/B
 +   * @return BufferedInputStram that covers original IS or null if IS is empty.
 +   * @throws IOException
 +   */
-+  protected BufferedInputStream validateInputStream(InputStream is) throws IOException {
++  protected boolean isInputStreamValid(InputStream is) throws IOException {
 +    if (is == null) {
 +      throw new NullPointerException("InputStream is null.");
 +    }
 +
-+    BufferedInputStream bis = new BufferedInputStream(is, 128);
-+    bis.mark(0);
-+    // check that there is some data
-+    if (bis.read(new byte[4]) < 4) {
++    if (is.available() <= 2) {
 +      try {
-+        bis.close();
++        is.close();
 +      } catch (IOException e) {
 +      }
-+      return null;
++      return false;
++    } else {
++      return true;
 +    }
-+    bis.reset();
-+    return bis;
 +  }
  }
 Index: component/document/src/main/java/org/exoplatform/services/document/impl/HTMLDocumentReader.java
 ===================================================================
 --- component/document/src/main/java/org/exoplatform/services/document/impl/HTMLDocumentReader.java	(revision 65754)
 +++ component/document/src/main/java/org/exoplatform/services/document/impl/HTMLDocumentReader.java	(working copy)
-@@ -16,6 +16,12 @@
+@@ -16,6 +16,11 @@
   */
  package org.exoplatform.services.document.impl;
  
@@ -55,11 +51,10 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/H
 +import org.htmlparser.beans.StringBean;
 +import org.htmlparser.util.ParserException;
 +
-+import java.io.BufferedInputStream;
  import java.io.ByteArrayOutputStream;
  import java.io.IOException;
  import java.io.InputStream;
-@@ -24,12 +30,6 @@
+@@ -24,12 +29,6 @@
  import java.util.regex.Pattern;
  import java.util.regex.PatternSyntaxException;
  
@@ -72,25 +67,17 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/H
  /**
   * Created by The eXo Platform SAS A parser of HTML files.
   * 
-@@ -66,12 +66,17 @@
+@@ -66,6 +65,10 @@
     * @return The string only with text from file content.
     */
    public String getContentAsText(InputStream is) throws Exception {
-+    BufferedInputStream bis = validateInputStream(is);
-+    if (bis == null) {
++    if (!isInputStreamValid(is)) {
 +      return "";
 +    }
 +
      String refined_text = new String();
      try {
        byte[] buffer = new byte[2048];
-       int len;
-       ByteArrayOutputStream bos = new ByteArrayOutputStream();
--      while ((len = is.read(buffer)) > 0)
-+      while ((len = bis.read(buffer)) > 0)
-         bos.write(buffer, 0, len);
-       bos.close();
- 
 Index: component/document/src/main/java/org/exoplatform/services/document/impl/MSExcelDocumentReader.java
 ===================================================================
 --- component/document/src/main/java/org/exoplatform/services/document/impl/MSExcelDocumentReader.java	(revision 65754)
@@ -107,11 +94,10 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/M
  import org.apache.poi.hssf.usermodel.HSSFCell;
  import org.apache.poi.hssf.usermodel.HSSFCellStyle;
  import org.apache.poi.hssf.usermodel.HSSFDateUtil;
-@@ -28,6 +23,12 @@
+@@ -28,6 +23,11 @@
  import org.apache.poi.hssf.usermodel.HSSFSheet;
  import org.apache.poi.hssf.usermodel.HSSFWorkbook;
  
-+import java.io.BufferedInputStream;
 +import java.io.InputStream;
 +import java.text.SimpleDateFormat;
 +import java.util.Date;
@@ -120,51 +106,40 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/M
  /**
   * Created by The eXo Platform SAS A parser of Microsoft Excel files.
   * 
-@@ -56,10 +57,15 @@
+@@ -56,7 +56,10 @@
     * @throws Exception
     */
    public String getContentAsText(InputStream is) throws Exception {
 -    
-+
-+    BufferedInputStream bis = validateInputStream(is);
-+    if (bis == null) {
++    if (!isInputStreamValid(is)) {
 +      return "";
 +    }
 +
      StringBuilder builder = new StringBuilder("");
      try {
--      HSSFWorkbook wb = new HSSFWorkbook(is);
-+      HSSFWorkbook wb = new HSSFWorkbook(bis);
-       for (int sheetNum = 0; sheetNum < wb.getNumberOfSheets(); sheetNum++) {
-         HSSFSheet sheet = wb.getSheetAt(sheetNum);
-         if (sheet != null) {
-@@ -121,8 +127,13 @@
+       HSSFWorkbook wb = new HSSFWorkbook(is);
+@@ -121,6 +124,10 @@
     * InputStream)
     */
    public Properties getProperties(InputStream is) throws Exception {
-+    BufferedInputStream bis = validateInputStream(is);
-+    if (bis == null) {
++    if (!isInputStreamValid(is)) {
 +      return new Properties();
 +    }
 +
      POIPropertiesReader reader = new POIPropertiesReader();
--    reader.readDCProperties(is);
-+    reader.readDCProperties(bis);
+     reader.readDCProperties(is);
      return reader.getProperties();
-   }
- 
 Index: component/document/src/main/java/org/exoplatform/services/document/impl/MSOutlookDocumentReader.java
 ===================================================================
 --- component/document/src/main/java/org/exoplatform/services/document/impl/MSOutlookDocumentReader.java	(revision 65754)
 +++ component/document/src/main/java/org/exoplatform/services/document/impl/MSOutlookDocumentReader.java	(working copy)
-@@ -17,12 +17,13 @@
+@@ -17,12 +17,12 @@
  
  package org.exoplatform.services.document.impl;
  
 +import org.apache.poi.hsmf.MAPIMessage;
 +import org.apache.poi.hsmf.exceptions.ChunkNotFoundException;
 +
-+import java.io.BufferedInputStream;
  import java.io.InputStream;
  import java.util.Properties;
  
@@ -174,31 +149,18 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/M
  /**
   * Created by The eXo Platform SAS Author : Sergey Karpenko
   * <sergey.karpenko@exoplatform.com.ua>
-@@ -48,8 +49,13 @@
+@@ -48,6 +48,10 @@
    }
  
    public String getContentAsText(InputStream is) throws Exception {
-+    BufferedInputStream bis = validateInputStream(is);
-+    if (bis == null) {
++    if (!isInputStreamValid(is)) {
 +      return "";
 +    }
 +
      try {
--      MAPIMessage message = new MAPIMessage(is);
-+      MAPIMessage message = new MAPIMessage(bis);
+       MAPIMessage message = new MAPIMessage(is);
        StringBuffer buffer = new StringBuffer();
-       try {
-         buffer.append(message.getDisplayFrom()).append('\n');
-@@ -72,7 +78,7 @@
-       // e.printStackTrace();
-       return "";
-     } finally {
--      is.close();
-+      bis.close();
-     }
-   }
- 
-@@ -82,7 +88,7 @@
+@@ -82,7 +86,7 @@
    }
  
    public Properties getProperties(InputStream is) throws Exception {
@@ -211,14 +173,13 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/M
 ===================================================================
 --- component/document/src/main/java/org/exoplatform/services/document/impl/MSWordDocumentReader.java	(revision 65754)
 +++ component/document/src/main/java/org/exoplatform/services/document/impl/MSWordDocumentReader.java	(working copy)
-@@ -16,13 +16,14 @@
+@@ -16,13 +16,13 @@
   */
  package org.exoplatform.services.document.impl;
  
 +import org.apache.poi.hwpf.HWPFDocument;
 +import org.apache.poi.hwpf.usermodel.Range;
 +
-+import java.io.BufferedInputStream;
  import java.io.IOException;
  import java.io.InputStream;
  import java.util.Properties;
@@ -229,42 +190,33 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/M
  /**
   * Created by The eXo Platform SAS A parser of Microsoft Word files.
   * 
-@@ -49,9 +50,14 @@
+@@ -49,6 +49,10 @@
     * @throws Exception
     */
    public String getContentAsText(InputStream is) throws Exception {
-+    BufferedInputStream bis = validateInputStream(is);
-+    if (bis == null) {
++    if (!isInputStreamValid(is)) {
 +      return "";
 +    }
 +
      String text = "";
      try {
--      HWPFDocument doc = new HWPFDocument(is);
-+      HWPFDocument doc = new HWPFDocument(bis);
-       // WordExtractor extr = new WordExtractor(doc);
- 
-       Range range = doc.getRange();
-@@ -73,8 +79,13 @@
+       HWPFDocument doc = new HWPFDocument(is);
+@@ -73,6 +77,10 @@
     * InputStream)
     */
    public Properties getProperties(InputStream is) throws Exception {
-+    BufferedInputStream bis = validateInputStream(is);
-+    if (bis == null) {
++    if (!isInputStreamValid(is)) {
 +      return new Properties();
 +    }
 +
      POIPropertiesReader reader = new POIPropertiesReader();
--    reader.readDCProperties(is);
-+    reader.readDCProperties(bis);
+     reader.readDCProperties(is);
      return reader.getProperties();
-   }
- 
 Index: component/document/src/main/java/org/exoplatform/services/document/impl/OpenOfficeDocumentReader.java
 ===================================================================
 --- component/document/src/main/java/org/exoplatform/services/document/impl/OpenOfficeDocumentReader.java	(revision 65754)
 +++ component/document/src/main/java/org/exoplatform/services/document/impl/OpenOfficeDocumentReader.java	(working copy)
-@@ -17,6 +17,15 @@
+@@ -17,6 +17,14 @@
  
  package org.exoplatform.services.document.impl;
  
@@ -276,11 +228,10 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/O
 +import org.xml.sax.XMLReader;
 +import org.xml.sax.helpers.DefaultHandler;
 +
-+import java.io.BufferedInputStream;
  import java.io.InputStream;
  import java.util.Properties;
  import java.util.zip.ZipEntry;
-@@ -25,15 +34,6 @@
+@@ -25,15 +33,6 @@
  import javax.xml.parsers.SAXParser;
  import javax.xml.parsers.SAXParserFactory;
  
@@ -296,112 +247,65 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/O
  /**
   * Created by The eXo Platform SAS .
   * 
-@@ -62,6 +62,11 @@
+@@ -62,6 +61,10 @@
     * io.InputStream)
     */
    public String getContentAsText(InputStream is) throws Exception {
-+    BufferedInputStream bis = validateInputStream(is);
-+    if (bis == null) {
++    if (!isInputStreamValid(is)) {
 +      return "";
 +    }
 +
      try {
        SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
        saxParserFactory.setValidating(false);
-@@ -70,7 +75,7 @@
-       xmlReader.setFeature("http://xml.org/sax/features/validation", false);
-       xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
- 
--      ZipInputStream zis = new ZipInputStream(is);
-+      ZipInputStream zis = new ZipInputStream(bis);
-       ZipEntry ze = zis.getNextEntry();
-       while (!ze.getName().equals("content.xml")) {
-         ze = zis.getNextEntry();
-@@ -90,7 +95,7 @@
-       // } catch (SAXException e) {
-       // return "";
-     } finally {
--      is.close();
-+      bis.close();
-     }
-   }
- 
-@@ -106,6 +111,11 @@
+@@ -106,6 +109,10 @@
     * InputStream)
     */
    public Properties getProperties(InputStream is) throws Exception {
-+    BufferedInputStream bis = validateInputStream(is);
-+    if (bis == null) {
++    if (!isInputStreamValid(is)) {
 +      return new Properties();
 +    }
 +
      try {
        SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
        saxParserFactory.setValidating(false);
-@@ -114,7 +124,7 @@
-       xmlReader.setFeature("http://xml.org/sax/features/validation", false);
-       xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
- 
--      ZipInputStream zis = new ZipInputStream(is);
-+      ZipInputStream zis = new ZipInputStream(bis);
-       ZipEntry ze = zis.getNextEntry();
-       while (!ze.getName().equals("meta.xml")) {
-         ze = zis.getNextEntry();
 Index: component/document/src/main/java/org/exoplatform/services/document/impl/PDFDocumentReader.java
 ===================================================================
 --- component/document/src/main/java/org/exoplatform/services/document/impl/PDFDocumentReader.java	(revision 65754)
 +++ component/document/src/main/java/org/exoplatform/services/document/impl/PDFDocumentReader.java	(working copy)
-@@ -16,6 +16,7 @@
-  */
- package org.exoplatform.services.document.impl;
- 
-+import java.io.BufferedInputStream;
- import java.io.ByteArrayInputStream;
- import java.io.InputStream;
- import java.io.StringWriter;
-@@ -69,7 +70,13 @@
+@@ -69,6 +69,10 @@
     * @throws Exception
     */
    public String getContentAsText(InputStream is) throws Exception {
--    PDDocument pdDocument = PDDocument.load(is);
-+
-+    BufferedInputStream bis = validateInputStream(is);
-+    if (bis == null) {
++    if (!isInputStreamValid(is)) {
 +      return "";
 +    }
 +    
-+    PDDocument pdDocument = PDDocument.load(bis);
+     PDDocument pdDocument = PDDocument.load(is);
      StringWriter sw = new StringWriter();
      try {
-       PDFTextStripper stripper = new PDFTextStripper();
-@@ -96,10 +103,14 @@
+@@ -95,7 +99,10 @@
+    * InputStream)
     */
    public Properties getProperties(InputStream is) throws Exception {
- 
-+    BufferedInputStream bis = validateInputStream(is);
-+    if(bis == null){
+-
++    if (!isInputStreamValid(is)) {
 +      return new Properties();
 +    }
 +    
      Properties props = null;
-+    PdfReader reader = new PdfReader(bis, "".getBytes());
  
--    PdfReader reader = new PdfReader(is, "".getBytes());
--
-     // Read the file metadata
-     byte[] metadata = reader.getMetadata();
- 
+     PdfReader reader = new PdfReader(is, "".getBytes());
 Index: component/document/src/main/java/org/exoplatform/services/document/impl/PPTDocumentReader.java
 ===================================================================
 --- component/document/src/main/java/org/exoplatform/services/document/impl/PPTDocumentReader.java	(revision 65754)
 +++ component/document/src/main/java/org/exoplatform/services/document/impl/PPTDocumentReader.java	(working copy)
-@@ -16,11 +16,12 @@
+@@ -16,11 +16,11 @@
   */
  package org.exoplatform.services.document.impl;
  
 +import org.apache.poi.hslf.extractor.PowerPointExtractor;
 +
-+import java.io.BufferedInputStream;
  import java.io.InputStream;
  import java.util.Properties;
  
@@ -410,26 +314,22 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/P
  /**
   * Created by The eXo Platform SAS A parser of Microsoft PowerPoint files.
   * Parses the files with application/powerpoint mime type.
-@@ -48,7 +49,12 @@
+@@ -48,6 +48,10 @@
     * @throws Exception
     */
    public String getContentAsText(InputStream is) throws Exception {
--    PowerPointExtractor ppe = new PowerPointExtractor(is);
-+    BufferedInputStream bis = validateInputStream(is);
-+    if (bis == null) {
++    if (!isInputStreamValid(is)) {
 +      return "";
 +    }
 +
-+    PowerPointExtractor ppe = new PowerPointExtractor(bis);
+     PowerPointExtractor ppe = new PowerPointExtractor(is);
      return ppe.getText(true, true);
    }
- 
-@@ -64,6 +70,11 @@
+@@ -64,6 +68,10 @@
     * InputStream)
     */
    public Properties getProperties(InputStream is) throws Exception {
-+    BufferedInputStream bis = validateInputStream(is);
-+    if (bis == null) {
++    if (!isInputStreamValid(is)) {
 +      return new Properties();
 +    }
 +
@@ -440,28 +340,14 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/X
 ===================================================================
 --- component/document/src/main/java/org/exoplatform/services/document/impl/XMLDocumentReader.java	(revision 65754)
 +++ component/document/src/main/java/org/exoplatform/services/document/impl/XMLDocumentReader.java	(working copy)
-@@ -16,6 +16,7 @@
-  */
- package org.exoplatform.services.document.impl;
- 
-+import java.io.BufferedInputStream;
- import java.io.ByteArrayOutputStream;
- import java.io.InputStream;
- import java.util.Properties;
-@@ -54,10 +55,15 @@
+@@ -54,6 +54,10 @@
     * @return The string only with text from file content.
     */
    public String getContentAsText(InputStream is) throws Exception {
-+    BufferedInputStream bis = validateInputStream(is);
-+    if (bis == null) {
++    if (!isInputStreamValid(is)) {
 +      return "";
 +    }
 +
      byte[] buffer = new byte[2048];
      int len;
      ByteArrayOutputStream bos = new ByteArrayOutputStream();
--    while ((len = is.read(buffer)) > 0)
-+    while ((len = bis.read(buffer)) > 0)
-       bos.write(buffer, 0, len);
-     bos.close();
-     String xml = new String(bos.toByteArray());
