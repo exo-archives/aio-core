@@ -106,9 +106,11 @@ public class LDAPUserPageList extends PageList {
           users.add(ldapAttrMapping_.attributesToUser(result.getAttributes()));
       }
       Control[] responseControls = ctx.getResponseControls();
-      for (int z = 0; z < responseControls.length; z++) {
-        if (responseControls[z] instanceof PagedResultsResponseControl)
-          cookie = ((PagedResultsResponseControl) responseControls[z]).getCookie();
+      if(responseControls!=null){
+        for (int z = 0; z < responseControls.length; z++) {
+          if (responseControls[z] instanceof PagedResultsResponseControl)
+            cookie = ((PagedResultsResponseControl) responseControls[z]).getCookie();
+        }
       }
       ctx.setRequestControls(new Control[] { sctl,
           new PagedResultsControl(getPageSize(), cookie, Control.CRITICAL) });
