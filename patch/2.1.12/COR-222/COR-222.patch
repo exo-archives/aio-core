@@ -2,7 +2,7 @@ Index: component/document/pom.xml
 ===================================================================
 --- component/document/pom.xml	(revision 65754)
 +++ component/document/pom.xml	(working copy)
-@@ -1,130 +1,130 @@
+@@ -1,130 +1,136 @@
 -<?xml version="1.0" encoding="UTF-8"?>
 -<!--
 -
@@ -204,6 +204,12 @@ Index: component/document/pom.xml
 +      <groupId>org.jempbox</groupId>
 +      <artifactId>jempbox</artifactId>
 +      <version>0.2.0</version>
++      <scope>compile</scope>
++    </dependency>
++    <dependency>
++      <groupId>com.lowagie</groupId>
++      <artifactId>itext</artifactId>
++      <version>2.1.0</version>
 +      <scope>compile</scope>
 +    </dependency>
 +    <dependency>
@@ -538,7 +544,7 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/P
 ===================================================================
 --- component/document/src/main/java/org/exoplatform/services/document/impl/PDFDocumentReader.java	(revision 65754)
 +++ component/document/src/main/java/org/exoplatform/services/document/impl/PDFDocumentReader.java	(working copy)
-@@ -16,31 +16,26 @@
+@@ -16,31 +16,25 @@
   */
  package org.exoplatform.services.document.impl;
  
@@ -549,7 +555,6 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/P
 +import org.jempbox.xmp.XMPMetadata;
 +import org.jempbox.xmp.XMPSchemaBasic;
 +import org.jempbox.xmp.XMPSchemaDublinCore;
-+import org.jempbox.xmp.XMPSchemaPDF;
 +import org.pdfbox.exceptions.InvalidPasswordException;
 +import org.pdfbox.pdmodel.PDDocument;
 +import org.pdfbox.pdmodel.PDDocumentCatalog;
@@ -585,7 +590,7 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/P
  /**
   * Created by The eXo Platform SAS A parser of Adobe PDF files.
   * 
-@@ -69,6 +64,10 @@
+@@ -69,6 +63,10 @@
     * @throws Exception
     */
    public String getContentAsText(InputStream is) throws Exception {
@@ -596,7 +601,7 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/P
      PDDocument pdDocument = PDDocument.load(is);
      StringWriter sw = new StringWriter();
      try {
-@@ -95,159 +94,174 @@
+@@ -95,159 +93,137 @@
     * InputStream)
     */
    public Properties getProperties(InputStream is) throws Exception {
@@ -703,7 +708,7 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/P
 +          }
 +          try {
 +            if (dc.getDescription() != null)
-+              props.put(DCMetaData.DESCRIPTION, dc.getDescription());
++              props.put(DCMetaData.SUBJECT, dc.getDescription());
 +          } catch (Exception e) {
 +            log.warn("getSubject failed: " + e);
 +          }
@@ -750,42 +755,6 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/P
 -    if (modDate != null) {
 -      props.put(DCMetaData.DATE, PdfDate.decode(modDate));
 -    }
-+        XMPSchemaPDF pdf = metadata.getPDFSchema();
-+        if (pdf != null) {
-+          try {
-+            if (pdf.getKeywords() != null)
-+              props.put(DCMetaData.SUBJECT, pdf.getKeywords());
-+          } catch (Exception e) {
-+            log.warn("getKeywords failed: " + e);
-+          }
- 
--    return props;
--  }
--
--  private Properties getPropsFromPDFAMetadata(Document doc) throws Exception {
--    Properties props = new Properties();
--    // get properties
--    NodeList list = doc.getElementsByTagName("rdf:li");
--    if (list != null && list.getLength() > 0) {
--      for (int i = 0; i < list.getLength(); i++) {
--
--        Node n = list.item(i);
--        // dc:title - TITLE
--        if (n.getParentNode().getParentNode().getNodeName().equals("dc:title")) {
--          String title = n.getLastChild().getTextContent();
--          props.put(DCMetaData.TITLE, title);
-+          try {
-+            if (pdf.getProducer() != null)
-+              props.put(DCMetaData.PUBLISHER, pdf.getProducer());
-+          } catch (Exception e) {
-+            log.warn("getProducer failed: " + e);
-+          }
-         }
- 
--        // dc:creator - CREATOR
--        if (n.getParentNode().getParentNode().getNodeName().equals("dc:creator")) {
--          String author = n.getLastChild().getTextContent();
--          props.put(DCMetaData.CREATOR, author);
 +        XMPSchemaBasic basic = metadata.getBasicSchema();
 +        if (basic != null) {
 +          try {
@@ -800,33 +769,24 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/P
 +          } catch (Exception e) {
 +            log.warn("getModificationDate failed: " + e);
 +          }
-+          // try
-+          // {
-+          // if (basic.getCreatorTool() != null)
-+          // props.put(DCMetaData.PUBLISHER, basic.getCreatorTool());
-+          // }
-+          // catch (Exception e)
-+          // {
-+          // log.warn("getCreatorTool failed: " + e);
-+          // }
-         }
-+      } else {
-+        // The pdf doesn't contain any metadata, try to use the document
++        }
++      }
+ 
+-    return props;
+-  }
++      if (props.isEmpty()) {
++        // The pdf doesn't contain any metadata or metadata do not contains any
++        // usefull data, try to use the document
 +        // information instead
 +        PDDocumentInformation docInfo = pdDocument.getDocumentInformation();
  
--        // DC:description - SUBJECT
--        if (n.getParentNode().getParentNode().getNodeName().equals("dc:description")) {
--          String description = n.getLastChild().getTextContent();
--          props.put(DCMetaData.SUBJECT, description);
--          // props.put(DCMetaData.DESCRIPTION, description);
+-  private Properties getPropsFromPDFAMetadata(Document doc) throws Exception {
+-    Properties props = new Properties();
+-    // get properties
+-    NodeList list = doc.getElementsByTagName("rdf:li");
+-    if (list != null && list.getLength() > 0) {
+-      for (int i = 0; i < list.getLength(); i++) {
 +        if (docInfo != null) {
-+          try {
-+            if (docInfo.getAuthor() != null)
-+              props.put(DCMetaData.CONTRIBUTOR, docInfo.getAuthor());
-+          } catch (Exception e) {
-+            log.warn("getAuthor failed: " + e);
-+          }
 +          try {
 +            if (docInfo.getCreationDate() != null)
 +              props.put(DCMetaData.DATE, docInfo.getCreationDate());
@@ -840,7 +800,12 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/P
 +            log.warn("getCreator failed: " + e);
 +          }
 +          try {
-+
+ 
+-        Node n = list.item(i);
+-        // dc:title - TITLE
+-        if (n.getParentNode().getParentNode().getNodeName().equals("dc:title")) {
+-          String title = n.getLastChild().getTextContent();
+-          props.put(DCMetaData.TITLE, title);
 +            if (docInfo.getKeywords() != null)
 +              props.put(DCMetaData.SUBJECT, docInfo.getKeywords());
 +          } catch (Exception e) {
@@ -851,12 +816,6 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/P
 +              props.put(DCMetaData.DATE, docInfo.getModificationDate());
 +          } catch (Exception e) {
 +            log.warn("getModificationDate failed: " + e);
-+          }
-+          try {
-+            if (docInfo.getProducer() != null)
-+              props.put(DCMetaData.PUBLISHER, docInfo.getProducer());
-+          } catch (Exception e) {
-+            log.warn("getProducer failed: " + e);
 +          }
 +          try {
 +            if (docInfo.getSubject() != null)
@@ -870,9 +829,20 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/P
 +          } catch (Exception e) {
 +            log.warn("getTitle failed: " + e);
 +          }
-+
-+          // docInfo.getTrapped();
          }
+-
+-        // dc:creator - CREATOR
+-        if (n.getParentNode().getParentNode().getNodeName().equals("dc:creator")) {
+-          String author = n.getLastChild().getTextContent();
+-          props.put(DCMetaData.CREATOR, author);
+-        }
+-
+-        // DC:description - SUBJECT
+-        if (n.getParentNode().getParentNode().getNodeName().equals("dc:description")) {
+-          String description = n.getLastChild().getTextContent();
+-          props.put(DCMetaData.SUBJECT, description);
+-          // props.put(DCMetaData.DESCRIPTION, description);
+-        }
        }
 -    }
  
@@ -1049,26 +1019,33 @@ Index: component/document/src/test/java/org/exoplatform/services/document/test/T
  public class TestPropertiesExtracting extends TestCase {
  
    DocumentReaderService service_;
-@@ -47,7 +45,9 @@
+@@ -47,7 +45,11 @@
      InputStream is = TestPropertiesExtracting.class.getResourceAsStream("/test.pdf");
      DocumentReader rdr = service_.getDocumentReader("application/pdf");
      Properties props = rdr.getProperties(is);
 -    printProps(props);
-+    Properties etalon = new Properties();
-+    etalon.put(DCMetaData.PUBLISHER, "FOP 0.20.4");
-+    evalProps(etalon, props, false);
++    assertTrue(props.isEmpty());
++
++    // Properties etalon = new Properties();
++    // etalon.put(DCMetaData.PUBLISHER, "FOP 0.20.4");
++    // evalProps(etalon, props, false);
    }
  
    public void testPDFDocumentReaderServiceXMPMetadata() throws Exception {
-@@ -60,14 +60,45 @@
+@@ -55,19 +57,48 @@
+     DocumentReader rdr = service_.getDocumentReader("application/pdf");
+ 
+     Properties testprops = rdr.getProperties(is);
+-    printProps(testprops);
++    // printProps(testprops);
+ 
      Properties etalon = new Properties();
      etalon.put(DCMetaData.TITLE, "Test de convertion de fichier tif");
      etalon.put(DCMetaData.CREATOR, "Christian Klaus");
--    etalon.put(DCMetaData.SUBJECT, "20080901 TEST Christian Etat OK");
+     etalon.put(DCMetaData.SUBJECT, "20080901 TEST Christian Etat OK");
 -    Calendar c = ISO8601.parseEx("2008-09-01T08:01:10+00:00");
 -    ;
 -    etalon.put(DCMetaData.DATE, c);
-+    etalon.put(DCMetaData.DESCRIPTION, "20080901 TEST Christian Etat OK");
 +    // Calendar c = ISO8601.parseEx("2008-09-01T08:01:10+00:00");
 +    // etalon.put(DCMetaData.DATE, c);
  
@@ -1085,7 +1062,6 @@ Index: component/document/src/test/java/org/exoplatform/services/document/test/T
 +      Properties etalon = new Properties();
 +      etalon.put(DCMetaData.TITLE, "Personal Account Opening Form VN");
 +      etalon.put(DCMetaData.CREATOR, "mr");
-+      etalon.put(DCMetaData.PUBLISHER, "Adobe LiveCycle Designer ES 8.2");
 +      evalProps(etalon, testprops, false);
 +    } finally {
 +      is.close();
@@ -1101,7 +1077,6 @@ Index: component/document/src/test/java/org/exoplatform/services/document/test/T
 +      Properties etalon = new Properties();
 +      etalon.put(DCMetaData.TITLE, "metro");
 +      etalon.put(DCMetaData.CREATOR, "Preview");
-+      etalon.put(DCMetaData.PUBLISHER, "Mac OS X 10.5.2 Quartz PDFContext");
 +      evalProps(etalon, testprops, false);
 +    } finally {
 +      is.close();
@@ -1155,16 +1130,15 @@ Index: packaging/module/src/main/javascript/core.packaging.module.js
 ===================================================================
 --- packaging/module/src/main/javascript/core.packaging.module.js	(revision 65754)
 +++ packaging/module/src/main/javascript/core.packaging.module.js	(working copy)
-@@ -31,7 +31,7 @@
-   module.component.documents =
+@@ -32,6 +32,7 @@
      new Project("org.exoplatform.core", "exo.core.component.document", "jar", module.version).
      addDependency(new Project("pdfbox", "pdfbox", "jar", "0.7.2")).
--    addDependency(new Project("com.lowagie", "itext", "jar", "2.1.0")).
+     addDependency(new Project("com.lowagie", "itext", "jar", "2.1.0")).
 +    addDependency(new Project("org.jempbox", "jempbox", "jar", "0.2.0")).
      addDependency(new Project("bouncycastle", "bcmail-jdk14", "jar", "136")).
      addDependency(new Project("bouncycastle", "bcprov-jdk14", "jar", "136")).
      addDependency(new Project("html-parser", "html-parser", "jar", "1.6")).
-@@ -56,7 +56,7 @@
+@@ -56,7 +57,7 @@
      new Project("org.exoplatform.core", "exo.core.component.resources.api", "jar", module.version).
      addDependency(new Project("org.exoplatform.core", "exo.core.component.gifbackport", "jar", module.version)).
      addDependency(new Project("org.exoplatform.core", "exo.core.component.database", "jar", module.version));
