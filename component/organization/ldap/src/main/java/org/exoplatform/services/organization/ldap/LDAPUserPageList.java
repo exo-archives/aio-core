@@ -16,6 +16,12 @@
  */
 package org.exoplatform.services.organization.ldap;
 
+import org.apache.commons.logging.Log;
+import org.exoplatform.commons.utils.PageList;
+import org.exoplatform.services.ldap.LDAPService;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.organization.User;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,12 +35,6 @@ import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.PagedResultsControl;
 import javax.naming.ldap.PagedResultsResponseControl;
 import javax.naming.ldap.SortControl;
-
-import org.apache.commons.logging.Log;
-import org.exoplatform.commons.utils.PageList;
-import org.exoplatform.services.ldap.LDAPService;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.organization.User;
 
 /**
  * Created by VietSpider Studio Author : Nhu Dinh Thuan nhudinhthuan@yahoo.com
@@ -81,6 +81,7 @@ public class LDAPUserPageList extends PageList {
   /**
    * {@inheritDoc}
    */
+  @Override
   protected void populateCurrentPage(int page) throws Exception {
     List<User> users = new ArrayList<User>();
     PagedResultsControl prc = new PagedResultsControl(getPageSize(), Control.CRITICAL);
@@ -100,11 +101,14 @@ public class LDAPUserPageList extends PageList {
       NamingEnumeration<SearchResult> results = ctx.search(searchBase_, filter_, constraints);
       if (results == null)
         break;
+
       while (results.hasMore()) {
         SearchResult result = results.next();
-        if (counter == page)
+        if (counter == page) {
           users.add(ldapAttrMapping_.attributesToUser(result.getAttributes()));
+        }
       }
+
       Control[] responseControls = ctx.getResponseControls();
       if(responseControls!=null){
         for (int z = 0; z < responseControls.length; z++) {
@@ -114,7 +118,7 @@ public class LDAPUserPageList extends PageList {
       }
       ctx.setRequestControls(new Control[] { sctl,
           new PagedResultsControl(getPageSize(), cookie, Control.CRITICAL) });
-    } while (cookie != null);
+    } while (cookie != null && counter < page);
     this.currentListPage_ = users;
   }
 
@@ -140,6 +144,7 @@ public class LDAPUserPageList extends PageList {
   /**
    * {@inheritDoc}
    */
+  @Override
   @SuppressWarnings("unchecked")
   public List getAll() throws Exception {
     LdapContext ctx = ldapService_.getLdapContext();
