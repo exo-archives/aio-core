@@ -1,59 +1,161 @@
+Index: component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/LDAPAttributeMapping.java
+===================================================================
+--- component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/LDAPAttributeMapping.java	(revision 67868)
++++ component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/LDAPAttributeMapping.java	(working copy)
+@@ -62,8 +62,14 @@
+ 
+   public String   baseURL, groupsURL, membershipTypeURL, userURL, profileURL;
+ 
+-  String          userDNKey;
++  String          userDNKey      = "cn";                                      ;
+ 
++  String          groupDNKey     = "ou";
++
++  String          groupNameAttr  = "ou";
++
++  String          groupLabelAttr = "l";
++
+   // String userAuthenticationAttr;
+   String          userUsernameAttr;
+ 
+@@ -132,14 +138,14 @@
+     if (GROUP_LDAP_CLASSES == null)
+       GROUP_LDAP_CLASSES = groupLDAPClasses.split(",");
+     attrs.put(new ObjectClassAttribute(GROUP_LDAP_CLASSES));
+-    attrs.put("ou", group.getGroupName());
++    attrs.put(groupNameAttr, group.getGroupName());
+     String desc = group.getDescription();
+     // TODO : http://jira.exoplatform.org/browse/COR-49
+     if (desc != null && desc.length() > 0)
+       attrs.put("description", desc);
+     String lbl = group.getLabel();
+     if (lbl != null && lbl.length() > 0)
+-      attrs.put("l", lbl);
++      attrs.put(groupLabelAttr, lbl);
+     return attrs;
+   }
+ 
+@@ -148,9 +154,9 @@
+       return null;
+     Group group = new GroupImpl();
+     // TODO : http://jira.exoplatform.org/browse/COR-49
+-    group.setGroupName(getAttributeValueAsString(attrs, "ou"));
++    group.setGroupName(getAttributeValueAsString(attrs, groupNameAttr));
+     group.setDescription(getAttributeValueAsString(attrs, "description"));
+-    group.setLabel(getAttributeValueAsString(attrs, "l"));
++    group.setLabel(getAttributeValueAsString(attrs, groupLabelAttr));
+     return group;
+   }
+ 
 Index: component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/GroupDAOImpl.java
 ===================================================================
 --- component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/GroupDAOImpl.java	(revision 67868)
 +++ component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/GroupDAOImpl.java	(working copy)
-@@ -74,7 +74,7 @@
+@@ -74,8 +74,8 @@
    public void addChild(Group parent, Group child, boolean broadcast) throws Exception {
      setId(parent, child);
      String searchBase = createSubDN(parent);
 -    String groupDN = "OU=" + child.getGroupName() + "," + searchBase;
-+    String groupDN = "ou=" + child.getGroupName() + "," + searchBase;
-     String filter = "ou=" + child.getGroupName();
+-    String filter = "ou=" + child.getGroupName();
++    String groupDN = ldapAttrMapping_.groupDNKey + "=" + child.getGroupName() + "," + searchBase;
++    String filter = ldapAttrMapping_.groupNameAttr + "=" + child.getGroupName();
  
      SearchControls constraints = new SearchControls();
-@@ -97,7 +97,7 @@
+     constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
+@@ -97,7 +97,8 @@
      LdapContext ctx = ldapService_.getLdapContext();
      Group parent = findGroupById(group.getParentId());
      setId(parent, group);
 -    String groupDN = "OU=" + group.getGroupName() + "," + createSubDN(parent);
-+    String groupDN = "ou=" + group.getGroupName() + "," + createSubDN(parent);
++    String groupDN = ldapAttrMapping_.groupDNKey + "=" + group.getGroupName() + ","
++        + createSubDN(parent);
  
      ArrayList<ModificationItem> modifications = new ArrayList<ModificationItem>();
      ModificationItem mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
-@@ -238,7 +238,7 @@
+@@ -105,8 +106,8 @@
+                                                                    group.getDescription()));
+     modifications.add(mod);
+ 
+-    mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("l",
+-                                                                                group.getLabel()));
++    mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
++                               new BasicAttribute(ldapAttrMapping_.groupLabelAttr, group.getLabel()));
+     modifications.add(mod);
+ 
+     ModificationItem[] mods = new ModificationItem[modifications.size()];
+@@ -122,7 +123,7 @@
+ 
+   public Group removeGroup(Group group, boolean broadcast) throws Exception {
+     LdapContext ctx = ldapService_.getLdapContext();
+-    String filter = "ou=" + group.getGroupName();
++    String filter = ldapAttrMapping_.groupNameAttr + "=" + group.getGroupName();
+     String searchBase = this.createSubDN(group.getParentId());
+     SearchControls constraints = new SearchControls();
+     constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
+@@ -211,7 +212,9 @@
+     constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+     NamingEnumeration<SearchResult> results = null;
+     try {
+-      results = ctx.search(ldapAttrMapping_.groupsURL, "(ou=*)", constraints);
++      results = ctx.search(ldapAttrMapping_.groupsURL,
++                           "(" + ldapAttrMapping_.groupNameAttr + "=*)",
++                           constraints);
+     } catch (Exception exp) {
+       return groups;
+     }
+@@ -238,7 +241,7 @@
      if (parent != null) {
        String dnParts[] = parent.getId().split("/");
        for (int x = (dnParts.length - 1); x > 0; x--) {
 -        buffer.append("OU=" + dnParts[x] + ", ");
-+        buffer.append("ou=" + dnParts[x] + ", ");
++        buffer.append(ldapAttrMapping_.groupDNKey + "=" + dnParts[x] + ", ");
        }
      }
      buffer.append(groupsBaseDN);
-@@ -352,7 +352,7 @@
+@@ -352,7 +355,7 @@
      if (parentId != null && parentId.length() > 0) {
        String dnParts[] = parentId.split("/");
        for (int x = (dnParts.length - 1); x > 0; x--)
 -        buffer.append("OU=" + dnParts[x] + ", ");
-+        buffer.append("ou=" + dnParts[x] + ", ");
++        buffer.append(ldapAttrMapping_.groupDNKey + "=" + dnParts[x] + ", ");
      }
      buffer.append(ldapAttrMapping_.groupsURL);
      return buffer.toString();
+Index: component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/OrganizationServiceImpl.java
+===================================================================
+--- component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/OrganizationServiceImpl.java	(revision 67868)
++++ component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/OrganizationServiceImpl.java	(working copy)
+@@ -56,8 +56,12 @@
+     membershipTypeDAO_ = new MembershipTypeDAOImpl(ldapAttrMapping, ldapService);
+ 
+     ValueParam param = params.getValueParam("ldap.userDN.key");
+-    ldapAttrMapping.userDNKey = param.getValue();
++    if (param != null)
++      ldapAttrMapping.userDNKey = param.getValue();
+ 
++    param = params.getValueParam("ldap.groupDN.key");
++    if (param != null)
++      ldapAttrMapping.groupDNKey = param.getValue();
+   }
+ 
+ }
 Index: component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/ADUserDAOImpl.java
 ===================================================================
 --- component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/ADUserDAOImpl.java	(revision 67868)
 +++ component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/ADUserDAOImpl.java	(working copy)
-@@ -47,8 +47,9 @@
+@@ -47,8 +47,10 @@
      LDAPUserPageList.SEARCH_CONTROL = Control.CRITICAL;
    }
  
 +  @Override
    public void createUser(User user, boolean broadcast) throws Exception {
 -    String userDN = "CN=" + user.getUserName() + "," + ldapAttrMapping_.userURL;
-+    String userDN = "cn=" + user.getUserName() + "," + ldapAttrMapping_.userURL;
++    String userDN = ldapAttrMapping_.userDNKey + "=" + user.getUserName() + ","
++        + ldapAttrMapping_.userURL;
      Attributes attrs = ldapAttrMapping_.userToAttributes(user);
      attrs.put("userAccountControl", Integer.toString(UF_NORMAL_ACCOUNT + UF_PASSWD_NOTREQD
          + UF_PASSWORD_EXPIRED + UF_ACCOUNTDISABLE));
-@@ -62,6 +63,7 @@
+@@ -62,6 +64,7 @@
  
    }
  
@@ -70,7 +172,17 @@ Index: component/organization/ldap/src/main/java/org/exoplatform/services/organi
      // TODO : http://jira.exoplatform.org/browse/COR-49
      for (int x = (groupParts.length - 1); x > 0; x--) {
 -      buffer.append("OU=" + groupParts[x] + ", ");
-+      buffer.append("ou=" + groupParts[x] + ", ");
++      buffer.append(ldapAttrMapping_.groupDNKey + "=" + groupParts[x] + ", ");
      }
      buffer.append(ldapAttrMapping_.groupsURL);
      return buffer.toString();
+@@ -118,7 +118,8 @@
+     // TODO needs to use mapping there :
+     // http://jira.exoplatform.org/browse/COR-49
+     group.setDescription(ldapAttrMapping_.getAttributeValueAsString(attrs, "description"));
+-    group.setLabel(ldapAttrMapping_.getAttributeValueAsString(attrs, "l"));
++    group.setLabel(ldapAttrMapping_.getAttributeValueAsString(attrs,
++                                                              ldapAttrMapping_.groupLabelAttr));
+     group.setParentId(parentId);
+     return group;
+   }
