@@ -90,7 +90,16 @@ public class LDAPUserPageList extends PageList {
 
     LdapContext ctx = ldapService_.getLdapContext();
     ctx.setRequestControls(new Control[] { sctl, prc });
+
+    // returns only needed attributes for creation UserImpl in
+    // LDAPAttributeMapping.attributesToUser() method
+    String[] returnedAtts = { ldapAttrMapping_.userUsernameAttr,
+        ldapAttrMapping_.userFirstNameAttr, ldapAttrMapping_.userLastNameAttr,
+        ldapAttrMapping_.userDisplayNameAttr, ldapAttrMapping_.userMailAttr,
+        ldapAttrMapping_.userPassword };
+
     SearchControls constraints = new SearchControls();
+    constraints.setReturningAttributes(returnedAtts);
     constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
     byte[] cookie = null;
@@ -123,14 +132,14 @@ public class LDAPUserPageList extends PageList {
   }
 
   private int getResultSize() throws Exception {
-    LdapContext ctx = ldapService_.getLdapContext();
-    NamingEnumeration<SearchResult> results = null;
-    SearchControls constraints = new SearchControls();
     String[] returnedAtts = { ldapAttrMapping_.userUsernameAttr };
+
+    SearchControls constraints = new SearchControls();
     constraints.setReturningAttributes(returnedAtts);
     constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
-    results = ctx.search(searchBase_, filter_, constraints);
+    LdapContext ctx = ldapService_.getLdapContext();
+    NamingEnumeration<SearchResult> results = ctx.search(searchBase_, filter_, constraints);
 
     int counter = 0;
     while (results != null && results.hasMore()) {
@@ -147,15 +156,21 @@ public class LDAPUserPageList extends PageList {
   @Override
   @SuppressWarnings("unchecked")
   public List getAll() throws Exception {
-    LdapContext ctx = ldapService_.getLdapContext();
     List<User> users = new ArrayList<User>();
-    NamingEnumeration<SearchResult> results = null;
+
+    // returns only needed attributes for creation UserImpl in
+    // LDAPAttributeMapping.attributesToUser() method
+    String[] returnedAtts = { ldapAttrMapping_.userUsernameAttr,
+        ldapAttrMapping_.userFirstNameAttr, ldapAttrMapping_.userLastNameAttr,
+        ldapAttrMapping_.userDisplayNameAttr, ldapAttrMapping_.userMailAttr,
+        ldapAttrMapping_.userPassword };
+
     SearchControls constraints = new SearchControls();
-    String[] returnedAtts = { ldapAttrMapping_.userUsernameAttr };
     constraints.setReturningAttributes(returnedAtts);
     constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
-    results = ctx.search(searchBase_, filter_, constraints);
+    LdapContext ctx = ldapService_.getLdapContext();
+    NamingEnumeration<SearchResult> results = ctx.search(searchBase_, filter_, constraints);
 
     while (results != null && results.hasMore()) {
       SearchResult result = results.next();

@@ -1,18 +1,92 @@
+Index: patch/2.1.13/COR-234/COR-234.patch
+===================================================================
+--- patch/2.1.13/COR-234/COR-234.patch	(revision 68766)
++++ patch/2.1.13/COR-234/COR-234.patch	(working copy)
+@@ -1,79 +0,0 @@
+-Index: component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/LDAPUserPageList.java
+-===================================================================
+---- component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/LDAPUserPageList.java	(revision 67868)
+-+++ component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/LDAPUserPageList.java	(working copy)
+-@@ -81,15 +81,26 @@
+-   /**
+-    * {@inheritDoc}
+-    */
+-+  @Override
+-   protected void populateCurrentPage(int page) throws Exception {
+-     List<User> users = new ArrayList<User>();
+-+
+-     PagedResultsControl prc = new PagedResultsControl(getPageSize(), Control.CRITICAL);
+-     String keys[] = { ldapAttrMapping_.userUsernameAttr };
+-     SortControl sctl = new SortControl(keys, SEARCH_CONTROL);
+- 
+-     LdapContext ctx = ldapService_.getLdapContext();
+-     ctx.setRequestControls(new Control[] { sctl, prc });
+-+
+-+    // returns only needed attributes for creation UserImpl in
+-+    // LDAPAttributeMapping.attributesToUser() method
+-+    String[] returnedAtts = { ldapAttrMapping_.userUsernameAttr,
+-+        ldapAttrMapping_.userFirstNameAttr, ldapAttrMapping_.userLastNameAttr,
+-+        ldapAttrMapping_.userDisplayNameAttr, ldapAttrMapping_.userMailAttr,
+-+        ldapAttrMapping_.userPassword };
+-+
+-     SearchControls constraints = new SearchControls();
+-+    constraints.setReturningAttributes(returnedAtts);
+-     constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+- 
+-     byte[] cookie = null;
+-@@ -119,14 +130,14 @@
+-   }
+- 
+-   private int getResultSize() throws Exception {
+--    LdapContext ctx = ldapService_.getLdapContext();
+--    NamingEnumeration<SearchResult> results = null;
+-+    String[] returnedAtts = { ldapAttrMapping_.userUsernameAttr };
+-+
+-     SearchControls constraints = new SearchControls();
+--    String[] returnedAtts = { ldapAttrMapping_.userUsernameAttr };
+-     constraints.setReturningAttributes(returnedAtts);
+-     constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+- 
+--    results = ctx.search(searchBase_, filter_, constraints);
+-+    LdapContext ctx = ldapService_.getLdapContext();
+-+    NamingEnumeration<SearchResult> results = ctx.search(searchBase_, filter_, constraints);
+- 
+-     int counter = 0;
+-     while (results != null && results.hasMore()) {
+-@@ -140,17 +151,24 @@
+-   /**
+-    * {@inheritDoc}
+-    */
+-+  @Override
+-   @SuppressWarnings("unchecked")
+-   public List getAll() throws Exception {
+--    LdapContext ctx = ldapService_.getLdapContext();
+-     List<User> users = new ArrayList<User>();
+--    NamingEnumeration<SearchResult> results = null;
+-+
+-+    // returns only needed attributes for creation UserImpl in
+-+    // LDAPAttributeMapping.attributesToUser() method
+-+    String[] returnedAtts = { ldapAttrMapping_.userUsernameAttr,
+-+        ldapAttrMapping_.userFirstNameAttr, ldapAttrMapping_.userLastNameAttr,
+-+        ldapAttrMapping_.userDisplayNameAttr, ldapAttrMapping_.userMailAttr,
+-+        ldapAttrMapping_.userPassword };
+-+
+-     SearchControls constraints = new SearchControls();
+--    String[] returnedAtts = { ldapAttrMapping_.userUsernameAttr };
+-     constraints.setReturningAttributes(returnedAtts);
+-     constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+- 
+--    results = ctx.search(searchBase_, filter_, constraints);
+-+    LdapContext ctx = ldapService_.getLdapContext();
+-+    NamingEnumeration<SearchResult> results = ctx.search(searchBase_, filter_, constraints);
+- 
+-     while (results != null && results.hasMore()) {
+-       SearchResult result = results.next();
 Index: component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/LDAPUserPageList.java
 ===================================================================
---- component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/LDAPUserPageList.java	(revision 67868)
+--- component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/LDAPUserPageList.java	(revision 68766)
 +++ component/organization/ldap/src/main/java/org/exoplatform/services/organization/ldap/LDAPUserPageList.java	(working copy)
-@@ -81,15 +81,26 @@
-   /**
-    * {@inheritDoc}
-    */
-+  @Override
-   protected void populateCurrentPage(int page) throws Exception {
-     List<User> users = new ArrayList<User>();
-+
-     PagedResultsControl prc = new PagedResultsControl(getPageSize(), Control.CRITICAL);
-     String keys[] = { ldapAttrMapping_.userUsernameAttr };
-     SortControl sctl = new SortControl(keys, SEARCH_CONTROL);
+@@ -90,7 +90,16 @@
  
      LdapContext ctx = ldapService_.getLdapContext();
      ctx.setRequestControls(new Control[] { sctl, prc });
@@ -29,7 +103,7 @@ Index: component/organization/ldap/src/main/java/org/exoplatform/services/organi
      constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
  
      byte[] cookie = null;
-@@ -119,14 +130,14 @@
+@@ -123,14 +132,14 @@
    }
  
    private int getResultSize() throws Exception {
@@ -48,11 +122,8 @@ Index: component/organization/ldap/src/main/java/org/exoplatform/services/organi
  
      int counter = 0;
      while (results != null && results.hasMore()) {
-@@ -140,17 +151,24 @@
-   /**
-    * {@inheritDoc}
-    */
-+  @Override
+@@ -147,15 +156,21 @@
+   @Override
    @SuppressWarnings("unchecked")
    public List getAll() throws Exception {
 -    LdapContext ctx = ldapService_.getLdapContext();
