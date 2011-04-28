@@ -74,8 +74,8 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler, GroupEventLis
   public void addChild(Group parent, Group child, boolean broadcast) throws Exception {
     setId(parent, child);
     String searchBase = createSubDN(parent);
-    String groupDN = "OU=" + child.getGroupName() + "," + searchBase;
-    String filter = "ou=" + child.getGroupName();
+    String groupDN = ldapAttrMapping_.groupDNKey + "=" + child.getGroupName() + "," + searchBase;
+    String filter = ldapAttrMapping_.groupNameAttr + "=" + child.getGroupName();
 
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
@@ -97,7 +97,8 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler, GroupEventLis
     LdapContext ctx = ldapService_.getLdapContext();
     Group parent = findGroupById(group.getParentId());
     setId(parent, group);
-    String groupDN = "OU=" + group.getGroupName() + "," + createSubDN(parent);
+    String groupDN = ldapAttrMapping_.groupDNKey + "=" + group.getGroupName() + ","
+        + createSubDN(parent);
 
     ArrayList<ModificationItem> modifications = new ArrayList<ModificationItem>();
     ModificationItem mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
@@ -105,8 +106,8 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler, GroupEventLis
                                                                    group.getDescription()));
     modifications.add(mod);
 
-    mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("l",
-                                                                                group.getLabel()));
+    mod = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
+                               new BasicAttribute(ldapAttrMapping_.groupLabelAttr, group.getLabel()));
     modifications.add(mod);
 
     ModificationItem[] mods = new ModificationItem[modifications.size()];
@@ -122,7 +123,7 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler, GroupEventLis
 
   public Group removeGroup(Group group, boolean broadcast) throws Exception {
     LdapContext ctx = ldapService_.getLdapContext();
-    String filter = "ou=" + group.getGroupName();
+    String filter = ldapAttrMapping_.groupNameAttr + "=" + group.getGroupName();
     String searchBase = this.createSubDN(group.getParentId());
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
@@ -211,7 +212,9 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler, GroupEventLis
     constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
     NamingEnumeration<SearchResult> results = null;
     try {
-      results = ctx.search(ldapAttrMapping_.groupsURL, "(ou=*)", constraints);
+      results = ctx.search(ldapAttrMapping_.groupsURL,
+                           "(" + ldapAttrMapping_.groupNameAttr + "=*)",
+                           constraints);
     } catch (Exception exp) {
       return groups;
     }
@@ -238,7 +241,7 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler, GroupEventLis
     if (parent != null) {
       String dnParts[] = parent.getId().split("/");
       for (int x = (dnParts.length - 1); x > 0; x--) {
-        buffer.append("OU=" + dnParts[x] + ", ");
+        buffer.append(ldapAttrMapping_.groupDNKey + "=" + dnParts[x] + ", ");
       }
     }
     buffer.append(groupsBaseDN);
@@ -352,7 +355,7 @@ public class GroupDAOImpl extends BaseDAO implements GroupHandler, GroupEventLis
     if (parentId != null && parentId.length() > 0) {
       String dnParts[] = parentId.split("/");
       for (int x = (dnParts.length - 1); x > 0; x--)
-        buffer.append("OU=" + dnParts[x] + ", ");
+        buffer.append(ldapAttrMapping_.groupDNKey + "=" + dnParts[x] + ", ");
     }
     buffer.append(ldapAttrMapping_.groupsURL);
     return buffer.toString();

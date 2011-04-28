@@ -62,7 +62,13 @@ public class LDAPAttributeMapping {
 
   public String   baseURL, groupsURL, membershipTypeURL, userURL, profileURL;
 
-  String          userDNKey;
+  String          userDNKey      = "cn";                                      ;
+
+  String          groupDNKey     = "ou";
+
+  String          groupNameAttr  = "ou";
+
+  String          groupLabelAttr = "l";
 
   // String userAuthenticationAttr;
   String          userUsernameAttr;
@@ -132,14 +138,14 @@ public class LDAPAttributeMapping {
     if (GROUP_LDAP_CLASSES == null)
       GROUP_LDAP_CLASSES = groupLDAPClasses.split(",");
     attrs.put(new ObjectClassAttribute(GROUP_LDAP_CLASSES));
-    attrs.put("ou", group.getGroupName());
+    attrs.put(groupNameAttr, group.getGroupName());
     String desc = group.getDescription();
     // TODO : http://jira.exoplatform.org/browse/COR-49
     if (desc != null && desc.length() > 0)
       attrs.put("description", desc);
     String lbl = group.getLabel();
     if (lbl != null && lbl.length() > 0)
-      attrs.put("l", lbl);
+      attrs.put(groupLabelAttr, lbl);
     return attrs;
   }
 
@@ -148,9 +154,9 @@ public class LDAPAttributeMapping {
       return null;
     Group group = new GroupImpl();
     // TODO : http://jira.exoplatform.org/browse/COR-49
-    group.setGroupName(getAttributeValueAsString(attrs, "ou"));
+    group.setGroupName(getAttributeValueAsString(attrs, groupNameAttr));
     group.setDescription(getAttributeValueAsString(attrs, "description"));
-    group.setLabel(getAttributeValueAsString(attrs, "l"));
+    group.setLabel(getAttributeValueAsString(attrs, groupLabelAttr));
     return group;
   }
 

@@ -47,8 +47,10 @@ public class ADUserDAOImpl extends UserDAOImpl {
     LDAPUserPageList.SEARCH_CONTROL = Control.CRITICAL;
   }
 
+  @Override
   public void createUser(User user, boolean broadcast) throws Exception {
-    String userDN = "CN=" + user.getUserName() + "," + ldapAttrMapping_.userURL;
+    String userDN = ldapAttrMapping_.userDNKey + "=" + user.getUserName() + ","
+        + ldapAttrMapping_.userURL;
     Attributes attrs = ldapAttrMapping_.userToAttributes(user);
     attrs.put("userAccountControl", Integer.toString(UF_NORMAL_ACCOUNT + UF_PASSWD_NOTREQD
         + UF_PASSWORD_EXPIRED + UF_ACCOUNTDISABLE));
@@ -62,6 +64,7 @@ public class ADUserDAOImpl extends UserDAOImpl {
 
   }
 
+  @Override
   void saveUserPassword(User user, String userDN) throws Exception {
     Object v = ldapService_.getLdapContext().getEnvironment().get(Context.SECURITY_PROTOCOL);
     if (v == null)

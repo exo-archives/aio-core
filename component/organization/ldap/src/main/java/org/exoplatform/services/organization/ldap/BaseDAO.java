@@ -62,7 +62,7 @@ public class BaseDAO {
     String groupParts[] = groupId.split("/");
     // TODO : http://jira.exoplatform.org/browse/COR-49
     for (int x = (groupParts.length - 1); x > 0; x--) {
-      buffer.append("OU=" + groupParts[x] + ", ");
+      buffer.append(ldapAttrMapping_.groupDNKey + "=" + groupParts[x] + ", ");
     }
     buffer.append(ldapAttrMapping_.groupsURL);
     return buffer.toString();
@@ -118,7 +118,8 @@ public class BaseDAO {
     // TODO needs to use mapping there :
     // http://jira.exoplatform.org/browse/COR-49
     group.setDescription(ldapAttrMapping_.getAttributeValueAsString(attrs, "description"));
-    group.setLabel(ldapAttrMapping_.getAttributeValueAsString(attrs, "l"));
+    group.setLabel(ldapAttrMapping_.getAttributeValueAsString(attrs,
+                                                              ldapAttrMapping_.groupLabelAttr));
     group.setParentId(parentId);
     return group;
   }
