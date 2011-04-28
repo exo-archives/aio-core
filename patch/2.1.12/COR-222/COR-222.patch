@@ -3777,9 +3777,14 @@ Index: component/document/src/main/java/org/exoplatform/services/document/impl/M
  }
 Index: component/document/pom.xml
 ===================================================================
---- component/document/pom.xml	(revision 66915)
+--- component/document/pom.xml	(revision 67868)
 +++ component/document/pom.xml	(working copy)
-@@ -66,6 +66,12 @@
+@@ -62,10 +62,16 @@
+     <dependency>
+       <groupId>pdfbox</groupId>
+       <artifactId>pdfbox</artifactId>
+-      <version>0.7.2</version>
++      <version>0.7.2-eXo01</version>
        <scope>compile</scope>
      </dependency>
      <dependency>
@@ -3794,11 +3799,14 @@ Index: component/document/pom.xml
        <version>2.1.0</version>
 Index: packaging/module/src/main/javascript/core.packaging.module.js
 ===================================================================
---- packaging/module/src/main/javascript/core.packaging.module.js	(revision 66915)
+--- packaging/module/src/main/javascript/core.packaging.module.js	(revision 67868)
 +++ packaging/module/src/main/javascript/core.packaging.module.js	(working copy)
-@@ -32,6 +32,7 @@
+@@ -30,8 +30,9 @@
+ 
+   module.component.documents =
      new Project("org.exoplatform.core", "exo.core.component.document", "jar", module.version).
-     addDependency(new Project("pdfbox", "pdfbox", "jar", "0.7.2")).
+-    addDependency(new Project("pdfbox", "pdfbox", "jar", "0.7.2")).
++    addDependency(new Project("pdfbox", "pdfbox", "jar", "0.7.2-eXo01")).
      addDependency(new Project("com.lowagie", "itext", "jar", "2.1.0")).
 +    addDependency(new Project("org.jempbox", "jempbox", "jar", "0.2.0")).
      addDependency(new Project("bouncycastle", "bcmail-jdk14", "jar", "136")).
