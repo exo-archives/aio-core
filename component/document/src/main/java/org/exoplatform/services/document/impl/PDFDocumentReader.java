@@ -16,30 +16,24 @@
  */
 package org.exoplatform.services.document.impl;
 
-import java.io.ByteArrayInputStream;
+import org.apache.commons.logging.Log;
+import org.exoplatform.services.document.DCMetaData;
+import org.exoplatform.services.log.ExoLogger;
+import org.jempbox.xmp.XMPMetadata;
+import org.jempbox.xmp.XMPSchemaBasic;
+import org.jempbox.xmp.XMPSchemaDublinCore;
+import org.pdfbox.exceptions.InvalidPasswordException;
+import org.pdfbox.pdmodel.PDDocument;
+import org.pdfbox.pdmodel.PDDocumentCatalog;
+import org.pdfbox.pdmodel.PDDocumentInformation;
+import org.pdfbox.pdmodel.common.PDMetadata;
+import org.pdfbox.util.PDFTextStripper;
+
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Calendar;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.pdfbox.pdmodel.PDDocument;
-import org.pdfbox.util.PDFTextStripper;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.apache.commons.logging.Log;
-
-import org.exoplatform.commons.utils.ISO8601;
-import org.exoplatform.services.document.DCMetaData;
-import org.exoplatform.services.log.ExoLogger;
-
-import com.lowagie.text.pdf.PdfDate;
-import com.lowagie.text.pdf.PdfReader;
 
 /**
  * Created by The eXo Platform SAS A parser of Adobe PDF files.
@@ -69,6 +63,10 @@ public class PDFDocumentReader extends BaseDocumentReader {
    * @throws Exception
    */
   public String getContentAsText(InputStream is) throws Exception {
+    if (!isInputStreamValid(is)) {
+      return "";
+    }
+
     PDDocument pdDocument = PDDocument.load(is);
     StringWriter sw = new StringWriter();
     try {
@@ -95,159 +93,137 @@ public class PDFDocumentReader extends BaseDocumentReader {
    * InputStream)
    */
   public Properties getProperties(InputStream is) throws Exception {
-
-    Properties props = null;
-
-    PdfReader reader = new PdfReader(is, "".getBytes());
-
-    // Read the file metadata
-    byte[] metadata = reader.getMetadata();
-
-    if (metadata != null) {
-      // there is XMP metadata try exctract it
-      props = getPropertiesFromMetadata(metadata);
+    if (!isInputStreamValid(is)) {
+      return new Properties();
     }
 
-    if (props == null) {
-      // it's old pdf document version
-      props = getPropertiesFromInfo(reader.getInfo());
-    }
-    reader.close();
-    return props;
-  }
-
-  /**
-   * Extract properties from XMP xml.
-   * 
-   * @param metadata XML as byte array
-   * @return extracted properties
-   * @throws Exception if extracting fails
-   */
-  protected Properties getPropertiesFromMetadata(byte[] metadata) throws Exception {
-
-    Properties props = null;
-
-    // parse xml
-    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    DocumentBuilder docBuilder = dbf.newDocumentBuilder();
-    Document doc = docBuilder.parse(new ByteArrayInputStream(metadata));
-
-    // Check is there PDF/A-1 XMP
-    String version = "";
-    NodeList list = doc.getElementsByTagName("pdfaid:conformance");
-    if (list != null && list.item(0) != null) {
-      version += list.item(0).getTextContent() + "-";
-    }
-
-    list = doc.getElementsByTagName("pdfaid:part");
-    if (list != null && list.item(0) != null) {
-      version += list.item(0).getTextContent();
-    }
-
-    // PDF/A-1a or PDF/A-1b
-    if (version.equalsIgnoreCase("A-1")) {
-      props = getPropsFromPDFAMetadata(doc);
-    }
-
-    return props;
-  }
-
-  /**
-   * Extracts properties from PDF Info hash set.
-   * 
-   * @param Pdf Info hash set
-   * @return Extracted properties
-   * @throws Exception if extracting fails
-   */
-  protected Properties getPropertiesFromInfo(HashMap info) throws Exception {
+    PDDocument pdDocument = PDDocument.load(is);
     Properties props = new Properties();
+    try {
+      if (pdDocument.isEncrypted()) {
+        try {
+          pdDocument.decrypt("");
+        } catch (InvalidPasswordException e) {
+          throw new Exception("The pdf document is encrypted.");
+        } catch (org.pdfbox.exceptions.CryptographyException e) {
+          throw e;
+        }
+      }
 
-    String title = (String) info.get("Title");
-    if (title != null) {
-      props.put(DCMetaData.TITLE, title);
-    }
+      PDDocumentCatalog catalog = pdDocument.getDocumentCatalog();
+      PDMetadata meta = catalog.getMetadata();
+      if (meta != null) {
+        XMPMetadata metadata = XMPMetadata.load(meta.createInputStream());
 
-    String author = (String) info.get("Author");
-    if (author != null) {
-      props.put(DCMetaData.CREATOR, author);
-    }
+        XMPSchemaDublinCore dc = metadata.getDublinCoreSchema();
+        if (dc != null) {
+          try {
+            if (dc.getTitle() != null)
+              props.put(DCMetaData.TITLE, dc.getTitle());
+          } catch (Exception e) {
+            log.warn("getTitle failed: " + e);
+          }
+          try {
+            if (dc.getDescription() != null)
+              props.put(DCMetaData.SUBJECT, dc.getDescription());
+          } catch (Exception e) {
+            log.warn("getSubject failed: " + e);
+          }
 
-    String subject = (String) info.get("Subject");
-    if (subject != null) {
-      props.put(DCMetaData.SUBJECT, subject);
-    }
+          try {
+            if (dc.getCreators() != null) {
+              List<String> list = dc.getCreators();
+              for (String creator : list) {
+                props.put(DCMetaData.CREATOR, creator);
+              }
+            }
+          } catch (Exception e) {
+            log.warn("getCreator failed: " + e);
+          }
 
-    /*
-     * String publisher = (String) info.get("Producer"); if (publisher != null)
-     * { props.put(DCMetaData.PUBLISHER, publisher); } String description =
-     * (String) info.get("Desc"); if (description != null) {
-     * props.put(DCMetaData.DESCRIPTION, description); }
-     */
+          try {
+            if (dc.getDates() != null) {
+              List<Calendar> list = dc.getDates();
 
-    String creationDate = (String) info.get("CreationDate");
-    if (creationDate != null) {
-      props.put(DCMetaData.DATE, PdfDate.decode(creationDate));
-    }
+              for (Calendar date : list) {
+                props.put(DCMetaData.DATE, date);
+              }
+            }
+          } catch (Exception e) {
+            log.warn("getDate failed: " + e);
+          }
+        }
 
-    String modDate = (String) info.get("ModDate");
-    if (modDate != null) {
-      props.put(DCMetaData.DATE, PdfDate.decode(modDate));
+        XMPSchemaBasic basic = metadata.getBasicSchema();
+        if (basic != null) {
+          try {
+            if (basic.getCreateDate() != null)
+              props.put(DCMetaData.DATE, basic.getCreateDate());
+          } catch (Exception e) {
+            log.warn("getCreationDate failed: " + e);
+          }
+          try {
+            if (basic.getModifyDate() != null)
+              props.put(DCMetaData.DATE, basic.getModifyDate());
+          } catch (Exception e) {
+            log.warn("getModificationDate failed: " + e);
+          }
+        }
+      }
+
+      if (props.isEmpty()) {
+        // The pdf doesn't contain any metadata or metadata do not contains any
+        // usefull data, try to use the document
+        // information instead
+        PDDocumentInformation docInfo = pdDocument.getDocumentInformation();
+
+        if (docInfo != null) {
+          try {
+            if (docInfo.getCreationDate() != null)
+              props.put(DCMetaData.DATE, docInfo.getCreationDate());
+          } catch (Exception e) {
+            log.warn("getCreationDate failed: " + e);
+          }
+          try {
+            if (docInfo.getCreator() != null)
+              props.put(DCMetaData.CREATOR, docInfo.getCreator());
+          } catch (Exception e) {
+            log.warn("getCreator failed: " + e);
+          }
+          try {
+
+            if (docInfo.getKeywords() != null)
+              props.put(DCMetaData.SUBJECT, docInfo.getKeywords());
+          } catch (Exception e) {
+            log.warn("getKeywords failed: " + e);
+          }
+          try {
+            if (docInfo.getModificationDate() != null)
+              props.put(DCMetaData.DATE, docInfo.getModificationDate());
+          } catch (Exception e) {
+            log.warn("getModificationDate failed: " + e);
+          }
+          try {
+            if (docInfo.getSubject() != null)
+              props.put(DCMetaData.DESCRIPTION, docInfo.getSubject());
+          } catch (Exception e) {
+            log.warn("getSubject failed: " + e);
+          }
+          try {
+            if (docInfo.getTitle() != null)
+              props.put(DCMetaData.TITLE, docInfo.getTitle());
+          } catch (Exception e) {
+            log.warn("getTitle failed: " + e);
+          }
+        }
+      }
+
+    } finally {
+      if (pdDocument != null) {
+        pdDocument.close();
+      }
     }
 
     return props;
   }
-
-  private Properties getPropsFromPDFAMetadata(Document doc) throws Exception {
-    Properties props = new Properties();
-    // get properties
-    NodeList list = doc.getElementsByTagName("rdf:li");
-    if (list != null && list.getLength() > 0) {
-      for (int i = 0; i < list.getLength(); i++) {
-
-        Node n = list.item(i);
-        // dc:title - TITLE
-        if (n.getParentNode().getParentNode().getNodeName().equals("dc:title")) {
-          String title = n.getLastChild().getTextContent();
-          props.put(DCMetaData.TITLE, title);
-        }
-
-        // dc:creator - CREATOR
-        if (n.getParentNode().getParentNode().getNodeName().equals("dc:creator")) {
-          String author = n.getLastChild().getTextContent();
-          props.put(DCMetaData.CREATOR, author);
-        }
-
-        // DC:description - SUBJECT
-        if (n.getParentNode().getParentNode().getNodeName().equals("dc:description")) {
-          String description = n.getLastChild().getTextContent();
-          props.put(DCMetaData.SUBJECT, description);
-          // props.put(DCMetaData.DESCRIPTION, description);
-        }
-      }
-    }
-
-    // xmp:CreateDate - DATE
-    list = doc.getElementsByTagName("xmp:CreateDate");
-    if (list != null && list.item(0) != null) {
-      Node creationDateNode = list.item(0).getLastChild();
-      if (creationDateNode != null) {
-        String creationDate = creationDateNode.getTextContent();
-        Calendar c = ISO8601.parseEx(creationDate);
-        props.put(DCMetaData.DATE, c);
-      }
-    }
-
-    // xmp:ModifyDate - DATE
-    list = doc.getElementsByTagName("xmp:ModifyDate");
-    if (list != null && list.item(0) != null) {
-      Node modifyDateNode = list.item(0).getLastChild();
-      if (modifyDateNode != null) {
-        String modifyDate = modifyDateNode.getTextContent();
-        Calendar c = ISO8601.parseEx(modifyDate);
-        props.put(DCMetaData.DATE, c);
-      }
-    }
-    return props;
-  }
-
 }

@@ -17,11 +17,11 @@
 
 package org.exoplatform.services.document.test;
 
-import java.io.InputStream;
-
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.document.DocumentReaderService;
 import org.exoplatform.test.BasicTestCase;
+
+import java.io.InputStream;
 
 /**
  * Created by The eXo Platform SAS Author : Sergey Karpenko
@@ -33,6 +33,7 @@ import org.exoplatform.test.BasicTestCase;
 public class TestPDFDocumentReader extends BasicTestCase {
   DocumentReaderService service_;
 
+  @Override
   public void setUp() throws Exception {
     PortalContainer pcontainer = PortalContainer.getInstance();
     service_ = (DocumentReaderService) pcontainer.getComponentInstanceOfType(DocumentReaderService.class);
@@ -41,9 +42,37 @@ public class TestPDFDocumentReader extends BasicTestCase {
   public void testGetContentAsString() throws Exception {
     InputStream is = TestPDFDocumentReader.class.getResourceAsStream("/test.pdf");
     String text = service_.getDocumentReader("application/pdf").getContentAsText(is);
-    String etalon = "Hello\nThis is my first Cocoon page!\npage 1 \n";
+    String expected = "Hello This is my first Cocoon page! page 1";
 
-    System.out.println("[" + text + "]");
-    // assertEquals("Wrong string returned",etalon ,text );
+    assertEquals("Wrong string returned",
+                 normalizeWhitespaces(expected),
+                 normalizeWhitespaces(text));
+  }
+
+  public void testGetContentAsStringMetro() throws Exception {
+    InputStream is = TestPDFDocumentReader.class.getResourceAsStream("/metro.pdf");
+    // there must be no exception Porte de Paris
+    String text = service_.getDocumentReader("application/pdf").getContentAsText(is);
+    assertTrue("Wrong string returned", normalizeWhitespaces(text).contains("Porte de Paris"));
+  }
+
+  public void testGetContentAsStringBrokenFile() throws Exception {
+    InputStream is = TestPDFDocumentReader.class.getResourceAsStream("/pfs_accapp.pdf");
+    // there must be no exception Qhnaod hnik
+    String text = service_.getDocumentReader("application/pdf").getContentAsText(is);
+    assertTrue("Wrong string returned", normalizeWhitespaces(text).contains("Qhnaod hnik"));
+  }
+
+  public void testGetContentAsStringMyTest() throws Exception {
+    InputStream is = TestPDFDocumentReader.class.getResourceAsStream("/MyTest.pdf");
+    // there must be no exception
+    String text = service_.getDocumentReader("application/pdf").getContentAsText(is);
+    assertEquals("Wrong string returned", "", normalizeWhitespaces(text));
+  }
+
+  public String normalizeWhitespaces(String str) {
+    str = str.trim();
+    str = str.replaceAll("\\s+", " ");
+    return str;
   }
 }

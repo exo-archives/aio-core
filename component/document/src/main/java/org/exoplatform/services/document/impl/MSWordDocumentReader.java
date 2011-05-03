@@ -16,12 +16,12 @@
  */
 package org.exoplatform.services.document.impl;
 
+import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.hwpf.usermodel.Range;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
-import org.apache.poi.hwpf.HWPFDocument;
-import org.apache.poi.hwpf.usermodel.Range;
 
 /**
  * Created by The eXo Platform SAS A parser of Microsoft Word files.
@@ -49,6 +49,10 @@ public class MSWordDocumentReader extends BaseDocumentReader {
    * @throws Exception
    */
   public String getContentAsText(InputStream is) throws Exception {
+    if (!isInputStreamValid(is)) {
+      return "";
+    }
+
     String text = "";
     try {
       HWPFDocument doc = new HWPFDocument(is);
@@ -73,6 +77,10 @@ public class MSWordDocumentReader extends BaseDocumentReader {
    * InputStream)
    */
   public Properties getProperties(InputStream is) throws Exception {
+    if (!isInputStreamValid(is)) {
+      return new Properties();
+    }
+
     POIPropertiesReader reader = new POIPropertiesReader();
     reader.readDCProperties(is);
     return reader.getProperties();

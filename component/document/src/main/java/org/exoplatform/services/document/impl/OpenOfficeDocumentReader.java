@@ -17,6 +17,14 @@
 
 package org.exoplatform.services.document.impl;
 
+import org.exoplatform.commons.utils.QName;
+import org.exoplatform.services.document.DCMetaData;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
+
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
@@ -24,15 +32,6 @@ import java.util.zip.ZipInputStream;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
-
-import org.exoplatform.commons.utils.QName;
-import org.exoplatform.services.document.DCMetaData;
 
 /**
  * Created by The eXo Platform SAS .
@@ -62,6 +61,10 @@ public class OpenOfficeDocumentReader extends BaseDocumentReader {
    * io.InputStream)
    */
   public String getContentAsText(InputStream is) throws Exception {
+    if (!isInputStreamValid(is)) {
+      return "";
+    }
+
     try {
       SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
       saxParserFactory.setValidating(false);
@@ -106,6 +109,10 @@ public class OpenOfficeDocumentReader extends BaseDocumentReader {
    * InputStream)
    */
   public Properties getProperties(InputStream is) throws Exception {
+    if (!isInputStreamValid(is)) {
+      return new Properties();
+    }
+
     try {
       SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
       saxParserFactory.setValidating(false);

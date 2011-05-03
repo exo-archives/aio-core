@@ -16,10 +16,10 @@
  */
 package org.exoplatform.services.document.impl;
 
+import org.apache.poi.hslf.extractor.PowerPointExtractor;
+
 import java.io.InputStream;
 import java.util.Properties;
-
-import org.apache.poi.hslf.extractor.PowerPointExtractor;
 
 /**
  * Created by The eXo Platform SAS A parser of Microsoft PowerPoint files.
@@ -48,6 +48,10 @@ public class PPTDocumentReader extends BaseDocumentReader {
    * @throws Exception
    */
   public String getContentAsText(InputStream is) throws Exception {
+    if (!isInputStreamValid(is)) {
+      return "";
+    }
+
     PowerPointExtractor ppe = new PowerPointExtractor(is);
     return ppe.getText(true, true);
   }
@@ -64,6 +68,10 @@ public class PPTDocumentReader extends BaseDocumentReader {
    * InputStream)
    */
   public Properties getProperties(InputStream is) throws Exception {
+    if (!isInputStreamValid(is)) {
+      return new Properties();
+    }
+
     POIPropertiesReader reader = new POIPropertiesReader();
     reader.readDCProperties(is);
     return reader.getProperties();

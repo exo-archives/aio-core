@@ -19,10 +19,35 @@ package org.exoplatform.services.document.impl;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.services.document.DocumentReader;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
  * Created by The eXo Platform SAS Author : Phung Hai Nam phunghainam@gmail.com
  * Oct 20, 2005
  */
 abstract public class BaseDocumentReader extends BaseComponentPlugin implements DocumentReader {
 
+  /**
+   * Validate that stream is not empty and return BufferedInputStream
+   * 
+   * @param is InputeStream
+   * @return BufferedInputStram that covers original IS or null if IS is empty.
+   * @throws IOException
+   */
+  protected boolean isInputStreamValid(InputStream is) throws IOException {
+    if (is == null) {
+      throw new NullPointerException("InputStream is null.");
+    }
+
+    if (is.available() <= 2) {
+      try {
+        is.close();
+      } catch (IOException e) {
+      }
+      return false;
+    } else {
+      return true;
+    }
+  }
 }

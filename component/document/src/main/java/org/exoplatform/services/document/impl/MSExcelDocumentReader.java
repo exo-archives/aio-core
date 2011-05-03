@@ -16,17 +16,17 @@
  */
 package org.exoplatform.services.document.impl;
 
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Properties;
-
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Properties;
 
 /**
  * Created by The eXo Platform SAS A parser of Microsoft Excel files.
@@ -56,7 +56,10 @@ public class MSExcelDocumentReader extends BaseDocumentReader {
    * @throws Exception
    */
   public String getContentAsText(InputStream is) throws Exception {
-    
+    if (!isInputStreamValid(is)) {
+      return "";
+    }
+
     StringBuilder builder = new StringBuilder("");
     try {
       HSSFWorkbook wb = new HSSFWorkbook(is);
@@ -121,6 +124,10 @@ public class MSExcelDocumentReader extends BaseDocumentReader {
    * InputStream)
    */
   public Properties getProperties(InputStream is) throws Exception {
+    if (!isInputStreamValid(is)) {
+      return new Properties();
+    }
+
     POIPropertiesReader reader = new POIPropertiesReader();
     reader.readDCProperties(is);
     return reader.getProperties();

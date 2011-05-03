@@ -16,6 +16,11 @@
  */
 package org.exoplatform.services.document.impl;
 
+import org.exoplatform.container.xml.InitParams;
+import org.htmlparser.Parser;
+import org.htmlparser.beans.StringBean;
+import org.htmlparser.util.ParserException;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,12 +28,6 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import org.htmlparser.Parser;
-import org.htmlparser.beans.StringBean;
-import org.htmlparser.util.ParserException;
-
-import org.exoplatform.container.xml.InitParams;
 
 /**
  * Created by The eXo Platform SAS A parser of HTML files.
@@ -66,6 +65,10 @@ public class HTMLDocumentReader extends BaseDocumentReader {
    * @return The string only with text from file content.
    */
   public String getContentAsText(InputStream is) throws Exception {
+    if (!isInputStreamValid(is)) {
+      return "";
+    }
+
     String refined_text = new String();
     try {
       byte[] buffer = new byte[2048];

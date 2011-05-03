@@ -17,11 +17,11 @@
 
 package org.exoplatform.services.document.impl;
 
-import java.io.InputStream;
-import java.util.Properties;
-
 import org.apache.poi.hsmf.MAPIMessage;
 import org.apache.poi.hsmf.exceptions.ChunkNotFoundException;
+
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * Created by The eXo Platform SAS Author : Sergey Karpenko
@@ -48,6 +48,10 @@ public class MSOutlookDocumentReader extends BaseDocumentReader {
   }
 
   public String getContentAsText(InputStream is) throws Exception {
+    if (!isInputStreamValid(is)) {
+      return "";
+    }
+
     try {
       MAPIMessage message = new MAPIMessage(is);
       StringBuffer buffer = new StringBuffer();
@@ -82,7 +86,7 @@ public class MSOutlookDocumentReader extends BaseDocumentReader {
   }
 
   public Properties getProperties(InputStream is) throws Exception {
-    return null;
+    return new Properties();
   }
 
 }

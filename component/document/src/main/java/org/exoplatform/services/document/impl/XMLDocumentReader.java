@@ -54,6 +54,10 @@ public class XMLDocumentReader extends BaseDocumentReader {
    * @return The string only with text from file content.
    */
   public String getContentAsText(InputStream is) throws Exception {
+    if (!isInputStreamValid(is)) {
+      return "";
+    }
+
     byte[] buffer = new byte[2048];
     int len;
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
