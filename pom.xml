@@ -42,6 +42,9 @@
     <exo.product.name>exo-core</exo.product.name>
     <exo.product.specification>2.1</exo.product.specification>
     <org.exoplatform.kernel.version>2.0.18-SNAPSHOT</org.exoplatform.kernel.version>
+
+    <version.release.plugin>2.2.1</version.release.plugin>
+    <version.buildnumber.plugin>1.0</version.buildnumber.plugin>
   </properties>
   <build>
     <resources>
