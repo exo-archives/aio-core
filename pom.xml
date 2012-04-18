@@ -30,9 +30,9 @@
   <packaging>pom</packaging>
   <name>eXo Core</name>
   <scm>
-    <connection>scm:svn:http://svn.exoplatform.org/projects/core/branches/2.1.x</connection>
-    <developerConnection>scm:svn:http://svn.exoplatform.org/projects/core/branches/2.1.x</developerConnection>
-    <url>http://fisheye.exoplatform.org/browse/projects/core/branches/2.1.x</url>
+    <connection>scm:git:ssh://github.com/exodev/core.git</connection>
+    <developerConnection>scm:git:ssh://github.com/exodev/core.git<developerConnection>
+    <url>http://fisheye.exoplatform.org/browse/projects/core</url>
   </scm>
   <ciManagement>
     <system>hudson</system>
