@@ -31,7 +31,7 @@
   <name>eXo Core</name>
   <scm>
     <connection>scm:git:git://github.com/exoplatform/aio-core.git</connection>
-    <developerConnection>scm:git:git@github.com/exoplatform/aio-core.git<developerConnection>
+    <developerConnection>scm:git:git@github.com/exoplatform/aio-core.git</developerConnection>
     <url>http://fisheye.exoplatform.org/browse/projects/core</url>
   </scm>
   <ciManagement>
